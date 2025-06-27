@@ -6,13 +6,15 @@ import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png"
 
 import wilgerrusorania_co_za__12_ from "@assets/wilgerrusorania.co.za (12).png";
 
+import wilgerrusorania_co_za__12__removebg_preview from "@assets/wilgerrusorania.co.za__12_-removebg-preview.png";
+
 export default function Navigation() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const StormLogo = () => (
     <img 
-      src={wilgerrusorania_co_za__12_} 
+      src={wilgerrusorania_co_za__12__removebg_preview} 
       alt="Storm Logo" 
       className="w-10 h-10 object-contain"
     />
