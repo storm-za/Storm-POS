@@ -5,41 +5,12 @@ export default function HeroSVG() {
     <div className="flex justify-center mb-8">
       <div className="relative">
         {/* Floating Tech Badges */}
-        <motion.div 
-          className="absolute -top-8 -left-12 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 2, duration: 0.8 }}
-        >
-          React
-        </motion.div>
         
-        <motion.div 
-          className="absolute -top-6 right-8 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 2.3, duration: 0.8 }}
-        >
-          Node.js
-        </motion.div>
         
-        <motion.div 
-          className="absolute top-12 -right-16 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.6, duration: 0.8 }}
-        >
-          TypeScript
-        </motion.div>
         
-        <motion.div 
-          className="absolute bottom-8 -left-16 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.9, duration: 0.8 }}
-        >
-          TailwindCSS
-        </motion.div>
+        
+        
+        
         
         <motion.svg 
           width="300" 

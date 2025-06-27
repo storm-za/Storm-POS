@@ -135,7 +135,7 @@ export default function WebDevelopment() {
           >
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Monthly Packages</h2>
             <p className="text-xl text-gray-600">All plans include hosting, support, SEO updates, and design</p>
-            <p className="text-lg text-[hsl(217,90%,40%)] font-semibold mt-2">✓ Only 12-month minimum required. No calls needed.</p>
+            <p className="text-lg text-[hsl(217,90%,40%)] font-semibold mt-2">✓ No calls needed.</p>
           </motion.div>
           
           <motion.div 
