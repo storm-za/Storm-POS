@@ -271,7 +271,7 @@ export default function WebDevelopment() {
         </div>
       </section>
       {/* Contact Form Section */}
-      <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#ffffff]">
         <div className="max-w-4xl mx-auto">
           <motion.div 
             className="text-center mb-12"
