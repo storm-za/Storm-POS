@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
 
+import wilgerrusorania_co_za__12_ from "@assets/wilgerrusorania.co.za (12).png";
+
 export default function Navigation() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const StormLogo = () => (
     <img 
-      src={stormLogoPath} 
+      src={wilgerrusorania_co_za__12_} 
       alt="Storm Logo" 
       className="w-10 h-10 object-contain"
     />
