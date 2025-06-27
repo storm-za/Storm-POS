@@ -82,6 +82,10 @@ Two main tables:
 
 ## Changelog
 - June 27, 2025. Initial setup
+- June 27, 2025. Removed download checklist button from contact form
+- June 27, 2025. Added email functionality for contact submissions to stormmailcompany@gmail.com
+- June 27, 2025. Fixed navigation scroll-to-top behavior for page transitions
+- June 27, 2025. Updated "Get Started" buttons to scroll to solutions section instead of navigating away
 
 ## User Preferences
 

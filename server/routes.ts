@@ -12,8 +12,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
       const submission = await storage.createContactSubmission(validatedData);
       
-      // In a real app, you would send an email here
-      console.log("New contact submission:", submission);
+      // Send email notification
+      const emailSent = await sendContactSubmissionEmail(submission);
+      
+      if (emailSent) {
+        console.log("✅ Contact submission saved and email sent:", submission.id);
+      } else {
+        console.log("⚠️ Contact submission saved but email failed:", submission.id);
+      }
       
       res.json({ 
         success: true, 
