@@ -53,8 +53,16 @@ export default function Navigation() {
             >
               Web Development
             </Link>
-            <Button asChild className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]">
-              <Link href="/web-development">Get Started</Link>
+            <Button 
+              className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                const solutionsSection = document.querySelector('#solutions-section');
+                if (solutionsSection) {
+                  solutionsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              Get Started
             </Button>
           </div>
           
@@ -89,10 +97,17 @@ export default function Navigation() {
             >
               Web Development
             </Link>
-            <Button asChild className="w-full mt-2 bg-[hsl(217,90%,40%)] text-white">
-              <Link href="/web-development" onClick={() => setIsMobileMenuOpen(false)}>
-                Get Started
-              </Link>
+            <Button 
+              className="w-full mt-2 bg-[hsl(217,90%,40%)] text-white"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                const solutionsSection = document.querySelector('#solutions-section');
+                if (solutionsSection) {
+                  solutionsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              Get Started
             </Button>
           </div>
         </div>
