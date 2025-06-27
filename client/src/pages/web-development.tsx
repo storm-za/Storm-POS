@@ -46,9 +46,7 @@ export default function WebDevelopment() {
                 onClick={scrollToContact}
                 size="lg"
                 className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                Start Your Website Today
-              </Button>
+              >Get Your Website Today</Button>
             </motion.div>
             
             <motion.div 
@@ -62,7 +60,6 @@ export default function WebDevelopment() {
           </div>
         </div>
       </section>
-
       {/* Pricing Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -210,7 +207,6 @@ export default function WebDevelopment() {
           </motion.div>
         </div>
       </section>
-
       {/* Contact Form Section */}
       <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
@@ -235,7 +231,6 @@ export default function WebDevelopment() {
           </motion.div>
         </div>
       </section>
-
       {/* Target Market Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -282,7 +277,6 @@ export default function WebDevelopment() {
           </motion.div>
         </div>
       </section>
-
       {/* Miracles & Miseries Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -365,7 +359,6 @@ export default function WebDevelopment() {
           </motion.div>
         </div>
       </section>
-
       {/* Final CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
         <div className="max-w-4xl mx-auto text-center">
