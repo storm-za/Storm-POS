@@ -209,10 +209,7 @@ export default function WebDevelopment() {
                       <Check className="text-green-400 mr-2 h-4 w-4" />
                       Advanced SEO
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-400 mr-2 h-4 w-4" />
-                      Analytics dashboard
-                    </li>
+                    
                     <li className="flex items-center">
                       <Check className="text-green-400 mr-2 h-4 w-4" />
                       Priority support
@@ -241,10 +238,7 @@ export default function WebDevelopment() {
                       <Check className="text-green-500 mr-2 h-4 w-4" />
                       Unlimited pages
                     </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Custom development
-                    </li>
+                    
                     <li className="flex items-center">
                       <Check className="text-green-500 mr-2 h-4 w-4" />
                       Advanced integrations

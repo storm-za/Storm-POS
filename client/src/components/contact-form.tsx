@@ -54,12 +54,7 @@ export default function ContactForm() {
     submitMutation.mutate(data);
   };
 
-  const handleDownloadChecklist = () => {
-    toast({
-      title: "Checklist Download",
-      description: "Our 5-minute site checklist will be sent to your email address.",
-    });
-  };
+  
 
   if (isSubmitted) {
     return (
@@ -188,31 +183,20 @@ export default function ContactForm() {
             )}
           />
           
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              type="submit" 
-              disabled={submitMutation.isPending}
-              className="flex-1 bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
-            >
-              {submitMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Start Your Website Today"
-              )}
-            </Button>
-            
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={handleDownloadChecklist}
-              className="flex-1 border-[hsl(217,90%,40%)] text-[hsl(217,90%,40%)] hover:bg-blue-50"
-            >
-              Download Our 5-Minute Site Checklist
-            </Button>
-          </div>
+          <Button 
+            type="submit" 
+            disabled={submitMutation.isPending}
+            className="w-full bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
+          >
+            {submitMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Start Your Website Today"
+            )}
+          </Button>
         </form>
       </Form>
     </div>
