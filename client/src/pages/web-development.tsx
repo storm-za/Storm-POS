@@ -341,7 +341,7 @@ export default function WebDevelopment() {
         </div>
       </section>
       {/* Miracles & Miseries Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#ffffff]">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             className="text-center mb-12"
