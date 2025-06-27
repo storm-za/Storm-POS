@@ -79,7 +79,7 @@ export default function WebDevelopment() {
               </motion.div>
 
               <motion.div
-                className="absolute top-16 -right-16 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center space-x-2"
+                className="absolute top-16 -right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center space-x-2"
                 animate={{
                   y: [0, 10, 0],
                   rotate: [0, -3, 0]
