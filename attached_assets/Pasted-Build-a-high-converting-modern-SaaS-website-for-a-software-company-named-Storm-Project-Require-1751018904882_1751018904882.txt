@@ -1,0 +1,140 @@
+Build a high-converting modern SaaS website for a software company named “Storm.”
+
+✅ Project Requirements:
+🏠 Homepage
+Use a modern UI design with clean fonts, soft gradients, glassmorphism elements, and lots of space.
+
+Add Storm’s logo placeholder at the top left.
+
+The hero section should feature animated SVG illustrations about websites, software, and automation.
+
+Show headline: “Smart Software. Built for Growth.”
+
+Subheadline: “From stunning websites to pricing automation – we’ve got you covered.”
+
+Main CTA: “Explore Our Solutions”
+
+📦 Showcase 3 SaaS Products
+Web Development
+
+Add a card with short text: “Custom websites for modern businesses”
+
+Button: “More Info” → opens a dedicated web development page
+
+POS Software
+
+Add a card labeled “Coming Soon...”
+
+Brief: “A full-featured POS system for modern retailers”
+
+Pricing Tracker
+
+Add a card labeled “Coming Soon...”
+
+Brief: “Track your market, suppliers & competitors in real time”
+
+Add a footer with:
+
+Company description
+
+Contact email: stormmailcompany@gmail.com
+
+Location: South Africa
+
+LinkedIn icon (placeholder)
+
+📄 Web Development Page (/web-development)
+✅ This is the main Google Ads landing page — focus on conversion and SEO.
+
+🎯 Page Sections (All with animated SVGs themed around websites, code, automation)
+1. Hero Section
+
+Heading: “Professional Websites Without the High Upfront Cost”
+
+Subtext: “Storm helps South African businesses grow online with powerful monthly web solutions.”
+
+CTA button: “Start Your Website Today”
+
+2. Our Offer (Pricing & Delivery)
+
+Monthly packages with pricing:
+
+Starter: R799/month
+
+Growth: R1,499/month
+
+Pro: R2,499+/month
+
+All plans include hosting, support, SEO updates, and design
+
+Bullet point: “Only 12-month minimum required. No calls needed.”
+
+3. Smart Contact Form
+
+Use smart form (not phone-based):
+
+Full Name
+
+Business Name
+
+Email
+
+What your business does
+
+What you want from the website
+
+Preferred timeline
+
+Include note under form: “📩 Prefer Email Over Calls? Same Here. We do everything online.”
+
+4. Target Market Section
+
+Describe ideal client:
+
+South African SME owners aged 30–50
+
+Located in urban hubs like Johannesburg, Cape Town
+
+Growth-oriented, tired of bad freelancers or DIY builders
+
+5. Miracles & Miseries Section
+
+Want more:
+
+Fast, mobile-ready websites
+
+More leads
+
+SEO visibility
+
+Want less:
+
+Missed deadlines
+
+Overpriced devs
+
+Broken sites
+
+6. CTA Section
+
+“Let’s Build Your Website — On Your Terms”
+
+Add second CTA button under form: “Download Our 5-Minute Site Checklist”
+
+✅ Design Notes:
+
+Use reactive, animated SVG illustrations (developer-themed, automation, UI mockups, typing animation, etc.)
+
+Make everything responsive and mobile-friendly
+
+All fonts must be modern and legible
+
+Use page transitions or subtle animations for a premium experience
+
+Prioritize fast load time and SEO-friendly layout
+
+✅ Routing:
+
+Homepage = /
+
+Web development page = /web-development
