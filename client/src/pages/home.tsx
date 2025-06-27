@@ -66,7 +66,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
       {/* Products Section */}
       <section id="solutions-section" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -98,7 +97,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">Web Development</h3>
                   <p className="text-gray-600 mb-6 flex-grow">Custom websites for modern businesses</p>
                   <Button asChild className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]">
-                    <Link href="/web-development">More Info</Link>
+                    <Link href="/web-development">Get Started</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -144,7 +143,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
