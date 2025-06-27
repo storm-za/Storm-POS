@@ -3,10 +3,12 @@ import { FaLinkedin } from "react-icons/fa";
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
 import stormTextPath from "@assets/wilgerrusorania.co.za__13_-removebg-preview_1751022992745.png";
 
+import wilgerrusorania_co_za__12__removebg_preview from "@assets/wilgerrusorania.co.za__12_-removebg-preview.png";
+
 export default function Footer() {
   const StormLogo = () => (
     <img 
-      src={stormLogoPath} 
+      src={wilgerrusorania_co_za__12__removebg_preview} 
       alt="Storm Logo" 
       className="w-8 h-8 object-contain"
     />
