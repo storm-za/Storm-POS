@@ -1,6 +1,7 @@
 import { Mail, MapPin } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
+import stormTextPath from "@assets/wilgerrusorania.co.za__13_-removebg-preview_1751022992745.png";
 
 export default function Footer() {
   const StormLogo = () => (
@@ -18,7 +19,11 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <StormLogo />
-              <span className="text-xl font-black text-gray-900 tracking-wide">STORM</span>
+              <img 
+                src={stormTextPath} 
+                alt="STORM" 
+                className="h-6 w-auto object-contain"
+              />
             </div>
             <p className="text-gray-600 mb-4">
               Empowering South African businesses with smart software solutions and professional web development services.

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
+import stormTextPath from "@assets/wilgerrusorania.co.za__13_-removebg-preview_1751022992745.png";
 
 import wilgerrusorania_co_za__12_ from "@assets/wilgerrusorania.co.za (12).png";
 
@@ -27,7 +28,11 @@ export default function Navigation() {
           {/* Storm Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <StormLogo />
-            <span className="text-xl font-black text-gray-900 tracking-wide">STORM</span>
+            <img 
+              src={stormTextPath} 
+              alt="STORM" 
+              className="h-8 w-auto object-contain"
+            />
           </Link>
           
           {/* Desktop Navigation */}
