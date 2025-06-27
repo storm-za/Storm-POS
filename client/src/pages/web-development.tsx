@@ -344,7 +344,7 @@ export default function WebDevelopment() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What You Want vs. What You're Getting</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What You Want vs. What You Don't</h2>
           </motion.div>
           
           <motion.div 
