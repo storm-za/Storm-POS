@@ -4,14 +4,6 @@ export default function HeroSVG() {
   return (
     <div className="flex justify-center mb-8">
       <div className="relative">
-        {/* Floating Tech Badges */}
-        
-        
-        
-        
-        
-        
-        
         <motion.svg 
           width="300" 
           height="200" 

@@ -446,7 +446,7 @@ export default function WebDevelopment() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-2 border-white text-white hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-200"
+                className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-200 font-semibold"
               >
                 <Link href="/">Back to Home</Link>
               </Button>
