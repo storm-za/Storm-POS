@@ -2,35 +2,18 @@ import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
 
 export default function Navigation() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const StormLogo = () => (
-    <svg width="40" height="40" viewBox="0 0 100 100" fill="none" className="w-10 h-10">
-      {/* Outer circle with gradient */}
-      <circle cx="50" cy="50" r="45" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="2"/>
-      <circle cx="50" cy="50" r="42" fill="#f1f5f9"/>
-      
-      {/* Lightning bolt - main body in gray */}
-      <path 
-        d="M35 25 L25 45 H40 L38 55 L48 35 H33 L35 25 Z" 
-        fill="#64748b"
-        style={{
-          filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.3))"
-        }}
-      />
-      
-      {/* Lightning bolt - blue accent */}
-      <path 
-        d="M30 20 L20 40 H35 L33 50 L43 30 H28 L30 20 Z" 
-        fill="#1e40af"
-        style={{
-          filter: "drop-shadow(1px 1px 2px rgba(0,0,0,0.2))"
-        }}
-      />
-    </svg>
+    <img 
+      src={stormLogoPath} 
+      alt="Storm Logo" 
+      className="w-10 h-10 object-contain"
+    />
   );
 
   return (
