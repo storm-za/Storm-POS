@@ -50,8 +50,17 @@ export default function Home() {
             </motion.p>
             
             <motion.div variants={fadeInUp}>
-              <Button asChild size="lg" className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] transform hover:scale-105 transition-all duration-200 shadow-lg">
-                <Link href="/web-development">Explore Our Solutions</Link>
+              <Button 
+                size="lg" 
+                className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] transform hover:scale-105 transition-all duration-200 shadow-lg"
+                onClick={() => {
+                  const solutionsSection = document.querySelector('#solutions-section');
+                  if (solutionsSection) {
+                    solutionsSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Explore Our Solutions
               </Button>
             </motion.div>
           </motion.div>
@@ -59,7 +68,7 @@ export default function Home() {
       </section>
 
       {/* Products Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="solutions-section" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             className="text-center mb-12"
