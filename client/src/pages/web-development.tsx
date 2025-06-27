@@ -36,8 +36,8 @@ export default function WebDevelopment() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Professional Websites Without the High Upfront Cost
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Professional Websites Without High Upfront Costs
               </h1>
               <p className="text-xl mb-8 text-blue-100">
                 Storm helps South African businesses grow online with powerful monthly web solutions.
