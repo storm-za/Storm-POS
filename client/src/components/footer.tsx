@@ -22,7 +22,7 @@ export default function Footer() {
               <img 
                 src={stormTextPath} 
                 alt="STORM" 
-                className="h-8 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </div>
             <p className="text-gray-600 mb-4">
