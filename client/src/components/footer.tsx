@@ -1,5 +1,5 @@
 import { Mail, MapPin } from "lucide-react";
-import { FaLinkedin } from "react-icons/fa";
+
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
 import stormTextPath from "@assets/wilgerrusorania.co.za__13_-removebg-preview_1751022992745.png";
 
@@ -17,7 +17,7 @@ export default function Footer() {
   return (
     <footer className="glassmorphism mt-16 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           <div>
             <div className="flex items-center space-x-3 mb-4">
               <StormLogo />
@@ -46,17 +46,7 @@ export default function Footer() {
             </div>
           </div>
           
-          <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">Follow Us</h4>
-            <div className="flex space-x-4">
-              <a 
-                href="#" 
-                className="w-10 h-10 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center text-white hover:bg-[hsl(217,90%,35%)] transition-colors duration-200"
-              >
-                <FaLinkedin className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
+          
         </div>
         
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
