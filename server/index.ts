@@ -39,8 +39,8 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Add sitemap.xml route before Vite middleware to ensure it's handled correctly
-  app.get("/sitemap.xml", (req, res) => {
+  // Add sitemap.xml middleware before Vite middleware 
+  app.use('/sitemap.xml', (req, res) => {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>

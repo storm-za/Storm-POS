@@ -86,6 +86,8 @@ Two main tables:
 - June 27, 2025. Added email functionality for contact submissions to stormmailcompany@gmail.com
 - June 27, 2025. Fixed navigation scroll-to-top behavior for page transitions
 - June 27, 2025. Updated "Get Started" buttons to scroll to solutions section instead of navigating away
+- June 28, 2025. Removed "Follow Us" social media section from footer component
+- June 28, 2025. Added /sitemap.xml endpoint for Google Search Console integration
 
 ## User Preferences
 
