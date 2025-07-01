@@ -1,0 +1,118 @@
+Create a cloud-based POS (Point of Sale) web application for a South African company called “Storm.”
+
+This POS system must be fast, mobile-friendly, and always-online (similar to Yoco). It should include modern SaaS features but remain fully hosted and controlled within Replit using Replit’s own database.
+
+🧩 Pages & Routes
+/pos – Landing Page
+Hero section:
+
+Headline: “Point of Sale That Goes Wherever You Do”
+
+Subheadline: “Storm POS is your lightweight, always-online, mobile-first solution for South African SMEs.”
+
+CTA: “Log In to POS” → takes user to /pos/login
+
+Features overview with icons
+
+Pricing section:
+
+Basic: R199/mo – 1 user, 100 products
+
+Growth: R349/mo – 3 users, unlimited products
+
+Pro: R499/mo – unlimited users, reporting, expense tracking
+
+Footer with contact email and social icons
+
+/pos/login
+Secure login with email + password
+
+No registration form (users created manually in database)
+
+Upon login:
+
+Check user’s paid field:
+
+If paid === true, allow access to /pos/system
+
+If paid === false, redirect to a “Subscription Inactive” screen
+
+/pos/system
+Main dashboard for POS features:
+
+Navigation bar or sidebar with tabs for: Sales, Products, Customers, Reports
+
+✅ Required Features
+🔐 Authentication
+Store users in Replit’s built-in DB
+
+Each user has: email, password, paid (true/false), and id
+
+Login persists using session/cookies
+
+🛒 Sales Screen (POS Terminal)
+Add products to sale
+
+Add/edit quantities
+
+Apply discount (manual or %)
+
+Optional customer name and notes
+
+Live total display
+
+“Checkout” button logs transaction
+
+📦 Product & Inventory Management
+Add/edit/delete products
+
+Fields: name, SKU, price, quantity
+
+Decrease quantity on sale
+
+👥 Basic Customer Profiles
+Store: name, notes, phone number (optional)
+
+Link to sales for future lookup
+
+📈 Sales Reports
+View totals by day, week, month
+
+Top-selling products
+
+Sales by payment type (cash, card, SnapScan)
+
+🧾 Receipts
+After each sale, generate a printable/downloadable receipt (preferably as PDF)
+
+Optionally allow input of customer email for emailing receipt
+
+🌍 Mobile-First UI
+Must work well on smartphones and tablets
+
+Clean layout with large buttons, minimal text, fast navigation
+
+🧠 Extra System Behavior
+If a user’s paid field in the database is false, show a screen:
+
+“Your Storm POS subscription is inactive. Please contact support to reactivate.”
+
+Admin (you) can update this manually in the database
+
+💾 Database Model (Replit DB only)
+users: { id, email, password, paid (true/false) }
+
+products: { userId, sku, name, price, quantity }
+
+sales: { userId, date, total, items[], customerName, notes, paymentType }
+
+customers: { userId, name, phone, notes }
+
+🎨 Design & Tech
+Use a modern, clean design (Tailwind-style or similar)
+
+Include light animations and transitions between views
+
+Use SVG icons and minimal UI for fast performance
+
+Do NOT use external databases like Supabase or Firebase

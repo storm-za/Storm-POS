@@ -1,4 +1,9 @@
-import { users, contactSubmissions, type User, type InsertUser, type ContactSubmission, type InsertContactSubmission } from "@shared/schema";
+import { 
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales,
+  type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
+  type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
+  type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale
+} from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -6,6 +11,22 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
   getContactSubmissions(): Promise<ContactSubmission[]>;
+  
+  // POS Operations
+  getPosUser(id: number): Promise<PosUser | undefined>;
+  getPosUserByEmail(email: string): Promise<PosUser | undefined>;
+  createPosUser(user: InsertPosUser): Promise<PosUser>;
+  
+  getPosProducts(userId: number): Promise<PosProduct[]>;
+  createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
+  updatePosProduct(id: number, product: Partial<PosProduct>): Promise<PosProduct | undefined>;
+  deletePosProduct(id: number): Promise<boolean>;
+  
+  getPosCustomers(userId: number): Promise<PosCustomer[]>;
+  createPosCustomer(customer: InsertPosCustomer): Promise<PosCustomer>;
+  
+  getPosSales(userId: number): Promise<PosSale[]>;
+  createPosSale(sale: InsertPosSale): Promise<PosSale>;
 }
 
 export class MemStorage implements IStorage {
@@ -13,12 +34,47 @@ export class MemStorage implements IStorage {
   private contactSubmissions: Map<number, ContactSubmission>;
   private currentUserId: number;
   private currentContactId: number;
+  
+  // POS Storage
+  private posUsers: Map<number, PosUser>;
+  private posProducts: Map<number, PosProduct>;
+  private posCustomers: Map<number, PosCustomer>;
+  private posSales: Map<number, PosSale>;
+  private currentPosUserId: number;
+  private currentPosProductId: number;
+  private currentPosCustomerId: number;
+  private currentPosSaleId: number;
 
   constructor() {
     this.users = new Map();
     this.contactSubmissions = new Map();
     this.currentUserId = 1;
     this.currentContactId = 1;
+    
+    // POS Storage initialization
+    this.posUsers = new Map();
+    this.posProducts = new Map();
+    this.posCustomers = new Map();
+    this.posSales = new Map();
+    this.currentPosUserId = 1;
+    this.currentPosProductId = 1;
+    this.currentPosCustomerId = 1;
+    this.currentPosSaleId = 1;
+    
+    // Create demo POS user
+    this.createDemoPosUser();
+  }
+  
+  private async createDemoPosUser() {
+    const demoUser: PosUser = {
+      id: 1,
+      email: "demo@storm.co.za",
+      password: "demo123", // In production, this should be hashed
+      paid: true,
+      createdAt: new Date(),
+    };
+    this.posUsers.set(1, demoUser);
+    this.currentPosUserId = 2;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -56,6 +112,101 @@ export class MemStorage implements IStorage {
 
   async getContactSubmissions(): Promise<ContactSubmission[]> {
     return Array.from(this.contactSubmissions.values());
+  }
+
+  // POS User Methods
+  async getPosUser(id: number): Promise<PosUser | undefined> {
+    return this.posUsers.get(id);
+  }
+
+  async getPosUserByEmail(email: string): Promise<PosUser | undefined> {
+    return Array.from(this.posUsers.values()).find(user => user.email === email);
+  }
+
+  async createPosUser(insertUser: InsertPosUser): Promise<PosUser> {
+    const id = this.currentPosUserId++;
+    const user: PosUser = {
+      id,
+      email: insertUser.email,
+      password: insertUser.password,
+      paid: insertUser.paid || false,
+      createdAt: new Date(),
+    };
+    this.posUsers.set(id, user);
+    return user;
+  }
+
+  // POS Product Methods
+  async getPosProducts(userId: number): Promise<PosProduct[]> {
+    return Array.from(this.posProducts.values()).filter(product => product.userId === userId);
+  }
+
+  async createPosProduct(insertProduct: InsertPosProduct): Promise<PosProduct> {
+    const id = this.currentPosProductId++;
+    const product: PosProduct = {
+      id,
+      userId: insertProduct.userId,
+      sku: insertProduct.sku,
+      name: insertProduct.name,
+      price: insertProduct.price,
+      quantity: insertProduct.quantity || 0,
+      createdAt: new Date(),
+    };
+    this.posProducts.set(id, product);
+    return product;
+  }
+
+  async updatePosProduct(id: number, updates: Partial<PosProduct>): Promise<PosProduct | undefined> {
+    const existing = this.posProducts.get(id);
+    if (!existing) return undefined;
+    
+    const updated: PosProduct = { ...existing, ...updates };
+    this.posProducts.set(id, updated);
+    return updated;
+  }
+
+  async deletePosProduct(id: number): Promise<boolean> {
+    return this.posProducts.delete(id);
+  }
+
+  // POS Customer Methods
+  async getPosCustomers(userId: number): Promise<PosCustomer[]> {
+    return Array.from(this.posCustomers.values()).filter(customer => customer.userId === userId);
+  }
+
+  async createPosCustomer(insertCustomer: InsertPosCustomer): Promise<PosCustomer> {
+    const id = this.currentPosCustomerId++;
+    const customer: PosCustomer = {
+      id,
+      userId: insertCustomer.userId,
+      name: insertCustomer.name,
+      phone: insertCustomer.phone || null,
+      notes: insertCustomer.notes || null,
+      createdAt: new Date(),
+    };
+    this.posCustomers.set(id, customer);
+    return customer;
+  }
+
+  // POS Sales Methods
+  async getPosSales(userId: number): Promise<PosSale[]> {
+    return Array.from(this.posSales.values()).filter(sale => sale.userId === userId);
+  }
+
+  async createPosSale(insertSale: InsertPosSale): Promise<PosSale> {
+    const id = this.currentPosSaleId++;
+    const sale: PosSale = {
+      id,
+      userId: insertSale.userId,
+      total: insertSale.total,
+      items: insertSale.items,
+      customerName: insertSale.customerName || null,
+      notes: insertSale.notes || null,
+      paymentType: insertSale.paymentType,
+      createdAt: new Date(),
+    };
+    this.posSales.set(id, sale);
+    return sale;
   }
 }
 
