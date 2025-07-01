@@ -123,6 +123,32 @@ export default function WebDevelopment() {
           </div>
         </div>
       </section>
+      
+      {/* Contact Form Section */}
+      <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#ffffff]">
+        <div className="max-w-4xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Let's Build Your Website</h2>
+            <p className="text-xl text-gray-600">📩 Prefer Email Over Calls? Same Here. We do everything online.</p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <ContactForm />
+          </motion.div>
+        </div>
+      </section>
+      
       {/* Pricing Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -264,30 +290,7 @@ export default function WebDevelopment() {
           </motion.div>
         </div>
       </section>
-      {/* Contact Form Section */}
-      <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#ffffff]">
-        <div className="max-w-4xl mx-auto">
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Let's Build Your Website</h2>
-            <p className="text-xl text-gray-600">📩 Prefer Email Over Calls? Same Here. We do everything online.</p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <ContactForm />
-          </motion.div>
-        </div>
-      </section>
+      
       {/* Target Market Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
