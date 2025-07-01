@@ -2,7 +2,7 @@
 
 ## Overview
 
-Storm is a modern SaaS website built for a South African software company offering web development services and future POS/pricing automation solutions. The application is designed as a high-converting marketing website with a focus on lead generation through a dedicated web development landing page optimized for Google Ads campaigns.
+Storm is a modern SaaS platform built for a South African software company offering web development services and a complete POS (Point of Sale) system. The application includes both a high-converting marketing website for lead generation and a fully functional cloud-based POS system for retailers.
 
 ## System Architecture
 
@@ -32,16 +32,50 @@ The application follows a full-stack TypeScript architecture with:
 - **Middleware**: Request logging, JSON parsing, and error handling
 
 ### Database Schema
-Two main tables:
+Main website tables:
 - **users**: Basic user authentication (id, username, password)
 - **contact_submissions**: Lead capture form data (business details, project requirements, timeline)
 
+POS System tables:
+- **pos_users**: POS user accounts (id, email, password, paid status)
+- **pos_products**: Product inventory (id, sku, name, price, quantity, user_id)
+- **pos_customers**: Customer directory (id, name, phone, notes, user_id)
+- **pos_sales**: Sales transactions (id, total, items, customer_name, payment_type, user_id)
+
 ## Data Flow
 
+### Website Flow
 1. **Homepage Flow**: Users land on homepage with hero section and three service cards
 2. **Web Development Page**: Main conversion page with detailed service information and contact form
 3. **Contact Form Submission**: Form data validated with Zod, stored in database, confirmation sent to user
 4. **Lead Management**: Contact submissions stored for admin review via API endpoint
+
+### POS System Flow
+1. **POS Landing Page** (/pos): Marketing page for Storm POS with pricing tiers
+2. **Authentication** (/pos/login): Secure login with email/password, subscription status validation
+3. **Main Dashboard** (/pos/system): Full POS interface with sales, products, customers, and reports
+4. **Sales Processing**: Real-time inventory updates, payment processing, receipt generation
+5. **Subscription Control**: Paid users access full system, unpaid users see inactive screen
+
+## POS System Features
+
+### Core Functionality
+- **Mobile-First Design**: Optimized for smartphones, tablets, and desktops
+- **Real-Time Sales**: Add products to cart, apply discounts, process payments
+- **Inventory Management**: Track products with SKU, pricing, and stock levels
+- **Customer Directory**: Store customer information and purchase history
+- **Multiple Payment Types**: Cash, card, and SnapScan support
+
+### Pricing Tiers
+- **Basic (R199/month)**: 1 user, 100 products, basic reporting
+- **Growth (R349/month)**: 3 users, unlimited products, advanced reporting
+- **Pro (R499/month)**: Unlimited users, premium reporting, expense tracking
+
+### Demo Account
+- **Email**: demo@storm.co.za
+- **Password**: demo123
+- **Status**: Paid subscription (full access)
+- **Sample Data**: 6 products (coffee shop items), 2 customers
 
 ## External Dependencies
 

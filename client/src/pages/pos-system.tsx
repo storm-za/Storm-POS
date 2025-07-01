@@ -148,16 +148,7 @@ export default function PosSystem() {
         paymentType,
       };
 
-      const response = await apiRequest("/api/pos/sales", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(saleData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to process sale");
-      }
-
+      const response = await apiRequest("POST", "/api/pos/sales", saleData);
       return response.json();
     },
     onSuccess: () => {

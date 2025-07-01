@@ -20,17 +20,7 @@ export default function PosLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await apiRequest("/api/pos/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Login failed");
-      }
-      
+      const response = await apiRequest("POST", "/api/pos/login", credentials);
       return response.json();
     },
     onSuccess: (data) => {

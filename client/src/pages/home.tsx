@@ -106,17 +106,20 @@ export default function Home() {
             {/* POS Software Card */}
             <motion.div variants={fadeInUp}>
               <Card className="glassmorphism hover:scale-105 transition-all duration-300 shadow-xl h-full relative overflow-hidden">
-                <div className="absolute top-4 right-4 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  Coming Soon
+                <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Available Now
                 </div>
                 <CardContent className="p-8 text-center h-full flex flex-col">
-                  <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center mx-auto mb-6">
                     <ScanBarcode className="text-white h-8 w-8" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">POS Software</h3>
-                  <p className="text-gray-600 mb-6 flex-grow">A full-featured POS system for modern retailers</p>
-                  <Button disabled className="bg-gray-400 text-white cursor-not-allowed">
-                    Coming Soon
+                  <p className="text-gray-600 mb-6 flex-grow">Mobile-first point of sale system for South African retailers</p>
+                  <Button 
+                    asChild 
+                    className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
+                  >
+                    <Link href="/pos">Learn More</Link>
                   </Button>
                 </CardContent>
               </Card>
