@@ -26,7 +26,7 @@ export default function WebDevelopment() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden w-full">
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
         <div className="max-w-7xl mx-auto">
@@ -50,16 +50,16 @@ export default function WebDevelopment() {
             </motion.div>
             
             <motion.div 
-              className="lg:text-right text-center relative"
+              className="lg:text-right text-center relative overflow-hidden"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
             >
               <WebDevSVG />
               
-              {/* Floating Icons with Text */}
+              {/* Floating Icons with Text - Mobile Safe Positioning */}
               <motion.div
-                className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg flex items-center space-x-2"
+                className="absolute top-2 left-2 sm:left-4 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[90px] sm:max-w-none"
                 animate={{
                   y: [0, -10, 0],
                   rotate: [0, 3, 0]
@@ -70,16 +70,16 @@ export default function WebDevelopment() {
                   ease: "easeInOut"
                 }}
               >
-                <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-xs font-semibold text-gray-800">Fast</span>
+                <span className="text-xs font-semibold text-gray-800 truncate">Fast</span>
               </motion.div>
 
               <motion.div
-                className="absolute top-12 right-8 lg:right-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg flex items-center space-x-2"
+                className="absolute top-12 right-2 sm:right-4 lg:right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[100px] sm:max-w-none"
                 animate={{
                   y: [0, 8, 0],
                   rotate: [0, -2, 0]
@@ -91,16 +91,16 @@ export default function WebDevelopment() {
                   delay: 1
                 }}
               >
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-xs font-semibold text-gray-800">Secure</span>
+                <span className="text-xs font-semibold text-gray-800 truncate">Secure</span>
               </motion.div>
 
               <motion.div
-                className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg flex items-center space-x-2"
+                className="absolute bottom-4 left-2 sm:left-4 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[100px] sm:max-w-none"
                 animate={{
                   y: [0, -6, 0],
                   rotate: [0, 1, 0]
@@ -112,12 +112,12 @@ export default function WebDevelopment() {
                   delay: 2
                 }}
               >
-                <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.586l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-xs font-semibold text-gray-800">Growth</span>
+                <span className="text-xs font-semibold text-gray-800 truncate">Growth</span>
               </motion.div>
             </motion.div>
           </div>
