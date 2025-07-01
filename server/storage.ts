@@ -61,8 +61,9 @@ export class MemStorage implements IStorage {
     this.currentPosCustomerId = 1;
     this.currentPosSaleId = 1;
     
-    // Create demo POS user
+    // Create demo POS user and data
     this.createDemoPosUser();
+    setTimeout(() => this.createDemoData(), 0);
   }
   
   private async createDemoPosUser() {
@@ -75,6 +76,49 @@ export class MemStorage implements IStorage {
     };
     this.posUsers.set(1, demoUser);
     this.currentPosUserId = 2;
+  }
+
+  private async createDemoData() {
+    // Demo products
+    const products = [
+      { sku: "PROD001", name: "Coffee - Espresso", price: "25.00", quantity: 50 },
+      { sku: "PROD002", name: "Coffee - Cappuccino", price: "30.00", quantity: 45 },
+      { sku: "PROD003", name: "Pastry - Croissant", price: "15.00", quantity: 20 },
+      { sku: "PROD004", name: "Sandwich - Chicken", price: "45.00", quantity: 15 },
+      { sku: "PROD005", name: "Muffin - Blueberry", price: "20.00", quantity: 30 },
+      { sku: "PROD006", name: "Tea - Earl Grey", price: "22.00", quantity: 40 },
+    ];
+
+    for (const product of products) {
+      const newProduct: PosProduct = {
+        id: this.currentPosProductId++,
+        userId: 1,
+        sku: product.sku,
+        name: product.name,
+        price: product.price,
+        quantity: product.quantity,
+        createdAt: new Date(),
+      };
+      this.posProducts.set(newProduct.id, newProduct);
+    }
+
+    // Demo customers
+    const customers = [
+      { name: "John Smith", phone: "+27123456789", notes: "Regular customer" },
+      { name: "Sarah Johnson", phone: "+27987654321", notes: "Prefers oat milk" },
+    ];
+
+    for (const customer of customers) {
+      const newCustomer: PosCustomer = {
+        id: this.currentPosCustomerId++,
+        userId: 1,
+        name: customer.name,
+        phone: customer.phone,
+        notes: customer.notes,
+        createdAt: new Date(),
+      };
+      this.posCustomers.set(newCustomer.id, newCustomer);
+    }
   }
 
   async getUser(id: number): Promise<User | undefined> {

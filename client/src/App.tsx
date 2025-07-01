@@ -6,6 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import WebDevelopment from "@/pages/web-development";
+import POS from "@/pages/pos";
+import PosLogin from "@/pages/pos-login";
+import PosSystem from "@/pages/pos-system";
+import PosInactive from "@/pages/pos-inactive";
 import Navigation from "@/components/navigation";
 import { useEffect } from "react";
 
@@ -17,12 +21,19 @@ function Router() {
     window.scrollTo(0, 0);
   }, [location]);
 
+  // Check if we're in POS routes to conditionally show navigation
+  const isPosRoute = location.startsWith('/pos');
+
   return (
     <>
-      <Navigation />
+      {!isPosRoute && <Navigation />}
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/web-development" component={WebDevelopment} />
+        <Route path="/pos" component={POS} />
+        <Route path="/pos/login" component={PosLogin} />
+        <Route path="/pos/system" component={PosSystem} />
+        <Route path="/pos/inactive" component={PosInactive} />
         <Route component={NotFound} />
       </Switch>
     </>
