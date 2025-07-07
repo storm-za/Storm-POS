@@ -28,7 +28,8 @@ interface Product {
   id: number;
   sku: string;
   name: string;
-  price: string;
+  retailPrice: string;
+  tradePrice?: string;
   quantity: number;
 }
 
@@ -36,6 +37,7 @@ interface Customer {
   id: number;
   name: string;
   phone?: string;
+  customerType: 'retail' | 'trade';
   notes?: string;
 }
 
@@ -73,7 +75,8 @@ export default function PosSystem() {
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
-    price: z.string().min(1, "Price is required"),
+    retailPrice: z.string().min(1, "Retail price is required"),
+    tradePrice: z.string().optional(),
     quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
   });
 
@@ -331,8 +334,20 @@ export default function PosSystem() {
     product.sku.toLowerCase().includes(productSearchTerm.toLowerCase())
   );
 
+  // Get price for product based on customer type
+  const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
+    if (customerType === 'trade' && product.tradePrice) {
+      return product.tradePrice;
+    }
+    return product.retailPrice;
+  };
+
   // Add product to sale
   const addToSale = (product: Product) => {
+    const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
+    const customerType = selectedCustomer?.customerType || 'retail';
+    const price = getProductPrice(product, customerType);
+    
     const existingItem = currentSale.find(item => item.productId === product.id);
     
     if (existingItem) {
@@ -346,7 +361,7 @@ export default function PosSystem() {
       }
       setCurrentSale(currentSale.map(item =>
         item.productId === product.id
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: item.quantity + 1, price: price }
           : item
       ));
     } else {
@@ -361,7 +376,7 @@ export default function PosSystem() {
       setCurrentSale([...currentSale, {
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: price,
         quantity: 1
       }]);
     }
@@ -605,7 +620,12 @@ export default function PosSystem() {
                               {customers.map((customer) => (
                                 <SelectItem key={customer.id} value={customer.id.toString()}>
                                   <div className="flex flex-col">
-                                    <span className="font-medium">{customer.name}</span>
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-medium">{customer.name}</span>
+                                      <span className={`text-xs px-1 rounded ${customer.customerType === 'trade' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}>
+                                        {customer.customerType === 'trade' ? 'Trade' : 'Retail'}
+                                      </span>
+                                    </div>
                                     {customer.phone && (
                                       <span className="text-xs text-gray-500">{customer.phone}</span>
                                     )}
@@ -620,13 +640,24 @@ export default function PosSystem() {
                           {selectedCustomerId && (() => {
                             const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
                             return selectedCustomer ? (
-                              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
-                                <p className="font-medium text-blue-900">{selectedCustomer.name}</p>
+                              <div className={`mt-2 p-2 border rounded text-sm ${selectedCustomer.customerType === 'trade' ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'}`}>
+                                <div className="flex items-center gap-2">
+                                  <p className={`font-medium ${selectedCustomer.customerType === 'trade' ? 'text-green-900' : 'text-blue-900'}`}>
+                                    {selectedCustomer.name}
+                                  </p>
+                                  <Badge variant={selectedCustomer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs">
+                                    {selectedCustomer.customerType === 'trade' ? 'Trade Pricing' : 'Retail Pricing'}
+                                  </Badge>
+                                </div>
                                 {selectedCustomer.phone && (
-                                  <p className="text-blue-700">Phone: {selectedCustomer.phone}</p>
+                                  <p className={selectedCustomer.customerType === 'trade' ? 'text-green-700' : 'text-blue-700'}>
+                                    Phone: {selectedCustomer.phone}
+                                  </p>
                                 )}
                                 {selectedCustomer.notes && (
-                                  <p className="text-blue-600 italic">Notes: {selectedCustomer.notes}</p>
+                                  <p className={`italic ${selectedCustomer.customerType === 'trade' ? 'text-green-600' : 'text-blue-600'}`}>
+                                    Notes: {selectedCustomer.notes}
+                                  </p>
                                 )}
                               </div>
                             ) : null;
@@ -742,12 +773,25 @@ export default function PosSystem() {
                           />
                           <FormField
                             control={productForm.control}
-                            name="price"
+                            name="retailPrice"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Price (R)</FormLabel>
+                                <FormLabel>Retail Price (R)</FormLabel>
                                 <FormControl>
                                   <Input placeholder="e.g., 25.00" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={productForm.control}
+                            name="tradePrice"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Trade Price (R) - Optional</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 20.00" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -811,7 +855,12 @@ export default function PosSystem() {
                             <p className="text-sm text-gray-500">SKU: {product.sku}</p>
                           </div>
                           <div className="text-right mr-4">
-                            <p className="font-bold text-gray-900">R{product.price}</p>
+                            <div className="space-y-1">
+                              <p className="font-bold text-gray-900">Retail: R{product.retailPrice}</p>
+                              {product.tradePrice && (
+                                <p className="text-sm text-blue-600">Trade: R{product.tradePrice}</p>
+                              )}
+                            </div>
                             <p className={`text-sm ${product.quantity <= 5 ? 'text-red-500' : 'text-gray-500'}`}>
                               Stock: {product.quantity}
                               {product.quantity <= 5 && (
@@ -865,7 +914,12 @@ export default function PosSystem() {
                   {customers.map((customer) => (
                     <div key={customer.id} className="p-4 border rounded-lg flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium">{customer.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium">{customer.name}</h3>
+                          <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'}>
+                            {customer.customerType === 'trade' ? 'Trade' : 'Retail'}
+                          </Badge>
+                        </div>
                         {customer.phone && <p className="text-sm text-gray-500">Phone: {customer.phone}</p>}
                         {customer.notes && <p className="text-sm text-gray-500">Notes: {customer.notes}</p>}
                       </div>

@@ -33,7 +33,8 @@ export const posProducts = pgTable("pos_products", {
   userId: integer("user_id").notNull(),
   sku: text("sku").notNull(),
   name: text("name").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  retailPrice: decimal("retail_price", { precision: 10, scale: 2 }).notNull(),
+  tradePrice: decimal("trade_price", { precision: 10, scale: 2 }),
   quantity: integer("quantity").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -43,6 +44,7 @@ export const posCustomers = pgTable("pos_customers", {
   userId: integer("user_id").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
+  customerType: text("customer_type").notNull().default('retail'), // 'retail' or 'trade'
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
