@@ -66,8 +66,8 @@ export default function PosSystem() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Product form schema
-  const productFormSchema = insertPosProductSchema.extend({
+  // Product form schema - exclude userId since we'll add it in the mutation
+  const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
     price: z.string().min(1, "Price is required"),
     quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
   });
@@ -100,7 +100,7 @@ export default function PosSystem() {
 
   // Product mutations
   const createProductMutation = useMutation({
-    mutationFn: async (productData: z.infer<typeof productFormSchema>) => {
+    mutationFn: async (productData: any) => {
       const response = await apiRequest("POST", "/api/pos/products", productData);
       return response.json();
     },
@@ -123,7 +123,7 @@ export default function PosSystem() {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: z.infer<typeof productFormSchema> }) => {
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
       console.log("Update mutation called with:", { id, data });
       const response = await apiRequest("PUT", `/api/pos/products/${id}`, data);
       console.log("Update response:", response);
@@ -197,10 +197,13 @@ export default function PosSystem() {
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
     console.log("Form submitted:", { data, editingProduct: editingProduct?.id, errors: productForm.formState.errors });
     
+    // Add userId to the data
+    const dataWithUserId = { ...data, userId: 1 }; // Demo user ID
+    
     if (editingProduct) {
-      updateProductMutation.mutate({ id: editingProduct.id, data });
+      updateProductMutation.mutate({ id: editingProduct.id, data: dataWithUserId });
     } else {
-      createProductMutation.mutate(data);
+      createProductMutation.mutate(dataWithUserId);
     }
   };
 
