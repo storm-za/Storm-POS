@@ -58,7 +58,7 @@ interface Sale {
 
 export default function PosSystem() {
   const [currentSale, setCurrentSale] = useState<SaleItem[]>([]);
-  const [customerName, setCustomerName] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [saleNotes, setSaleNotes] = useState("");
   const [paymentType, setPaymentType] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
@@ -399,10 +399,11 @@ export default function PosSystem() {
   // Process checkout
   const checkoutMutation = useMutation({
     mutationFn: async () => {
+      const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
       const saleData = {
         total: calculateTotal(),
         items: currentSale,
-        customerName: customerName || null,
+        customerName: selectedCustomer?.name || null,
         notes: saleNotes || null,
         paymentType,
       };
@@ -428,7 +429,7 @@ export default function PosSystem() {
       
       // Clear current sale
       setCurrentSale([]);
-      setCustomerName("");
+      setSelectedCustomerId(null);
       setSaleNotes("");
       setPaymentType("cash");
       
@@ -592,12 +593,44 @@ export default function PosSystem() {
                       <div className="space-y-3 pt-4 border-t">
                         <div>
                           <Label htmlFor="customer">Customer (Optional)</Label>
-                          <Input
-                            id="customer"
-                            value={customerName}
-                            onChange={(e) => setCustomerName(e.target.value)}
-                            placeholder="Customer name"
-                          />
+                          <Select 
+                            value={selectedCustomerId?.toString() || "none"} 
+                            onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a customer" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">No customer</SelectItem>
+                              {customers.map((customer) => (
+                                <SelectItem key={customer.id} value={customer.id.toString()}>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">{customer.name}</span>
+                                    {customer.phone && (
+                                      <span className="text-xs text-gray-500">{customer.phone}</span>
+                                    )}
+                                    {customer.notes && (
+                                      <span className="text-xs text-gray-400 italic">{customer.notes}</span>
+                                    )}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {selectedCustomerId && (() => {
+                            const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+                            return selectedCustomer ? (
+                              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
+                                <p className="font-medium text-blue-900">{selectedCustomer.name}</p>
+                                {selectedCustomer.phone && (
+                                  <p className="text-blue-700">Phone: {selectedCustomer.phone}</p>
+                                )}
+                                {selectedCustomer.notes && (
+                                  <p className="text-blue-600 italic">Notes: {selectedCustomer.notes}</p>
+                                )}
+                              </div>
+                            ) : null;
+                          })()}
                         </div>
 
                         <div>
