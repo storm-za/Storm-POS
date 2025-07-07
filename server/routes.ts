@@ -111,6 +111,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/pos/products/:id", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const validatedData = insertPosProductSchema.parse({
+        ...req.body,
+        userId: 1 // Demo user
+      });
+      const product = await storage.updatePosProduct(productId, validatedData);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ message: "Failed to update product" });
+    }
+  });
+
+  app.delete("/api/pos/products/:id", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const success = await storage.deletePosProduct(productId);
+      if (!success) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ message: "Failed to delete product" });
+    }
+  });
+
   // POS Customers
   app.get("/api/pos/customers", async (req, res) => {
     try {

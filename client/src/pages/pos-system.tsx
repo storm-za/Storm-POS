@@ -8,12 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertPosProductSchema, type InsertPosProduct, type PosProduct } from "@shared/schema";
+import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
-  CreditCard, DollarSign, Receipt, Search, LogOut
+  CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle
 } from "lucide-react";
 
 interface Product {
@@ -54,8 +60,28 @@ export default function PosSystem() {
   const [saleNotes, setSaleNotes] = useState("");
   const [paymentType, setPaymentType] = useState("cash");
   const [searchTerm, setSearchTerm] = useState("");
+  const [productSearchTerm, setProductSearchTerm] = useState("");
+  const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
+  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Product form schema
+  const productFormSchema = insertPosProductSchema.extend({
+    price: z.string().min(1, "Price is required"),
+    quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
+  });
+
+  // Product form
+  const productForm = useForm<z.infer<typeof productFormSchema>>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      sku: "",
+      name: "",
+      price: "",
+      quantity: 0,
+    },
+  });
 
   // Fetch products
   const { data: products = [] } = useQuery<Product[]>({
@@ -71,6 +97,117 @@ export default function PosSystem() {
   const { data: sales = [] } = useQuery<Sale[]>({
     queryKey: ["/api/pos/sales"],
   });
+
+  // Product mutations
+  const createProductMutation = useMutation({
+    mutationFn: async (productData: z.infer<typeof productFormSchema>) => {
+      const response = await apiRequest("POST", "/api/pos/products", productData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      productForm.reset();
+      setIsProductDialogOpen(false);
+      toast({
+        title: "Product created",
+        description: "Product has been successfully created.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: z.infer<typeof productFormSchema> }) => {
+      const response = await apiRequest("PUT", `/api/pos/products/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      productForm.reset();
+      setEditingProduct(null);
+      setIsProductDialogOpen(false);
+      toast({
+        title: "Product updated",
+        description: "Product has been successfully updated.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/products/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      toast({
+        title: "Product deleted",
+        description: "Product has been successfully deleted.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Helper functions for product management
+  const openProductDialog = (product?: PosProduct) => {
+    if (product) {
+      setEditingProduct(product);
+      productForm.reset({
+        sku: product.sku,
+        name: product.name,
+        price: product.price,
+        quantity: product.quantity,
+      });
+    } else {
+      setEditingProduct(null);
+      productForm.reset({
+        sku: "",
+        name: "",
+        price: "",
+        quantity: 0,
+      });
+    }
+    setIsProductDialogOpen(true);
+  };
+
+  const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
+    if (editingProduct) {
+      updateProductMutation.mutate({ id: editingProduct.id, data });
+    } else {
+      createProductMutation.mutate(data);
+    }
+  };
+
+  const handleDeleteProduct = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      deleteProductMutation.mutate(id);
+    }
+  };
+
+  // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+    product.sku.toLowerCase().includes(productSearchTerm.toLowerCase())
+  );
 
   // Add product to sale
   const addToSale = (product: Product) => {
@@ -176,11 +313,7 @@ export default function PosSystem() {
     },
   });
 
-  // Filter products based on search
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
 
   // Logout
   const logout = () => {
@@ -388,22 +521,151 @@ export default function PosSystem() {
           <TabsContent value="products">
             <Card>
               <CardHeader>
-                <CardTitle>Product Inventory</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Product Inventory</CardTitle>
+                  <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Add Product
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingProduct ? 'Edit Product' : 'Add New Product'}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <Form {...productForm}>
+                        <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="space-y-4">
+                          <FormField
+                            control={productForm.control}
+                            name="sku"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>SKU</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., PROD001" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={productForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Product Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., Coffee - Espresso" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={productForm.control}
+                            name="price"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Price (R)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 25.00" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={productForm.control}
+                            name="quantity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Stock Quantity</FormLabel>
+                                <FormControl>
+                                  <Input type="number" placeholder="e.g., 50" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <div className="flex justify-end space-x-2">
+                            <Button type="button" variant="outline" onClick={() => setIsProductDialogOpen(false)}>
+                              Cancel
+                            </Button>
+                            <Button 
+                              type="submit" 
+                              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                              disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                            >
+                              {editingProduct ? 'Update Product' : 'Add Product'}
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {products.map((product) => (
-                    <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">{product.name}</h3>
-                        <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search products by name or SKU..."
+                      value={productSearchTerm}
+                      onChange={(e) => setProductSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+
+                  {/* Product List */}
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {filteredProducts.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        {productSearchTerm ? 'No products found matching your search.' : 'No products available.'}
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold">R{product.price}</p>
-                        <p className="text-sm text-gray-500">Stock: {product.quantity}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ) : (
+                      filteredProducts.map((product) => (
+                        <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{product.name}</h3>
+                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+                          </div>
+                          <div className="text-right mr-4">
+                            <p className="font-bold text-gray-900">R{product.price}</p>
+                            <p className={`text-sm ${product.quantity <= 5 ? 'text-red-500' : 'text-gray-500'}`}>
+                              Stock: {product.quantity}
+                              {product.quantity <= 5 && (
+                                <span className="ml-1 text-xs bg-red-100 text-red-600 px-1 rounded">Low</span>
+                              )}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openProductDialog(product)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              disabled={deleteProductMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
