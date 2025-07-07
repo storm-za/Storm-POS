@@ -148,6 +148,15 @@ POS System tables:
   - Added summary cards showing total revenue, transactions, average transaction value
   - Detailed sales list with transaction breakdown and customer information
   - Updated payment options: replaced SnapScan with EFT (Cash, Card, EFT)
+- July 7, 2025. Implemented customer dropdown selection system:
+  - Replaced customer name input with dropdown showing all customers
+  - Customer details (name, phone, notes) displayed in dropdown and below when selected
+  - Enhanced checkout flow with customer information preview
+- July 7, 2025. Migrated to PostgreSQL database for data persistence:
+  - Replaced in-memory storage with PostgreSQL database
+  - Sales data now persists across server restarts and sessions
+  - Demo account and sample data properly maintained in database
+  - Fixed issue where sales reports showed 0 after restart
 
 ## User Preferences
 

@@ -4,6 +4,8 @@ import {
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -269,4 +271,120 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// DatabaseStorage implementation
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async createContactSubmission(insertSubmission: InsertContactSubmission): Promise<ContactSubmission> {
+    const [submission] = await db
+      .insert(contactSubmissions)
+      .values(insertSubmission)
+      .returning();
+    return submission;
+  }
+
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return db.select().from(contactSubmissions);
+  }
+
+  // POS Operations
+  async getPosUser(id: number): Promise<PosUser | undefined> {
+    const [user] = await db.select().from(posUsers).where(eq(posUsers.id, id));
+    return user || undefined;
+  }
+
+  async getPosUserByEmail(email: string): Promise<PosUser | undefined> {
+    const [user] = await db.select().from(posUsers).where(eq(posUsers.email, email));
+    return user || undefined;
+  }
+
+  async createPosUser(insertUser: InsertPosUser): Promise<PosUser> {
+    const [user] = await db
+      .insert(posUsers)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getPosProducts(userId: number): Promise<PosProduct[]> {
+    return db.select().from(posProducts).where(eq(posProducts.userId, userId));
+  }
+
+  async createPosProduct(insertProduct: InsertPosProduct): Promise<PosProduct> {
+    const [product] = await db
+      .insert(posProducts)
+      .values(insertProduct)
+      .returning();
+    return product;
+  }
+
+  async updatePosProduct(id: number, updates: Partial<PosProduct>): Promise<PosProduct | undefined> {
+    const [product] = await db
+      .update(posProducts)
+      .set(updates)
+      .where(eq(posProducts.id, id))
+      .returning();
+    return product || undefined;
+  }
+
+  async deletePosProduct(id: number): Promise<boolean> {
+    const result = await db.delete(posProducts).where(eq(posProducts.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getPosCustomers(userId: number): Promise<PosCustomer[]> {
+    return db.select().from(posCustomers).where(eq(posCustomers.userId, userId));
+  }
+
+  async createPosCustomer(insertCustomer: InsertPosCustomer): Promise<PosCustomer> {
+    const [customer] = await db
+      .insert(posCustomers)
+      .values(insertCustomer)
+      .returning();
+    return customer;
+  }
+
+  async updatePosCustomer(id: number, updates: Partial<PosCustomer>): Promise<PosCustomer | undefined> {
+    const [customer] = await db
+      .update(posCustomers)
+      .set(updates)
+      .where(eq(posCustomers.id, id))
+      .returning();
+    return customer || undefined;
+  }
+
+  async deletePosCustomer(id: number): Promise<boolean> {
+    const result = await db.delete(posCustomers).where(eq(posCustomers.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getPosSales(userId: number): Promise<PosSale[]> {
+    return db.select().from(posSales).where(eq(posSales.userId, userId));
+  }
+
+  async createPosSale(insertSale: InsertPosSale): Promise<PosSale> {
+    const [sale] = await db
+      .insert(posSales)
+      .values(insertSale)
+      .returning();
+    return sale;
+  }
+}
+
+export const storage = new DatabaseStorage();
