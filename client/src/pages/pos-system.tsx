@@ -19,8 +19,10 @@ import { insertPosProductSchema, insertPosCustomerSchema, type InsertPosProduct,
 import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
-  CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle
+  CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
+  Calendar, TrendingUp
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 interface Product {
   id: number;
@@ -65,6 +67,7 @@ export default function PosSystem() {
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -606,7 +609,7 @@ export default function PosSystem() {
                             <SelectContent>
                               <SelectItem value="cash">Cash</SelectItem>
                               <SelectItem value="card">Card</SelectItem>
-                              <SelectItem value="snapscan">SnapScan</SelectItem>
+                              <SelectItem value="eft">EFT</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -864,45 +867,230 @@ export default function PosSystem() {
 
           {/* Reports Tab */}
           <TabsContent value="reports">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {/* Date Filter */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Today's Sales</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Sales Analytics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-[hsl(217,90%,40%)]">
-                    R{sales
-                      .filter(sale => new Date(sale.createdAt).toDateString() === new Date().toDateString())
-                      .reduce((total, sale) => total + parseFloat(sale.total), 0)
-                      .toFixed(2)
-                    }
+                  <div className="flex items-center gap-4">
+                    <Label htmlFor="date-filter">Select Date:</Label>
+                    <Input
+                      id="date-filter"
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="w-auto"
+                    />
                   </div>
-                  <p className="text-sm text-gray-500">
-                    {sales.filter(sale => new Date(sale.createdAt).toDateString() === new Date().toDateString()).length} transactions
-                  </p>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {sales.slice(0, 10).map((sale) => (
-                      <div key={sale.id} className="flex justify-between items-center p-2 border rounded">
-                        <div>
-                          <p className="font-medium">R{sale.total}</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(sale.createdAt).toLocaleString()}
-                          </p>
+              {(() => {
+                // Filter sales for selected date
+                const dateFilteredSales = sales.filter(sale => {
+                  const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+                  return saleDate === selectedDate;
+                });
+
+                // Calculate totals by payment method
+                const paymentMethodTotals = dateFilteredSales.reduce((acc, sale) => {
+                  const method = sale.paymentType;
+                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
+                  return acc;
+                }, {} as Record<string, number>);
+
+                // Prepare chart data
+                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
+                  name: method.charAt(0).toUpperCase() + method.slice(1),
+                  value: total,
+                  amount: `R${total.toFixed(2)}`
+                }));
+
+                // Daily totals for line chart (last 7 days including selected date)
+                const last7Days = Array.from({ length: 7 }, (_, i) => {
+                  const date = new Date(selectedDate);
+                  date.setDate(date.getDate() - (6 - i));
+                  return date.toISOString().split('T')[0];
+                });
+
+                const dailyTotals = last7Days.map(date => {
+                  const daySales = sales.filter(sale => 
+                    new Date(sale.createdAt).toISOString().split('T')[0] === date
+                  );
+                  const total = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                  return {
+                    date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    total: total,
+                    transactions: daySales.length
+                  };
+                });
+
+                const totalRevenue = dateFilteredSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const totalTransactions = dateFilteredSales.length;
+                const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+
+                const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+                return (
+                  <>
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-gray-600">Total Revenue</span>
+                          </div>
+                          <div className="text-2xl font-bold text-green-600">R{totalRevenue.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Receipt className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-600">Transactions</span>
+                          </div>
+                          <div className="text-2xl font-bold text-blue-600">{totalTransactions}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-purple-600" />
+                            <span className="text-sm font-medium text-gray-600">Avg Transaction</span>
+                          </div>
+                          <div className="text-2xl font-bold text-purple-600">R{avgTransactionValue.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="w-4 h-4 text-orange-600" />
+                            <span className="text-sm font-medium text-gray-600">Payment Methods</span>
+                          </div>
+                          <div className="text-2xl font-bold text-orange-600">{Object.keys(paymentMethodTotals).length}</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Payment Methods Pie Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Payment Methods Breakdown</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {paymentChartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                              <PieChart>
+                                <Pie
+                                  data={paymentChartData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={({ name, value }) => `${name}: R${value.toFixed(2)}`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {paymentChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Pie>
+                                <Tooltip formatter={(value) => [`R${Number(value).toFixed(2)}`, 'Amount']} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-500">
+                              No sales data for selected date
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* 7-Day Trend Line Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>7-Day Sales Trend</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={dailyTotals}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="date" />
+                              <YAxis />
+                              <Tooltip 
+                                formatter={(value, name) => [
+                                  name === 'total' ? `R${Number(value).toFixed(2)}` : value,
+                                  name === 'total' ? 'Revenue' : 'Transactions'
+                                ]}
+                              />
+                              <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Detailed Sales List */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                          {dateFilteredSales.length > 0 ? (
+                            dateFilteredSales.map((sale) => (
+                              <div key={sale.id} className="flex justify-between items-center p-3 border rounded-lg">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-4">
+                                    <div>
+                                      <p className="font-medium">R{sale.total}</p>
+                                      <p className="text-sm text-gray-500">
+                                        {new Date(sale.createdAt).toLocaleTimeString()}
+                                      </p>
+                                    </div>
+                                    {sale.customerName && (
+                                      <div>
+                                        <p className="text-sm font-medium">{sale.customerName}</p>
+                                        <p className="text-xs text-gray-500">Customer</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="mt-2">
+                                    <p className="text-xs text-gray-600">
+                                      Items: {sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <Badge variant="outline" className="mb-1">
+                                    {sale.paymentType.toUpperCase()}
+                                  </Badge>
+                                  <p className="text-xs text-gray-500">#{sale.id}</p>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-gray-500">
+                              No sales recorded for {new Date(selectedDate).toLocaleDateString()}
+                            </div>
+                          )}
                         </div>
-                        <Badge variant="outline">{sale.paymentType}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </Card>
+                  </>
+                );
+              })()}
             </div>
           </TabsContent>
         </Tabs>

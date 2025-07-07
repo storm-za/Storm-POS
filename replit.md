@@ -136,6 +136,18 @@ POS System tables:
   - Added product management dialog with form validation
   - Enhanced product list with edit/delete buttons and low stock warnings
   - Added API endpoints for product operations (POST, PUT, DELETE)
+- July 7, 2025. Added complete customer CRUD functionality:
+  - Customer management with Create, Read, Update, Delete operations
+  - Customer form dialog with name, phone, and notes fields
+  - API endpoints for all customer operations
+  - Edit and delete buttons for each customer
+- July 7, 2025. Enhanced reports with detailed analytics and charts:
+  - Replaced basic reports with comprehensive sales analytics dashboard
+  - Added date filter for viewing sales data by specific date
+  - Implemented interactive charts: pie chart for payment methods, line chart for 7-day trend
+  - Added summary cards showing total revenue, transactions, average transaction value
+  - Detailed sales list with transaction breakdown and customer information
+  - Updated payment options: replaced SnapScan with EFT (Cash, Card, EFT)
 
 ## User Preferences
 
