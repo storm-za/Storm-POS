@@ -404,10 +404,20 @@ export default function PosSystem() {
         paymentType,
       };
 
-      const response = await apiRequest("POST", "/api/pos/sales", saleData);
-      return response.json();
+      try {
+        const response = await apiRequest("POST", "/api/pos/sales", saleData);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to process sale");
+        }
+        return response.json();
+      } catch (error: any) {
+        console.error("Checkout error:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Sale completed successfully:", data);
       toast({
         title: "Sale completed",
         description: `Sale of R${calculateTotal()} processed successfully`,
@@ -424,9 +434,10 @@ export default function PosSystem() {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
     },
     onError: (error: Error) => {
+      console.error("Sale error:", error);
       toast({
         title: "Sale failed",
-        description: error.message,
+        description: error.message || "An error occurred while processing the sale",
         variant: "destructive",
       });
     },

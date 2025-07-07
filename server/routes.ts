@@ -219,18 +219,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const validatedData = insertPosSaleSchema.parse(saleData);
-      const sale = await storage.createPosSale(validatedData);
       
-      // Update product quantities
+      // Get all products first to avoid async issues
+      const products = await storage.getPosProducts(1);
+      
+      // Check inventory and prepare updates
+      const inventoryUpdates = [];
       for (const item of validatedData.items as any[]) {
-        const product = await storage.getPosProducts(1).then(products => 
-          products.find(p => p.id === item.productId)
-        );
+        const product = products.find(p => p.id === item.productId);
         if (product) {
-          await storage.updatePosProduct(item.productId, {
-            quantity: product.quantity - item.quantity
+          const newQuantity = product.quantity - item.quantity;
+          if (newQuantity < 0) {
+            return res.status(400).json({ 
+              message: `Insufficient stock for ${product.name}. Available: ${product.quantity}, Requested: ${item.quantity}` 
+            });
+          }
+          inventoryUpdates.push({
+            productId: item.productId,
+            newQuantity: newQuantity
+          });
+        } else {
+          return res.status(400).json({ 
+            message: `Product with ID ${item.productId} not found` 
           });
         }
+      }
+      
+      // Create the sale
+      const sale = await storage.createPosSale(validatedData);
+      
+      // Update inventory
+      for (const update of inventoryUpdates) {
+        await storage.updatePosProduct(update.productId, {
+          quantity: update.newQuantity
+        });
       }
       
       res.json(sale);
