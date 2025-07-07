@@ -124,10 +124,13 @@ export default function PosSystem() {
 
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: z.infer<typeof productFormSchema> }) => {
+      console.log("Update mutation called with:", { id, data });
       const response = await apiRequest("PUT", `/api/pos/products/${id}`, data);
+      console.log("Update response:", response);
       return response.json();
     },
     onSuccess: () => {
+      console.log("Update successful");
       queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
       productForm.reset();
       setEditingProduct(null);
@@ -138,6 +141,7 @@ export default function PosSystem() {
       });
     },
     onError: (error: Error) => {
+      console.error("Update error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to update product",
@@ -169,16 +173,17 @@ export default function PosSystem() {
 
   // Helper functions for product management
   const openProductDialog = (product?: PosProduct) => {
+    console.log("Opening product dialog with product:", product);
     if (product) {
       setEditingProduct(product);
-      productForm.reset({
-        sku: product.sku,
-        name: product.name,
-        price: product.price,
-        quantity: product.quantity,
-      });
+      console.log("Setting form values for editing product:", product);
+      productForm.setValue("sku", product.sku);
+      productForm.setValue("name", product.name);
+      productForm.setValue("price", product.price);
+      productForm.setValue("quantity", product.quantity);
     } else {
       setEditingProduct(null);
+      console.log("Resetting form for new product");
       productForm.reset({
         sku: "",
         name: "",
@@ -190,6 +195,8 @@ export default function PosSystem() {
   };
 
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
+    console.log("Form submitted:", { data, editingProduct: editingProduct?.id, errors: productForm.formState.errors });
+    
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.id, data });
     } else {
@@ -530,14 +537,24 @@ export default function PosSystem() {
                         Add Product
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
+                    <DialogContent className="sm:max-w-[500px]" aria-describedby="product-dialog-description">
                       <DialogHeader>
                         <DialogTitle>
                           {editingProduct ? 'Edit Product' : 'Add New Product'}
                         </DialogTitle>
+                        <div id="product-dialog-description" className="text-sm text-gray-600">
+                          {editingProduct ? 'Update the product information below.' : 'Enter the details for the new product.'}
+                        </div>
                       </DialogHeader>
                       <Form {...productForm}>
-                        <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="space-y-4">
+                        <form 
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            console.log("Form submit event triggered");
+                            productForm.handleSubmit(handleProductSubmit)(e);
+                          }} 
+                          className="space-y-4"
+                        >
                           <FormField
                             control={productForm.control}
                             name="sku"
