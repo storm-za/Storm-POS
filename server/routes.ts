@@ -168,6 +168,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/pos/customers/:id", async (req, res) => {
+    try {
+      const customerId = parseInt(req.params.id);
+      const validatedData = insertPosCustomerSchema.parse({
+        ...req.body,
+        userId: 1
+      });
+      const customer = await storage.updatePosCustomer(customerId, validatedData);
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.json(customer);
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      res.status(500).json({ message: "Failed to update customer" });
+    }
+  });
+
+  app.delete("/api/pos/customers/:id", async (req, res) => {
+    try {
+      const customerId = parseInt(req.params.id);
+      const success = await storage.deletePosCustomer(customerId);
+      if (!success) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ message: "Failed to delete customer" });
+    }
+  });
+
   // POS Sales
   app.get("/api/pos/sales", async (req, res) => {
     try {

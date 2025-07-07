@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, type InsertPosProduct, type PosProduct } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, type InsertPosProduct, type PosProduct, type PosCustomer } from "@shared/schema";
 import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
@@ -63,6 +63,8 @@ export default function PosSystem() {
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -72,6 +74,9 @@ export default function PosSystem() {
     quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
   });
 
+  // Customer form schema - exclude userId since we'll add it in the mutation
+  const customerFormSchema = insertPosCustomerSchema.omit({ userId: true });
+
   // Product form
   const productForm = useForm<z.infer<typeof productFormSchema>>({
     resolver: zodResolver(productFormSchema),
@@ -80,6 +85,16 @@ export default function PosSystem() {
       name: "",
       price: "",
       quantity: 0,
+    },
+  });
+
+  // Customer form
+  const customerForm = useForm<z.infer<typeof customerFormSchema>>({
+    resolver: zodResolver(customerFormSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+      notes: "",
     },
   });
 
@@ -171,6 +186,75 @@ export default function PosSystem() {
     },
   });
 
+  // Customer mutations
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: any) => {
+      const response = await apiRequest("POST", "/api/pos/customers", customerData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      setIsCustomerDialogOpen(false);
+      customerForm.reset();
+      toast({
+        title: "Success",
+        description: "Customer created successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateCustomerMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const response = await apiRequest("PUT", `/api/pos/customers/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      setIsCustomerDialogOpen(false);
+      setEditingCustomer(null);
+      customerForm.reset();
+      toast({
+        title: "Success",
+        description: "Customer updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: async (customerId: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/customers/${customerId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      toast({
+        title: "Success",
+        description: "Customer deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete customer",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Helper functions for product management
   const openProductDialog = (product?: PosProduct) => {
     console.log("Opening product dialog with product:", product);
@@ -194,6 +278,20 @@ export default function PosSystem() {
     setIsProductDialogOpen(true);
   };
 
+  // Helper functions for customer management
+  const openCustomerDialog = (customer?: PosCustomer) => {
+    if (customer) {
+      setEditingCustomer(customer);
+      customerForm.setValue("name", customer.name);
+      customerForm.setValue("phone", customer.phone || "");
+      customerForm.setValue("notes", customer.notes || "");
+    } else {
+      setEditingCustomer(null);
+      customerForm.reset();
+    }
+    setIsCustomerDialogOpen(true);
+  };
+
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
     console.log("Form submitted:", { data, editingProduct: editingProduct?.id, errors: productForm.formState.errors });
     
@@ -204,6 +302,17 @@ export default function PosSystem() {
       updateProductMutation.mutate({ id: editingProduct.id, data: dataWithUserId });
     } else {
       createProductMutation.mutate(dataWithUserId);
+    }
+  };
+
+  const handleCustomerSubmit = (data: z.infer<typeof customerFormSchema>) => {
+    // Add userId to the data
+    const dataWithUserId = { ...data, userId: 1 }; // Demo user ID
+    
+    if (editingCustomer) {
+      updateCustomerMutation.mutate({ id: editingCustomer.id, data: dataWithUserId });
+    } else {
+      createCustomerMutation.mutate(dataWithUserId);
     }
   };
 
@@ -694,18 +803,49 @@ export default function PosSystem() {
           {/* Customers Tab */}
           <TabsContent value="customers">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Customer Directory</CardTitle>
+                <Button 
+                  onClick={() => openCustomerDialog()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Add Customer
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {customers.map((customer) => (
-                    <div key={customer.id} className="p-4 border rounded-lg">
-                      <h3 className="font-medium">{customer.name}</h3>
-                      {customer.phone && <p className="text-sm text-gray-500">Phone: {customer.phone}</p>}
-                      {customer.notes && <p className="text-sm text-gray-500">Notes: {customer.notes}</p>}
+                    <div key={customer.id} className="p-4 border rounded-lg flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-medium">{customer.name}</h3>
+                        {customer.phone && <p className="text-sm text-gray-500">Phone: {customer.phone}</p>}
+                        {customer.notes && <p className="text-sm text-gray-500">Notes: {customer.notes}</p>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openCustomerDialog(customer)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteCustomerMutation.mutate(customer.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
+                  {customers.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No customers found. Add your first customer to get started.
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -756,6 +896,75 @@ export default function PosSystem() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Customer Dialog */}
+      <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]" aria-describedby="customer-dialog-description">
+          <DialogHeader>
+            <DialogTitle>
+              {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
+            </DialogTitle>
+            <div id="customer-dialog-description" className="text-sm text-gray-600">
+              {editingCustomer ? 'Update the customer information below.' : 'Enter the details for the new customer.'}
+            </div>
+          </DialogHeader>
+          <Form {...customerForm}>
+            <form onSubmit={customerForm.handleSubmit(handleCustomerSubmit)} className="space-y-4">
+              <FormField
+                control={customerForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., John Smith" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., +27 12 345 6789" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Any additional notes about the customer..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsCustomerDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
+                >
+                  {editingCustomer ? 'Update Customer' : 'Add Customer'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

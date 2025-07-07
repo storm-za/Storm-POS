@@ -24,6 +24,8 @@ export interface IStorage {
   
   getPosCustomers(userId: number): Promise<PosCustomer[]>;
   createPosCustomer(customer: InsertPosCustomer): Promise<PosCustomer>;
+  updatePosCustomer(id: number, customer: Partial<PosCustomer>): Promise<PosCustomer | undefined>;
+  deletePosCustomer(id: number): Promise<boolean>;
   
   getPosSales(userId: number): Promise<PosSale[]>;
   createPosSale(sale: InsertPosSale): Promise<PosSale>;
@@ -230,6 +232,19 @@ export class MemStorage implements IStorage {
     };
     this.posCustomers.set(id, customer);
     return customer;
+  }
+
+  async updatePosCustomer(id: number, updates: Partial<PosCustomer>): Promise<PosCustomer | undefined> {
+    const existing = this.posCustomers.get(id);
+    if (!existing) return undefined;
+    
+    const updated: PosCustomer = { ...existing, ...updates };
+    this.posCustomers.set(id, updated);
+    return updated;
+  }
+
+  async deletePosCustomer(id: number): Promise<boolean> {
+    return this.posCustomers.delete(id);
   }
 
   // POS Sales Methods
