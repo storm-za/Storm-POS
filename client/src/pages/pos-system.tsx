@@ -555,7 +555,16 @@ export default function PosSystem() {
                             <p className="text-sm text-gray-500">Stock: {product.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-[hsl(217,90%,40%)]">R{product.price}</p>
+                            <p className="font-bold text-[hsl(217,90%,40%)]">
+                              R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
+                            </p>
+                            {product.tradePrice && (
+                              <p className="text-xs text-gray-500">
+                                {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
+                                  ? `Retail: R${product.retailPrice}` 
+                                  : `Trade: R${product.tradePrice}`}
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))}
