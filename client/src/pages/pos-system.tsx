@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -74,6 +74,12 @@ export default function PosSystem() {
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
   const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
+  const [deletePasswordDialog, setDeletePasswordDialog] = useState<{ open: boolean; accountId: number; itemIndex: number }>({
+    open: false,
+    accountId: 0,
+    itemIndex: 0
+  });
+  const [deletePassword, setDeletePassword] = useState("");
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -656,6 +662,8 @@ export default function PosSystem() {
         description: "Item removed from account successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
+      setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
+      setDeletePassword("");
     },
     onError: (error: Error) => {
       toast({
@@ -665,6 +673,26 @@ export default function PosSystem() {
       });
     },
   });
+
+  const handleDeleteItemClick = (accountId: number, itemIndex: number) => {
+    setDeletePasswordDialog({ open: true, accountId, itemIndex });
+  };
+
+  const handlePasswordConfirm = () => {
+    if (deletePassword === "2003") {
+      removeItemFromOpenAccountMutation.mutate({ 
+        accountId: deletePasswordDialog.accountId, 
+        itemIndex: deletePasswordDialog.itemIndex 
+      });
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Incorrect password. Please try again.",
+        variant: "destructive",
+      });
+      setDeletePassword("");
+    }
+  };
 
   // Add items to existing open account mutation
   const addToOpenAccountMutation = useMutation({
@@ -1856,10 +1884,7 @@ export default function PosSystem() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => removeItemFromOpenAccountMutation.mutate({ 
-                            accountId: selectedOpenAccount.id, 
-                            itemIndex: index 
-                          })}
+                          onClick={() => handleDeleteItemClick(selectedOpenAccount.id, index)}
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                           disabled={removeItemFromOpenAccountMutation.isPending}
                         >
@@ -1890,6 +1915,58 @@ export default function PosSystem() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Confirmation Dialog for Item Deletion */}
+      <Dialog open={deletePasswordDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
+          setDeletePassword("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Item Deletion</DialogTitle>
+            <DialogDescription>
+              Enter the password to delete this item from the account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="deletePassword">Password</Label>
+              <Input
+                id="deletePassword"
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter password"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handlePasswordConfirm();
+                  }
+                }}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
+                  setDeletePassword("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handlePasswordConfirm}
+                disabled={!deletePassword || removeItemFromOpenAccountMutation.isPending}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {removeItemFromOpenAccountMutation.isPending ? "Deleting..." : "Delete Item"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
