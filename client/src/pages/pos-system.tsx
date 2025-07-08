@@ -63,6 +63,7 @@ export default function PosSystem() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [saleNotes, setSaleNotes] = useState("");
   const [paymentType, setPaymentType] = useState("cash");
+  const [discountPercentage, setDiscountPercentage] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
@@ -411,11 +412,22 @@ export default function PosSystem() {
     }
   };
 
-  // Calculate total
-  const calculateTotal = () => {
+  // Calculate subtotal and total with discount
+  const calculateSubtotal = () => {
     return currentSale.reduce((total, item) => {
       return total + (parseFloat(item.price) * item.quantity);
-    }, 0).toFixed(2);
+    }, 0);
+  };
+
+  const calculateDiscount = () => {
+    const subtotal = calculateSubtotal();
+    return (subtotal * discountPercentage) / 100;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const discount = calculateDiscount();
+    return (subtotal - discount).toFixed(2);
   };
 
   // Process checkout
@@ -454,6 +466,7 @@ export default function PosSystem() {
       setSelectedCustomerId(null);
       setSaleNotes("");
       setPaymentType("cash");
+      setDiscountPercentage(0);
       
       // Refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
@@ -705,9 +718,38 @@ export default function PosSystem() {
                           />
                         </div>
 
-                        {/* Total */}
-                        <div className="pt-4 border-t">
-                          <div className="flex justify-between items-center text-xl font-bold">
+                        {/* Discount Section */}
+                        <div>
+                          <Label>Discount</Label>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {[0, 5, 10, 20, 50].map((percentage) => (
+                              <Button
+                                key={percentage}
+                                type="button"
+                                size="sm"
+                                variant={discountPercentage === percentage ? "default" : "outline"}
+                                onClick={() => setDiscountPercentage(percentage)}
+                                className={discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                {percentage === 0 ? "No Discount" : `${percentage}%`}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Total Section */}
+                        <div className="pt-4 border-t space-y-2">
+                          <div className="flex justify-between items-center text-lg">
+                            <span>Subtotal:</span>
+                            <span>R{calculateSubtotal().toFixed(2)}</span>
+                          </div>
+                          {discountPercentage > 0 && (
+                            <div className="flex justify-between items-center text-lg text-green-600">
+                              <span>Discount ({discountPercentage}%):</span>
+                              <span>-R{calculateDiscount().toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center text-xl font-bold border-t pt-2">
                             <span>Total:</span>
                             <span className="text-[hsl(217,90%,40%)]">R{calculateTotal()}</span>
                           </div>
