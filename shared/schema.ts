@@ -60,6 +60,18 @@ export const posSales = pgTable("pos_sales", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const posOpenAccounts = pgTable("pos_open_accounts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  accountName: text("account_name").notNull(), // Table name or customer name
+  accountType: text("account_type").notNull(), // "table" or "customer"
+  items: jsonb("items").notNull(), // Array of {productId, name, price, quantity}
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -91,6 +103,12 @@ export const insertPosSaleSchema = createInsertSchema(posSales).omit({
   createdAt: true,
 });
 
+export const insertPosOpenAccountSchema = createInsertSchema(posOpenAccounts).omit({
+  id: true,
+  createdAt: true,
+  lastUpdated: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -106,3 +124,5 @@ export type InsertPosCustomer = z.infer<typeof insertPosCustomerSchema>;
 export type PosCustomer = typeof posCustomers.$inferSelect;
 export type InsertPosSale = z.infer<typeof insertPosSaleSchema>;
 export type PosSale = typeof posSales.$inferSelect;
+export type InsertPosOpenAccount = z.infer<typeof insertPosOpenAccountSchema>;
+export type PosOpenAccount = typeof posOpenAccounts.$inferSelect;

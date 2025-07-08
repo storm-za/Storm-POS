@@ -5,7 +5,8 @@ import {
   insertContactSubmissionSchema, 
   insertPosProductSchema, 
   insertPosCustomerSchema, 
-  insertPosSaleSchema 
+  insertPosSaleSchema,
+  insertPosOpenAccountSchema 
 } from "@shared/schema";
 import { sendContactSubmissionEmail } from "./email";
 import { z } from "zod";
@@ -259,6 +260,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating sale:", error);
       res.status(500).json({ message: "Failed to create sale" });
+    }
+  });
+
+  // Open Accounts routes
+  app.get("/api/pos/open-accounts", async (req, res) => {
+    try {
+      const userId = 1; // Demo user ID
+      const openAccounts = await storage.getPosOpenAccounts(userId);
+      res.json(openAccounts);
+    } catch (error) {
+      console.error("Error fetching open accounts:", error);
+      res.status(500).json({ message: "Failed to fetch open accounts" });
+    }
+  });
+
+  app.post("/api/pos/open-accounts", async (req, res) => {
+    try {
+      const validatedData = insertPosOpenAccountSchema.parse({
+        ...req.body,
+        userId: 1, // Demo user ID
+      });
+      const openAccount = await storage.createPosOpenAccount(validatedData);
+      res.json(openAccount);
+    } catch (error) {
+      console.error("Error creating open account:", error);
+      res.status(500).json({ message: "Failed to create open account" });
+    }
+  });
+
+  app.put("/api/pos/open-accounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updatedAccount = await storage.updatePosOpenAccount(id, req.body);
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Open account not found" });
+      }
+      res.json(updatedAccount);
+    } catch (error) {
+      console.error("Error updating open account:", error);
+      res.status(500).json({ message: "Failed to update open account" });
+    }
+  });
+
+  app.delete("/api/pos/open-accounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deletePosOpenAccount(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Open account not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting open account:", error);
+      res.status(500).json({ message: "Failed to delete open account" });
+    }
+  });
+
+  app.post("/api/pos/open-accounts/:id/items", async (req, res) => {
+    try {
+      const accountId = parseInt(req.params.id);
+      const updatedAccount = await storage.addItemToPosOpenAccount(accountId, req.body);
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Open account not found" });
+      }
+      res.json(updatedAccount);
+    } catch (error) {
+      console.error("Error adding item to open account:", error);
+      res.status(500).json({ message: "Failed to add item to open account" });
+    }
+  });
+
+  app.delete("/api/pos/open-accounts/:id/items/:itemIndex", async (req, res) => {
+    try {
+      const accountId = parseInt(req.params.id);
+      const itemIndex = parseInt(req.params.itemIndex);
+      const updatedAccount = await storage.removeItemFromPosOpenAccount(accountId, itemIndex);
+      if (!updatedAccount) {
+        return res.status(404).json({ message: "Open account not found or item not found" });
+      }
+      res.json(updatedAccount);
+    } catch (error) {
+      console.error("Error removing item from open account:", error);
+      res.status(500).json({ message: "Failed to remove item from open account" });
     }
   });
 

@@ -15,12 +15,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, insertPosCustomerSchema, type InsertPosProduct, type PosProduct, type PosCustomer } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
 import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp
+  Calendar, TrendingUp, FileText, Clock, Eye, Download
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
@@ -71,6 +71,9 @@ export default function PosSystem() {
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
+  const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account'>('complete');
+  const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
+  const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -83,6 +86,12 @@ export default function PosSystem() {
 
   // Customer form schema - exclude userId since we'll add it in the mutation
   const customerFormSchema = insertPosCustomerSchema.omit({ userId: true });
+
+  // Open account form schema
+  const openAccountFormSchema = insertPosOpenAccountSchema.omit({ userId: true }).extend({
+    accountName: z.string().min(1, "Account name is required"),
+    accountType: z.enum(["table", "customer"]),
+  });
 
   // Product form
   const productForm = useForm<z.infer<typeof productFormSchema>>({
@@ -106,6 +115,18 @@ export default function PosSystem() {
     },
   });
 
+  // Open account form
+  const openAccountForm = useForm<z.infer<typeof openAccountFormSchema>>({
+    resolver: zodResolver(openAccountFormSchema),
+    defaultValues: {
+      accountName: "",
+      accountType: "table",
+      items: [],
+      total: "0.00",
+      notes: "",
+    },
+  });
+
   // Fetch products
   const { data: products = [] } = useQuery<Product[]>({
     queryKey: ["/api/pos/products"],
@@ -119,6 +140,11 @@ export default function PosSystem() {
   // Fetch sales
   const { data: sales = [] } = useQuery<Sale[]>({
     queryKey: ["/api/pos/sales"],
+  });
+
+  // Fetch open accounts
+  const { data: openAccounts = [] } = useQuery<PosOpenAccount[]>({
+    queryKey: ["/api/pos/open-accounts"],
   });
 
   // Product mutations
@@ -440,31 +466,74 @@ export default function PosSystem() {
   const checkoutMutation = useMutation({
     mutationFn: async () => {
       const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
-      const saleData = {
-        total: calculateTotal(),
-        items: currentSale,
-        customerName: selectedCustomer?.name || null,
-        notes: saleNotes || null,
-        paymentType,
-      };
+      
+      if (checkoutOption === 'complete') {
+        // Complete sale immediately
+        const saleData = {
+          total: calculateTotal(),
+          items: currentSale,
+          customerName: selectedCustomer?.name || null,
+          notes: saleNotes || null,
+          paymentType,
+        };
 
-      try {
         const response = await apiRequest("POST", "/api/pos/sales", saleData);
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Failed to process sale");
         }
-        return response.json();
-      } catch (error: any) {
-        console.error("Checkout error:", error);
-        throw error;
+        return { type: 'sale', data: await response.json() };
+      } else {
+        // Create open account
+        setIsOpenAccountDialogOpen(true);
+        return { type: 'open-account', data: null };
       }
     },
-    onSuccess: (data) => {
-      console.log("Sale completed successfully:", data);
+    onSuccess: (result) => {
+      if (result.type === 'sale') {
+        console.log("Sale completed successfully:", result.data);
+        toast({
+          title: "Sale completed",
+          description: `Sale of R${calculateTotal()} processed successfully`,
+        });
+        
+        // Clear current sale
+        setCurrentSale([]);
+        setSelectedCustomerId(null);
+        setSaleNotes("");
+        setPaymentType("cash");
+        setDiscountPercentage(0);
+        
+        // Refresh data
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      }
+      // For open-account, the dialog will handle the next steps
+    },
+    onError: (error: Error) => {
+      console.error("Checkout error:", error);
       toast({
-        title: "Sale completed",
-        description: `Sale of R${calculateTotal()} processed successfully`,
+        title: "Checkout failed",
+        description: error.message || "An error occurred during checkout",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create open account mutation
+  const createOpenAccountMutation = useMutation({
+    mutationFn: async (accountData: any) => {
+      const response = await apiRequest("POST", "/api/pos/open-accounts", accountData);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create open account");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Open account created",
+        description: `Account "${data.accountName}" created successfully`,
       });
       
       // Clear current sale
@@ -473,16 +542,92 @@ export default function PosSystem() {
       setSaleNotes("");
       setPaymentType("cash");
       setDiscountPercentage(0);
+      setIsOpenAccountDialogOpen(false);
       
       // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to create open account",
+        description: error.message || "An error occurred while creating the account",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Close open account mutation (convert to sale)
+  const closeOpenAccountMutation = useMutation({
+    mutationFn: async ({ accountId, paymentType }: { accountId: number; paymentType: string }) => {
+      const account = openAccounts.find(a => a.id === accountId);
+      if (!account) throw new Error("Account not found");
+
+      // Create sale from open account
+      const saleData = {
+        total: account.total,
+        items: account.items,
+        customerName: account.accountName,
+        notes: account.notes,
+        paymentType,
+      };
+
+      const saleResponse = await apiRequest("POST", "/api/pos/sales", saleData);
+      if (!saleResponse.ok) {
+        const errorData = await saleResponse.json();
+        throw new Error(errorData.message || "Failed to process sale");
+      }
+
+      // Delete open account
+      const deleteResponse = await apiRequest("DELETE", `/api/pos/open-accounts/${accountId}`);
+      if (!deleteResponse.ok) {
+        const errorData = await deleteResponse.json();
+        throw new Error(errorData.message || "Failed to close account");
+      }
+
+      return await saleResponse.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Account closed",
+        description: `Sale of R${data.total} processed successfully`,
+      });
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
       queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
     },
     onError: (error: Error) => {
-      console.error("Sale error:", error);
       toast({
-        title: "Sale failed",
-        description: error.message || "An error occurred while processing the sale",
+        title: "Failed to close account",
+        description: error.message || "An error occurred while closing the account",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove item from open account mutation
+  const removeItemFromOpenAccountMutation = useMutation({
+    mutationFn: async ({ accountId, itemIndex }: { accountId: number; itemIndex: number }) => {
+      const response = await apiRequest("DELETE", `/api/pos/open-accounts/${accountId}/items/${itemIndex}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to remove item");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Item removed",
+        description: "Item removed from account successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to remove item",
+        description: error.message || "An error occurred while removing the item",
         variant: "destructive",
       });
     },
@@ -520,7 +665,7 @@ export default function PosSystem() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="sales" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="sales" className="flex items-center space-x-2">
               <ShoppingCart className="h-4 w-4" />
               <span>Sales</span>
@@ -532,6 +677,10 @@ export default function PosSystem() {
             <TabsTrigger value="customers" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span>Customers</span>
+            </TabsTrigger>
+            <TabsTrigger value="open-accounts" className="flex items-center space-x-2">
+              <FileText className="h-4 w-4" />
+              <span>Open Accounts</span>
             </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center space-x-2">
               <BarChart3 className="h-4 w-4" />
@@ -761,15 +910,53 @@ export default function PosSystem() {
                           </div>
                         </div>
 
-                        {/* Checkout Button */}
-                        <Button
-                          className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                          onClick={() => checkoutMutation.mutate()}
-                          disabled={currentSale.length === 0 || checkoutMutation.isPending}
-                        >
-                          <Receipt className="h-4 w-4 mr-2" />
-                          {checkoutMutation.isPending ? "Processing..." : "Complete Sale"}
-                        </Button>
+                        {/* Checkout Options */}
+                        <div className="space-y-3">
+                          <div>
+                            <Label>Checkout Option</Label>
+                            <div className="flex gap-2 mt-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={checkoutOption === 'complete' ? "default" : "outline"}
+                                onClick={() => setCheckoutOption('complete')}
+                                className={checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                <Receipt className="h-4 w-4 mr-2" />
+                                Complete Sale
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={checkoutOption === 'open-account' ? "default" : "outline"}
+                                onClick={() => setCheckoutOption('open-account')}
+                                className={checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                Open Account
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Checkout Button */}
+                          <Button
+                            className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                            onClick={() => checkoutMutation.mutate()}
+                            disabled={currentSale.length === 0 || checkoutMutation.isPending}
+                          >
+                            {checkoutOption === 'complete' ? (
+                              <>
+                                <Receipt className="h-4 w-4 mr-2" />
+                                {checkoutMutation.isPending ? "Processing..." : "Complete Sale"}
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                {checkoutMutation.isPending ? "Processing..." : "Create Open Account"}
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -1014,6 +1201,91 @@ export default function PosSystem() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Open Accounts Tab */}
+          <TabsContent value="open-accounts">
+            <div className="space-y-6">
+              {/* Open Accounts Header */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Open Accounts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4">
+                    {openAccounts.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        No open accounts. Create one from the Sales tab to get started.
+                      </div>
+                    ) : (
+                      openAccounts.map((account) => (
+                        <div key={account.id} className="border rounded-lg p-4 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1">
+                                {account.accountType === 'table' ? (
+                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                ) : (
+                                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                )}
+                                <h3 className="font-semibold text-lg">{account.accountName}</h3>
+                              </div>
+                              <Badge variant={account.accountType === 'table' ? 'default' : 'outline'}>
+                                {account.accountType === 'table' ? 'Table' : 'Customer'}
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{account.total}</p>
+                              <p className="text-sm text-gray-500">
+                                {Array.isArray(account.items) ? account.items.length : 0} items
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {account.notes && (
+                            <p className="text-sm text-gray-600 italic">{account.notes}</p>
+                          )}
+                          
+                          <div className="text-xs text-gray-500">
+                            <p>Created: {new Date(account.createdAt).toLocaleDateString()} at {new Date(account.createdAt).toLocaleTimeString()}</p>
+                            {account.lastUpdated && (
+                              <p>Updated: {new Date(account.lastUpdated).toLocaleDateString()} at {new Date(account.lastUpdated).toLocaleTimeString()}</p>
+                            )}
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedOpenAccount(account)}
+                              className="flex-1"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                const paymentType = 'cash'; // Default to cash, could be made configurable
+                                closeOpenAccountMutation.mutate({ accountId: account.id, paymentType });
+                              }}
+                              className="flex-1 bg-green-600 hover:bg-green-700"
+                              disabled={closeOpenAccountMutation.isPending}
+                            >
+                              <Receipt className="w-4 h-4 mr-2" />
+                              {closeOpenAccountMutation.isPending ? 'Closing...' : 'Close & Pay'}
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Reports Tab */}
@@ -1334,6 +1606,170 @@ export default function PosSystem() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Open Account Creation Dialog */}
+      <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create Open Account</DialogTitle>
+          </DialogHeader>
+          <Form {...openAccountForm}>
+            <form 
+              onSubmit={openAccountForm.handleSubmit((data) => {
+                const accountData = {
+                  ...data,
+                  items: currentSale,
+                  total: calculateTotal(),
+                  notes: saleNotes || null,
+                };
+                createOpenAccountMutation.mutate(accountData);
+              })} 
+              className="space-y-4"
+            >
+              <FormField
+                control={openAccountForm.control}
+                name="accountName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Table 5, John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={openAccountForm.control}
+                name="accountType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select account type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="table">Table</SelectItem>
+                        <SelectItem value="customer">Customer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={openAccountForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Any additional notes..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsOpenAccountDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  disabled={createOpenAccountMutation.isPending}
+                >
+                  {createOpenAccountMutation.isPending ? 'Creating...' : 'Create Account'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Account Details Dialog */}
+      <Dialog open={!!selectedOpenAccount} onOpenChange={() => setSelectedOpenAccount(null)}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedOpenAccount?.accountName} - Account Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedOpenAccount && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium">Account Type</p>
+                  <Badge variant={selectedOpenAccount.accountType === 'table' ? 'default' : 'outline'}>
+                    {selectedOpenAccount.accountType === 'table' ? 'Table' : 'Customer'}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Total Amount</p>
+                  <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{selectedOpenAccount.total}</p>
+                </div>
+              </div>
+              
+              {selectedOpenAccount.notes && (
+                <div>
+                  <p className="text-sm font-medium">Notes</p>
+                  <p className="text-gray-600">{selectedOpenAccount.notes}</p>
+                </div>
+              )}
+              
+              <div>
+                <p className="text-sm font-medium mb-2">Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})</p>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.map((item: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-gray-500">R{item.price} each</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Qty: {item.quantity}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => removeItemFromOpenAccountMutation.mutate({ 
+                            accountId: selectedOpenAccount.id, 
+                            itemIndex: index 
+                          })}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          disabled={removeItemFromOpenAccountMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setSelectedOpenAccount(null)}>
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const paymentType = 'cash'; // Default to cash
+                    closeOpenAccountMutation.mutate({ accountId: selectedOpenAccount.id, paymentType });
+                    setSelectedOpenAccount(null);
+                  }}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={closeOpenAccountMutation.isPending}
+                >
+                  <Receipt className="w-4 h-4 mr-2" />
+                  {closeOpenAccountMutation.isPending ? 'Closing...' : 'Close & Pay'}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

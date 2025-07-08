@@ -1,8 +1,9 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
-  type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale
+  type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
+  type PosOpenAccount, type InsertPosOpenAccount
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -31,6 +32,14 @@ export interface IStorage {
   
   getPosSales(userId: number): Promise<PosSale[]>;
   createPosSale(sale: InsertPosSale): Promise<PosSale>;
+  
+  // Open Accounts Operations
+  getPosOpenAccounts(userId: number): Promise<PosOpenAccount[]>;
+  createPosOpenAccount(account: InsertPosOpenAccount): Promise<PosOpenAccount>;
+  updatePosOpenAccount(id: number, account: Partial<PosOpenAccount>): Promise<PosOpenAccount | undefined>;
+  deletePosOpenAccount(id: number): Promise<boolean>;
+  addItemToPosOpenAccount(accountId: number, item: any): Promise<PosOpenAccount | undefined>;
+  removeItemFromPosOpenAccount(accountId: number, itemIndex: number): Promise<PosOpenAccount | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -44,10 +53,12 @@ export class MemStorage implements IStorage {
   private posProducts: Map<number, PosProduct>;
   private posCustomers: Map<number, PosCustomer>;
   private posSales: Map<number, PosSale>;
+  private posOpenAccounts: Map<number, PosOpenAccount>;
   private currentPosUserId: number;
   private currentPosProductId: number;
   private currentPosCustomerId: number;
   private currentPosSaleId: number;
+  private currentPosOpenAccountId: number;
 
   constructor() {
     this.users = new Map();
@@ -60,10 +71,12 @@ export class MemStorage implements IStorage {
     this.posProducts = new Map();
     this.posCustomers = new Map();
     this.posSales = new Map();
+    this.posOpenAccounts = new Map();
     this.currentPosUserId = 1;
     this.currentPosProductId = 1;
     this.currentPosCustomerId = 1;
     this.currentPosSaleId = 1;
+    this.currentPosOpenAccountId = 1;
     
     // Create demo POS user and data
     this.createDemoPosUser();
@@ -269,6 +282,87 @@ export class MemStorage implements IStorage {
     this.posSales.set(id, sale);
     return sale;
   }
+
+  // Open Accounts Methods
+  async getPosOpenAccounts(userId: number): Promise<PosOpenAccount[]> {
+    return Array.from(this.posOpenAccounts.values()).filter(account => account.userId === userId);
+  }
+
+  async createPosOpenAccount(insertAccount: InsertPosOpenAccount): Promise<PosOpenAccount> {
+    const id = this.currentPosOpenAccountId++;
+    const account: PosOpenAccount = {
+      id,
+      userId: insertAccount.userId,
+      accountName: insertAccount.accountName,
+      accountType: insertAccount.accountType,
+      items: insertAccount.items,
+      total: insertAccount.total,
+      notes: insertAccount.notes || null,
+      createdAt: new Date(),
+      lastUpdated: new Date(),
+    };
+    this.posOpenAccounts.set(id, account);
+    return account;
+  }
+
+  async updatePosOpenAccount(id: number, updates: Partial<PosOpenAccount>): Promise<PosOpenAccount | undefined> {
+    const existing = this.posOpenAccounts.get(id);
+    if (!existing) return undefined;
+    
+    const updated: PosOpenAccount = { 
+      ...existing, 
+      ...updates, 
+      lastUpdated: new Date() 
+    };
+    this.posOpenAccounts.set(id, updated);
+    return updated;
+  }
+
+  async deletePosOpenAccount(id: number): Promise<boolean> {
+    return this.posOpenAccounts.delete(id);
+  }
+
+  async addItemToPosOpenAccount(accountId: number, item: any): Promise<PosOpenAccount | undefined> {
+    const account = this.posOpenAccounts.get(accountId);
+    if (!account) return undefined;
+    
+    const items = Array.isArray(account.items) ? account.items : [];
+    const updatedItems = [...items, item];
+    
+    // Recalculate total
+    const newTotal = updatedItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    
+    const updated: PosOpenAccount = { 
+      ...account, 
+      items: updatedItems,
+      total: newTotal.toFixed(2),
+      lastUpdated: new Date() 
+    };
+    this.posOpenAccounts.set(accountId, updated);
+    return updated;
+  }
+
+  async removeItemFromPosOpenAccount(accountId: number, itemIndex: number): Promise<PosOpenAccount | undefined> {
+    const account = this.posOpenAccounts.get(accountId);
+    if (!account) return undefined;
+    
+    const items = Array.isArray(account.items) ? account.items : [];
+    if (itemIndex < 0 || itemIndex >= items.length) return undefined;
+    
+    const updatedItems = items.filter((_, index) => index !== itemIndex);
+    
+    // Recalculate total
+    const newTotal = updatedItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    
+    const updated: PosOpenAccount = { 
+      ...account, 
+      items: updatedItems,
+      total: newTotal.toFixed(2),
+      lastUpdated: new Date() 
+    };
+    this.posOpenAccounts.set(accountId, updated);
+    return updated;
+  }
 }
 
 // DatabaseStorage implementation
@@ -384,6 +478,79 @@ export class DatabaseStorage implements IStorage {
       .values(insertSale)
       .returning();
     return sale;
+  }
+
+  // Open Accounts Methods
+  async getPosOpenAccounts(userId: number): Promise<PosOpenAccount[]> {
+    return db.select().from(posOpenAccounts).where(eq(posOpenAccounts.userId, userId));
+  }
+
+  async createPosOpenAccount(insertAccount: InsertPosOpenAccount): Promise<PosOpenAccount> {
+    const [account] = await db
+      .insert(posOpenAccounts)
+      .values(insertAccount)
+      .returning();
+    return account;
+  }
+
+  async updatePosOpenAccount(id: number, updates: Partial<PosOpenAccount>): Promise<PosOpenAccount | undefined> {
+    const [account] = await db
+      .update(posOpenAccounts)
+      .set({ ...updates, lastUpdated: new Date() })
+      .where(eq(posOpenAccounts.id, id))
+      .returning();
+    return account || undefined;
+  }
+
+  async deletePosOpenAccount(id: number): Promise<boolean> {
+    const result = await db.delete(posOpenAccounts).where(eq(posOpenAccounts.id, id));
+    return result.rowCount > 0;
+  }
+
+  async addItemToPosOpenAccount(accountId: number, item: any): Promise<PosOpenAccount | undefined> {
+    const [account] = await db.select().from(posOpenAccounts).where(eq(posOpenAccounts.id, accountId));
+    if (!account) return undefined;
+    
+    const items = Array.isArray(account.items) ? account.items : [];
+    const updatedItems = [...items, item];
+    
+    // Recalculate total
+    const newTotal = updatedItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    
+    const [updated] = await db
+      .update(posOpenAccounts)
+      .set({ 
+        items: updatedItems,
+        total: newTotal.toFixed(2),
+        lastUpdated: new Date() 
+      })
+      .where(eq(posOpenAccounts.id, accountId))
+      .returning();
+    return updated || undefined;
+  }
+
+  async removeItemFromPosOpenAccount(accountId: number, itemIndex: number): Promise<PosOpenAccount | undefined> {
+    const [account] = await db.select().from(posOpenAccounts).where(eq(posOpenAccounts.id, accountId));
+    if (!account) return undefined;
+    
+    const items = Array.isArray(account.items) ? account.items : [];
+    if (itemIndex < 0 || itemIndex >= items.length) return undefined;
+    
+    const updatedItems = items.filter((_, index) => index !== itemIndex);
+    
+    // Recalculate total
+    const newTotal = updatedItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    
+    const [updated] = await db
+      .update(posOpenAccounts)
+      .set({ 
+        items: updatedItems,
+        total: newTotal.toFixed(2),
+        lastUpdated: new Date() 
+      })
+      .where(eq(posOpenAccounts.id, accountId))
+      .returning();
+    return updated || undefined;
   }
 }
 
