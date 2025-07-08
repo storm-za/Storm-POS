@@ -100,6 +100,7 @@ export default function PosSystem() {
     defaultValues: {
       name: "",
       phone: "",
+      customerType: "retail",
       notes: "",
     },
   });
@@ -290,10 +291,16 @@ export default function PosSystem() {
       setEditingCustomer(customer);
       customerForm.setValue("name", customer.name);
       customerForm.setValue("phone", customer.phone || "");
+      customerForm.setValue("customerType", customer.customerType);
       customerForm.setValue("notes", customer.notes || "");
     } else {
       setEditingCustomer(null);
-      customerForm.reset();
+      customerForm.reset({
+        name: "",
+        phone: "",
+        customerType: "retail",
+        notes: "",
+      });
     }
     setIsCustomerDialogOpen(true);
   };
@@ -1218,6 +1225,27 @@ export default function PosSystem() {
                     <FormControl>
                       <Input placeholder="e.g., +27 12 345 6789" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="customerType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Customer Type *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select customer type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="retail">Retail Customer</SelectItem>
+                        <SelectItem value="trade">Trade Customer</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
