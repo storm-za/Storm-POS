@@ -336,10 +336,16 @@ export default function PosSystem() {
     }
   };
 
-  // Filter products based on search term
+  // Filter products based on search term for Products tab
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
     product.sku.toLowerCase().includes(productSearchTerm.toLowerCase())
+  );
+
+  // Filter products based on search term for Sales tab
+  const filteredSalesProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Get price for product based on customer type
@@ -556,7 +562,7 @@ export default function PosSystem() {
                   </CardHeader>
                   <CardContent className="max-h-96 overflow-y-auto">
                     <div className="grid gap-2">
-                      {filteredProducts.map((product) => (
+                      {filteredSalesProducts.map((product) => (
                         <div
                           key={product.id}
                           className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
