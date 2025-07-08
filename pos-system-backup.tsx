@@ -1053,6 +1053,7 @@ export default function PosSystem() {
                               </Select>
                             </div>
                           )}
+
                           {/* Checkout Button */}
                           <Button
                             className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"

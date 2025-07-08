@@ -320,14 +320,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pos/open-accounts/:id/items", async (req, res) => {
     try {
       const accountId = parseInt(req.params.id);
-      const updatedAccount = await storage.addItemToPosOpenAccount(accountId, req.body);
+      const { items } = req.body;
+      
+      if (!Array.isArray(items)) {
+        return res.status(400).json({ message: "Items must be an array" });
+      }
+      
+      // Add each item to the account
+      let updatedAccount = await storage.getPosOpenAccounts(1).then(accounts => accounts.find(a => a.id === accountId));
       if (!updatedAccount) {
         return res.status(404).json({ message: "Open account not found" });
       }
+      
+      // Add all items to the account
+      for (const item of items) {
+        updatedAccount = await storage.addItemToPosOpenAccount(accountId, item);
+        if (!updatedAccount) {
+          return res.status(404).json({ message: "Failed to add item to account" });
+        }
+      }
+      
       res.json(updatedAccount);
     } catch (error) {
-      console.error("Error adding item to open account:", error);
-      res.status(500).json({ message: "Failed to add item to open account" });
+      console.error("Error adding items to open account:", error);
+      res.status(500).json({ message: "Failed to add items to open account" });
     }
   });
 
