@@ -34,6 +34,7 @@ export const posProducts = pgTable("pos_products", {
   userId: integer("user_id").notNull(),
   sku: text("sku").notNull(),
   name: text("name").notNull(),
+  costPrice: decimal("cost_price", { precision: 10, scale: 2 }).notNull().default("0.00"),
   retailPrice: decimal("retail_price", { precision: 10, scale: 2 }).notNull(),
   tradePrice: decimal("trade_price", { precision: 10, scale: 2 }),
   quantity: integer("quantity").notNull().default(0),

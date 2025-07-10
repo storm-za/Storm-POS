@@ -29,6 +29,7 @@ interface Product {
   id: number;
   sku: string;
   name: string;
+  costPrice: string;
   retailPrice: string;
   tradePrice?: string;
   quantity: number;
@@ -46,6 +47,7 @@ interface SaleItem {
   productId: number;
   name: string;
   price: string;
+  costPrice?: string;
   quantity: number;
 }
 
@@ -119,6 +121,7 @@ export default function PosSystem() {
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
+    costPrice: z.string().min(1, "Cost price is required"),
     retailPrice: z.string().min(1, "Retail price is required"),
     tradePrice: z.string().optional(),
     quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
@@ -139,7 +142,9 @@ export default function PosSystem() {
     defaultValues: {
       sku: "",
       name: "",
-      price: "",
+      costPrice: "",
+      retailPrice: "",
+      tradePrice: "",
       quantity: 0,
     },
   });
@@ -457,6 +462,7 @@ export default function PosSystem() {
         productId: product.id,
         name: product.name,
         price: price,
+        costPrice: product.costPrice,
         quantity: 1
       }]);
     }
@@ -1457,6 +1463,19 @@ export default function PosSystem() {
                           />
                           <FormField
                             control={productForm.control}
+                            name="costPrice"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Cost Price (R)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., 12.00" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={productForm.control}
                             name="retailPrice"
                             render={({ field }) => (
                               <FormItem>
@@ -1540,6 +1559,7 @@ export default function PosSystem() {
                           </div>
                           <div className="text-right mr-4">
                             <div className="space-y-1">
+                              <p className="text-sm text-gray-600">Cost: R{product.costPrice}</p>
                               <p className="font-bold text-gray-900">Retail: R{product.retailPrice}</p>
                               {product.tradePrice && (
                                 <p className="text-sm text-blue-600">Trade: R{product.tradePrice}</p>
@@ -1789,6 +1809,16 @@ export default function PosSystem() {
                 const totalRevenue = dateFilteredSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
                 const totalTransactions = dateFilteredSales.length;
                 const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+                
+                // Calculate total profit (revenue - cost)
+                const totalProfit = dateFilteredSales.reduce((profit, sale) => {
+                  const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
+                    const salePrice = parseFloat(item.price) * item.quantity;
+                    const costPrice = item.costPrice ? parseFloat(item.costPrice) * item.quantity : 0;
+                    return itemProfit + (salePrice - costPrice);
+                  }, 0);
+                  return profit + saleProfit;
+                }, 0);
 
                 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -1809,6 +1839,16 @@ export default function PosSystem() {
                       <Card>
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-emerald-600" />
+                            <span className="text-sm font-medium text-gray-600">Total Profit</span>
+                          </div>
+                          <div className="text-2xl font-bold text-emerald-600">R{totalProfit.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
                             <Receipt className="w-4 h-4 text-blue-600" />
                             <span className="text-sm font-medium text-gray-600">Transactions</span>
                           </div>
@@ -1823,16 +1863,6 @@ export default function PosSystem() {
                             <span className="text-sm font-medium text-gray-600">Avg Transaction</span>
                           </div>
                           <div className="text-2xl font-bold text-purple-600">R{avgTransactionValue.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-orange-600" />
-                            <span className="text-sm font-medium text-gray-600">Payment Methods</span>
-                          </div>
-                          <div className="text-2xl font-bold text-orange-600">{Object.keys(paymentMethodTotals).length}</div>
                         </CardContent>
                       </Card>
                     </div>
