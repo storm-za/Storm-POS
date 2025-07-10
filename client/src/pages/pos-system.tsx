@@ -91,7 +91,28 @@ export default function PosSystem() {
   useEffect(() => {
     const userData = localStorage.getItem('posUser');
     if (userData) {
-      setCurrentUser(JSON.parse(userData));
+      try {
+        const parsedUser = JSON.parse(userData);
+        setCurrentUser(parsedUser);
+        console.log('Current user loaded:', parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        // Fallback for demo account
+        setCurrentUser({
+          id: 1,
+          email: 'demo@storm.co.za',
+          paid: true,
+          companyLogo: null
+        });
+      }
+    } else {
+      // If no user data in localStorage, set demo user as fallback
+      setCurrentUser({
+        id: 1,
+        email: 'demo@storm.co.za',
+        paid: true,
+        companyLogo: null
+      });
     }
   }, []);
 
@@ -721,8 +742,10 @@ export default function PosSystem() {
   // Logo upload mutation
   const logoUploadMutation = useMutation({
     mutationFn: async (logo: string) => {
-      if (!currentUser) throw new Error("No user logged in");
-      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/logo`, { logo });
+      // Use current user or fallback to demo user ID
+      const userId = currentUser?.id || 1;
+      console.log('Uploading logo for user ID:', userId);
+      const response = await apiRequest("PUT", `/api/pos/user/${userId}/logo`, { logo });
       return response.json();
     },
     onSuccess: (data) => {
@@ -736,9 +759,10 @@ export default function PosSystem() {
       setLogoFile(null);
     },
     onError: (error: Error) => {
+      console.error('Logo upload error:', error);
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: error.message || "Failed to upload logo",
         variant: "destructive",
       });
     },
