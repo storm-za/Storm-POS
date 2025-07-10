@@ -19,6 +19,7 @@ export interface IStorage {
   getPosUser(id: number): Promise<PosUser | undefined>;
   getPosUserByEmail(email: string): Promise<PosUser | undefined>;
   createPosUser(user: InsertPosUser): Promise<PosUser>;
+  updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined>;
   
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
@@ -89,6 +90,7 @@ export class MemStorage implements IStorage {
       email: "demo@storm.co.za",
       password: "demo123", // In production, this should be hashed
       paid: true,
+      companyLogo: null,
       createdAt: new Date(),
     };
     this.posUsers.set(1, demoUser);
@@ -191,10 +193,20 @@ export class MemStorage implements IStorage {
       email: insertUser.email,
       password: insertUser.password,
       paid: insertUser.paid || false,
+      companyLogo: insertUser.companyLogo || null,
       createdAt: new Date(),
     };
     this.posUsers.set(id, user);
     return user;
+  }
+
+  async updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, companyLogo: logo };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
   }
 
   // POS Product Methods
@@ -414,6 +426,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ companyLogo: logo })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async getPosProducts(userId: number): Promise<PosProduct[]> {

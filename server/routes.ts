@@ -78,11 +78,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In production, you'd use proper session management here
       res.json({ 
         success: true, 
-        user: { id: user.id, email: user.email, paid: user.paid }
+        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo }
       });
     } catch (error) {
       console.error("POS login error:", error);
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Update user company logo
+  app.put("/api/pos/user/:id/logo", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { logo } = req.body;
+      
+      if (!logo) {
+        return res.status(400).json({ message: "Logo is required" });
+      }
+      
+      const updatedUser = await storage.updatePosUserLogo(userId, logo);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating user logo:", error);
+      res.status(500).json({ message: "Failed to update logo" });
     }
   });
 

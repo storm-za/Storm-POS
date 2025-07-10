@@ -81,8 +81,19 @@ export default function PosSystem() {
   });
   const [deletePassword, setDeletePassword] = useState("");
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
+  const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
+  const [logoFile, setLogoFile] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string} | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Get current user from localStorage or session
+  useEffect(() => {
+    const userData = localStorage.getItem('posUser');
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
+    }
+  }, []);
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
@@ -694,6 +705,45 @@ export default function PosSystem() {
     }
   };
 
+  // File upload handler
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setLogoFile(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Logo upload mutation
+  const logoUploadMutation = useMutation({
+    mutationFn: async (logo: string) => {
+      if (!currentUser) throw new Error("No user logged in");
+      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/logo`, { logo });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Logo updated",
+        description: "Company logo has been updated successfully",
+      });
+      setCurrentUser(prev => prev ? { ...prev, companyLogo: data.user.companyLogo } : null);
+      localStorage.setItem('posUser', JSON.stringify(data.user));
+      setIsLogoDialogOpen(false);
+      setLogoFile(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Add items to existing open account mutation
   const addToOpenAccountMutation = useMutation({
     mutationFn: async ({ accountId, items }: { accountId: number; items: any[] }) => {
@@ -749,14 +799,36 @@ export default function PosSystem() {
               <h1 className="text-2xl font-bold text-[hsl(217,90%,40%)]">Storm POS</h1>
               <Badge variant="outline" className="ml-3">Demo Account</Badge>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={logout}
-              className="flex items-center space-x-2"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
-            </Button>
+            <div className="flex items-center space-x-3">
+              {/* Profile Image */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsLogoDialogOpen(true)}
+                className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
+              >
+                {currentUser?.companyLogo ? (
+                  <img 
+                    src={currentUser.companyLogo} 
+                    alt="Company Logo" 
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
+                    {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={logout}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -1964,6 +2036,77 @@ export default function PosSystem() {
                 className="bg-red-600 hover:bg-red-700"
               >
                 {removeItemFromOpenAccountMutation.isPending ? "Deleting..." : "Delete Item"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Logo Upload Dialog */}
+      <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update Company Logo</DialogTitle>
+            <DialogDescription>
+              Upload your company logo to personalize your POS system.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Current Logo Preview */}
+            {currentUser?.companyLogo && (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">Current Logo:</p>
+                <img 
+                  src={currentUser.companyLogo} 
+                  alt="Current Logo" 
+                  className="h-20 w-20 object-cover rounded-lg mx-auto border"
+                />
+              </div>
+            )}
+            
+            {/* File Upload */}
+            <div>
+              <Label htmlFor="logoUpload">Choose New Logo</Label>
+              <Input
+                id="logoUpload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Recommended: Square images work best (PNG, JPG, max 2MB)
+              </p>
+            </div>
+            
+            {/* New Logo Preview */}
+            {logoFile && (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">New Logo Preview:</p>
+                <img 
+                  src={logoFile} 
+                  alt="New Logo Preview" 
+                  className="h-20 w-20 object-cover rounded-lg mx-auto border"
+                />
+              </div>
+            )}
+            
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsLogoDialogOpen(false);
+                  setLogoFile(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => logoFile && logoUploadMutation.mutate(logoFile)}
+                disabled={!logoFile || logoUploadMutation.isPending}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              >
+                {logoUploadMutation.isPending ? "Uploading..." : "Update Logo"}
               </Button>
             </div>
           </div>

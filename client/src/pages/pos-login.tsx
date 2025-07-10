@@ -24,6 +24,9 @@ export default function PosLogin() {
       return response.json();
     },
     onSuccess: (data) => {
+      // Store user data in localStorage
+      localStorage.setItem('posUser', JSON.stringify(data.user));
+      
       if (data.user.paid) {
         toast({
           title: "Login successful",

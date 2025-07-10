@@ -25,6 +25,7 @@ export const posUsers = pgTable("pos_users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   paid: boolean("paid").notNull().default(false),
+  companyLogo: text("company_logo"), // Base64 encoded image
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
