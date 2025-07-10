@@ -726,14 +726,56 @@ export default function PosSystem() {
     }
   };
 
-  // File upload handler
+  // File upload handler with compression
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Check file size (limit to 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please choose an image smaller than 2MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64 = e.target?.result as string;
-        setLogoFile(base64);
+        
+        // Compress the image
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Resize to max 200x200 while maintaining aspect ratio
+          const maxSize = 200;
+          let { width, height } = img;
+          
+          if (width > height) {
+            if (width > maxSize) {
+              height = height * (maxSize / width);
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = width * (maxSize / height);
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            setLogoFile(compressedBase64);
+          }
+        };
+        img.src = base64;
       };
       reader.readAsDataURL(file);
     }
@@ -758,11 +800,21 @@ export default function PosSystem() {
       setIsLogoDialogOpen(false);
       setLogoFile(null);
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       console.error('Logo upload error:', error);
+      let errorMessage = "Failed to upload logo";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       toast({
         title: "Upload failed",
-        description: error.message || "Failed to upload logo",
+        description: errorMessage,
         variant: "destructive",
       });
     },
