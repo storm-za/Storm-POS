@@ -909,7 +909,7 @@ export default function PosSystem() {
     yPosition += 10;
     doc.setFontSize(8);
     doc.text('Thank you for your business!', 20, yPosition);
-    doc.text('Powered by Storm POS - www.storm.co.za', 20, yPosition + 5);
+    doc.text('Powered by Storm POS - stormsoftware.co.za', 20, yPosition + 5);
 
     // Download the PDF
     const fileName = isOpenAccount 
