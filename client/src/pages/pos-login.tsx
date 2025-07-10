@@ -120,11 +120,7 @@ export default function PosLogin() {
                 </div>
               </div>
 
-              <Alert className="bg-blue-50 border-blue-200">
-                <AlertDescription className="text-blue-800">
-                  Demo Account: demo@storm.co.za / demo123
-                </AlertDescription>
-              </Alert>
+              
               
               <Button
                 type="submit"
