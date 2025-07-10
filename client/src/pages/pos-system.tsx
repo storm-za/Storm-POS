@@ -23,6 +23,7 @@ import {
   Calendar, TrendingUp, FileText, Clock, Eye, Download
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import jsPDF from 'jspdf';
 
 interface Product {
   id: number;
@@ -545,9 +546,21 @@ export default function PosSystem() {
     onSuccess: (result) => {
       if (result.type === 'sale') {
         console.log("Sale completed successfully:", result.data);
+        
+        // Generate PDF receipt
+        const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
+        generateReceipt(
+          currentSale,
+          calculateTotal(),
+          selectedCustomer?.name,
+          saleNotes,
+          paymentType,
+          false
+        );
+        
         toast({
           title: "Sale completed",
-          description: `Sale of R${calculateTotal()} processed successfully`,
+          description: `Sale of R${calculateTotal()} processed successfully. Receipt downloaded.`,
         });
         
         // Clear current sale
@@ -659,9 +672,23 @@ export default function PosSystem() {
       return await saleResponse.json();
     },
     onSuccess: (data) => {
+      // Generate PDF receipt for closed account
+      const account = openAccounts.find(a => a.id === data.accountId) || 
+                     { accountName: data.customerName, items: data.items, notes: data.notes };
+      
+      generateReceipt(
+        data.items,
+        data.total,
+        data.customerName,
+        data.notes,
+        data.paymentType,
+        true,
+        account.accountName
+      );
+      
       toast({
         title: "Account closed",
-        description: `Sale of R${data.total} processed successfully`,
+        description: `Sale of R${data.total} processed successfully. Receipt downloaded.`,
       });
       
       // Refresh data
@@ -779,6 +806,116 @@ export default function PosSystem() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // PDF Receipt Generation
+  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string) => {
+    const doc = new jsPDF();
+    let yPosition = 20;
+
+    // Add company logo if available
+    if (currentUser?.companyLogo) {
+      try {
+        doc.addImage(currentUser.companyLogo, 'JPEG', 20, yPosition, 30, 30);
+        yPosition += 35;
+      } catch (error) {
+        console.error('Error adding logo to PDF:', error);
+      }
+    }
+
+    // Company name and title
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('STORM POS', 20, yPosition);
+    yPosition += 10;
+
+    doc.setFontSize(16);
+    doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', 20, yPosition);
+    yPosition += 15;
+
+    // Date and time
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
+    doc.text(`Time: ${new Date().toLocaleTimeString()}`, 120, yPosition);
+    yPosition += 10;
+
+    // Customer or account info
+    if (customerName) {
+      doc.text(`Customer: ${customerName}`, 20, yPosition);
+      yPosition += 8;
+    }
+    if (accountName) {
+      doc.text(`Account: ${accountName}`, 20, yPosition);
+      yPosition += 8;
+    }
+
+    yPosition += 5;
+
+    // Items header
+    doc.setFont('helvetica', 'bold');
+    doc.text('Item', 20, yPosition);
+    doc.text('Qty', 120, yPosition);
+    doc.text('Price', 150, yPosition);
+    doc.text('Total', 175, yPosition);
+    yPosition += 5;
+
+    // Draw line
+    doc.line(20, yPosition, 190, yPosition);
+    yPosition += 8;
+
+    // Items
+    doc.setFont('helvetica', 'normal');
+    items.forEach(item => {
+      const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+      
+      // Item name (truncate if too long)
+      let itemName = item.name;
+      if (itemName.length > 25) {
+        itemName = itemName.substring(0, 22) + '...';
+      }
+      
+      doc.text(itemName, 20, yPosition);
+      doc.text(item.quantity.toString(), 120, yPosition);
+      doc.text(`R${item.price}`, 150, yPosition);
+      doc.text(`R${itemTotal}`, 175, yPosition);
+      yPosition += 6;
+    });
+
+    yPosition += 5;
+    // Draw line
+    doc.line(20, yPosition, 190, yPosition);
+    yPosition += 8;
+
+    // Total
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text(`TOTAL: R${total}`, 150, yPosition);
+    yPosition += 15;
+
+    // Payment method and notes
+    if (paymentType) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Payment: ${paymentType.toUpperCase()}`, 20, yPosition);
+      yPosition += 8;
+    }
+
+    if (notes) {
+      doc.text(`Notes: ${notes}`, 20, yPosition);
+      yPosition += 8;
+    }
+
+    yPosition += 10;
+    doc.setFontSize(8);
+    doc.text('Thank you for your business!', 20, yPosition);
+    doc.text('Powered by Storm POS - www.storm.co.za', 20, yPosition + 5);
+
+    // Download the PDF
+    const fileName = isOpenAccount 
+      ? `account-statement-${accountName?.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`
+      : `receipt-${Date.now()}.pdf`;
+    doc.save(fileName);
   };
 
   // Logo upload mutation
