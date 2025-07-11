@@ -164,7 +164,7 @@ export default function POS() {
                 <CardContent className="p-8 text-center h-full flex flex-col">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Basic</h3>
                   <div className="text-4xl font-bold text-[hsl(217,90%,40%)] mb-4">
-                    R199<span className="text-lg text-gray-600">/month</span>
+                    R900<span className="text-lg text-gray-600">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
                     <li className="flex items-center">
@@ -203,7 +203,7 @@ export default function POS() {
                 <CardContent className="p-8 text-center h-full flex flex-col">
                   <h3 className="text-2xl font-bold mb-2">Growth</h3>
                   <div className="text-4xl font-bold mb-4">
-                    R349<span className="text-lg text-blue-200">/month</span>
+                    R1500<span className="text-lg text-blue-200">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-blue-100 mb-8 flex-grow">
                     <li className="flex items-center">
@@ -239,7 +239,7 @@ export default function POS() {
                 <CardContent className="p-8 text-center h-full flex flex-col">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                   <div className="text-4xl font-bold text-[hsl(217,90%,40%)] mb-4">
-                    R499<span className="text-lg text-gray-600">/month</span>
+                    R6500<span className="text-lg text-gray-600">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
                     <li className="flex items-center">

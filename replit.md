@@ -67,9 +67,9 @@ POS System tables:
 - **Multiple Payment Types**: Cash, card, and SnapScan support
 
 ### Pricing Tiers
-- **Basic (R199/month)**: 1 user, 100 products, basic reporting
-- **Growth (R349/month)**: 3 users, unlimited products, advanced reporting
-- **Pro (R499/month)**: Unlimited users, premium reporting, expense tracking
+- **Basic (R900/month)**: 1 user, 100 products, basic reporting
+- **Growth (R1500/month)**: 3 users, unlimited products, advanced reporting
+- **Pro (R6500/month)**: Unlimited users, premium reporting, expense tracking
 
 ### Demo Account
 - **Email**: demo@storm.co.za
