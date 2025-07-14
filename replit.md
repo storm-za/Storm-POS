@@ -69,7 +69,7 @@ POS System tables:
 ### Pricing Tiers
 - **Basic (R900/month)**: 1 user, 100 products, basic reporting
 - **Growth (R1500/month)**: 3 users, unlimited products, advanced reporting
-- **Pro (R6500/month)**: Unlimited users, premium reporting, expense tracking
+- **Pro (R6500/month)**: 15 users, premium reporting, expense tracking
 
 ### Demo Account
 - **Email**: demo@storm.co.za

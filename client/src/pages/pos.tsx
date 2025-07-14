@@ -244,7 +244,7 @@ export default function POS() {
                   <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
                     <li className="flex items-center">
                       <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Unlimited users
+                      15 users
                     </li>
                     <li className="flex items-center">
                       <Check className="text-green-500 mr-2 h-4 w-4" />
