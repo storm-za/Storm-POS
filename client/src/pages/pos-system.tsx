@@ -110,6 +110,7 @@ export default function PosSystem() {
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
+  const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -818,7 +819,7 @@ export default function PosSystem() {
         true,
         account.accountName,
         currentStaff?.username,
-        tipOptionEnabled
+        openAccountTipEnabled
       );
       
       toast({
@@ -978,21 +979,7 @@ export default function PosSystem() {
       doc.text('TOTAL:', margin, yPosition);
       doc.text(`R${totalAmount.toFixed(2)}`, 70, yPosition, { align: 'right' });
 
-      // Tip lines if enabled
-      if (tipOptionEnabled) {
-        yPosition += lineHeight * 2;
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        
-        // Draw tip line
-        doc.text('Tip: ', margin, yPosition);
-        doc.line(margin + 10, yPosition, 65, yPosition);
-        yPosition += lineHeight * 1.5;
-        
-        // Draw new total line
-        doc.text('New Total: ', margin, yPosition);
-        doc.line(margin + 20, yPosition, 65, yPosition);
-      }
+
 
       // Download the PDF
       doc.save(`${selectedOpenAccount.accountName}-selected-items-${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -2884,6 +2871,31 @@ export default function PosSystem() {
                 </div>
               </div>
               
+              {/* Tip Option for Close & Pay */}
+              <div>
+                <Label>Tip Option</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setOpenAccountTipEnabled(!openAccountTipEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      openAccountTipEnabled 
+                        ? 'bg-[hsl(217,90%,40%)]' 
+                        : 'bg-gray-200'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        openAccountTipEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  <span className="text-sm text-gray-600">
+                    {openAccountTipEnabled ? 'Tip lines enabled on receipt' : 'Add tip option to receipt'}
+                  </span>
+                </div>
+              </div>
+
               <div className="flex justify-between">
                 <Button 
                   variant="outline"
@@ -2898,6 +2910,7 @@ export default function PosSystem() {
                   <Button variant="outline" onClick={() => {
                     setSelectedOpenAccount(null);
                     setSelectedItemsForPrint([]);
+                    setOpenAccountTipEnabled(false);
                   }}>
                     Close
                   </Button>
@@ -2907,6 +2920,7 @@ export default function PosSystem() {
                       closeOpenAccountMutation.mutate({ accountId: selectedOpenAccount.id, paymentType });
                       setSelectedOpenAccount(null);
                       setSelectedItemsForPrint([]);
+                      setOpenAccountTipEnabled(false);
                     }}
                     className="bg-green-600 hover:bg-green-700"
                     disabled={closeOpenAccountMutation.isPending}

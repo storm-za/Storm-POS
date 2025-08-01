@@ -180,9 +180,10 @@ POS System tables:
   - Staff information clearly visible in Reports section for accountability
 - August 1, 2025. Implemented tip option functionality for waiters:
   - Added tip option toggle underneath discount section in sales interface
-  - When enabled, receipts include fillable tip lines for customers to write tip amount
-  - Includes "Tip: _______" and "New Total: _______" lines on both standard and Quick Print receipts
-  - Tip option resets after each sale completion to prevent unintended usage
+  - Added separate tip option toggle in open account dialog for "Close & Pay" operations
+  - When enabled, receipts include fillable tip lines: "Tip: _______" and "New Total: _______"
+  - Quick Print receipts (for kitchen orders) do not include tip lines as they're not customer-facing
+  - Tip options reset after each sale/account closure to prevent unintended usage
   - Designed for pen-and-paper tip collection to make it easy for wait staff to receive tips
 
 ## User Preferences
