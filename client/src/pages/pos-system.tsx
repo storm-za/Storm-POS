@@ -20,7 +20,7 @@ import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X
+  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
@@ -108,6 +108,7 @@ export default function PosSystem() {
   const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
+  const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -879,6 +880,111 @@ export default function PosSystem() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleItemCheckboxChange = (itemIndex: number, checked: boolean) => {
+    if (checked) {
+      setSelectedItemsForPrint(prev => [...prev, itemIndex]);
+    } else {
+      setSelectedItemsForPrint(prev => prev.filter(index => index !== itemIndex));
+    }
+  };
+
+  const handleQuickPrint = () => {
+    if (!selectedOpenAccount || selectedItemsForPrint.length === 0) {
+      toast({
+        title: "No items selected",
+        description: "Please select items to print",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedItems = selectedItemsForPrint
+      .map(index => selectedOpenAccount.items[index])
+      .filter(item => item);
+
+    // Generate kitchen order receipt
+    const generateKitchenOrderPDF = () => {
+      const { jsPDF } = window as any;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, 200] // Thermal printer size
+      });
+
+      let yPosition = 10;
+      const lineHeight = 5;
+      const margin = 5;
+
+      // Header
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('KITCHEN ORDER', 40, yPosition, { align: 'center' });
+      yPosition += lineHeight * 1.5;
+
+      // Account info
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Account: ${selectedOpenAccount.accountName}`, margin, yPosition);
+      yPosition += lineHeight;
+      doc.text(`Time: ${new Date().toLocaleString()}`, margin, yPosition);
+      yPosition += lineHeight;
+      
+      if (currentStaff) {
+        const staffName = currentStaff.displayName || currentStaff.username || `Staff #${currentStaff.id}`;
+        doc.text(`Waiter: ${staffName}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+
+      yPosition += lineHeight;
+
+      // Separator line
+      doc.setDrawColor(0);
+      doc.line(margin, yPosition, 75, yPosition);
+      yPosition += lineHeight;
+
+      // Items
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('ITEMS TO PREPARE:', margin, yPosition);
+      yPosition += lineHeight * 1.5;
+
+      doc.setFont(undefined, 'normal');
+      selectedItems.forEach(item => {
+        // Item name and quantity
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text(`${item.quantity}x ${item.name}`, margin, yPosition);
+        yPosition += lineHeight;
+        
+        // Add some space between items
+        yPosition += lineHeight * 0.5;
+      });
+
+      // Footer
+      yPosition += lineHeight;
+      doc.setDrawColor(0);
+      doc.line(margin, yPosition, 75, yPosition);
+      yPosition += lineHeight;
+      
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.text('Kitchen Order - Not a Receipt', 40, yPosition, { align: 'center' });
+
+      // Auto-print
+      window.open(doc.output('bloburl'), '_blank');
+    };
+
+    generateKitchenOrderPDF();
+    
+    // Clear selection after printing
+    setSelectedItemsForPrint([]);
+    
+    toast({
+      title: "Kitchen order printed",
+      description: `Printed ${selectedItems.length} items for ${selectedOpenAccount.accountName}`,
+    });
   };
 
 
@@ -2629,12 +2735,18 @@ export default function PosSystem() {
       </Dialog>
 
       {/* Account Details Dialog */}
-      <Dialog open={!!selectedOpenAccount} onOpenChange={() => setSelectedOpenAccount(null)}>
+      <Dialog open={!!selectedOpenAccount} onOpenChange={() => {
+        setSelectedOpenAccount(null);
+        setSelectedItemsForPrint([]);
+      }}>
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>
               {selectedOpenAccount?.accountName} - Account Details
             </DialogTitle>
+            <DialogDescription>
+              View account details, select items for kitchen orders, or close the account.
+            </DialogDescription>
           </DialogHeader>
           {selectedOpenAccount && (
             <div className="space-y-4">
@@ -2659,13 +2771,37 @@ export default function PosSystem() {
               )}
               
               <div>
-                <p className="text-sm font-medium mb-2">Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})</p>
+                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const allIndices = selectedOpenAccount.items.map((_, index) => index);
+                        const allSelected = allIndices.every(index => selectedItemsForPrint.includes(index));
+                        setSelectedItemsForPrint(allSelected ? [] : allIndices);
+                      }}
+                      className="text-xs h-auto py-1 px-2"
+                    >
+                      {selectedItemsForPrint.length === selectedOpenAccount.items.length ? 'Deselect All' : 'Select All'}
+                    </Button>
+                  )}
+                </div>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.map((item: any, index: number) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">R{item.price} each</p>
+                      <div className="flex items-center gap-3 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedItemsForPrint.includes(index)}
+                          onChange={(e) => handleItemCheckboxChange(index, e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-500">R{item.price} each</p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-500">Qty: {item.quantity}</span>
@@ -2684,22 +2820,37 @@ export default function PosSystem() {
                 </div>
               </div>
               
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setSelectedOpenAccount(null)}>
-                  Close
-                </Button>
+              <div className="flex justify-between">
                 <Button 
-                  onClick={() => {
-                    const paymentType = 'cash'; // Default to cash
-                    closeOpenAccountMutation.mutate({ accountId: selectedOpenAccount.id, paymentType });
-                    setSelectedOpenAccount(null);
-                  }}
-                  className="bg-green-600 hover:bg-green-700"
-                  disabled={closeOpenAccountMutation.isPending}
+                  variant="outline"
+                  onClick={handleQuickPrint}
+                  disabled={selectedItemsForPrint.length === 0}
+                  className="bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200"
                 >
-                  <Receipt className="w-4 h-4 mr-2" />
-                  {closeOpenAccountMutation.isPending ? 'Closing...' : 'Close & Pay'}
+                  <Printer className="w-4 h-4 mr-2" />
+                  Quick Print ({selectedItemsForPrint.length})
                 </Button>
+                <div className="flex space-x-2">
+                  <Button variant="outline" onClick={() => {
+                    setSelectedOpenAccount(null);
+                    setSelectedItemsForPrint([]);
+                  }}>
+                    Close
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      const paymentType = 'cash'; // Default to cash
+                      closeOpenAccountMutation.mutate({ accountId: selectedOpenAccount.id, paymentType });
+                      setSelectedOpenAccount(null);
+                      setSelectedItemsForPrint([]);
+                    }}
+                    className="bg-green-600 hover:bg-green-700"
+                    disabled={closeOpenAccountMutation.isPending}
+                  >
+                    <Receipt className="w-4 h-4 mr-2" />
+                    {closeOpenAccountMutation.isPending ? 'Closing...' : 'Close & Pay'}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
