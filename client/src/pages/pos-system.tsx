@@ -606,6 +606,7 @@ export default function PosSystem() {
           customerName: selectedCustomer?.name || null,
           notes: saleNotes || null,
           paymentType,
+          staffAccountId: currentStaff?.id || null,
         };
 
         const response = await apiRequest("POST", "/api/pos/sales", saleData);
@@ -646,7 +647,9 @@ export default function PosSystem() {
           selectedCustomer?.name,
           saleNotes,
           paymentType,
-          false
+          false,
+          undefined,
+          currentStaff?.username
         );
         
         toast({
@@ -745,6 +748,7 @@ export default function PosSystem() {
         customerName: account.accountName,
         notes: account.notes,
         paymentType,
+        staffAccountId: currentStaff?.id || null,
       };
 
       const saleResponse = await apiRequest("POST", "/api/pos/sales", saleData);
@@ -774,7 +778,8 @@ export default function PosSystem() {
         data.notes,
         data.paymentType,
         true,
-        account.accountName
+        account.accountName,
+        currentStaff?.username
       );
       
       toast({
@@ -900,7 +905,7 @@ export default function PosSystem() {
   };
 
   // PDF Receipt Generation
-  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string) => {
+  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string) => {
     const doc = new jsPDF();
     let yPosition = 20;
 
@@ -930,6 +935,12 @@ export default function PosSystem() {
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
     doc.text(`Time: ${new Date().toLocaleTimeString()}`, 120, yPosition);
     yPosition += 10;
+
+    // Staff member info
+    if (staffName) {
+      doc.text(`Served by: ${staffName}`, 20, yPosition);
+      yPosition += 8;
+    }
 
     // Customer or account info
     if (customerName) {
