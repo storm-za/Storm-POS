@@ -96,12 +96,7 @@ export default function PosSystem() {
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
   const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
-  const [deletePasswordDialog, setDeletePasswordDialog] = useState<{ open: boolean; accountId: number; itemIndex: number }>({
-    open: false,
-    accountId: 0,
-    itemIndex: 0
-  });
-  const [deletePassword, setDeletePassword] = useState("");
+
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
@@ -867,24 +862,23 @@ export default function PosSystem() {
   });
 
   const handleDeleteItemClick = (accountId: number, itemIndex: number) => {
-    setDeletePasswordDialog({ open: true, accountId, itemIndex });
-  };
-
-  const handlePasswordConfirm = () => {
-    if (deletePassword === "2003") {
-      removeItemFromOpenAccountMutation.mutate({ 
-        accountId: deletePasswordDialog.accountId, 
-        itemIndex: deletePasswordDialog.itemIndex 
-      });
+    // Check if current staff has management access
+    if (currentStaff?.userType === 'management') {
+      // Management users can delete directly after confirmation
+      if (window.confirm('Are you sure you want to delete this item from the account?')) {
+        removeItemFromOpenAccountMutation.mutate({ accountId, itemIndex });
+      }
     } else {
+      // Staff users need management access
       toast({
-        title: "Access Denied",
-        description: "Incorrect password. Please try again.",
+        title: "Management Access Required",
+        description: "Only management users can delete items from open accounts. Please login with a management account.",
         variant: "destructive",
       });
-      setDeletePassword("");
     }
   };
+
+
 
   // File upload handler with compression
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2709,57 +2703,7 @@ export default function PosSystem() {
         </DialogContent>
       </Dialog>
 
-      {/* Password Confirmation Dialog for Item Deletion */}
-      <Dialog open={deletePasswordDialog.open} onOpenChange={(open) => {
-        if (!open) {
-          setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
-          setDeletePassword("");
-        }
-      }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirm Item Deletion</DialogTitle>
-            <DialogDescription>
-              Enter the password to delete this item from the account.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="deletePassword">Password</Label>
-              <Input
-                id="deletePassword"
-                type="password"
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                placeholder="Enter password"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handlePasswordConfirm();
-                  }
-                }}
-              />
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
-                  setDeletePassword("");
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handlePasswordConfirm}
-                disabled={!deletePassword || removeItemFromOpenAccountMutation.isPending}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                {removeItemFromOpenAccountMutation.isPending ? "Deleting..." : "Delete Item"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
