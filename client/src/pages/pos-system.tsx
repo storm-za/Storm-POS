@@ -776,7 +776,7 @@ export default function PosSystem() {
 
   // Close open account mutation (convert to sale)
   const closeOpenAccountMutation = useMutation({
-    mutationFn: async ({ accountId, paymentType }: { accountId: number; paymentType: string }) => {
+    mutationFn: async ({ accountId, paymentType, tipEnabled }: { accountId: number; paymentType: string; tipEnabled: boolean }) => {
       const account = openAccounts.find(a => a.id === accountId);
       if (!account) throw new Error("Account not found");
 
@@ -803,14 +803,13 @@ export default function PosSystem() {
         throw new Error(errorData.message || "Failed to close account");
       }
 
-      return await saleResponse.json();
+      return { ...await saleResponse.json(), tipEnabled };
     },
     onSuccess: (data) => {
       // Generate PDF receipt for closed account
       const account = openAccounts.find(a => a.id === data.accountId) || 
                      { accountName: data.customerName, items: data.items, notes: data.notes };
       
-      console.log('Open account tip enabled:', openAccountTipEnabled);
       generateReceipt(
         data.items,
         data.total,
@@ -820,7 +819,7 @@ export default function PosSystem() {
         true,
         account.accountName,
         currentStaff?.username,
-        openAccountTipEnabled
+        data.tipEnabled
       );
       
       toast({
@@ -1056,7 +1055,6 @@ export default function PosSystem() {
 
   // PDF Receipt Generation
   const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false) => {
-    console.log('Generate receipt called with includeTipLines:', includeTipLines);
     const doc = new jsPDF();
     let yPosition = 20;
 
@@ -2919,7 +2917,11 @@ export default function PosSystem() {
                   <Button 
                     onClick={() => {
                       const paymentType = 'cash'; // Default to cash
-                      closeOpenAccountMutation.mutate({ accountId: selectedOpenAccount.id, paymentType });
+                      closeOpenAccountMutation.mutate({ 
+                        accountId: selectedOpenAccount.id, 
+                        paymentType,
+                        tipEnabled: openAccountTipEnabled 
+                      });
                       setSelectedOpenAccount(null);
                       setSelectedItemsForPrint([]);
                       setOpenAccountTipEnabled(false);
