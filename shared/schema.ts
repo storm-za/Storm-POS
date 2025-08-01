@@ -29,6 +29,16 @@ export const posUsers = pgTable("pos_users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const posStaffAccounts = pgTable("pos_staff_accounts", {
+  id: serial("id").primaryKey(),
+  posUserId: integer("pos_user_id").references(() => posUsers.id, { onDelete: 'cascade' }).notNull(),
+  username: text("username").notNull(),
+  password: text("password").notNull(),
+  userType: text("user_type").notNull(), // 'staff' or 'management'
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const posProducts = pgTable("pos_products", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -54,6 +64,7 @@ export const posCustomers = pgTable("pos_customers", {
 export const posSales = pgTable("pos_sales", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
+  staffAccountId: integer("staff_account_id").references(() => posStaffAccounts.id),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   items: jsonb("items").notNull(), // Array of {productId, name, price, quantity}
   customerName: text("customer_name"),
@@ -111,6 +122,11 @@ export const insertPosOpenAccountSchema = createInsertSchema(posOpenAccounts).om
   lastUpdated: true,
 });
 
+export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -128,3 +144,5 @@ export type InsertPosSale = z.infer<typeof insertPosSaleSchema>;
 export type PosSale = typeof posSales.$inferSelect;
 export type InsertPosOpenAccount = z.infer<typeof insertPosOpenAccountSchema>;
 export type PosOpenAccount = typeof posOpenAccounts.$inferSelect;
+export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
+export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;

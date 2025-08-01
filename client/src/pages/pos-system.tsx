@@ -20,8 +20,9 @@ import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, Download
+  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings
 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 
@@ -61,6 +62,15 @@ interface Sale {
   createdAt: string;
 }
 
+interface StaffAccount {
+  id: number;
+  posUserId: number;
+  username: string;
+  userType: 'staff' | 'management';
+  isActive: boolean;
+  createdAt: string;
+}
+
 export default function PosSystem() {
   const [currentSale, setCurrentSale] = useState<SaleItem[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
@@ -73,6 +83,10 @@ export default function PosSystem() {
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+  const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
+  const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
+  const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
+  const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
@@ -190,6 +204,11 @@ export default function PosSystem() {
   // Fetch open accounts
   const { data: openAccounts = [] } = useQuery<PosOpenAccount[]>({
     queryKey: ["/api/pos/open-accounts"],
+  });
+
+  // Fetch staff accounts
+  const { data: staffAccounts = [] } = useQuery<StaffAccount[]>({
+    queryKey: ["/api/pos/staff-accounts"],
   });
 
   // Product mutations
@@ -329,6 +348,72 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: "Failed to delete customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Staff account mutations
+  const createStaffAccountMutation = useMutation({
+    mutationFn: async (staffData: any) => {
+      const response = await apiRequest("POST", "/api/pos/staff-accounts", staffData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts"] });
+      setIsUserManagementOpen(false);
+      toast({
+        title: "Staff account created",
+        description: "Staff account has been successfully created.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create staff account",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const authenticateStaffMutation = useMutation({
+    mutationFn: async (credentials: { username: string; password: string }) => {
+      const response = await apiRequest("POST", "/api/pos/staff-accounts/authenticate", credentials);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCurrentStaff(data.staffAccount);
+      setIsStaffAuthOpen(false);
+      toast({
+        title: "Welcome back",
+        description: `Logged in as ${data.staffAccount.username}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid credentials",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteStaffAccountMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/staff-accounts/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts"] });
+      toast({
+        title: "Staff account deleted",
+        description: "Staff account has been successfully deleted.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete staff account",
         variant: "destructive",
       });
     },
@@ -1019,6 +1104,53 @@ export default function PosSystem() {
               <Badge variant="outline" className="ml-3">Demo Account</Badge>
             </div>
             <div className="flex items-center space-x-3">
+              {/* Staff Account Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>{currentStaff ? currentStaff.username : 'Select Staff'}</span>
+                    {currentStaff && (
+                      <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs">
+                        {currentStaff.userType}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {!currentStaff ? (
+                    <>
+                      <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
+                        <User className="mr-2 h-4 w-4" />
+                        Login as Staff
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-2 py-2 text-sm">
+                        <div className="font-medium">{currentStaff.username}</div>
+                        <div className="text-muted-foreground capitalize">{currentStaff.userType}</div>
+                      </div>
+                      <DropdownMenuSeparator />
+                      {currentStaff.userType === 'management' && (
+                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          User Management
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={() => setCurrentStaff(null)}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Switch User
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {/* Profile Image */}
               <Button
                 variant="ghost"
@@ -2351,6 +2483,194 @@ export default function PosSystem() {
               >
                 {logoUploadMutation.isPending ? "Uploading..." : "Update Logo"}
               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Staff Authentication Dialog */}
+      <Dialog open={isStaffAuthOpen} onOpenChange={setIsStaffAuthOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Staff Login</DialogTitle>
+            <DialogDescription>
+              Enter your username and password to log in as a staff member.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const username = formData.get('username') as string;
+            const password = formData.get('password') as string;
+            if (username && password) {
+              authenticateStaffMutation.mutate({ username, password });
+            }
+          }}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="staff-username">Username</Label>
+                <Input
+                  id="staff-username"
+                  name="username"
+                  type="text"
+                  required
+                  placeholder="Enter username"
+                />
+              </div>
+              <div>
+                <Label htmlFor="staff-password">Password</Label>
+                <Input
+                  id="staff-password"
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Enter password"
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => setIsStaffAuthOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={authenticateStaffMutation.isPending}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                >
+                  {authenticateStaffMutation.isPending ? "Logging in..." : "Login"}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* User Management Dialog */}
+      <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>User Management</DialogTitle>
+            <DialogDescription>
+              Manage staff accounts and permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Create New Staff Account */}
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold mb-3">Add New Staff Account</h3>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const username = formData.get('new-username') as string;
+                const password = formData.get('new-password') as string;
+                const userType = formData.get('user-type') as 'staff' | 'management';
+                const managementPassword = formData.get('management-password') as string;
+                
+                if (username && password && userType) {
+                  createStaffAccountMutation.mutate({
+                    username,
+                    password,
+                    userType,
+                    managementPassword: userType === 'management' ? managementPassword : undefined
+                  });
+                  (e.target as HTMLFormElement).reset();
+                }
+              }}>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="new-username">Username</Label>
+                    <Input
+                      id="new-username"
+                      name="new-username"
+                      type="text"
+                      required
+                      placeholder="Enter username"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="new-password">Password</Label>
+                    <Input
+                      id="new-password"
+                      name="new-password"
+                      type="password"
+                      required
+                      placeholder="Enter password"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label htmlFor="user-type">User Type</Label>
+                    <Select name="user-type" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="management">Management</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="management-password">Management Password (if required)</Label>
+                    <Input
+                      id="management-password"
+                      name="management-password"
+                      type="password"
+                      placeholder="Required for management accounts"
+                    />
+                  </div>
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={createStaffAccountMutation.isPending}
+                  className="w-full"
+                >
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  {createStaffAccountMutation.isPending ? "Creating..." : "Create Staff Account"}
+                </Button>
+              </form>
+            </div>
+
+            {/* Existing Staff Accounts */}
+            <div className="border rounded-lg p-4">
+              <h3 className="font-semibold mb-3">Existing Staff Accounts</h3>
+              <div className="space-y-2">
+                {staffAccounts.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No staff accounts created yet.</p>
+                ) : (
+                  staffAccounts.map((staff) => (
+                    <div key={staff.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">{staff.username}</div>
+                        <div className="text-sm text-muted-foreground capitalize">
+                          {staff.userType} • {staff.isActive ? 'Active' : 'Inactive'}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={staff.userType === 'management' ? 'default' : 'secondary'}>
+                          {staff.userType}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete ${staff.username}?`)) {
+                              deleteStaffAccountMutation.mutate(staff.id);
+                            }
+                          }}
+                          disabled={deleteStaffAccountMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>

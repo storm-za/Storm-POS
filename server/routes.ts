@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create the sale
+      // Create the sale - staffAccountId will be handled in frontend if needed
       const sale = await storage.createPosSale(validatedData);
       
       // Update inventory
@@ -381,6 +381,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error removing item from open account:", error);
       res.status(500).json({ message: "Failed to remove item from open account" });
+    }
+  });
+
+  // Staff Account Routes
+  app.get("/api/pos/staff-accounts", async (req, res) => {
+    try {
+      const userId = 1; // Demo user ID for now
+      const staffAccounts = await storage.getPosStaffAccounts(userId);
+      res.json(staffAccounts);
+    } catch (error) {
+      console.error("Error fetching staff accounts:", error);
+      res.status(500).json({ message: "Failed to fetch staff accounts" });
+    }
+  });
+
+  app.post("/api/pos/staff-accounts", async (req, res) => {
+    try {
+      const userId = 1; // Demo user ID for now
+      
+      const { username, password, userType, managementPassword } = req.body;
+      
+      // Check if management password is required (if there are management accounts)
+      const existingStaff = await storage.getPosStaffAccounts(userId);
+      const hasManagementAccounts = existingStaff.some(staff => staff.userType === 'management');
+      
+      if (hasManagementAccounts && managementPassword) {
+        // Verify management password
+        const isValidManagement = existingStaff.some(staff => 
+          staff.userType === 'management' && staff.password === managementPassword
+        );
+        
+        if (!isValidManagement) {
+          return res.status(403).json({ message: "Invalid management password" });
+        }
+      }
+      
+      const staffAccount = await storage.createPosStaffAccount({
+        posUserId: userId,
+        username,
+        password,
+        userType
+      });
+      
+      res.json(staffAccount);
+    } catch (error) {
+      console.error("Error creating staff account:", error);
+      res.status(500).json({ message: "Failed to create staff account" });
+    }
+  });
+
+  app.post("/api/pos/staff-accounts/authenticate", async (req, res) => {
+    try {
+      const userId = 1; // Demo user ID for now
+      
+      const { username, password } = req.body;
+      const staffAccount = await storage.authenticateStaffAccount(userId, username, password);
+      
+      if (!staffAccount) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      res.json({ success: true, staffAccount });
+    } catch (error) {
+      console.error("Error authenticating staff account:", error);
+      res.status(500).json({ message: "Failed to authenticate staff account" });
+    }
+  });
+
+  app.delete("/api/pos/staff-accounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deletePosStaffAccount(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting staff account:", error);
+      res.status(500).json({ message: "Failed to delete staff account" });
     }
   });
 

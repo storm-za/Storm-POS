@@ -1,9 +1,9 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posStaffAccounts,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
-  type PosOpenAccount, type InsertPosOpenAccount
+  type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -41,6 +41,13 @@ export interface IStorage {
   deletePosOpenAccount(id: number): Promise<boolean>;
   addItemToPosOpenAccount(accountId: number, item: any): Promise<PosOpenAccount | undefined>;
   removeItemFromPosOpenAccount(accountId: number, itemIndex: number): Promise<PosOpenAccount | undefined>;
+  
+  // Staff Account Operations
+  getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]>;
+  createPosStaffAccount(staffAccount: InsertPosStaffAccount): Promise<PosStaffAccount>;
+  updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined>;
+  deletePosStaffAccount(id: number): Promise<boolean>;
+  authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -572,6 +579,38 @@ export class DatabaseStorage implements IStorage {
       .where(eq(posOpenAccounts.id, accountId))
       .returning();
     return updated || undefined;
+  }
+
+  // Staff Account Operations
+  async getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]> {
+    return await db.select().from(posStaffAccounts).where(eq(posStaffAccounts.posUserId, posUserId));
+  }
+
+  async createPosStaffAccount(staffAccount: InsertPosStaffAccount): Promise<PosStaffAccount> {
+    const [created] = await db.insert(posStaffAccounts).values(staffAccount).returning();
+    return created;
+  }
+
+  async updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined> {
+    const [updated] = await db.update(posStaffAccounts)
+      .set(staffAccount)
+      .where(eq(posStaffAccounts.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deletePosStaffAccount(id: number): Promise<boolean> {
+    const result = await db.delete(posStaffAccounts).where(eq(posStaffAccounts.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined> {
+    const [staff] = await db.select().from(posStaffAccounts)
+      .where(eq(posStaffAccounts.posUserId, posUserId))
+      .where(eq(posStaffAccounts.username, username))
+      .where(eq(posStaffAccounts.password, password))
+      .where(eq(posStaffAccounts.isActive, true));
+    return staff || undefined;
   }
 }
 
