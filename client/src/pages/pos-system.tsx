@@ -2210,6 +2210,16 @@ export default function PosSystem() {
                                         <p className="text-xs text-gray-500">Customer</p>
                                       </div>
                                     )}
+                                    <div>
+                                      <p className="text-sm font-medium">
+                                        Served by: {
+                                          sale.staffAccountId 
+                                            ? staffAccounts.find(staff => staff.id === sale.staffAccountId)?.displayName || 'Staff Member'
+                                            : currentUser?.email?.split('@')[0] || 'Manager'
+                                        }
+                                      </p>
+                                      <p className="text-xs text-gray-500">Staff</p>
+                                    </div>
                                   </div>
                                   <div className="mt-2">
                                     <p className="text-xs text-gray-600">

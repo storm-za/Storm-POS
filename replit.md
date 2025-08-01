@@ -173,6 +173,11 @@ POS System tables:
   - Sales figures exclude voided sales from revenue calculations
   - Updated database schema with isVoided, voidReason, voidedAt, voidedBy fields
   - API endpoint for voiding sales with proper authorization checks
+- August 1, 2025. Enhanced sales history with staff information:
+  - Added "Served by" display to each sale showing staff member or manager name
+  - Sales made by staff accounts show the staff member's display name
+  - Sales made by main user/manager show manager username or "Manager"
+  - Staff information clearly visible in Reports section for accountability
 
 ## User Preferences
 
