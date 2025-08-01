@@ -636,6 +636,20 @@ export class DatabaseStorage implements IStorage {
       ));
     return staff || undefined;
   }
+
+  async voidPosSale(saleId: number, voidReason: string, voidedBy: string): Promise<PosSale | undefined> {
+    const [sale] = await db
+      .update(posSales)
+      .set({ 
+        isVoided: true, 
+        voidReason, 
+        voidedAt: new Date(), 
+        voidedBy 
+      })
+      .where(eq(posSales.id, saleId))
+      .returning();
+    return sale || undefined;
+  }
 }
 
 export const storage = new DatabaseStorage();
