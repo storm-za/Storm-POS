@@ -110,45 +110,27 @@ export default function PosSystem() {
 
   // Handle tab change with role-based access control
   const handleTabChange = (tabValue: string) => {
-    // If no staff is logged in or staff is management, allow all tabs
-    if (!currentStaff || currentStaff.userType === 'management') {
+    // If staff is management, allow all tabs
+    if (currentStaff && currentStaff.userType === 'management') {
       setCurrentTab(tabValue);
       return;
     }
 
-    // For staff users, only allow sales, customers, and open-accounts
+    // For staff users or no user logged in, only allow sales, customers, and open-accounts
     const allowedTabs = ['sales', 'customers', 'open-accounts'];
     
     if (allowedTabs.includes(tabValue)) {
       setCurrentTab(tabValue);
     } else {
-      // Show management password dialog for restricted tabs
-      setPendingTab(tabValue);
+      // Show management access required notification
       setManagementPasswordDialog(true);
     }
   };
 
-  // Verify management password
-  const verifyManagementPassword = () => {
-    // For this demo, use a simple password. In production, this should be more secure
-    const correctPassword = "manager123";
-    
-    if (managementPassword === correctPassword) {
-      setCurrentTab(pendingTab || "sales");
-      setManagementPasswordDialog(false);
-      setPendingTab(null);
-      setManagementPassword("");
-      toast({
-        title: "Access Granted",
-        description: "You now have access to management features.",
-      });
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "Incorrect management password.",
-        variant: "destructive",
-      });
-    }
+  // Close management dialog
+  const closeManagementDialog = () => {
+    setManagementPasswordDialog(false);
+    setManagementPassword("");
   };
 
   // Get current user from localStorage or session
@@ -2742,52 +2724,22 @@ export default function PosSystem() {
         </DialogContent>
       </Dialog>
 
-      {/* Management Password Dialog */}
+      {/* Management Access Notification Dialog */}
       <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>Management Access Required</DialogTitle>
             <DialogDescription>
-              This section requires management privileges. Please enter the management password to continue.
+              The Products and Reports sections are restricted to management users only. Please login with a management account to access these features.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="mgmt-password">Management Password</Label>
-              <Input
-                id="mgmt-password"
-                type="password"
-                value={managementPassword}
-                onChange={(e) => setManagementPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    verifyManagementPassword();
-                  }
-                }}
-                placeholder="Enter management password"
-                autoFocus
-              />
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setManagementPasswordDialog(false);
-                  setPendingTab(null);
-                  setManagementPassword("");
-                }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={verifyManagementPassword}
-                className="flex-1"
-                disabled={!managementPassword.trim()}
-              >
-                Verify
-              </Button>
-            </div>
+          <div className="flex justify-center">
+            <Button
+              onClick={closeManagementDialog}
+              className="w-full"
+            >
+              Understood
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
