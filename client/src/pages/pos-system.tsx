@@ -904,9 +904,8 @@ export default function PosSystem() {
       .map(index => selectedOpenAccount.items[index])
       .filter(item => item);
 
-    // Generate kitchen order receipt
-    const generateKitchenOrderPDF = () => {
-      const { jsPDF } = window as any;
+    // Generate receipt for selected items
+    const generateSelectedItemsPDF = () => {
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -916,12 +915,6 @@ export default function PosSystem() {
       let yPosition = 10;
       const lineHeight = 5;
       const margin = 5;
-
-      // Header
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('KITCHEN ORDER', 40, yPosition, { align: 'center' });
-      yPosition += lineHeight * 1.5;
 
       // Account info
       doc.setFontSize(10);
@@ -933,7 +926,7 @@ export default function PosSystem() {
       
       if (currentStaff) {
         const staffName = currentStaff.displayName || currentStaff.username || `Staff #${currentStaff.id}`;
-        doc.text(`Waiter: ${staffName}`, margin, yPosition);
+        doc.text(`Served by: ${staffName}`, margin, yPosition);
         yPosition += lineHeight;
       }
 
@@ -947,36 +940,43 @@ export default function PosSystem() {
       // Items
       doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
-      doc.text('ITEMS TO PREPARE:', margin, yPosition);
+      doc.text('SELECTED ITEMS:', margin, yPosition);
       yPosition += lineHeight * 1.5;
 
+      let totalAmount = 0;
       doc.setFont(undefined, 'normal');
       selectedItems.forEach(item => {
         // Item name and quantity
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text(`${item.quantity}x ${item.name}`, margin, yPosition);
+        
+        // Price on the right
+        const itemTotal = parseFloat(item.price) * item.quantity;
+        totalAmount += itemTotal;
+        doc.text(`R${itemTotal.toFixed(2)}`, 70, yPosition, { align: 'right' });
         yPosition += lineHeight;
         
         // Add some space between items
         yPosition += lineHeight * 0.5;
       });
 
-      // Footer
+      // Total
       yPosition += lineHeight;
       doc.setDrawColor(0);
       doc.line(margin, yPosition, 75, yPosition);
       yPosition += lineHeight;
       
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.text('Kitchen Order - Not a Receipt', 40, yPosition, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('TOTAL:', margin, yPosition);
+      doc.text(`R${totalAmount.toFixed(2)}`, 70, yPosition, { align: 'right' });
 
-      // Auto-print
-      window.open(doc.output('bloburl'), '_blank');
+      // Download the PDF
+      doc.save(`${selectedOpenAccount.accountName}-selected-items-${new Date().toISOString().slice(0, 10)}.pdf`);
     };
 
-    generateKitchenOrderPDF();
+    generateSelectedItemsPDF();
     
     // Clear selection after printing
     setSelectedItemsForPrint([]);
