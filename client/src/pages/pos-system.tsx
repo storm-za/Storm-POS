@@ -1124,10 +1124,17 @@ export default function PosSystem() {
                 <DropdownMenuContent align="end" className="w-56">
                   {!currentStaff ? (
                     <>
-                      <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
-                        <User className="mr-2 h-4 w-4" />
-                        Login as Staff
-                      </DropdownMenuItem>
+                      {staffAccounts.length === 0 ? (
+                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Create First Staff Account
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
+                          <User className="mr-2 h-4 w-4" />
+                          Login as Staff
+                        </DropdownMenuItem>
+                      )}
                     </>
                   ) : (
                     <>
@@ -2552,9 +2559,14 @@ export default function PosSystem() {
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>User Management</DialogTitle>
+            <DialogTitle>
+              {staffAccounts.length === 0 ? "Create Your First Staff Account" : "User Management"}
+            </DialogTitle>
             <DialogDescription>
-              Manage staff accounts and permissions.
+              {staffAccounts.length === 0 
+                ? "Set up your first staff account to start using the staff management system."
+                : "Manage staff accounts and permissions."
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
