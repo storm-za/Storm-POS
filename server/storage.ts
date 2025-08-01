@@ -6,7 +6,7 @@ import {
   type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -606,10 +606,12 @@ export class DatabaseStorage implements IStorage {
 
   async authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined> {
     const [staff] = await db.select().from(posStaffAccounts)
-      .where(eq(posStaffAccounts.posUserId, posUserId))
-      .where(eq(posStaffAccounts.username, username))
-      .where(eq(posStaffAccounts.password, password))
-      .where(eq(posStaffAccounts.isActive, true));
+      .where(and(
+        eq(posStaffAccounts.posUserId, posUserId),
+        eq(posStaffAccounts.username, username),
+        eq(posStaffAccounts.password, password),
+        eq(posStaffAccounts.isActive, true)
+      ));
     return staff || undefined;
   }
 }
