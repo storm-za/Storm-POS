@@ -184,6 +184,7 @@ POS System tables:
   - When enabled, receipts include fillable tip lines: "Tip: _______" and "New Total: _______"
   - Quick Print receipts (for kitchen orders) do not include tip lines as they're not customer-facing
   - Tip options reset after each sale/account closure to prevent unintended usage
+  - Fixed closure issue where open account tip state wasn't being captured correctly
   - Designed for pen-and-paper tip collection to make it easy for wait staff to receive tips
 
 ## User Preferences
