@@ -810,6 +810,7 @@ export default function PosSystem() {
       const account = openAccounts.find(a => a.id === data.accountId) || 
                      { accountName: data.customerName, items: data.items, notes: data.notes };
       
+      console.log('Open account tip enabled:', openAccountTipEnabled);
       generateReceipt(
         data.items,
         data.total,
@@ -1055,6 +1056,7 @@ export default function PosSystem() {
 
   // PDF Receipt Generation
   const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false) => {
+    console.log('Generate receipt called with includeTipLines:', includeTipLines);
     const doc = new jsPDF();
     let yPosition = 20;
 
