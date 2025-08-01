@@ -178,6 +178,12 @@ POS System tables:
   - Sales made by staff accounts show the staff member's display name
   - Sales made by main user/manager show manager username or "Manager"
   - Staff information clearly visible in Reports section for accountability
+- August 1, 2025. Implemented tip option functionality for waiters:
+  - Added tip option toggle underneath discount section in sales interface
+  - When enabled, receipts include fillable tip lines for customers to write tip amount
+  - Includes "Tip: _______" and "New Total: _______" lines on both standard and Quick Print receipts
+  - Tip option resets after each sale completion to prevent unintended usage
+  - Designed for pen-and-paper tip collection to make it easy for wait staff to receive tips
 
 ## User Preferences
 

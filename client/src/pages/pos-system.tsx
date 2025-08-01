@@ -109,6 +109,7 @@ export default function PosSystem() {
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
+  const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -682,7 +683,8 @@ export default function PosSystem() {
           paymentType,
           false,
           undefined,
-          currentStaff?.username
+          currentStaff?.username,
+          tipOptionEnabled
         );
         
         toast({
@@ -696,6 +698,7 @@ export default function PosSystem() {
         setSaleNotes("");
         setPaymentType("cash");
         setDiscountPercentage(0);
+        setTipOptionEnabled(false);
         setSelectedOpenAccountId(null);
         
         // Refresh data
@@ -713,6 +716,7 @@ export default function PosSystem() {
         setSaleNotes("");
         setPaymentType("cash");
         setDiscountPercentage(0);
+        setTipOptionEnabled(false);
         setSelectedOpenAccountId(null);
         
         // Refresh data
@@ -753,6 +757,7 @@ export default function PosSystem() {
       setSaleNotes("");
       setPaymentType("cash");
       setDiscountPercentage(0);
+      setTipOptionEnabled(false);
       setIsOpenAccountDialogOpen(false);
       
       // Refresh data
@@ -812,7 +817,8 @@ export default function PosSystem() {
         data.paymentType,
         true,
         account.accountName,
-        currentStaff?.username
+        currentStaff?.username,
+        tipOptionEnabled
       );
       
       toast({
@@ -972,6 +978,22 @@ export default function PosSystem() {
       doc.text('TOTAL:', margin, yPosition);
       doc.text(`R${totalAmount.toFixed(2)}`, 70, yPosition, { align: 'right' });
 
+      // Tip lines if enabled
+      if (tipOptionEnabled) {
+        yPosition += lineHeight * 2;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        
+        // Draw tip line
+        doc.text('Tip: ', margin, yPosition);
+        doc.line(margin + 10, yPosition, 65, yPosition);
+        yPosition += lineHeight * 1.5;
+        
+        // Draw new total line
+        doc.text('New Total: ', margin, yPosition);
+        doc.line(margin + 20, yPosition, 65, yPosition);
+      }
+
       // Download the PDF
       doc.save(`${selectedOpenAccount.accountName}-selected-items-${new Date().toISOString().slice(0, 10)}.pdf`);
     };
@@ -1045,7 +1067,7 @@ export default function PosSystem() {
   };
 
   // PDF Receipt Generation
-  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string) => {
+  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false) => {
     const doc = new jsPDF();
     let yPosition = 20;
 
@@ -1130,6 +1152,23 @@ export default function PosSystem() {
     doc.setFontSize(12);
     doc.text(`TOTAL: R${total}`, 150, yPosition);
     yPosition += 15;
+
+    // Tip lines if enabled
+    if (includeTipLines) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      yPosition += 5;
+      
+      // Draw tip line
+      doc.text('Tip: ', 20, yPosition);
+      doc.line(35, yPosition, 100, yPosition);
+      yPosition += 10;
+      
+      // Draw new total line
+      doc.text('New Total: ', 20, yPosition);
+      doc.line(50, yPosition, 100, yPosition);
+      yPosition += 15;
+    }
 
     // Payment method and notes
     if (paymentType) {
@@ -1771,6 +1810,31 @@ export default function PosSystem() {
                                 {percentage === 0 ? "No Discount" : `${percentage}%`}
                               </Button>
                             ))}
+                          </div>
+                        </div>
+
+                        {/* Tip Option Section */}
+                        <div>
+                          <Label>Tip Option</Label>
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              type="button"
+                              onClick={() => setTipOptionEnabled(!tipOptionEnabled)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                tipOptionEnabled 
+                                  ? 'bg-[hsl(217,90%,40%)]' 
+                                  : 'bg-gray-200'
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  tipOptionEnabled ? 'translate-x-6' : 'translate-x-1'
+                                }`}
+                              />
+                            </button>
+                            <span className="text-sm text-gray-600">
+                              {tipOptionEnabled ? 'Tip lines enabled on receipt' : 'Add tip option to receipt'}
+                            </span>
                           </div>
                         </div>
 
