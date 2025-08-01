@@ -843,14 +843,17 @@ export default function PosSystem() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedAccount) => {
       toast({
         title: "Item removed",
         description: "Item removed from account successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
-      setDeletePasswordDialog({ open: false, accountId: 0, itemIndex: 0 });
-      setDeletePassword("");
+      
+      // Update the selected open account with the fresh data
+      if (selectedOpenAccount && updatedAccount.id === selectedOpenAccount.id) {
+        setSelectedOpenAccount(updatedAccount);
+      }
     },
     onError: (error: Error) => {
       toast({
