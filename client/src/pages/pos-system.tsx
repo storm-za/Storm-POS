@@ -2214,7 +2214,10 @@ export default function PosSystem() {
                                       <p className="text-sm font-medium">
                                         Served by: {
                                           sale.staffAccountId 
-                                            ? staffAccounts.find(staff => staff.id === sale.staffAccountId)?.displayName || 'Staff Member'
+                                            ? (() => {
+                                                const staff = staffAccounts.find(staff => staff.id === sale.staffAccountId);
+                                                return staff ? (staff.displayName || staff.username || `Staff #${staff.id}`) : 'Staff Member';
+                                              })()
                                             : currentUser?.email?.split('@')[0] || 'Manager'
                                         }
                                       </p>
