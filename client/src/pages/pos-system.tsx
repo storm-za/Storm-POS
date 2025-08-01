@@ -92,6 +92,7 @@ export default function PosSystem() {
   const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
+  const [selectedStaffFilter, setSelectedStaffFilter] = useState<number | "all">("all");
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
   const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
@@ -1195,6 +1196,148 @@ export default function PosSystem() {
     });
   };
 
+  // Print Report Function
+  const handlePrintReport = () => {
+    // Filter sales data for the report
+    const filteredSales = sales.filter(sale => {
+      const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+      const dateMatch = saleDate === selectedDate;
+      
+      if (selectedStaffFilter === "all") {
+        return dateMatch;
+      } else if (selectedStaffFilter === 0) {
+        return dateMatch && !sale.staffAccountId;
+      } else {
+        return dateMatch && sale.staffAccountId === selectedStaffFilter;
+      }
+    });
+
+    const validSales = filteredSales.filter(sale => !sale.isVoided);
+    const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const totalTransactions = validSales.length;
+    const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+
+    // Calculate profit
+    const totalProfit = validSales.reduce((profit, sale) => {
+      const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
+        const salePrice = parseFloat(item.price) * item.quantity;
+        const costPrice = item.costPrice ? parseFloat(item.costPrice) * item.quantity : 0;
+        return itemProfit + (salePrice - costPrice);
+      }, 0);
+      return profit + saleProfit;
+    }, 0);
+
+    // Payment method breakdown
+    const paymentMethods = validSales.reduce((acc, sale) => {
+      const method = sale.paymentType;
+      acc[method] = (acc[method] || 0) + parseFloat(sale.total);
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Staff filter name
+    const staffFilterName = selectedStaffFilter === "all" 
+      ? "All Staff" 
+      : selectedStaffFilter === 0 
+        ? "Manager" 
+        : staffAccounts.find(s => s.id === selectedStaffFilter)?.displayName || 
+          staffAccounts.find(s => s.id === selectedStaffFilter)?.username || 
+          `Staff #${selectedStaffFilter}`;
+
+    // Generate PDF
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.width;
+    let yPosition = 20;
+
+    // Header
+    pdf.setFontSize(20);
+    pdf.text('Storm POS - Sales Analytics Report', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 15;
+
+    pdf.setFontSize(12);
+    pdf.text(`Date: ${new Date(selectedDate).toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 10;
+    pdf.text(`Staff Filter: ${staffFilterName}`, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 20;
+
+    // Summary Section
+    pdf.setFontSize(16);
+    pdf.text('Summary', 20, yPosition);
+    yPosition += 15;
+
+    pdf.setFontSize(11);
+    pdf.text(`Total Revenue: R${totalRevenue.toFixed(2)}`, 20, yPosition);
+    yPosition += 8;
+    pdf.text(`Total Profit: R${totalProfit.toFixed(2)}`, 20, yPosition);
+    yPosition += 8;
+    pdf.text(`Total Transactions: ${totalTransactions}`, 20, yPosition);
+    yPosition += 8;
+    pdf.text(`Average Transaction: R${avgTransactionValue.toFixed(2)}`, 20, yPosition);
+    yPosition += 15;
+
+    // Payment Methods
+    pdf.setFontSize(16);
+    pdf.text('Payment Methods', 20, yPosition);
+    yPosition += 15;
+
+    pdf.setFontSize(11);
+    Object.entries(paymentMethods).forEach(([method, total]) => {
+      pdf.text(`${method.charAt(0).toUpperCase() + method.slice(1)}: R${total.toFixed(2)}`, 20, yPosition);
+      yPosition += 8;
+    });
+    yPosition += 10;
+
+    // Sales Details
+    pdf.setFontSize(16);
+    pdf.text('Sales Details', 20, yPosition);
+    yPosition += 15;
+
+    pdf.setFontSize(9);
+    filteredSales.forEach((sale, index) => {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+
+      const staffName = sale.staffAccountId 
+        ? staffAccounts.find(staff => staff.id === sale.staffAccountId)?.displayName || 
+          staffAccounts.find(staff => staff.id === sale.staffAccountId)?.username || 
+          `Staff #${sale.staffAccountId}`
+        : 'Manager';
+
+      const saleText = `#${sale.id} - R${sale.total} - ${sale.paymentType.toUpperCase()} - ${new Date(sale.createdAt).toLocaleTimeString()} - ${staffName}`;
+      pdf.text(saleText, 20, yPosition);
+      yPosition += 6;
+
+      if (sale.isVoided) {
+        pdf.text(`   VOIDED: ${sale.voidReason || 'No reason provided'}`, 25, yPosition);
+        yPosition += 6;
+      }
+
+      if (sale.customerName) {
+        pdf.text(`   Customer: ${sale.customerName}`, 25, yPosition);
+        yPosition += 6;
+      }
+
+      const itemsText = `   Items: ${sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}`;
+      pdf.text(itemsText, 25, yPosition);
+      yPosition += 8;
+    });
+
+    // Footer
+    yPosition += 10;
+    pdf.setFontSize(8);
+    pdf.text(`Generated on ${new Date().toLocaleString()}`, pageWidth / 2, yPosition, { align: 'center' });
+
+    // Download PDF
+    const fileName = `storm-pos-report-${selectedDate}-${staffFilterName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+    pdf.save(fileName);
+
+    toast({
+      title: "Report Generated",
+      description: `Sales analytics report for ${new Date(selectedDate).toLocaleDateString()} has been downloaded.`,
+    });
+  };
+
   // Logout
   const logout = () => {
     // In a real app, you'd clear session/tokens here
@@ -2000,24 +2143,58 @@ export default function PosSystem() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-4">
-                    <Label htmlFor="date-filter">Select Date:</Label>
-                    <Input
-                      id="date-filter"
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="w-auto"
-                    />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="date-filter">Select Date:</Label>
+                      <Input
+                        id="date-filter"
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="w-auto"
+                      />
+                      <Label htmlFor="staff-filter">Filter by Staff:</Label>
+                      <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="All Staff" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Sales</SelectItem>
+                          <SelectItem value="0">Manager</SelectItem>
+                          {staffAccounts.map((staff) => (
+                            <SelectItem key={staff.id} value={staff.id.toString()}>
+                              {staff.displayName || staff.username || `Staff #${staff.id}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={() => handlePrintReport()}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Print
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
 
               {(() => {
-                // Filter sales for selected date
+                // Filter sales for selected date and staff
                 const dateFilteredSales = sales.filter(sale => {
                   const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
-                  return saleDate === selectedDate;
+                  const dateMatch = saleDate === selectedDate;
+                  
+                  if (selectedStaffFilter === "all") {
+                    return dateMatch;
+                  } else if (selectedStaffFilter === 0) {
+                    // Manager sales (no staffAccountId)
+                    return dateMatch && !sale.staffAccountId;
+                  } else {
+                    // Specific staff member
+                    return dateMatch && sale.staffAccountId === selectedStaffFilter;
+                  }
                 });
 
                 // Filter out voided sales for calculations
