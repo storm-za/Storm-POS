@@ -919,13 +919,9 @@ export default function PosSystem() {
       }
     }
 
-    // Company name and title
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('STORM POS', 20, yPosition);
-    yPosition += 10;
-
+    // Receipt title only
     doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
     doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', 20, yPosition);
     yPosition += 15;
 
