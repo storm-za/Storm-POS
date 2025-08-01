@@ -101,8 +101,55 @@ export default function PosSystem() {
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string} | null>(null);
+  const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [managementPassword, setManagementPassword] = useState("");
+  const [currentTab, setCurrentTab] = useState("sales");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Handle tab change with role-based access control
+  const handleTabChange = (tabValue: string) => {
+    // If no staff is logged in or staff is management, allow all tabs
+    if (!currentStaff || currentStaff.userType === 'management') {
+      setCurrentTab(tabValue);
+      return;
+    }
+
+    // For staff users, only allow sales, customers, and open-accounts
+    const allowedTabs = ['sales', 'customers', 'open-accounts'];
+    
+    if (allowedTabs.includes(tabValue)) {
+      setCurrentTab(tabValue);
+    } else {
+      // Show management password dialog for restricted tabs
+      setPendingTab(tabValue);
+      setManagementPasswordDialog(true);
+    }
+  };
+
+  // Verify management password
+  const verifyManagementPassword = () => {
+    // For this demo, use a simple password. In production, this should be more secure
+    const correctPassword = "manager123";
+    
+    if (managementPassword === correctPassword) {
+      setCurrentTab(pendingTab || "sales");
+      setManagementPasswordDialog(false);
+      setPendingTab(null);
+      setManagementPassword("");
+      toast({
+        title: "Access Granted",
+        description: "You now have access to management features.",
+      });
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Incorrect management password.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Get current user from localStorage or session
   useEffect(() => {
@@ -1199,7 +1246,7 @@ export default function PosSystem() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="sales" className="w-full">
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="sales" className="flex items-center space-x-2">
               <ShoppingCart className="h-4 w-4" />
@@ -2690,6 +2737,56 @@ export default function PosSystem() {
                   ))
                 )}
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Management Password Dialog */}
+      <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Management Access Required</DialogTitle>
+            <DialogDescription>
+              This section requires management privileges. Please enter the management password to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="mgmt-password">Management Password</Label>
+              <Input
+                id="mgmt-password"
+                type="password"
+                value={managementPassword}
+                onChange={(e) => setManagementPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    verifyManagementPassword();
+                  }
+                }}
+                placeholder="Enter management password"
+                autoFocus
+              />
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setManagementPasswordDialog(false);
+                  setPendingTab(null);
+                  setManagementPassword("");
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={verifyManagementPassword}
+                className="flex-1"
+                disabled={!managementPassword.trim()}
+              >
+                Verify
+              </Button>
             </div>
           </div>
         </DialogContent>

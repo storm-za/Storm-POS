@@ -157,6 +157,14 @@ POS System tables:
   - Sales data now persists across server restarts and sessions
   - Demo account and sample data properly maintained in database
   - Fixed issue where sales reports showed 0 after restart
+- August 1, 2025. Implemented comprehensive staff account system:
+  - Added staff account management with role-based access control
+  - Staff users limited to Sales, Customers, and Open Accounts tabs
+  - Management password (manager123) required for Products and Reports access
+  - Staff information tracked on all sales transactions and receipts
+  - Security fixes for proper staff authentication using Drizzle ORM
+  - PDF receipts now display "Served by: [Staff Name]" information
+  - Removed "STORM POS" header from receipts for cleaner appearance
 
 ## User Preferences
 
