@@ -165,6 +165,14 @@ POS System tables:
   - Security fixes for proper staff authentication using Drizzle ORM
   - PDF receipts now display "Served by: [Staff Name]" information
   - Removed "STORM POS" header from receipts for cleaner appearance
+- August 1, 2025. Implemented void sale functionality:
+  - Added void buttons to each sale in the Reports section
+  - Management users can void sales with reason tracking
+  - Voided sales are visually distinguished with red styling and strikethrough
+  - Void reasons are stored and can be viewed via "View" button
+  - Sales figures exclude voided sales from revenue calculations
+  - Updated database schema with isVoided, voidReason, voidedAt, voidedBy fields
+  - API endpoint for voiding sales with proper authorization checks
 
 ## User Preferences
 

@@ -465,6 +465,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Void Sale Route
+  app.patch("/api/pos/sales/:id/void", async (req, res) => {
+    try {
+      const saleId = parseInt(req.params.id);
+      const { voidReason, voidedBy } = req.body;
+      
+      if (!voidReason || !voidReason.trim()) {
+        return res.status(400).json({ message: "Void reason is required" });
+      }
+      
+      const voidedSale = await storage.voidPosSale(saleId, voidReason, voidedBy);
+      
+      if (!voidedSale) {
+        return res.status(404).json({ message: "Sale not found" });
+      }
+      
+      res.json(voidedSale);
+    } catch (error) {
+      console.error("Error voiding sale:", error);
+      res.status(500).json({ message: "Failed to void sale" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

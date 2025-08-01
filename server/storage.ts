@@ -33,6 +33,7 @@ export interface IStorage {
   
   getPosSales(userId: number): Promise<PosSale[]>;
   createPosSale(sale: InsertPosSale): Promise<PosSale>;
+  voidPosSale(saleId: number, voidReason: string, voidedBy: number): Promise<PosSale | undefined>;
   
   // Open Accounts Operations
   getPosOpenAccounts(userId: number): Promise<PosOpenAccount[]>;
@@ -291,15 +292,36 @@ export class MemStorage implements IStorage {
     const sale: PosSale = {
       id,
       userId: insertSale.userId,
+      staffAccountId: insertSale.staffAccountId || null,
       total: insertSale.total,
       items: insertSale.items,
       customerName: insertSale.customerName || null,
       notes: insertSale.notes || null,
       paymentType: insertSale.paymentType,
+      isVoided: false,
+      voidReason: null,
+      voidedAt: null,
+      voidedBy: null,
       createdAt: new Date(),
     };
     this.posSales.set(id, sale);
     return sale;
+  }
+
+  async voidPosSale(saleId: number, voidReason: string, voidedBy: number): Promise<PosSale | undefined> {
+    const sale = this.posSales.get(saleId);
+    if (!sale || sale.isVoided) return undefined;
+    
+    const voidedSale: PosSale = {
+      ...sale,
+      isVoided: true,
+      voidReason,
+      voidedAt: new Date(),
+      voidedBy,
+    };
+    
+    this.posSales.set(saleId, voidedSale);
+    return voidedSale;
   }
 
   // Open Accounts Methods

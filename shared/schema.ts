@@ -69,7 +69,11 @@ export const posSales = pgTable("pos_sales", {
   items: jsonb("items").notNull(), // Array of {productId, name, price, quantity}
   customerName: text("customer_name"),
   notes: text("notes"),
-  paymentType: text("payment_type").notNull(), // 'cash', 'card', 'snapscan'
+  paymentType: text("payment_type").notNull(), // 'cash', 'card', 'eft'
+  isVoided: boolean("is_voided").notNull().default(false),
+  voidReason: text("void_reason"),
+  voidedAt: timestamp("voided_at"),
+  voidedBy: integer("voided_by").references(() => posStaffAccounts.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

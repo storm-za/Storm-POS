@@ -20,7 +20,7 @@ import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings
+  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
@@ -59,6 +59,10 @@ interface Sale {
   customerName?: string;
   notes?: string;
   paymentType: string;
+  isVoided: boolean;
+  voidReason?: string;
+  voidedAt?: string;
+  voidedBy?: number;
   createdAt: string;
 }
 
@@ -105,6 +109,9 @@ export default function PosSystem() {
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("sales");
+  const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
+  const [voidReason, setVoidReason] = useState("");
+  const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -1121,7 +1128,72 @@ export default function PosSystem() {
     },
   });
 
+  // Void sale mutation
+  const voidSaleMutation = useMutation({
+    mutationFn: async ({ saleId, voidReason }: { saleId: number; voidReason: string }) => {
+      const response = await apiRequest("PATCH", `/api/pos/sales/${saleId}/void`, {
+        voidReason,
+        voidedBy: currentStaff?.id || null,
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to void sale");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sale voided",
+        description: "The sale has been voided successfully",
+      });
+      
+      setVoidSaleDialog({ open: false, sale: null });
+      setVoidReason("");
+      
+      // Refresh sales data
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to void sale",
+        description: error.message || "An error occurred while voiding the sale",
+        variant: "destructive",
+      });
+    },
+  });
 
+  // Void sale handlers
+  const handleVoidSaleClick = (sale: Sale) => {
+    if (currentStaff?.userType !== 'management') {
+      toast({
+        title: "Access denied",
+        description: "Only management users can void sales",
+        variant: "destructive",
+      });
+      return;
+    }
+    setVoidSaleDialog({ open: true, sale });
+  };
+
+  const handleViewVoidReason = (sale: Sale) => {
+    setViewVoidDialog({ open: true, sale });
+  };
+
+  const handleVoidSaleSubmit = () => {
+    if (!voidSaleDialog.sale || !voidReason.trim()) {
+      toast({
+        title: "Invalid void reason",
+        description: "Please enter a reason for voiding this sale",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    voidSaleMutation.mutate({
+      saleId: voidSaleDialog.sale.id,
+      voidReason: voidReason.trim(),
+    });
+  };
 
   // Logout
   const logout = () => {
@@ -1948,8 +2020,11 @@ export default function PosSystem() {
                   return saleDate === selectedDate;
                 });
 
-                // Calculate totals by payment method
-                const paymentMethodTotals = dateFilteredSales.reduce((acc, sale) => {
+                // Filter out voided sales for calculations
+                const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
+
+                // Calculate totals by payment method (excluding voided sales)
+                const paymentMethodTotals = validSales.reduce((acc, sale) => {
                   const method = sale.paymentType;
                   acc[method] = (acc[method] || 0) + parseFloat(sale.total);
                   return acc;
@@ -1962,7 +2037,7 @@ export default function PosSystem() {
                   amount: `R${total.toFixed(2)}`
                 }));
 
-                // Daily totals for line chart (last 7 days including selected date)
+                // Daily totals for line chart (last 7 days including selected date) - excluding voided sales
                 const last7Days = Array.from({ length: 7 }, (_, i) => {
                   const date = new Date(selectedDate);
                   date.setDate(date.getDate() - (6 - i));
@@ -1971,7 +2046,7 @@ export default function PosSystem() {
 
                 const dailyTotals = last7Days.map(date => {
                   const daySales = sales.filter(sale => 
-                    new Date(sale.createdAt).toISOString().split('T')[0] === date
+                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
                   );
                   const total = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
                   return {
@@ -1981,12 +2056,12 @@ export default function PosSystem() {
                   };
                 });
 
-                const totalRevenue = dateFilteredSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
-                const totalTransactions = dateFilteredSales.length;
+                const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const totalTransactions = validSales.length;
                 const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
                 
-                // Calculate total profit (revenue - cost)
-                const totalProfit = dateFilteredSales.reduce((profit, sale) => {
+                // Calculate total profit (revenue - cost) - excluding voided sales
+                const totalProfit = validSales.reduce((profit, sale) => {
                   const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
                     const salePrice = parseFloat(item.price) * item.quantity;
                     const costPrice = item.costPrice ? parseFloat(item.costPrice) * item.quantity : 0;
@@ -2111,11 +2186,20 @@ export default function PosSystem() {
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                           {dateFilteredSales.length > 0 ? (
                             dateFilteredSales.map((sale) => (
-                              <div key={sale.id} className="flex justify-between items-center p-3 border rounded-lg">
+                              <div key={sale.id} className={`flex justify-between items-center p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-4">
                                     <div>
-                                      <p className="font-medium">R{sale.total}</p>
+                                      <div className="flex items-center gap-2">
+                                        <p className={`font-medium ${sale.isVoided ? 'line-through text-red-600' : ''}`}>
+                                          R{sale.total}
+                                        </p>
+                                        {sale.isVoided && (
+                                          <Badge variant="destructive" className="text-xs">
+                                            VOIDED
+                                          </Badge>
+                                        )}
+                                      </div>
                                       <p className="text-sm text-gray-500">
                                         {new Date(sale.createdAt).toLocaleTimeString()}
                                       </p>
@@ -2131,13 +2215,40 @@ export default function PosSystem() {
                                     <p className="text-xs text-gray-600">
                                       Items: {sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}
                                     </p>
+                                    {sale.isVoided && sale.voidReason && (
+                                      <p className="text-xs text-red-600 mt-1">
+                                        Void Reason: {sale.voidReason}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right flex flex-col items-end gap-1">
                                   <Badge variant="outline" className="mb-1">
                                     {sale.paymentType.toUpperCase()}
                                   </Badge>
                                   <p className="text-xs text-gray-500">#{sale.id}</p>
+                                  {!sale.isVoided && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleVoidSaleClick(sale)}
+                                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <X className="h-3 w-3 mr-1" />
+                                      Void
+                                    </Button>
+                                  )}
+                                  {sale.isVoided && sale.voidReason && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleViewVoidReason(sale)}
+                                      className="h-6 px-2 text-xs"
+                                    >
+                                      <Eye className="h-3 w-3 mr-1" />
+                                      View
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                             ))
@@ -2740,6 +2851,104 @@ export default function PosSystem() {
             >
               Understood
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Void Sale Dialog */}
+      <Dialog open={voidSaleDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setVoidSaleDialog({ open: false, sale: null });
+          setVoidReason("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Void Sale</DialogTitle>
+            <DialogDescription>
+              Enter the reason for voiding this sale. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {voidSaleDialog.sale && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="font-medium">Sale #{voidSaleDialog.sale.id}</p>
+                <p className="text-sm text-gray-600">Amount: R{voidSaleDialog.sale.total}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(voidSaleDialog.sale.createdAt).toLocaleString()}
+                </p>
+              </div>
+            )}
+            <div>
+              <Label htmlFor="voidReason">Reason for voiding</Label>
+              <Textarea
+                id="voidReason"
+                value={voidReason}
+                onChange={(e) => setVoidReason(e.target.value)}
+                placeholder="Enter the reason for voiding this sale..."
+                className="mt-1"
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setVoidSaleDialog({ open: false, sale: null });
+                  setVoidReason("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleVoidSaleSubmit}
+                disabled={!voidReason.trim() || voidSaleMutation.isPending}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {voidSaleMutation.isPending ? "Voiding..." : "Void Sale"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Void Reason Dialog */}
+      <Dialog open={viewVoidDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setViewVoidDialog({ open: false, sale: null });
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Void Sale Details</DialogTitle>
+            <DialogDescription>
+              Information about this voided sale.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {viewVoidDialog.sale && (
+              <>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="font-medium text-red-800">Sale #{viewVoidDialog.sale.id} - VOIDED</p>
+                  <p className="text-sm text-red-700">Original Amount: R{viewVoidDialog.sale.total}</p>
+                  <p className="text-xs text-red-600">
+                    Voided: {viewVoidDialog.sale.voidedAt ? new Date(viewVoidDialog.sale.voidedAt).toLocaleString() : 'Unknown'}
+                  </p>
+                </div>
+                {viewVoidDialog.sale.voidReason && (
+                  <div>
+                    <Label>Void Reason</Label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded border text-sm">
+                      {viewVoidDialog.sale.voidReason}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="flex justify-end">
+              <Button onClick={() => setViewVoidDialog({ open: false, sale: null })}>
+                Close
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
