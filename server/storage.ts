@@ -95,6 +95,8 @@ export class MemStorage implements IStorage {
   private async createDemoPosUser() {
     const demoUser: PosUser = {
       id: 1,
+      firstName: "Demo",
+      lastName: "User",
       email: "demo@storm.co.za",
       password: "demo123", // In production, this should be hashed
       paid: true,
@@ -198,6 +200,8 @@ export class MemStorage implements IStorage {
     const id = this.currentPosUserId++;
     const user: PosUser = {
       id,
+      firstName: insertUser.firstName,
+      lastName: insertUser.lastName,
       email: insertUser.email,
       password: insertUser.password,
       paid: insertUser.paid || false,
@@ -637,7 +641,7 @@ export class DatabaseStorage implements IStorage {
     return staff || undefined;
   }
 
-  async voidPosSale(saleId: number, voidReason: string, voidedBy: string): Promise<PosSale | undefined> {
+  async voidPosSale(saleId: number, voidReason: string, voidedBy: number): Promise<PosSale | undefined> {
     const [sale] = await db
       .update(posSales)
       .set({ 
