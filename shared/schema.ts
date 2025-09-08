@@ -22,8 +22,8 @@ export const contactSubmissions = pgTable("contact_submissions", {
 // POS System Tables
 export const posUsers = pgTable("pos_users", {
   id: serial("id").primaryKey(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull().default("User"),
+  lastName: text("last_name").notNull().default("Account"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   paid: boolean("paid").notNull().default(true),
