@@ -149,8 +149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POS Products
   app.get("/api/pos/products", async (req, res) => {
     try {
-      // For demo, use user ID 1
-      const products = await storage.getPosProducts(1);
+      const userId = parseInt(req.query.userId as string) || 1;
+      const products = await storage.getPosProducts(userId);
       res.json(products);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -160,9 +160,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/products", async (req, res) => {
     try {
+      const { userId, ...productData } = req.body;
       const validatedData = insertPosProductSchema.parse({
-        ...req.body,
-        userId: 1 // Demo user
+        ...productData,
+        userId: userId || 1
       });
       const product = await storage.createPosProduct(validatedData);
       res.json(product);
@@ -175,9 +176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pos/products/:id", async (req, res) => {
     try {
       const productId = parseInt(req.params.id);
+      const { userId, ...productData } = req.body;
       const validatedData = insertPosProductSchema.parse({
-        ...req.body,
-        userId: 1 // Demo user
+        ...productData,
+        userId: userId || 1
       });
       const product = await storage.updatePosProduct(productId, validatedData);
       if (!product) {
@@ -207,7 +209,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POS Customers
   app.get("/api/pos/customers", async (req, res) => {
     try {
-      const customers = await storage.getPosCustomers(1);
+      const userId = parseInt(req.query.userId as string) || 1;
+      const customers = await storage.getPosCustomers(userId);
       res.json(customers);
     } catch (error) {
       console.error("Error fetching customers:", error);
@@ -217,9 +220,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/customers", async (req, res) => {
     try {
+      const { userId, ...customerData } = req.body;
       const validatedData = insertPosCustomerSchema.parse({
-        ...req.body,
-        userId: 1
+        ...customerData,
+        userId: userId || 1
       });
       const customer = await storage.createPosCustomer(validatedData);
       res.json(customer);
@@ -232,9 +236,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pos/customers/:id", async (req, res) => {
     try {
       const customerId = parseInt(req.params.id);
+      const { userId, ...customerData } = req.body;
       const validatedData = insertPosCustomerSchema.parse({
-        ...req.body,
-        userId: 1
+        ...customerData,
+        userId: userId || 1
       });
       const customer = await storage.updatePosCustomer(customerId, validatedData);
       if (!customer) {
@@ -264,7 +269,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POS Sales
   app.get("/api/pos/sales", async (req, res) => {
     try {
-      const sales = await storage.getPosSales(1);
+      const userId = parseInt(req.query.userId as string) || 1;
+      const sales = await storage.getPosSales(userId);
       res.json(sales);
     } catch (error) {
       console.error("Error fetching sales:", error);
@@ -274,15 +280,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/sales", async (req, res) => {
     try {
-      const saleData = {
-        ...req.body,
-        userId: 1
-      };
+      const { userId, ...saleData } = req.body;
+      const userIdToUse = userId || 1;
       
-      const validatedData = insertPosSaleSchema.parse(saleData);
+      const validatedData = insertPosSaleSchema.parse({
+        ...saleData,
+        userId: userIdToUse
+      });
       
       // Get all products first to avoid async issues
-      const products = await storage.getPosProducts(1);
+      const products = await storage.getPosProducts(userIdToUse);
       
       // Check inventory and prepare updates
       const inventoryUpdates = [];
@@ -326,7 +333,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Open Accounts routes
   app.get("/api/pos/open-accounts", async (req, res) => {
     try {
-      const userId = 1; // Demo user ID
+      const userId = parseInt(req.query.userId as string) || 1;
       const openAccounts = await storage.getPosOpenAccounts(userId);
       res.json(openAccounts);
     } catch (error) {
@@ -337,9 +344,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/open-accounts", async (req, res) => {
     try {
+      const { userId, ...accountData } = req.body;
       const validatedData = insertPosOpenAccountSchema.parse({
-        ...req.body,
-        userId: 1, // Demo user ID
+        ...accountData,
+        userId: userId || 1,
       });
       const openAccount = await storage.createPosOpenAccount(validatedData);
       res.json(openAccount);

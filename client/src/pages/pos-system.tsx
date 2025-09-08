@@ -225,22 +225,50 @@ export default function PosSystem() {
 
   // Fetch products
   const { data: products = [] } = useQuery<Product[]>({
-    queryKey: ["/api/pos/products"],
+    queryKey: ["/api/pos/products", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/products?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
+    },
+    enabled: !!currentUser,
   });
 
   // Fetch customers
   const { data: customers = [] } = useQuery<Customer[]>({
-    queryKey: ["/api/pos/customers"],
+    queryKey: ["/api/pos/customers", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/customers?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch customers');
+      return response.json();
+    },
+    enabled: !!currentUser,
   });
 
   // Fetch sales
   const { data: sales = [] } = useQuery<Sale[]>({
-    queryKey: ["/api/pos/sales"],
+    queryKey: ["/api/pos/sales", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/sales?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch sales');
+      return response.json();
+    },
+    enabled: !!currentUser,
   });
 
   // Fetch open accounts
   const { data: openAccounts = [] } = useQuery<PosOpenAccount[]>({
-    queryKey: ["/api/pos/open-accounts"],
+    queryKey: ["/api/pos/open-accounts", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/open-accounts?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch open accounts');
+      return response.json();
+    },
+    enabled: !!currentUser,
   });
 
   // Fetch staff accounts
@@ -258,11 +286,14 @@ export default function PosSystem() {
   // Product mutations
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {
-      const response = await apiRequest("POST", "/api/pos/products", productData);
+      const response = await apiRequest("POST", "/api/pos/products", {
+        ...productData,
+        userId: currentUser?.id
+      });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       productForm.reset();
       setIsProductDialogOpen(false);
       toast({
@@ -288,7 +319,7 @@ export default function PosSystem() {
     },
     onSuccess: () => {
       console.log("Update successful");
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       productForm.reset();
       setEditingProduct(null);
       setIsProductDialogOpen(false);
@@ -313,7 +344,7 @@ export default function PosSystem() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       toast({
         title: "Product deleted",
         description: "Product has been successfully deleted.",
@@ -331,11 +362,14 @@ export default function PosSystem() {
   // Customer mutations
   const createCustomerMutation = useMutation({
     mutationFn: async (customerData: any) => {
-      const response = await apiRequest("POST", "/api/pos/customers", customerData);
+      const response = await apiRequest("POST", "/api/pos/customers", {
+        ...customerData,
+        userId: currentUser?.id
+      });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers", currentUser?.id] });
       setIsCustomerDialogOpen(false);
       customerForm.reset();
       toast({
@@ -358,7 +392,7 @@ export default function PosSystem() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers", currentUser?.id] });
       setIsCustomerDialogOpen(false);
       setEditingCustomer(null);
       customerForm.reset();
@@ -382,7 +416,7 @@ export default function PosSystem() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers", currentUser?.id] });
       toast({
         title: "Success",
         description: "Customer deleted successfully",
@@ -404,7 +438,7 @@ export default function PosSystem() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts", currentUser?.id] });
       setIsUserManagementOpen(false);
       toast({
         title: "Staff account created",
@@ -448,7 +482,7 @@ export default function PosSystem() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts", currentUser?.id] });
       toast({
         title: "Staff account deleted",
         description: "Staff account has been successfully deleted.",
@@ -651,6 +685,7 @@ export default function PosSystem() {
           notes: saleNotes || null,
           paymentType,
           staffAccountId: currentStaff?.id || null,
+          userId: currentUser?.id,
         };
 
         const response = await apiRequest("POST", "/api/pos/sales", saleData);
@@ -712,8 +747,8 @@ export default function PosSystem() {
         setSelectedOpenAccountId(null);
         
         // Refresh data
-        queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       } else if (result.type === 'add-to-account') {
         toast({
           title: "Items added to account",
@@ -730,8 +765,8 @@ export default function PosSystem() {
         setSelectedOpenAccountId(null);
         
         // Refresh data
-        queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts", currentUser?.id] });
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       }
       // For open-account, the dialog will handle the next steps
     },
@@ -748,7 +783,10 @@ export default function PosSystem() {
   // Create open account mutation
   const createOpenAccountMutation = useMutation({
     mutationFn: async (accountData: any) => {
-      const response = await apiRequest("POST", "/api/pos/open-accounts", accountData);
+      const response = await apiRequest("POST", "/api/pos/open-accounts", {
+        ...accountData,
+        userId: currentUser?.id
+      });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to create open account");
@@ -771,8 +809,8 @@ export default function PosSystem() {
       setIsOpenAccountDialogOpen(false);
       
       // Refresh data
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
     },
     onError: (error: Error) => {
       toast({
@@ -838,8 +876,8 @@ export default function PosSystem() {
       
       // Refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
     },
     onError: (error: Error) => {
       toast({
@@ -1256,7 +1294,7 @@ export default function PosSystem() {
       
       // Refresh data
       queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
     },
     onError: (error: Error) => {
       toast({
@@ -1290,7 +1328,7 @@ export default function PosSystem() {
       setVoidReason("");
       
       // Refresh sales data
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
     },
     onError: (error: Error) => {
       toast({
