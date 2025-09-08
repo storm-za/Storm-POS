@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, Building } from "lucide-react";
 
 export default function PosSignup() {
   const [, setLocation] = useLocation();
@@ -16,20 +16,18 @@ export default function PosSignup() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const { toast } = useToast();
 
   const signupMutation = useMutation({
-    mutationFn: async (userData: { firstName: string; lastName: string; email: string; password: string }) => {
+    mutationFn: async (userData: { firstName: string; lastName: string; email: string; password: string; companyName: string }) => {
       const response = await apiRequest("POST", "/api/pos/signup", userData);
       return response.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Account created successfully!",
-        description: "You can now sign in with your credentials.",
-      });
-      setLocation("/pos/login");
+      setSignupSuccess(true);
     },
     onError: (error: Error) => {
       toast({
@@ -42,7 +40,7 @@ export default function PosSignup() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password || !companyName) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
@@ -50,8 +48,56 @@ export default function PosSignup() {
       });
       return;
     }
-    signupMutation.mutate({ firstName, lastName, email, password });
+    signupMutation.mutate({ firstName, lastName, email, password, companyName });
   };
+
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen overflow-x-hidden w-full bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-md"
+        >
+          <Card className="shadow-2xl border-0">
+            <CardHeader className="text-center space-y-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto">
+                <User className="h-8 w-8 text-green-500" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Account Created!</h1>
+                <p className="text-green-100">Welcome to Storm POS</p>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-8 text-center">
+              <div className="space-y-4">
+                <p className="text-gray-600">
+                  Your account has been created successfully! You can now sign in with your credentials.
+                </p>
+                <Button
+                  onClick={() => setLocation("/pos/login")}
+                  className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
+                >
+                  Log In
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <div className="mt-6 text-center">
+            <a 
+              href="/pos" 
+              className="text-sm text-gray-600 hover:text-[hsl(217,90%,40%)] hover:underline"
+            >
+              ← Back to POS Info
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden w-full bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
@@ -109,6 +155,24 @@ export default function PosSignup() {
                       required
                     />
                   </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="companyName" className="text-sm font-medium text-gray-700">
+                  Company Name
+                </Label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="companyName"
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Enter your company name"
+                    className="pl-10 h-12"
+                    required
+                  />
                 </div>
               </div>
               

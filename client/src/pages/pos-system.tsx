@@ -154,7 +154,8 @@ export default function PosSystem() {
           id: 1,
           email: 'demo@storm.co.za',
           paid: true,
-          companyLogo: null
+          companyLogo: null,
+          companyName: 'Demo Account'
         });
       }
     } else {
@@ -163,7 +164,8 @@ export default function PosSystem() {
         id: 1,
         email: 'demo@storm.co.za',
         paid: true,
-        companyLogo: null
+        companyLogo: null,
+        companyName: 'Demo Account'
       });
     }
   }, []);
@@ -1481,7 +1483,7 @@ export default function PosSystem() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-[hsl(217,90%,40%)]">Storm POS</h1>
-              <Badge variant="outline" className="ml-3">Demo Account</Badge>
+              <Badge variant="outline" className="ml-3">{currentUser?.companyName || "Demo Account"}</Badge>
             </div>
             <div className="flex items-center space-x-3">
               {/* Staff Account Dropdown */}

@@ -82,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         message: "Account created successfully! You can now sign in.",
-        user: { id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName }
+        user: { id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName, companyName: newUser.companyName }
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -116,7 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In production, you'd use proper session management here
       res.json({ 
         success: true, 
-        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo }
+        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo, companyName: user.companyName }
       });
     } catch (error) {
       console.error("POS login error:", error);

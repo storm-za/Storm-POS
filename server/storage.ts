@@ -99,6 +99,7 @@ export class MemStorage implements IStorage {
       lastName: "User",
       email: "demo@storm.co.za",
       password: "demo123", // In production, this should be hashed
+      companyName: "Demo Company",
       paid: true,
       companyLogo: null,
       createdAt: new Date(),
@@ -204,6 +205,7 @@ export class MemStorage implements IStorage {
       lastName: insertUser.lastName,
       email: insertUser.email,
       password: insertUser.password,
+      companyName: insertUser.companyName,
       paid: insertUser.paid || false,
       companyLogo: insertUser.companyLogo || null,
       createdAt: new Date(),

@@ -26,6 +26,7 @@ export const posUsers = pgTable("pos_users", {
   lastName: text("last_name").notNull().default("Account"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  companyName: text("company_name").notNull().default("My Company"),
   paid: boolean("paid").notNull().default(true),
   companyLogo: text("company_logo"), // Base64 encoded image
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -112,6 +113,7 @@ export const signupPosUserSchema = createInsertSchema(posUsers).pick({
   lastName: true,
   email: true,
   password: true,
+  companyName: true,
 });
 
 export const insertPosProductSchema = createInsertSchema(posProducts).omit({
