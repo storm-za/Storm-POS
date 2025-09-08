@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import WebDevelopment from "@/pages/web-development";
 import POS from "@/pages/pos";
 import PosLogin from "@/pages/pos-login";
+import PosSignup from "@/pages/pos-signup";
 import PosSystem from "@/pages/pos-system";
 import PosInactive from "@/pages/pos-inactive";
 import Navigation from "@/components/navigation";
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/web-development" component={WebDevelopment} />
         <Route path="/pos" component={POS} />
         <Route path="/pos/login" component={PosLogin} />
+        <Route path="/pos/signup" component={PosSignup} />
         <Route path="/pos/system" component={PosSystem} />
         <Route path="/pos/inactive" component={PosInactive} />
         <Route component={NotFound} />
