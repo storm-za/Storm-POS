@@ -425,7 +425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Staff Account Routes
   app.get("/api/pos/staff-accounts", async (req, res) => {
     try {
-      const userId = 1; // Demo user ID for now
+      const userId = parseInt(req.query.userId as string) || 1; // Use provided user ID or default to 1
       const staffAccounts = await storage.getPosStaffAccounts(userId);
       res.json(staffAccounts);
     } catch (error) {
@@ -436,12 +436,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/staff-accounts", async (req, res) => {
     try {
-      const userId = 1; // Demo user ID for now
-      
-      const { username, password, userType, managementPassword } = req.body;
+      const { username, password, userType, managementPassword, userId } = req.body;
+      const posUserId = userId || 1; // Use provided user ID or default to 1
       
       // Check if management password is required (if there are management accounts)
-      const existingStaff = await storage.getPosStaffAccounts(userId);
+      const existingStaff = await storage.getPosStaffAccounts(posUserId);
       const hasManagementAccounts = existingStaff.some(staff => staff.userType === 'management');
       
       if (hasManagementAccounts && managementPassword) {
@@ -456,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const staffAccount = await storage.createPosStaffAccount({
-        posUserId: userId,
+        posUserId,
         username,
         password,
         userType
@@ -471,10 +470,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/staff-accounts/authenticate", async (req, res) => {
     try {
-      const userId = 1; // Demo user ID for now
+      const { username, password, userId } = req.body;
+      const posUserId = userId || 1; // Use provided user ID or default to 1
       
-      const { username, password } = req.body;
-      const staffAccount = await storage.authenticateStaffAccount(userId, username, password);
+      const staffAccount = await storage.authenticateStaffAccount(posUserId, username, password);
       
       if (!staffAccount) {
         return res.status(401).json({ message: "Invalid credentials" });

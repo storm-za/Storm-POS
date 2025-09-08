@@ -245,7 +245,14 @@ export default function PosSystem() {
 
   // Fetch staff accounts
   const { data: staffAccounts = [] } = useQuery<StaffAccount[]>({
-    queryKey: ["/api/pos/staff-accounts"],
+    queryKey: ["/api/pos/staff-accounts", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/staff-accounts?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch staff accounts');
+      return response.json();
+    },
+    enabled: !!currentUser,
   });
 
   // Product mutations
@@ -414,7 +421,7 @@ export default function PosSystem() {
   });
 
   const authenticateStaffMutation = useMutation({
-    mutationFn: async (credentials: { username: string; password: string }) => {
+    mutationFn: async (credentials: { username: string; password: string; userId?: number }) => {
       const response = await apiRequest("POST", "/api/pos/staff-accounts/authenticate", credentials);
       return response.json();
     },
@@ -3029,7 +3036,7 @@ export default function PosSystem() {
             const username = formData.get('username') as string;
             const password = formData.get('password') as string;
             if (username && password) {
-              authenticateStaffMutation.mutate({ username, password });
+              authenticateStaffMutation.mutate({ username, password, userId: currentUser?.id });
             }
           }}>
             <div className="space-y-4">
@@ -3105,7 +3112,8 @@ export default function PosSystem() {
                     username,
                     password,
                     userType,
-                    managementPassword: userType === 'management' ? managementPassword : undefined
+                    managementPassword: userType === 'management' ? managementPassword : undefined,
+                    userId: currentUser?.id
                   });
                   (e.target as HTMLFormElement).reset();
                 }
