@@ -136,12 +136,12 @@ export default function PosLogin() {
             
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Need access?{" "}
+                Don't have an account?{" "}
                 <a 
-                  href="mailto:stormmailcompany@gmail.com" 
+                  href="/pos/signup" 
                   className="text-[hsl(217,90%,40%)] hover:underline font-medium"
                 >
-                  Contact Support
+                  Create an Account for free
                 </a>
               </p>
             </div>
