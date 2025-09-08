@@ -6,7 +6,8 @@ import {
   insertPosProductSchema, 
   insertPosCustomerSchema, 
   insertPosSaleSchema,
-  insertPosOpenAccountSchema 
+  insertPosOpenAccountSchema,
+  signupPosUserSchema
 } from "@shared/schema";
 import { sendContactSubmissionEmail } from "./email";
 import { z } from "zod";
@@ -57,6 +58,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching submissions:", error);
       res.status(500).json({ message: "Failed to fetch submissions" });
+    }
+  });
+
+  // POS Signup
+  app.post("/api/pos/signup", async (req, res) => {
+    try {
+      const validatedData = signupPosUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getPosUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      // Create new user with paid = true by default
+      const newUser = await storage.createPosUser({
+        ...validatedData,
+        paid: true,
+        companyLogo: null
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "Account created successfully! You can now sign in.",
+        user: { id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName }
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Please fill out all required fields correctly.",
+          errors: error.errors 
+        });
+      } else {
+        console.error("POS signup error:", error);
+        res.status(500).json({ message: "Failed to create account" });
+      }
     }
   });
 
