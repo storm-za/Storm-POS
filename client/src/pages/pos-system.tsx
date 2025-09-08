@@ -1509,7 +1509,7 @@ export default function PosSystem() {
                       {staffAccounts.length === 0 ? (
                         <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
                           <UserPlus className="mr-2 h-4 w-4" />
-                          Create First Staff Account
+                          Create Management Account
                         </DropdownMenuItem>
                       ) : (
                         <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
@@ -3135,9 +3135,9 @@ export default function PosSystem() {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <Label htmlFor="user-type">User Type</Label>
-                    <Select name="user-type" required>
+                    <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : undefined}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select user type" />
+                        <SelectValue placeholder={staffAccounts.length === 0 ? "Management (Default)" : "Select user type"} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="staff">Staff</SelectItem>
