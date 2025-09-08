@@ -22,9 +22,11 @@ export const contactSubmissions = pgTable("contact_submissions", {
 // POS System Tables
 export const posUsers = pgTable("pos_users", {
   id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  paid: boolean("paid").notNull().default(false),
+  paid: boolean("paid").notNull().default(true),
   companyLogo: text("company_logo"), // Base64 encoded image
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -105,6 +107,13 @@ export const insertPosUserSchema = createInsertSchema(posUsers).omit({
   createdAt: true,
 });
 
+export const signupPosUserSchema = createInsertSchema(posUsers).pick({
+  firstName: true,
+  lastName: true,
+  email: true,
+  password: true,
+});
+
 export const insertPosProductSchema = createInsertSchema(posProducts).omit({
   id: true,
   createdAt: true,
@@ -139,6 +148,7 @@ export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 
 // POS Types
 export type InsertPosUser = z.infer<typeof insertPosUserSchema>;
+export type SignupPosUser = z.infer<typeof signupPosUserSchema>;
 export type PosUser = typeof posUsers.$inferSelect;
 export type InsertPosProduct = z.infer<typeof insertPosProductSchema>;
 export type PosProduct = typeof posProducts.$inferSelect;
