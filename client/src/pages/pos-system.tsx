@@ -1641,7 +1641,6 @@ export default function PosSystem() {
                 <h2 className="text-white text-lg font-semibold">
                   {currentUser?.companyName || "Demo Account"}
                 </h2>
-                <p className="text-blue-100 text-sm">Point of Sale System</p>
               </div>
             </div>
           </div>
