@@ -1527,28 +1527,31 @@ export default function PosSystem() {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
-            <div className="flex items-center">
+            {/* Logo */}
+            <div className="flex-shrink-0">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
-                className="h-60 w-auto mix-blend-multiply"
+                className="h-16 w-auto mix-blend-multiply"
                 style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
               />
-              <Badge variant="outline" className="ml-3">{currentUser?.companyName || "Demo Account"}</Badge>
             </div>
-            <div className="flex items-center space-x-3">
+            
+            {/* Right side controls */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
               {/* Staff Account Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
                   >
                     <User className="h-4 w-4" />
-                    <span>{currentStaff ? currentStaff.username : 'Select Staff'}</span>
+                    <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Select Staff'}</span>
+                    <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Staff'}</span>
                     {currentStaff && (
-                      <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs">
+                      <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
                         {currentStaff.userType}
                       </Badge>
                     )}
@@ -1591,40 +1594,59 @@ export default function PosSystem() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Profile Image */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsLogoDialogOpen(true)}
-                className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
-              >
-                {currentUser?.companyLogo ? (
-                  <img 
-                    src={currentUser.companyLogo} 
-                    alt="Company Logo" 
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
-                    {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                )}
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                onClick={logout}
-                className="flex items-center space-x-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </Button>
+              {/* Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
+                  >
+                    {currentUser?.companyLogo ? (
+                      <img 
+                        src={currentUser.companyLogo} 
+                        alt="Company Logo" 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
+                        {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setIsLogoDialogOpen(true)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Change Profile Picture
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Company Banner */}
+        <div className="mb-6">
+          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-lg px-6 py-4 shadow-lg">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-white text-lg font-semibold">
+                  {currentUser?.companyName || "Demo Account"}
+                </h2>
+                <p className="text-blue-100 text-sm">Point of Sale System</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
             {/* Mobile Tab Navigation - Horizontal Scroll */}
