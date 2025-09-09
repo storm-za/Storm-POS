@@ -204,7 +204,7 @@ export default function PosSystemAfrikaans() {
           id: 1,
           email: 'demo@storm.co.za',
           paid: true,
-          companyLogo: null,
+          companyLogo: undefined,
           companyName: 'Demo Rekening'
         });
       }
@@ -214,7 +214,7 @@ export default function PosSystemAfrikaans() {
         id: 1,
         email: 'demo@storm.co.za',
         paid: true,
-        companyLogo: null,
+        companyLogo: undefined,
         companyName: 'Demo Rekening'
       });
     }
@@ -1676,7 +1676,7 @@ ${dateFilteredSales.map(sale =>
                           <SelectItem value="0">Bestuur</SelectItem>
                           {staffAccounts.map((staff) => (
                             <SelectItem key={staff.id} value={staff.id.toString()}>
-                              {staff.displayName || staff.username || `Personeel #${staff.id}`}
+                              {staff.username || `Personeel #${staff.id}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
