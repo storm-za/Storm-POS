@@ -34,9 +34,7 @@ export default function POS() {
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Point of Sale That Goes Wherever You Do
               </h1>
-              <p className="text-xl mb-8 text-blue-100">
-                Storm POS is your lightweight, always-online, mobile-first solution for South African SMEs.
-              </p>
+              <p className="text-xl mb-8 text-blue-100 font-medium">Storm POS is the always-online solution for South African businesses</p>
               <Button 
                 asChild
                 size="lg"
@@ -88,7 +86,6 @@ export default function POS() {
           </div>
         </div>
       </section>
-
       {/* Features Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -136,7 +133,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Pricing Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
@@ -271,7 +267,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Call to Action */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
         <div className="max-w-4xl mx-auto text-center">
@@ -304,7 +299,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
