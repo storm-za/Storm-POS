@@ -37,7 +37,7 @@ export default function Footer() {
             <div className="space-y-2 text-gray-600">
               <p className="flex items-center">
                 <Mail className="mr-2 h-4 w-4" />
-                stormmailcompany@gmail.com
+                softwarebystorm@gmail.com
               </p>
               <p className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4" />

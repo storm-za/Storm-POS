@@ -78,7 +78,7 @@ Storm Contact System
     return true;
   } catch (error) {
     console.error('❌ Gmail authentication failed. Please check:');
-    console.error('1. 2-factor authentication is enabled on stormmailcompany@gmail.com');
+    console.error('1. 2-factor authentication is enabled on softwarebystorm@gmail.com');
     console.error('2. App password is correctly generated and copied');
     console.error('3. Go to Google Account > Security > App passwords');
     console.error('Error details:', error.message);

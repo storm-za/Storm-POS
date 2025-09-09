@@ -31,7 +31,7 @@ export default function PosInactive() {
                 asChild
                 className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
               >
-                <a href="mailto:stormmailcompany@gmail.com?subject=POS Subscription Reactivation">
+                <a href="mailto:softwarebystorm@gmail.com?subject=POS Subscription Reactivation">
                   <Mail className="h-4 w-4 mr-2" />
                   Contact Support
                 </a>
@@ -52,7 +52,7 @@ export default function PosInactive() {
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
                 <strong>Need immediate assistance?</strong><br />
-                Email: stormmailcompany@gmail.com<br />
+                Email: softwarebystorm@gmail.com<br />
                 We typically respond within 24 hours.
               </p>
             </div>

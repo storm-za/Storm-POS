@@ -3034,10 +3034,7 @@ export default function PosSystem() {
                             <div className="space-y-2 text-sm text-gray-600">
                               <p>Questions about your billing?</p>
                               <p className="font-medium text-[hsl(217,90%,40%)]">
-                                Email: billing@storm.co.za
-                              </p>
-                              <p className="font-medium text-[hsl(217,90%,40%)]">
-                                Phone: 087 550 7866
+                                Email: softwarebystorm@gmail.com
                               </p>
                             </div>
                           </div>
