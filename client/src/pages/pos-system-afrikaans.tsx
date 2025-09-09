@@ -768,7 +768,8 @@ export default function PosSystemAfrikaans() {
 
     // Items
     doc.setFont('helvetica', 'normal');
-    JSON.parse(sale.items).forEach((item: any) => {
+    const items = Array.isArray(sale.items) ? sale.items : JSON.parse(sale.items);
+    items.forEach((item: any) => {
       const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
       doc.text(item.name, 20, yPosition);
       doc.text(item.quantity.toString(), 120, yPosition);
