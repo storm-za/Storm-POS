@@ -1706,11 +1706,22 @@ export default function PosSystem() {
                   <BarChart3 className="h-4 w-4 mb-1" />
                   <span>Reports</span>
                 </button>
+                <button
+                  onClick={() => handleTabChange("usage")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "usage"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <CreditCard className="h-4 w-4 mb-1" />
+                  <span>Usage</span>
+                </button>
               </div>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-5 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
               <TabsTrigger 
                 value="sales" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
@@ -1745,6 +1756,13 @@ export default function PosSystem() {
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Reports</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="usage" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <CreditCard className="h-4 w-4" />
+                <span>Usage</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -2761,6 +2779,275 @@ export default function PosSystem() {
                 );
               })()}
             </div>
+          </TabsContent>
+
+          {/* Usage Tab */}
+          <TabsContent value="usage">
+            {(() => {
+              // Calculate current month dates
+              const now = new Date();
+              const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+              const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+              
+              // Filter sales for current month and current user
+              const currentMonthSales = sales.filter(sale => {
+                if (sale.isVoided) return false;
+                const saleDate = new Date(sale.createdAt);
+                return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+              });
+
+              // Calculate total revenue for current month
+              const currentMonthRevenue = currentMonthSales.reduce((total, sale) => {
+                return total + parseFloat(sale.total);
+              }, 0);
+
+              // Calculate Storm fee (1% of revenue)
+              const stormFee = currentMonthRevenue * 0.01;
+
+              // Calculate daily breakdown
+              const dailyBreakdown: { [key: string]: number } = {};
+              currentMonthSales.forEach(sale => {
+                const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+                dailyBreakdown[saleDate] = (dailyBreakdown[saleDate] || 0) + parseFloat(sale.total);
+              });
+
+              const daysInMonth = currentMonthEnd.getDate();
+              const daysCompleted = now.getDate();
+              const progressPercentage = (daysCompleted / daysInMonth) * 100;
+
+              const formatMonthYear = (date: Date) => {
+                return date.toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
+              };
+
+              return (
+                <div className="space-y-6">
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-bold">Usage & Billing</h2>
+                        <p className="text-blue-100 mt-1">{formatMonthYear(now)} billing period</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">R{stormFee.toFixed(2)}</div>
+                        <div className="text-blue-100 text-sm">Amount due to Storm</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Key Metrics */}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <Card className="border-l-4 border-l-green-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4" />
+                          Current Month Revenue
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-green-600">R{currentMonthRevenue.toFixed(2)}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          {currentMonthSales.length} transactions
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-blue-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          Storm Service Fee
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          1% of monthly revenue
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-orange-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          Billing Period
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-orange-600">{Math.round(progressPercentage)}%</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Day {daysCompleted} of {daysInMonth}
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${progressPercentage}%` }}
+                          ></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Billing Breakdown */}
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    {/* Fee Calculation */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <DollarSign className="w-5 h-5" />
+                          Fee Breakdown
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Gross Revenue</span>
+                            <span className="font-semibold">R{currentMonthRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Storm Service Rate</span>
+                            <span className="font-semibold">1.0%</span>
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Amount Due to Storm</span>
+                              <span className="text-xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
+                            <div>
+                              <h4 className="font-medium text-blue-900">Monthly Billing</h4>
+                              <p className="text-sm text-blue-700 mt-1">
+                                Storm POS charges 1% of your monthly revenue for using our platform. 
+                                Payment is automatically calculated and due at the end of each month.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Revenue Trend */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5" />
+                          Recent Performance
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {Object.keys(dailyBreakdown).length > 0 ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <div className="text-gray-600">Avg. Daily Revenue</div>
+                                <div className="font-semibold">
+                                  R{(currentMonthRevenue / Math.max(daysCompleted, 1)).toFixed(2)}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-gray-600">Best Day</div>
+                                <div className="font-semibold">
+                                  R{Math.max(...Object.values(dailyBreakdown)).toFixed(2)}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium text-gray-700">Daily Revenue Trend</div>
+                              <div className="space-y-1">
+                                {Object.entries(dailyBreakdown)
+                                  .sort(([a], [b]) => b.localeCompare(a))
+                                  .slice(0, 7)
+                                  .map(([date, revenue]) => {
+                                    const percentage = (revenue / Math.max(...Object.values(dailyBreakdown))) * 100;
+                                    return (
+                                      <div key={date} className="flex items-center gap-3">
+                                        <div className="w-16 text-xs text-gray-500">
+                                          {new Date(date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
+                                        </div>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                          <div 
+                                            className="bg-[hsl(217,90%,40%)] h-2 rounded-full transition-all duration-300"
+                                            style={{ width: `${percentage}%` }}
+                                          ></div>
+                                        </div>
+                                        <div className="w-20 text-xs text-right font-medium">
+                                          R{revenue.toFixed(2)}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-gray-500">
+                            <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>No sales data for this month yet.</p>
+                            <p className="text-sm">Start making sales to see your revenue trends!</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Payment Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Receipt className="w-5 h-5" />
+                        Payment Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-semibold mb-3">How Billing Works</h4>
+                            <ul className="space-y-2 text-sm text-gray-600">
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Monthly billing cycle: 1st to last day of month
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Service fee: 1% of gross monthly revenue
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Payment due: End of each month
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                No setup fees or hidden charges
+                              </li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-3">Contact & Support</h4>
+                            <div className="space-y-2 text-sm text-gray-600">
+                              <p>Questions about your billing?</p>
+                              <p className="font-medium text-[hsl(217,90%,40%)]">
+                                Email: billing@storm.co.za
+                              </p>
+                              <p className="font-medium text-[hsl(217,90%,40%)]">
+                                Phone: 087 550 7866
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
           </TabsContent>
         </Tabs>
       </div>
