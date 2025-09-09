@@ -1531,7 +1531,8 @@ export default function PosSystem() {
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
-                className="h-20 w-auto"
+                className="h-60 w-auto mix-blend-multiply"
+                style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
               />
               <Badge variant="outline" className="ml-3">{currentUser?.companyName || "Demo Account"}</Badge>
             </div>
