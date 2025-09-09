@@ -20,7 +20,8 @@ import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer
+  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
+  ChevronDown, Globe
 } from "lucide-react";
 import stormLogo from "@assets/STORM (1)_1757446684640.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -1597,28 +1598,36 @@ export default function PosSystem() {
               {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
-                  >
-                    {currentUser?.companyLogo ? (
-                      <img 
-                        src={currentUser.companyLogo} 
-                        alt="Company Logo" 
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
-                        {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
-                      </div>
-                    )}
-                  </Button>
+                  <div className="flex flex-col items-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
+                    >
+                      {currentUser?.companyLogo ? (
+                        <img 
+                          src={currentUser.companyLogo} 
+                          alt="Company Logo" 
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
+                          {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                      )}
+                    </Button>
+                    <ChevronDown className="h-3 w-3 text-gray-400 mt-1" />
+                  </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem onClick={() => setIsLogoDialogOpen(true)}>
                     <User className="mr-2 h-4 w-4" />
                     Change Profile Picture
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => window.location.href = '/pos/system/afrikaans'}>
+                    <Globe className="mr-2 h-4 w-4" />
+                    Switch to Afrikaans
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>

@@ -10,6 +10,7 @@ import POS from "@/pages/pos";
 import PosLogin from "@/pages/pos-login";
 import PosSignup from "@/pages/pos-signup";
 import PosSystem from "@/pages/pos-system";
+import PosSystemAfrikaans from "@/pages/pos-system-afrikaans";
 import PosInactive from "@/pages/pos-inactive";
 import Navigation from "@/components/navigation";
 import { useEffect } from "react";
@@ -35,6 +36,7 @@ function Router() {
         <Route path="/pos/login" component={PosLogin} />
         <Route path="/pos/signup" component={PosSignup} />
         <Route path="/pos/system" component={PosSystem} />
+        <Route path="/pos/system/afrikaans" component={PosSystemAfrikaans} />
         <Route path="/pos/inactive" component={PosInactive} />
         <Route component={NotFound} />
       </Switch>
