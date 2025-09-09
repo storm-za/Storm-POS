@@ -22,6 +22,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer
 } from "lucide-react";
+import stormLogo from "@assets/STORM (1)_1757446684640.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
@@ -1527,7 +1528,11 @@ export default function PosSystem() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-[hsl(217,90%,40%)]">Storm POS</h1>
+              <img 
+                src={stormLogo} 
+                alt="Storm POS" 
+                className="h-10 w-auto"
+              />
               <Badge variant="outline" className="ml-3">{currentUser?.companyName || "Demo Account"}</Badge>
             </div>
             <div className="flex items-center space-x-3">
