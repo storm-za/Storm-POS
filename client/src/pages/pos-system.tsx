@@ -1620,28 +1620,107 @@ export default function PosSystem() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="sales" className="flex items-center space-x-2">
-              <ShoppingCart className="h-4 w-4" />
-              <span>Sales</span>
-            </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center space-x-2">
-              <Package className="h-4 w-4" />
-              <span>Products</span>
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="flex items-center space-x-2">
-              <Users className="h-4 w-4" />
-              <span>Customers</span>
-            </TabsTrigger>
-            <TabsTrigger value="open-accounts" className="flex items-center space-x-2">
-              <FileText className="h-4 w-4" />
-              <span>Open Accounts</span>
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center space-x-2">
-              <BarChart3 className="h-4 w-4" />
-              <span>Reports</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="mb-8">
+            {/* Mobile Tab Navigation - Horizontal Scroll */}
+            <div className="block md:hidden">
+              <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-x-auto scrollbar-hide">
+                <button
+                  onClick={() => handleTabChange("sales")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "sales"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <ShoppingCart className="h-4 w-4 mb-1" />
+                  <span>Sales</span>
+                </button>
+                <button
+                  onClick={() => handleTabChange("products")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "products"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <Package className="h-4 w-4 mb-1" />
+                  <span>Products</span>
+                </button>
+                <button
+                  onClick={() => handleTabChange("customers")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "customers"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <Users className="h-4 w-4 mb-1" />
+                  <span>Customers</span>
+                </button>
+                <button
+                  onClick={() => handleTabChange("open-accounts")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "open-accounts"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <FileText className="h-4 w-4 mb-1" />
+                  <span>Accounts</span>
+                </button>
+                <button
+                  onClick={() => handleTabChange("reports")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "reports"
+                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  <BarChart3 className="h-4 w-4 mb-1" />
+                  <span>Reports</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop Tab Navigation */}
+            <TabsList className="hidden md:grid w-full grid-cols-5 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <TabsTrigger 
+                value="sales" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                <span>Sales</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="products" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <Package className="h-4 w-4" />
+                <span>Products</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="customers" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <Users className="h-4 w-4" />
+                <span>Customers</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="open-accounts" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <FileText className="h-4 w-4" />
+                <span>Open Accounts</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="reports" 
+                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>Reports</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Sales Tab */}
           <TabsContent value="sales">
