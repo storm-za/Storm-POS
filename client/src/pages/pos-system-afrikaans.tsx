@@ -1596,104 +1596,292 @@ export default function PosSystemAfrikaans() {
           {/* Reports Tab */}
           <TabsContent value="verslae">
             <div className="space-y-6">
-              {/* Summary Cards */}
-              <div className="grid md:grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <DollarSign className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Totale Omset</p>
-                        <p className="text-2xl font-bold text-gray-900">R{monthlyRevenue.toFixed(2)}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Receipt className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Transaksies</p>
-                        <p className="text-2xl font-bold text-gray-900">{currentMonthSales.length}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <TrendingUp className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600">Gemiddelde Transaksie</p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          R{currentMonthSales.length > 0 ? (monthlyRevenue / currentMonthSales.length).toFixed(2) : '0.00'}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Sales List */}
+              {/* Date Filter */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Verkopegeskiedenis</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Verkope Analise
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {sales.slice(0, 10).map((sale) => (
-                      <div key={sale.id} className={`flex items-center justify-between p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={`font-medium ${sale.isVoided ? 'line-through text-red-600' : ''}`}>
-                              Verkoop #{sale.id}
-                            </span>
-                            {sale.isVoided && (
-                              <Badge variant="destructive" className="text-xs">
-                                Gekanselleer
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-500">
-                            {new Date(sale.createdAt).toLocaleString('af-ZA')}
-                            {sale.customerName && ` • ${sale.customerName}`}
-                            {sale.staffAccount && ` • Bedien deur: ${sale.staffAccount.username}`}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-bold ${sale.isVoided ? 'line-through text-red-600' : 'text-[hsl(217,90%,40%)]'}`}>
-                            R{sale.total}
-                          </span>
-                          {sale.isVoided ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setViewVoidDialog({ open: true, sale })}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          ) : currentStaff?.userType === 'management' && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setVoidSaleDialog({ open: true, sale })}
-                            >
-                              Kanselleer
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="date-filter">Kies Datum:</Label>
+                      <Input
+                        id="date-filter"
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="w-auto"
+                      />
+                      <Label htmlFor="staff-filter">Filter volgens Personeel:</Label>
+                      <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Alle Personeel" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Alle Verkope</SelectItem>
+                          <SelectItem value="0">Bestuur</SelectItem>
+                          {staffAccounts.map((staff) => (
+                            <SelectItem key={staff.id} value={staff.id.toString()}>
+                              {staff.displayName || staff.username || `Personeel #${staff.id}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      onClick={() => handlePrintReport()}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Druk
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
+
+              {(() => {
+                // Filter sales for selected date and staff
+                const dateFilteredSales = sales.filter(sale => {
+                  const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+                  const dateMatch = saleDate === selectedDate;
+                  
+                  if (selectedStaffFilter === "all") {
+                    return dateMatch;
+                  } else if (selectedStaffFilter === 0) {
+                    // Manager sales (no staffAccountId)
+                    return dateMatch && !sale.staffAccountId;
+                  } else {
+                    // Specific staff member
+                    return dateMatch && sale.staffAccountId === selectedStaffFilter;
+                  }
+                });
+
+                // Filter out voided sales for calculations
+                const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
+
+                // Calculate totals by payment method (excluding voided sales)
+                const paymentMethodTotals = validSales.reduce((acc, sale) => {
+                  const method = sale.paymentType;
+                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
+                  return acc;
+                }, {} as Record<string, number>);
+
+                // Prepare chart data
+                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
+                  name: method === 'kontant' ? 'Kontant' : method === 'kaart' ? 'Kaart' : method === 'eft' ? 'EFT' : method.charAt(0).toUpperCase() + method.slice(1),
+                  value: total,
+                  amount: `R${total.toFixed(2)}`
+                }));
+
+                // Daily totals for line chart (last 7 days including selected date) - excluding voided sales
+                const last7Days = Array.from({ length: 7 }, (_, i) => {
+                  const date = new Date(selectedDate);
+                  date.setDate(date.getDate() - (6 - i));
+                  return date.toISOString().split('T')[0];
+                });
+
+                const dailyTotals = last7Days.map(date => {
+                  const daySales = sales.filter(sale => 
+                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
+                  );
+                  const total = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                  return {
+                    date: new Date(date).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' }),
+                    total: total,
+                    transactions: daySales.length
+                  };
+                });
+
+                const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const totalTransactions = validSales.length;
+                const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+                
+                // Calculate total profit (revenue - cost) - excluding voided sales
+                const totalProfit = validSales.reduce((profit, sale) => {
+                  const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
+                    const salePrice = parseFloat(item.price) * item.quantity;
+                    const costPrice = item.costPrice ? parseFloat(item.costPrice) * item.quantity : 0;
+                    return itemProfit + (salePrice - costPrice);
+                  }, 0);
+                  return profit + saleProfit;
+                }, 0);
+
+                const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+                return (
+                  <>
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-gray-600">Totale Omset</span>
+                          </div>
+                          <div className="text-2xl font-bold text-green-600">R{totalRevenue.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-emerald-600" />
+                            <span className="text-sm font-medium text-gray-600">Totale Wins</span>
+                          </div>
+                          <div className="text-2xl font-bold text-emerald-600">R{totalProfit.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Receipt className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-600">Transaksies</span>
+                          </div>
+                          <div className="text-2xl font-bold text-blue-600">{totalTransactions}</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-purple-600" />
+                            <span className="text-sm font-medium text-gray-600">Gem. Transaksie</span>
+                          </div>
+                          <div className="text-2xl font-bold text-purple-600">R{avgTransactionValue.toFixed(2)}</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Payment Methods Pie Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Betaalmetodes Verdeling</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {paymentChartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                              <PieChart>
+                                <Pie
+                                  data={paymentChartData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={({ name, value }) => `${name}: R${value.toFixed(2)}`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {paymentChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Pie>
+                                <Tooltip formatter={(value) => [`R${Number(value).toFixed(2)}`, 'Bedrag']} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          ) : (
+                            <div className="h-[300px] flex items-center justify-center text-gray-500">
+                              Geen verkope data vir geselekteerde datum nie
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* 7-Day Trend Line Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>7-Dag Verkope Tendens</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={dailyTotals}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="date" />
+                              <YAxis />
+                              <Tooltip 
+                                formatter={(value, name) => [
+                                  name === 'total' ? `R${Number(value).toFixed(2)}` : value,
+                                  name === 'total' ? 'Omset' : 'Transaksies'
+                                ]}
+                              />
+                              <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Detailed Sales List */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Gedetailleerde Verkope Lys</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {dateFilteredSales.length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                              Geen verkope vir geselekteerde datum en filter nie
+                            </div>
+                          ) : (
+                            dateFilteredSales.map((sale) => (
+                              <div key={sale.id} className={`flex items-center justify-between p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`font-medium ${sale.isVoided ? 'line-through text-red-600' : ''}`}>
+                                      Verkoop #{sale.id}
+                                    </span>
+                                    {sale.isVoided && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        Gekanselleer
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    {new Date(sale.createdAt).toLocaleString('af-ZA')} • {sale.paymentType === 'kontant' ? 'Kontant' : sale.paymentType === 'kaart' ? 'Kaart' : sale.paymentType === 'eft' ? 'EFT' : sale.paymentType}
+                                    {sale.customerName && ` • ${sale.customerName}`}
+                                    {sale.staffAccount ? ` • Bedien deur: ${sale.staffAccount.username}` : ' • Bedien deur: Bestuur'}
+                                  </p>
+                                  <p className="text-xs text-gray-400">
+                                    Items: {Array.isArray(sale.items) ? sale.items.length : 0}
+                                    {sale.notes && ` • Nota: ${sale.notes}`}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`font-bold ${sale.isVoided ? 'line-through text-red-600' : 'text-[hsl(217,90%,40%)]'}`}>
+                                    R{sale.total}
+                                  </span>
+                                  {sale.isVoided ? (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => setViewVoidDialog({ open: true, sale })}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  ) : currentStaff?.userType === 'management' && (
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => setVoidSaleDialog({ open: true, sale })}
+                                    >
+                                      Kanselleer
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                );
+              })()}
             </div>
           </TabsContent>
 
