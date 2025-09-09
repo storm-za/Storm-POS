@@ -193,14 +193,24 @@ export default function PosSystemAfrikaans() {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const response = await fetch('/api/pos/current-user');
+        const response = await fetch('/api/pos/current-user', {
+          credentials: 'include', // Include cookies for session persistence
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (response.ok) {
           const userData = await response.json();
           console.log("Huidige gebruiker gelaai:", userData);
           setCurrentUser(userData);
+        } else if (response.status === 401) {
+          // User not authenticated, redirect to login
+          window.location.href = '/pos/login';
         }
       } catch (error) {
         console.error("Fout met laai van gebruiker:", error);
+        // If there's a network error or other issue, redirect to login
+        window.location.href = '/pos/login';
       }
     };
     loadUser();
@@ -1685,104 +1695,268 @@ export default function PosSystemAfrikaans() {
 
           {/* Usage Tab */}
           <TabsContent value="gebruik">
-            <div className="space-y-6">
-              {/* Usage Banner */}
-              <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-lg px-6 py-8 text-white">
-                <div className="text-center">
-                  <h2 className="text-2xl font-bold mb-2">Maandelikse Gebruik & Fakturering</h2>
-                  <p className="text-blue-100">
-                    {new Date().toLocaleDateString('af-ZA', { month: 'long', year: 'numeric' })}
-                  </p>
-                </div>
-              </div>
+            {(() => {
+              // Calculate current month dates
+              const now = new Date();
+              const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+              const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+              
+              // Filter sales for current month and current user
+              const currentMonthSales = sales.filter(sale => {
+                if (sale.isVoided) return false;
+                const saleDate = new Date(sale.createdAt);
+                return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+              });
 
-              {/* Usage Cards */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <DollarSign className="h-5 w-5 text-green-600" />
-                      <span>Omset Opsomming</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Totale Maandelikse Omset:</span>
-                      <span className="text-2xl font-bold text-green-600">R{monthlyRevenue.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Aantal Transaksies:</span>
-                      <span className="text-lg font-semibold">{currentMonthSales.length}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Gemiddelde Transaksie:</span>
-                      <span className="text-lg font-semibold">
-                        R{currentMonthSales.length > 0 ? (monthlyRevenue / currentMonthSales.length).toFixed(2) : '0.00'}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+              // Calculate total revenue for current month
+              const currentMonthRevenue = currentMonthSales.reduce((total, sale) => {
+                return total + parseFloat(sale.total);
+              }, 0);
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <CreditCard className="h-5 w-5 text-blue-600" />
-                      <span>Storm Fooi</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-2">Maandelikse Storm Platform Fooi (1%)</p>
-                      <p className="text-3xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</p>
-                    </div>
-                    <div className="text-center pt-4 border-t">
-                      <p className="text-xs text-gray-500 mb-2">
-                        Vir ondersteuning kontak:
-                      </p>
-                      <p className="text-sm font-medium text-[hsl(217,90%,40%)]">
-                        softwarebystorm@gmail.com
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              // Calculate Storm fee (1% of revenue)
+              const stormFee = currentMonthRevenue * 0.01;
 
-              {/* Fee Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Gedetailleerde Fooi Uiteensetting</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="font-semibold mb-2">Hoe werk Storm se fooi?</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• 1% van jou totale maandelikse omset</li>
-                        <li>• Bereken vanaf die 1ste tot die laaste dag van die maand</li>
-                        <li>• Slegs suksesvolle transaksies word ingesluit</li>
-                        <li>• Gekanselleerde verkope word nie ingesluit nie</li>
-                        <li>• Geen opstel- of vaste fooie nie</li>
-                      </ul>
-                    </div>
-                    
-                    <div className="grid md:grid-cols-3 gap-4 text-center">
-                      <div className="bg-green-50 rounded-lg p-4">
-                        <p className="text-2xl font-bold text-green-600">R{monthlyRevenue.toFixed(2)}</p>
-                        <p className="text-sm text-gray-600">Totale Omset</p>
+              // Calculate daily breakdown
+              const dailyBreakdown: { [key: string]: number } = {};
+              currentMonthSales.forEach(sale => {
+                const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+                dailyBreakdown[saleDate] = (dailyBreakdown[saleDate] || 0) + parseFloat(sale.total);
+              });
+
+              const daysInMonth = currentMonthEnd.getDate();
+              const daysCompleted = now.getDate();
+              const progressPercentage = (daysCompleted / daysInMonth) * 100;
+
+              const formatMonthYear = (date: Date) => {
+                return date.toLocaleDateString('af-ZA', { month: 'long', year: 'numeric' });
+              };
+
+              return (
+                <div className="space-y-6">
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-bold">Gebruik & Fakturering</h2>
+                        <p className="text-blue-100 mt-1">{formatMonthYear(now)} faktuurperiode</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-2xl font-bold text-gray-600">× 1%</p>
-                        <p className="text-sm text-gray-600">Storm Fooi Koers</p>
-                      </div>
-                      <div className="bg-blue-50 rounded-lg p-4">
-                        <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</p>
-                        <p className="text-sm text-gray-600">Fooi Verskuldig</p>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">R{stormFee.toFixed(2)}</div>
+                        <div className="text-blue-100 text-sm">Bedrag verskuldig aan Storm</div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+
+                  {/* Key Metrics */}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <Card className="border-l-4 border-l-green-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4" />
+                          Huidige Maand Omset
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-green-600">R{currentMonthRevenue.toFixed(2)}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          {currentMonthSales.length} transaksies
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-blue-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          Storm Diensfooi
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          1% van maandelikse omset
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-orange-500">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          Faktuurperiode
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold text-orange-600">{Math.round(progressPercentage)}%</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Dag {daysCompleted} van {daysInMonth}
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${progressPercentage}%` }}
+                          ></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Billing Breakdown */}
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    {/* Fee Calculation */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <DollarSign className="w-5 h-5" />
+                          Fooi Uiteensetting
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Bruto Omset</span>
+                            <span className="font-semibold">R{currentMonthRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-600">Storm Dienskoers</span>
+                            <span className="font-semibold">1.0%</span>
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Bedrag Verskuldig aan Storm</span>
+                              <span className="text-xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
+                            <div>
+                              <h4 className="font-medium text-blue-900">Maandelikse Fakturering</h4>
+                              <p className="text-sm text-blue-700 mt-1">
+                                Storm POS hef 1% van jou maandelikse omset vir die gebruik van ons platform. 
+                                Betaling word outomaties bereken en is verskuldig aan die einde van elke maand.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Revenue Trend */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5" />
+                          Onlangse Prestasie
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {Object.keys(dailyBreakdown).length > 0 ? (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <div className="text-gray-600">Gem. Daaglikse Omset</div>
+                                <div className="font-semibold">
+                                  R{(currentMonthRevenue / Math.max(daysCompleted, 1)).toFixed(2)}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-gray-600">Beste Dag</div>
+                                <div className="font-semibold">
+                                  R{Math.max(...Object.values(dailyBreakdown)).toFixed(2)}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium text-gray-700">Daaglikse Omset Tendens</div>
+                              <div className="space-y-1">
+                                {Object.entries(dailyBreakdown)
+                                  .sort(([a], [b]) => b.localeCompare(a))
+                                  .slice(0, 7)
+                                  .map(([date, revenue]) => {
+                                    const percentage = (revenue / Math.max(...Object.values(dailyBreakdown))) * 100;
+                                    return (
+                                      <div key={date} className="flex items-center gap-3">
+                                        <div className="w-16 text-xs text-gray-500">
+                                          {new Date(date).toLocaleDateString('af-ZA', { day: 'numeric', month: 'short' })}
+                                        </div>
+                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                          <div 
+                                            className="bg-[hsl(217,90%,40%)] h-2 rounded-full transition-all duration-300"
+                                            style={{ width: `${percentage}%` }}
+                                          ></div>
+                                        </div>
+                                        <div className="w-20 text-xs text-right font-medium">
+                                          R{revenue.toFixed(2)}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-gray-500">
+                            <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>Nog geen verkoopdata vir hierdie maand nie.</p>
+                            <p className="text-sm">Begin verkoop om jou omset tendense te sien!</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Payment Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Receipt className="w-5 h-5" />
+                        Betaalinligting
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-semibold mb-3">Hoe Fakturering Werk</h4>
+                            <ul className="space-y-2 text-sm text-gray-600">
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Maandelikse faktureringssiklus: 1ste tot laaste dag van maand
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Diensfooi: 1% van bruto maandelikse omset
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Betaling verskuldig: Einde van elke maand
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                Geen opstellingsfooi of versteekte koste nie
+                              </li>
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-3">Kontak & Ondersteuning</h4>
+                            <div className="space-y-2 text-sm text-gray-600">
+                              <p>Vrae oor jou fakturering?</p>
+                              <p className="font-medium text-[hsl(217,90%,40%)]">
+                                E-pos: softwarebystorm@gmail.com
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
           </TabsContent>
         </Tabs>
 
