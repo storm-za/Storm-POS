@@ -1526,12 +1526,12 @@ export default function PosSystem() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-24">
             <div className="flex items-center">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
-                className="h-10 w-auto"
+                className="h-20 w-auto"
               />
               <Badge variant="outline" className="ml-3">{currentUser?.companyName || "Demo Account"}</Badge>
             </div>
