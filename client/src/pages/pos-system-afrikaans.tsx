@@ -837,6 +837,57 @@ export default function PosSystemAfrikaans() {
     setIsCustomerDialogOpen(true);
   };
 
+  // Print report function
+  const handlePrintReport = () => {
+    const dateFilteredSales = sales.filter(sale => {
+      const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
+      const dateMatch = saleDate === selectedDate;
+      
+      if (selectedStaffFilter === "all") {
+        return dateMatch;
+      } else if (selectedStaffFilter === 0) {
+        return dateMatch && !sale.staffAccountId;
+      } else {
+        return dateMatch && sale.staffAccountId === selectedStaffFilter;
+      }
+    });
+
+    const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
+    const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const totalTransactions = validSales.length;
+
+    const printContent = `
+Verkope Verslag - ${new Date(selectedDate).toLocaleDateString('af-ZA')}
+
+Totale Omset: R${totalRevenue.toFixed(2)}
+Transaksies: ${totalTransactions}
+Gemiddelde Transaksie: R${totalTransactions > 0 ? (totalRevenue / totalTransactions).toFixed(2) : '0.00'}
+
+${dateFilteredSales.map(sale => 
+  `Verkoop #${sale.id} - R${sale.total} - ${new Date(sale.createdAt).toLocaleTimeString('af-ZA')}${sale.isVoided ? ' (GEKANSELLEER)' : ''}`
+).join('\n')}
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head><title>Verkope Verslag</title></head>
+          <body style="font-family: monospace; white-space: pre-line; padding: 20px;">
+            ${printContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+
+    toast({
+      title: "Verslag gedruk",
+      description: `Verkope analise verslag vir ${new Date(selectedDate).toLocaleDateString('af-ZA')} is gedruk.`,
+    });
+  };
+
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
     const dataWithUserId = { ...data, userId: currentUser?.id };
     
