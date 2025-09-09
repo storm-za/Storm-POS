@@ -189,31 +189,35 @@ export default function PosSystemAfrikaans() {
     setManagementPassword("");
   };
 
-  // Load current user
+  // Get current user from localStorage or session
   useEffect(() => {
-    const loadUser = async () => {
+    const userData = localStorage.getItem('posUser');
+    if (userData) {
       try {
-        const response = await fetch('/api/pos/current-user', {
-          credentials: 'include', // Include cookies for session persistence
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          console.log("Huidige gebruiker gelaai:", userData);
-          setCurrentUser(userData);
-        } else if (response.status === 401) {
-          // User not authenticated, redirect to login
-          window.location.href = '/pos/login';
-        }
+        const parsedUser = JSON.parse(userData);
+        setCurrentUser(parsedUser);
+        console.log('Huidige gebruiker gelaai:', parsedUser);
       } catch (error) {
-        console.error("Fout met laai van gebruiker:", error);
-        // If there's a network error or other issue, redirect to login
-        window.location.href = '/pos/login';
+        console.error('Fout met ontleding van gebruikerdata:', error);
+        // Fallback for demo account
+        setCurrentUser({
+          id: 1,
+          email: 'demo@storm.co.za',
+          paid: true,
+          companyLogo: null,
+          companyName: 'Demo Rekening'
+        });
       }
-    };
-    loadUser();
+    } else {
+      // If no user data in localStorage, set demo user as fallback
+      setCurrentUser({
+        id: 1,
+        email: 'demo@storm.co.za',
+        paid: true,
+        companyLogo: null,
+        companyName: 'Demo Rekening'
+      });
+    }
   }, []);
 
   // Check if user has paid subscription
