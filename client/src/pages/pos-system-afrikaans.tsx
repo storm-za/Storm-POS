@@ -2346,6 +2346,200 @@ export default function PosSystemAfrikaans() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Staff Authentication Dialog */}
+        <Dialog open={isStaffAuthOpen} onOpenChange={setIsStaffAuthOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Personeel Aanmelding</DialogTitle>
+              <DialogDescription>
+                Voer jou gebruikersnaam en wagwoord in om aan te meld as 'n personeellid.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const username = formData.get('username') as string;
+              const password = formData.get('password') as string;
+              if (username && password) {
+                authenticateStaffMutation.mutate({ username, password, userId: currentUser?.id });
+              }
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="staff-username">Gebruikersnaam</Label>
+                  <Input
+                    id="staff-username"
+                    name="username"
+                    type="text"
+                    required
+                    placeholder="Voer gebruikersnaam in"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="staff-password">Wagwoord</Label>
+                  <Input
+                    id="staff-password"
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="Voer wagwoord in"
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    onClick={() => setIsStaffAuthOpen(false)}
+                  >
+                    Kanselleer
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={authenticateStaffMutation.isPending}
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  >
+                    {authenticateStaffMutation.isPending ? "Meld aan..." : "Meld aan"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* User Management Dialog */}
+        <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {staffAccounts.length === 0 ? "Skep Jou Eerste Personeelrekening" : "Gebruikersbestuur"}
+              </DialogTitle>
+              <DialogDescription>
+                {staffAccounts.length === 0 
+                  ? "Stel jou eerste personeelrekening op om die personeelbestuurstelsel te begin gebruik."
+                  : "Bestuur personeelrekeninge en toestemmings."
+                }
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Create New Staff Account */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold mb-3">Voeg Nuwe Personeelrekening By</h3>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const username = formData.get('new-username') as string;
+                  const password = formData.get('new-password') as string;
+                  const userType = formData.get('user-type') as 'staff' | 'management';
+                  const managementPassword = formData.get('management-password') as string;
+                  
+                  if (username && password && userType) {
+                    createStaffAccountMutation.mutate({
+                      username,
+                      password,
+                      userType,
+                      managementPassword: userType === 'management' ? managementPassword : undefined,
+                      userId: currentUser?.id
+                    });
+                    (e.target as HTMLFormElement).reset();
+                  }
+                }}>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label htmlFor="new-username">Gebruikersnaam</Label>
+                      <Input
+                        id="new-username"
+                        name="new-username"
+                        type="text"
+                        required
+                        placeholder="Voer gebruikersnaam in"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="new-password">Wagwoord</Label>
+                      <Input
+                        id="new-password"
+                        name="new-password"
+                        type="password"
+                        required
+                        placeholder="Voer wagwoord in"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label htmlFor="user-type">Gebruikertipe</Label>
+                      <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : undefined}>
+                        <SelectTrigger>
+                          <SelectValue placeholder={staffAccounts.length === 0 ? "Bestuur (Verstekk)" : "Kies gebruikertipe"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="staff">Personeel</SelectItem>
+                          <SelectItem value="management">Bestuur</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="management-password">Bestuurswagwoord (indien nodig)</Label>
+                      <Input
+                        id="management-password"
+                        name="management-password"
+                        type="password"
+                        placeholder="Vereis vir bestuursrekeninge"
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={createStaffAccountMutation.isPending}
+                    className="w-full"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    {createStaffAccountMutation.isPending ? "Skep..." : "Skep Personeelrekening"}
+                  </Button>
+                </form>
+              </div>
+
+              {/* Existing Staff Accounts */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold mb-3">Bestaande Personeelrekeninge</h3>
+                <div className="space-y-2">
+                  {staffAccounts.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">Nog geen personeelrekeninge geskep nie.</p>
+                  ) : (
+                    staffAccounts.map((staff) => (
+                      <div key={staff.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">{staff.username}</div>
+                          <div className="text-sm text-muted-foreground capitalize">
+                            {staff.userType === 'management' ? 'Bestuur' : 'Personeel'} • {staff.isActive ? 'Aktief' : 'Onaktief'}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={staff.userType === 'management' ? 'default' : 'secondary'}>
+                            {staff.userType === 'management' ? 'Bestuur' : 'Personeel'}
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (window.confirm(`Is jy seker jy wil ${staff.username} verwyder?`)) {
+                                deleteStaffAccountMutation.mutate(staff.id);
+                              }
+                            }}
+                            disabled={deleteStaffAccountMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
