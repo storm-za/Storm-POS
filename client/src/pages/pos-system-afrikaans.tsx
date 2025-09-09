@@ -173,7 +173,7 @@ export default function PosSystemAfrikaans() {
       return;
     }
 
-    const restrictedTabs = ['produkte', 'verslae'];
+    const restrictedTabs = ['produkte', 'verslae', 'gebruik'];
     if (restrictedTabs.includes(tabValue) && (!currentStaff || currentStaff.userType !== 'management')) {
       setPendingTab(tabValue);
       setManagementPasswordDialog(true);
