@@ -316,6 +316,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create the sale - staffAccountId will be handled in frontend if needed
       const sale = await storage.createPosSale(validatedData);
       
+      // Automatically increment user usage by 1% of sale total
+      try {
+        const saleTotal = parseFloat(validatedData.total);
+        const usageAmount = (saleTotal * 0.01).toFixed(2); // 1% of sale total
+        await storage.incrementUserUsage(userIdToUse, usageAmount);
+      } catch (usageError) {
+        console.error("Error tracking usage for sale:", usageError);
+        // Don't fail the sale if usage tracking fails
+      }
+      
       // Update inventory
       for (const update of inventoryUpdates) {
         await storage.updatePosProduct(update.productId, {
