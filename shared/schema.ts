@@ -93,6 +93,14 @@ export const posOpenAccounts = pgTable("pos_open_accounts", {
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
 
+// System settings for tracking admin operations like monthly resets
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  settingKey: text("setting_key").notNull().unique(),
+  settingValue: text("setting_value").notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -143,6 +151,11 @@ export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).
   createdAt: true,
 });
 
+export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({
+  id: true,
+  lastUpdated: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -163,3 +176,5 @@ export type InsertPosOpenAccount = z.infer<typeof insertPosOpenAccountSchema>;
 export type PosOpenAccount = typeof posOpenAccounts.$inferSelect;
 export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
+export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
+export type SystemSetting = typeof systemSettings.$inferSelect;

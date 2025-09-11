@@ -11,6 +11,43 @@ import {
 } from "@shared/schema";
 import { sendContactSubmissionEmail } from "./email";
 import { z } from "zod";
+import * as bcrypt from "bcrypt";
+
+// Idempotent monthly reset using database persistence to prevent duplicate resets
+async function checkAndPerformMonthlyReset() {
+  try {
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const dayOfMonth = now.getDate();
+    
+    // Only attempt reset on the 1st day of the month
+    if (dayOfMonth !== 1) {
+      return;
+    }
+    
+    // Check if reset already performed for this date (idempotent check)
+    const lastResetDate = await storage.getLastMonthlyResetDate();
+    if (lastResetDate === currentDate) {
+      // Reset already completed for this month
+      return;
+    }
+    
+    console.log(`🔄 Performing idempotent monthly usage reset for ${currentDate}`);
+    console.log(`📊 Last reset was: ${lastResetDate || 'never'}`);
+    
+    // Perform the reset and atomically update the reset date
+    await storage.resetAllUsersUsage();
+    await storage.setLastMonthlyResetDate(currentDate);
+    
+    console.log(`✅ Monthly usage reset completed and persisted for ${currentDate}`);
+  } catch (error) {
+    console.error("❌ Error during monthly reset:", error);
+    // On error, don't update the reset date so it can retry
+  }
+}
+
+// Set up monthly reset interval - check every hour to catch the 1st day of month
+setInterval(checkAndPerformMonthlyReset, 60 * 60 * 1000);
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Contact form submission endpoint
@@ -109,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.getPosUserByEmail(email);
       
-      if (!user || user.password !== password) {
+      if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
@@ -542,6 +579,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to void sale" });
     }
   });
+
+  // Usage tracking routes - requires user authentication via POST with credentials in body
+  app.post("/api/pos/usage/get", async (req, res) => {
+    try {
+      const { userId, email, password } = req.body;
+      
+      // Validate required fields
+      if (!userId || !email || !password) {
+        return res.status(400).json({ message: "User ID, email, and password required to access usage data" });
+      }
+      
+      const parsedUserId = parseInt(userId);
+      if (isNaN(parsedUserId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      // Verify user credentials and ownership
+      const user = await storage.getPosUserByEmail(email);
+      if (!user || !(await bcrypt.compare(password, user.password)) || user.id !== parsedUserId) {
+        return res.status(403).json({ message: "Access denied: Invalid credentials or unauthorized access" });
+      }
+      
+      const usage = await storage.getUserUsage(parsedUserId);
+      res.json({ userId: parsedUserId, currentUsage: usage });
+    } catch (error) {
+      console.error("Error fetching usage:", error);
+      res.status(500).json({ message: "Failed to fetch usage" });
+    }
+  });
+
+  // Manual reset all users' usage - Admin endpoint (requires admin authentication)
+  app.post("/api/pos/usage/reset-all", async (req, res) => {
+    try {
+      const { adminEmail, adminPassword, adminKey } = req.body;
+      
+      // Option 1: Admin key for system-level access
+      const systemAdminKey = process.env.ADMIN_RESET_KEY;
+      if (systemAdminKey && adminKey === systemAdminKey) {
+        await storage.resetAllUsersUsage();
+        console.log("✅ All users' usage reset to R0.00 (via admin key)");
+        return res.json({ success: true, message: "All users' usage reset to R0.00" });
+      }
+      
+      // Option 2: Management user credentials - requires proper admin role validation
+      if (adminEmail && adminPassword) {
+        const adminUser = await storage.getPosUserByEmail(adminEmail);
+        if (!adminUser || !(await bcrypt.compare(adminPassword, adminUser.password))) {
+          return res.status(403).json({ 
+            message: "Access denied: Invalid admin credentials" 
+          });
+        }
+        
+        // Critical security check: Verify user has management role via staff accounts
+        const staffAccounts = await storage.getPosStaffAccounts(adminUser.id);
+        const hasManagementRole = staffAccounts.some(staff => 
+          staff.userType === 'management' && 
+          staff.isActive === true
+        );
+        
+        if (!hasManagementRole) {
+          console.log(`⚠️ Unauthorized usage reset attempt by non-management user: ${adminEmail}`);
+          return res.status(403).json({ 
+            message: "Access denied: Management role required for system-wide operations" 
+          });
+        }
+        
+        await storage.resetAllUsersUsage();
+        console.log(`✅ All users' usage reset to R0.00 (by management user: ${adminEmail})`);
+        return res.json({ success: true, message: "All users' usage reset to R0.00" });
+      }
+      
+      // Access denied
+      res.status(403).json({ 
+        message: "Access denied: Admin authentication required. Provide either adminKey or valid adminEmail/adminPassword." 
+      });
+    } catch (error) {
+      console.error("Error resetting usage:", error);
+      res.status(500).json({ message: "Failed to reset usage" });
+    }
+  });
+
+  // Initialize monthly reset scheduler (but don't run immediately)
+  console.log("📅 Monthly usage reset scheduler initialized - will check every hour for 1st day of month");
 
   const httpServer = createServer(app);
   return httpServer;

@@ -1,12 +1,14 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posStaffAccounts,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posStaffAccounts, systemSettings,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
-  type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount
+  type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount,
+  type SystemSetting, type InsertSystemSetting
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
+import * as bcrypt from "bcrypt";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -54,6 +56,12 @@ export interface IStorage {
   incrementUserUsage(userId: number, amount: string): Promise<void>;
   resetAllUsersUsage(): Promise<void>;
   getUserUsage(userId: number): Promise<string>;
+  
+  // System settings for idempotent operations
+  getSystemSetting(key: string): Promise<string | null>;
+  setSystemSetting(key: string, value: string): Promise<void>;
+  getLastMonthlyResetDate(): Promise<string | null>;
+  setLastMonthlyResetDate(date: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -98,12 +106,13 @@ export class MemStorage implements IStorage {
   }
   
   private async createDemoPosUser() {
+    const hashedPassword = await bcrypt.hash("demo123", 10);
     const demoUser: PosUser = {
       id: 1,
       firstName: "Demo",
       lastName: "User",
       email: "demo@storm.co.za",
-      password: "demo123", // In production, this should be hashed
+      password: hashedPassword,
       companyName: "Demo Company",
       paid: true,
       companyLogo: null,
@@ -204,12 +213,13 @@ export class MemStorage implements IStorage {
 
   async createPosUser(insertUser: InsertPosUser): Promise<PosUser> {
     const id = this.currentPosUserId++;
+    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
     const user: PosUser = {
       id,
       firstName: insertUser.firstName,
       lastName: insertUser.lastName,
       email: insertUser.email,
-      password: insertUser.password,
+      password: hashedPassword,
       companyName: insertUser.companyName,
       paid: insertUser.paid || false,
       companyLogo: insertUser.companyLogo || null,
@@ -620,7 +630,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPosStaffAccount(staffAccount: InsertPosStaffAccount): Promise<PosStaffAccount> {
-    const [created] = await db.insert(posStaffAccounts).values(staffAccount).returning();
+    const hashedPassword = await bcrypt.hash(staffAccount.password, 10);
+    const staffAccountWithHashedPassword = {
+      ...staffAccount,
+      password: hashedPassword
+    };
+    const [created] = await db.insert(posStaffAccounts).values(staffAccountWithHashedPassword).returning();
     return created;
   }
 
@@ -638,14 +653,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined> {
+    // First get the staff account by user ID, username, and active status (without password comparison)
     const [staff] = await db.select().from(posStaffAccounts)
       .where(and(
         eq(posStaffAccounts.posUserId, posUserId),
         eq(posStaffAccounts.username, username),
-        eq(posStaffAccounts.password, password),
         eq(posStaffAccounts.isActive, true)
       ));
-    return staff || undefined;
+    
+    // If staff account exists, verify password using bcrypt
+    if (staff && await bcrypt.compare(password, staff.password)) {
+      return staff;
+    }
+    
+    return undefined;
   }
 
   async voidPosSale(saleId: number, voidReason: string, voidedBy: number): Promise<PosSale | undefined> {
@@ -684,6 +705,33 @@ export class DatabaseStorage implements IStorage {
       .from(posUsers)
       .where(eq(posUsers.id, userId));
     return user?.currentUsage || "0.00";
+  }
+
+  // System settings methods for idempotent operations
+  async getSystemSetting(key: string): Promise<string | null> {
+    const [setting] = await db
+      .select({ settingValue: systemSettings.settingValue })
+      .from(systemSettings)
+      .where(eq(systemSettings.settingKey, key));
+    return setting?.settingValue || null;
+  }
+
+  async setSystemSetting(key: string, value: string): Promise<void> {
+    await db
+      .insert(systemSettings)
+      .values({ settingKey: key, settingValue: value })
+      .onConflictDoUpdate({
+        target: systemSettings.settingKey,
+        set: { settingValue: value, lastUpdated: sql`now()` }
+      });
+  }
+
+  async getLastMonthlyResetDate(): Promise<string | null> {
+    return this.getSystemSetting('last_monthly_reset_date');
+  }
+
+  async setLastMonthlyResetDate(date: string): Promise<void> {
+    return this.setSystemSetting('last_monthly_reset_date', date);
   }
 }
 
