@@ -29,6 +29,7 @@ export const posUsers = pgTable("pos_users", {
   companyName: text("company_name").notNull().default("My Company"),
   paid: boolean("paid").notNull().default(true),
   companyLogo: text("company_logo"), // Base64 encoded image
+  currentUsage: decimal("current_usage", { precision: 10, scale: 2 }).notNull().default("0.00"), // Current month usage amount
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
