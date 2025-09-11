@@ -6,7 +6,7 @@ import {
   type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -49,6 +49,11 @@ export interface IStorage {
   updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined>;
   deletePosStaffAccount(id: number): Promise<boolean>;
   authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined>;
+
+  // Usage tracking
+  incrementUserUsage(userId: number, amount: string): Promise<void>;
+  resetAllUsersUsage(): Promise<void>;
+  getUserUsage(userId: number): Promise<string>;
 }
 
 export class MemStorage implements IStorage {
@@ -655,6 +660,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(posSales.id, saleId))
       .returning();
     return sale || undefined;
+  }
+
+  // Usage tracking methods
+  async incrementUserUsage(userId: number, amount: string): Promise<void> {
+    await db
+      .update(posUsers)
+      .set({ 
+        currentUsage: sql`current_usage + ${amount}`
+      })
+      .where(eq(posUsers.id, userId));
+  }
+
+  async resetAllUsersUsage(): Promise<void> {
+    await db
+      .update(posUsers)
+      .set({ currentUsage: "0.00" });
+  }
+
+  async getUserUsage(userId: number): Promise<string> {
+    const [user] = await db
+      .select({ currentUsage: posUsers.currentUsage })
+      .from(posUsers)
+      .where(eq(posUsers.id, userId));
+    return user?.currentUsage || "0.00";
   }
 }
 
