@@ -353,10 +353,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create the sale - staffAccountId will be handled in frontend if needed
       const sale = await storage.createPosSale(validatedData);
       
-      // Automatically increment user usage by 1% of sale total
+      // Automatically increment user usage by 0.5% of sale total
       try {
         const saleTotal = parseFloat(validatedData.total);
-        const usageAmount = (saleTotal * 0.01).toFixed(2); // 1% of sale total
+        const usageAmount = (saleTotal * 0.005).toFixed(2); // 0.5% of sale total
         await storage.incrementUserUsage(userIdToUse, usageAmount);
       } catch (usageError) {
         console.error("Error tracking usage for sale:", usageError);

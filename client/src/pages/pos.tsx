@@ -133,137 +133,140 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-      {/* Pricing Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Usage-Based Pricing Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        <div className="max-w-6xl mx-auto">
           <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-xl text-gray-600">Choose the plan that fits your business size</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              We Only Make Money<br />
+              <span className="text-[hsl(217,90%,40%)]">When You Do</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              No upfront costs, no monthly fees, no hidden charges. Pay only when you succeed with our revolutionary usage-based model.
+            </p>
           </motion.div>
-          
+
           <motion.div 
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 gap-12 items-center mb-16"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            {/* Basic Plan */}
-            <motion.div variants={fadeInUp}>
-              <Card className="h-full shadow-xl border-2 border-gray-100 hover:border-[hsl(217,90%,40%)] transition-all duration-300">
-                <CardContent className="p-8 text-center h-full flex flex-col">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Basic</h3>
-                  <div className="text-4xl font-bold text-[hsl(217,90%,40%)] mb-4">
-                    R900<span className="text-lg text-gray-600">/month</span>
-                  </div>
-                  <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      1 user account
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      100 products max
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Basic reporting
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Mobile POS
-                    </li>
-                  </ul>
-                  <Button 
-                    asChild
-                    className="w-full bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
-                  >
-                    <Link href="/pos/login">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-            
-            {/* Growth Plan */}
-            <motion.div variants={fadeInUp}>
-              <Card className="h-full shadow-xl text-white transform scale-105 relative hero-gradient">
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                  Most Popular
+            {/* Left Side - Main Value Prop */}
+            <motion.div variants={fadeInUp} className="space-y-8">
+              <div className="text-center md:text-left">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl mb-6">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
                 </div>
-                <CardContent className="p-8 text-center h-full flex flex-col">
-                  <h3 className="text-2xl font-bold mb-2">Growth</h3>
-                  <div className="text-4xl font-bold mb-4">
-                    R1500<span className="text-lg text-blue-200">/month</span>
-                  </div>
-                  <ul className="text-left space-y-3 text-blue-100 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-green-400 mr-2 h-4 w-4" />
-                      3 user accounts
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-400 mr-2 h-4 w-4" />
-                      Unlimited products
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-400 mr-2 h-4 w-4" />
-                      Advanced reporting
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-400 mr-2 h-4 w-4" />
-                      Customer management
-                    </li>
-                  </ul>
-                  <Button 
-                    asChild
-                    className="w-full bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100"
-                  >
-                    <Link href="/pos/login">Get Started</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">Only 0.5% Per Sale</h3>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  That's just 50 cents for every R100 you sell. No matter how small your business, 
+                  you'll never pay more than what's fair for your success.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center p-6 bg-white rounded-xl shadow-lg">
+                  <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
+                  <div className="text-sm text-gray-600">Setup Fee</div>
+                </div>
+                <div className="text-center p-6 bg-white rounded-xl shadow-lg">
+                  <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
+                  <div className="text-sm text-gray-600">Monthly Fee</div>
+                </div>
+              </div>
             </motion.div>
-            
-            {/* Pro Plan */}
+
+            {/* Right Side - Benefits */}
             <motion.div variants={fadeInUp}>
-              <Card className="h-full shadow-xl border-2 border-gray-100 hover:border-[hsl(217,90%,40%)] transition-all duration-300">
-                <CardContent className="p-8 text-center h-full flex flex-col">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
-                  <div className="text-4xl font-bold text-[hsl(217,90%,40%)] mb-4">
-                    R6500<span className="text-lg text-gray-600">/month</span>
-                  </div>
-                  <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      15 users
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Premium reporting
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Expense tracking
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-green-500 mr-2 h-4 w-4" />
-                      Priority support
-                    </li>
-                  </ul>
-                  <Button 
-                    asChild
-                    className="w-full bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
-                  >
-                    <Link href="/pos/login">Get Started</Link>
-                  </Button>
-                </CardContent>
+              <Card className="p-8 shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+                <h4 className="text-2xl font-bold text-gray-900 mb-6">Everything Included</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Unlimited Everything</div>
+                      <div className="text-gray-600 text-sm">Users, products, customers, sales - no limits</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Advanced Analytics</div>
+                      <div className="text-gray-600 text-sm">Real-time insights and comprehensive reporting</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">24/7 Support</div>
+                      <div className="text-gray-600 text-sm">Always here when you need us</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">Automatic Updates</div>
+                      <div className="text-gray-600 text-sm">New features delivered continuously</div>
+                    </div>
+                  </li>
+                </ul>
               </Card>
             </motion.div>
+          </motion.div>
+
+          {/* Usage Examples */}
+          <motion.div 
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl p-8 text-white"
+          >
+            <h4 className="text-2xl font-bold text-center mb-8">See How Affordable It Really Is</h4>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center p-6 bg-white/10 rounded-xl backdrop-blur-sm">
+                <div className="text-3xl font-bold mb-2">R1,000</div>
+                <div className="text-blue-100 mb-2">Daily Sales</div>
+                <div className="text-sm">You pay only <strong>R5/day</strong></div>
+              </div>
+              <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm transform scale-105">
+                <div className="text-3xl font-bold mb-2">R5,000</div>
+                <div className="text-blue-100 mb-2">Daily Sales</div>
+                <div className="text-sm">You pay only <strong>R25/day</strong></div>
+              </div>
+              <div className="text-center p-6 bg-white/10 rounded-xl backdrop-blur-sm">
+                <div className="text-3xl font-bold mb-2">R10,000</div>
+                <div className="text-blue-100 mb-2">Daily Sales</div>
+                <div className="text-sm">You pay only <strong>R50/day</strong></div>
+              </div>
+            </div>
+            <div className="text-center mt-8">
+              <Button 
+                asChild
+                size="lg"
+                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 font-semibold px-8"
+              >
+                <Link href="/pos/login">Start Selling Today - Free Setup</Link>
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
