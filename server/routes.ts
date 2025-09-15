@@ -11,7 +11,7 @@ import {
 } from "@shared/schema";
 import { sendContactSubmissionEmail } from "./email";
 import { z } from "zod";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 // Idempotent monthly reset using database persistence to prevent duplicate resets
 async function checkAndPerformMonthlyReset() {
@@ -146,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.getPosUserByEmail(email);
       
-      if (!user || !(await bcrypt.compare(password, user.password))) {
+      if (!user || !(await bcrypt.compare(String(password), String(user.password).trim()))) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 

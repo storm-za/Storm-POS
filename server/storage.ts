@@ -8,7 +8,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
