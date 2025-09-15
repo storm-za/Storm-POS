@@ -8,7 +8,25 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
-import * as bcrypt from "bcryptjs";
+import { scrypt, randomBytes } from "crypto";
+import { promisify } from "util";
+
+const scryptAsync = promisify(scrypt);
+
+// Secure password hashing using Node.js built-in crypto
+async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString('hex');
+  const hash = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${salt}:${hash.toString('hex')}`;
+}
+
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  const [salt, hash] = storedHash.split(':');
+  const hashBuffer = Buffer.from(hash, 'hex');
+  const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer;
+  const { timingSafeEqual } = await import('crypto');
+  return timingSafeEqual(hashBuffer, derivedKey);
+}
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -471,9 +489,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPosUser(insertUser: InsertPosUser): Promise<PosUser> {
+    const hashedPassword = await hashPassword(insertUser.password);
     const [user] = await db
       .insert(posUsers)
-      .values(insertUser)
+      .values({ ...insertUser, password: hashedPassword })
       .returning();
     return user;
   }
@@ -630,7 +649,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPosStaffAccount(staffAccount: InsertPosStaffAccount): Promise<PosStaffAccount> {
-    const hashedPassword = await bcrypt.hash(staffAccount.password, 10);
+    const hashedPassword = await hashPassword(staffAccount.password);
     const staffAccountWithHashedPassword = {
       ...staffAccount,
       password: hashedPassword
@@ -661,8 +680,8 @@ export class DatabaseStorage implements IStorage {
         eq(posStaffAccounts.isActive, true)
       ));
     
-    // If staff account exists, verify password using bcrypt
-    if (staff && await bcrypt.compare(password, staff.password)) {
+    // If staff account exists, verify password using our secure scrypt implementation
+    if (staff && await verifyPassword(password, staff.password)) {
       return staff;
     }
     

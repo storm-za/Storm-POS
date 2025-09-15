@@ -11,7 +11,24 @@ import {
 } from "@shared/schema";
 import { sendContactSubmissionEmail } from "./email";
 import { z } from "zod";
-import * as bcrypt from "bcryptjs";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
+
+const scryptAsync = promisify(scrypt);
+
+// Secure password hashing using Node.js built-in crypto
+async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString('hex');
+  const hash = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${salt}:${hash.toString('hex')}`;
+}
+
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  const [salt, hash] = storedHash.split(':');
+  const hashBuffer = Buffer.from(hash, 'hex');
+  const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer;
+  return timingSafeEqual(hashBuffer, derivedKey);
+}
 
 // Idempotent monthly reset using database persistence to prevent duplicate resets
 async function checkAndPerformMonthlyReset() {
@@ -146,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.getPosUserByEmail(email);
       
-      if (!user || !(await bcrypt.compare(String(password), String(user.password).trim()))) {
+      if (!user || !(await verifyPassword(String(password), String(user.password).trim()))) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
