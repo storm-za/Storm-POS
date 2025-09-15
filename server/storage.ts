@@ -21,7 +21,17 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  // Handle legacy plaintext passwords (temporary backward compatibility)
+  if (!storedHash.includes(':')) {
+    return password === storedHash;
+  }
+  
+  // Handle scrypt format (salt:hash)
   const [salt, hash] = storedHash.split(':');
+  if (!salt || !hash) {
+    return false;
+  }
+  
   const hashBuffer = Buffer.from(hash, 'hex');
   const derivedKey = (await scryptAsync(password, salt, 64)) as Buffer;
   const { timingSafeEqual } = await import('crypto');
