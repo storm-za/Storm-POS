@@ -1482,67 +1482,80 @@ ${dateFilteredSales.map(sale =>
           <TabsContent value="produkte">
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center space-x-2">
-                    <Package className="h-5 w-5" />
-                    <span>Produkvoorraad</span>
-                  </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Produkvoorraad</CardTitle>
                   <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
-                    <PlusCircle className="w-4 h-4 mr-2" />
+                    <PlusCircle className="h-4 w-4 mr-2" />
                     Voeg Produk By
                   </Button>
-                </div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Soek produkte..."
-                    value={productSearchTerm}
-                    onChange={(e) => setProductSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {filteredProducts.map((product) => (
-                    <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{product.name}</h3>
-                          {product.quantity <= 5 && (
-                            <Badge variant="destructive" className="text-xs">
-                              Lae voorraad
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-                        <div className="flex gap-4 mt-1">
-                          <span className="text-sm">Kosprys: R{product.costPrice}</span>
-                          <span className="text-sm">Kleinhandel: R{product.retailPrice}</span>
-                          {product.tradePrice && (
-                            <span className="text-sm">Groothandel: R{product.tradePrice}</span>
-                          )}
-                          <span className="text-sm">Voorraad: {product.quantity}</span>
-                        </div>
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Soek produkte op naam of SKU..."
+                      value={productSearchTerm}
+                      onChange={(e) => setProductSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+
+                  {/* Product List */}
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {filteredProducts.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        {productSearchTerm ? 'Geen produkte gevind wat ooreenstem met jou soektog nie.' : 'Geen produkte beskikbaar nie.'}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openProductDialog(product)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteProduct(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ) : (
+                      filteredProducts.map((product) => (
+                        <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{product.name}</h3>
+                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+                          </div>
+                          <div className="text-right mr-4">
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-600">Kosprys: R{product.costPrice}</p>
+                              <p className="font-bold text-gray-900">Kleinhandel: R{product.retailPrice}</p>
+                              {product.tradePrice && (
+                                <p className="text-sm text-blue-600">Groothandel: R{product.tradePrice}</p>
+                              )}
+                            </div>
+                            <p className={`text-sm ${
+                              product.quantity <= 5 ? 'text-red-500' : 'text-gray-500'
+                            }`}>
+                              Voorraad: {product.quantity}
+                              {product.quantity <= 5 && (
+                                <span className="ml-1 text-xs bg-red-100 text-red-600 px-1 rounded">Laag</span>
+                              )}
+                            </p>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openProductDialog(product)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              disabled={deleteProductMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
