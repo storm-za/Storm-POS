@@ -23,25 +23,71 @@ export default function POS() {
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 hero-gradient text-white overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
+              className="relative z-10"
             >
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Point of Sale That Goes Wherever You Do
-              </h1>
-              <p className="text-xl mb-8 text-blue-100 font-medium">Storm POS is the always-online solution for South African businesses</p>
-              <Button 
-                asChild
-                size="lg"
-                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
+              {/* Floating Badge */}
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-white/20"
               >
-                <Link href="/pos/login">Log In to POS</Link>
-              </Button>
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                Live • Always Online
+              </motion.div>
+
+              <h1 className="text-4xl md:text-7xl font-extrabold mb-8 leading-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+                Point of Sale That Goes 
+                <span className="block text-white drop-shadow-lg">Wherever You Do</span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl mb-10 text-blue-100/90 font-medium leading-relaxed max-w-xl">
+                Storm POS is the <span className="text-cyan-300 font-semibold">always-online solution</span> for South African businesses
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  asChild
+                  size="lg"
+                  className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
+                >
+                  <Link href="/pos/login">
+                    Log In to POS
+                    <motion.span 
+                      className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
+                      initial={{ x: 0 }}
+                    >
+                      →
+                    </motion.span>
+                  </Link>
+                </Button>
+                
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex items-center text-blue-200 text-sm"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  No setup fees • Start immediately
+                </motion.div>
+              </div>
             </motion.div>
             
             <motion.div 
@@ -51,36 +97,111 @@ export default function POS() {
               transition={{ duration: 1, delay: 0.2 }}
             >
               <div className="relative">
-                <svg className="w-full h-auto max-w-md mx-auto" viewBox="0 0 400 300" fill="none">
-                  {/* Mobile Phone */}
-                  <rect x="150" y="50" width="100" height="180" rx="15" fill="#1f2937" stroke="#3b82f6" strokeWidth="2"/>
-                  <rect x="160" y="70" width="80" height="120" rx="5" fill="#3b82f6"/>
-                  <circle cx="200" cy="210" r="8" fill="#6b7280"/>
-                  
-                  {/* POS Terminal */}
-                  <rect x="80" y="120" width="80" height="60" rx="8" fill="#f3f4f6" stroke="#3b82f6" strokeWidth="2"/>
-                  <rect x="90" y="130" width="60" height="20" rx="3" fill="#3b82f6"/>
-                  <rect x="90" y="155" width="20" height="8" rx="2" fill="#10b981"/>
-                  <rect x="115" y="155" width="20" height="8" rx="2" fill="#f59e0b"/>
-                  <rect x="140" y="155" width="10" height="8" rx="2" fill="#ef4444"/>
-                  
-                  {/* Credit Card */}
-                  <rect x="260" y="140" width="60" height="40" rx="6" fill="#1f2937"/>
-                  <rect x="270" y="150" width="40" height="6" rx="2" fill="#fbbf24"/>
-                  <rect x="270" y="165" width="25" height="4" rx="1" fill="#9ca3af"/>
-                  
-                  {/* Floating Elements */}
-                  <motion.circle 
-                    cx="100" cy="80" r="15" fill="#10b981" 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                  <motion.circle 
-                    cx="320" cy="100" r="12" fill="#f59e0b"
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-                  />
-                </svg>
+                {/* Glassmorphism Container */}
+                <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+                  <svg className="w-full h-auto max-w-lg mx-auto" viewBox="0 0 500 400" fill="none">
+                    {/* Enhanced Mobile Phone */}
+                    <defs>
+                      <linearGradient id="phoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#1f2937"/>
+                        <stop offset="100%" stopColor="#374151"/>
+                      </linearGradient>
+                      <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#3b82f6"/>
+                        <stop offset="100%" stopColor="#1d4ed8"/>
+                      </linearGradient>
+                    </defs>
+                    
+                    {/* Phone Shadow */}
+                    <ellipse cx="205" cy="340" rx="50" ry="8" fill="#000" opacity="0.2"/>
+                    
+                    {/* Main Phone */}
+                    <rect x="175" y="60" width="120" height="220" rx="20" fill="url(#phoneGradient)" stroke="#60a5fa" strokeWidth="3"/>
+                    <rect x="185" y="85" width="100" height="150" rx="8" fill="url(#screenGradient)"/>
+                    
+                    {/* Phone Details */}
+                    <rect x="190" y="95" width="90" height="60" rx="4" fill="#1e40af" opacity="0.8"/>
+                    <rect x="195" y="100" width="35" height="8" rx="2" fill="#60a5fa"/>
+                    <rect x="195" y="112" width="25" height="6" rx="1" fill="#93c5fd"/>
+                    <rect x="195" y="122" width="45" height="6" rx="1" fill="#dbeafe"/>
+                    
+                    {/* Modern POS Terminal */}
+                    <rect x="90" y="150" width="100" height="80" rx="12" fill="#f8fafc" stroke="#3b82f6" strokeWidth="3"/>
+                    <rect x="100" y="165" width="80" height="30" rx="6" fill="url(#screenGradient)"/>
+                    <circle cx="110" cy="215" r="8" fill="#10b981"/>
+                    <circle cx="130" cy="215" r="8" fill="#f59e0b"/>
+                    <circle cx="150" cy="215" r="8" fill="#ef4444"/>
+                    <circle cx="170" cy="215" r="8" fill="#8b5cf6"/>
+                    
+                    {/* Enhanced Credit Card */}
+                    <rect x="310" y="170" width="80" height="50" rx="8" fill="#1f2937" stroke="#fbbf24" strokeWidth="2"/>
+                    <rect x="320" y="185" width="50" height="8" rx="3" fill="#fbbf24"/>
+                    <rect x="320" y="200" width="30" height="5" rx="2" fill="#d1d5db"/>
+                    <circle cx="365" cy="205" r="12" fill="#fbbf24" opacity="0.3"/>
+                    <circle cx="365" cy="205" r="8" fill="#fbbf24" opacity="0.6"/>
+                    
+                    {/* Floating Data Particles */}
+                    <motion.circle 
+                      cx="120" cy="100" r="18" fill="#10b981" opacity="0.8"
+                      animate={{ y: [0, -15, 0], opacity: [0.8, 1, 0.8] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                    />
+                    <motion.circle 
+                      cx="380" cy="120" r="15" fill="#f59e0b" opacity="0.7"
+                      animate={{ y: [0, 12, 0], opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                    />
+                    <motion.circle 
+                      cx="140" cy="80" r="12" fill="#8b5cf6" opacity="0.6"
+                      animate={{ y: [0, -8, 0], opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 3.5, repeat: Infinity, delay: 2 }}
+                    />
+                    <motion.circle 
+                      cx="350" cy="280" r="20" fill="#06b6d4" opacity="0.5"
+                      animate={{ y: [0, 10, 0], opacity: [0.5, 0.9, 0.5] }}
+                      transition={{ duration: 4.5, repeat: Infinity, delay: 0.5 }}
+                    />
+                    
+                    {/* Connection Lines */}
+                    <motion.path 
+                      d="M195 180 L310 190" 
+                      stroke="#60a5fa" 
+                      strokeWidth="2" 
+                      strokeDasharray="5,5"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    <motion.path 
+                      d="M150 190 L175 200" 
+                      stroke="#10b981" 
+                      strokeWidth="2" 
+                      strokeDasharray="3,3"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
+                    />
+                  </svg>
+                </div>
+                
+                {/* Floating Stats */}
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                  className="absolute -top-4 -left-4 bg-green-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-xl"
+                >
+                  99.9% Uptime
+                </motion.div>
+                
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.3, duration: 0.5 }}
+                  className="absolute -bottom-4 -right-4 bg-purple-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-xl"
+                >
+                  Real-time Sync
+                </motion.div>
               </div>
             </motion.div>
           </div>
