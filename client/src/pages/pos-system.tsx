@@ -508,7 +508,9 @@ export default function PosSystem() {
       console.log("Setting form values for editing product:", product);
       productForm.setValue("sku", product.sku);
       productForm.setValue("name", product.name);
-      productForm.setValue("price", product.price);
+      productForm.setValue("costPrice", product.costPrice.toString());
+      productForm.setValue("retailPrice", product.retailPrice.toString());
+      productForm.setValue("tradePrice", product.tradePrice ? product.tradePrice.toString() : "");
       productForm.setValue("quantity", product.quantity);
     } else {
       setEditingProduct(null);
@@ -516,7 +518,9 @@ export default function PosSystem() {
       productForm.reset({
         sku: "",
         name: "",
-        price: "",
+        costPrice: "",
+        retailPrice: "",
+        tradePrice: "",
         quantity: 0,
       });
     }

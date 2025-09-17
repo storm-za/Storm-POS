@@ -814,9 +814,9 @@ export default function PosSystemAfrikaans() {
       setEditingProduct(product);
       productForm.setValue("sku", product.sku);
       productForm.setValue("name", product.name);
-      productForm.setValue("costPrice", product.costPrice);
-      productForm.setValue("retailPrice", product.retailPrice);
-      productForm.setValue("tradePrice", product.tradePrice || "");
+      productForm.setValue("costPrice", product.costPrice.toString());
+      productForm.setValue("retailPrice", product.retailPrice.toString());
+      productForm.setValue("tradePrice", product.tradePrice ? product.tradePrice.toString() : "");
       productForm.setValue("quantity", product.quantity);
     } else {
       setEditingProduct(null);
