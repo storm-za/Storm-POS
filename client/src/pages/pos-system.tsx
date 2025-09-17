@@ -3782,7 +3782,7 @@ export default function PosSystem() {
 
       {/* Bank Details Dialog */}
       <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-[hsl(217,90%,40%)]" />
@@ -3806,24 +3806,24 @@ export default function PosSystem() {
                 </div>
               </div>
               
-              <div className="grid gap-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+              <div className="grid gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                   <span className="text-sm font-medium text-gray-600">Account Holder</span>
-                  <span className="font-semibold text-gray-900">Derrick Venter</span>
+                  <span className="font-semibold text-gray-900">Storm</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                   <span className="text-sm font-medium text-gray-600">Account Number</span>
                   <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">1229368612</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                   <span className="text-sm font-medium text-gray-600">Account Type</span>
                   <span className="font-semibold text-gray-900">Current Account</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                   <span className="text-sm font-medium text-gray-600">Bank Name</span>
                   <span className="font-semibold text-gray-900">Nedbank</span>
                 </div>
-                <div className="flex justify-between items-center py-3">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3">
                   <span className="text-sm font-medium text-gray-600">Branch Code</span>
                   <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">198765</span>
                 </div>

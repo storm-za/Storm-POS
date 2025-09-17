@@ -2806,7 +2806,7 @@ ${dateFilteredSales.map(sale =>
 
         {/* Bank Details Dialog - Afrikaans */}
         <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[hsl(217,90%,40%)]" />
@@ -2830,24 +2830,24 @@ ${dateFilteredSales.map(sale =>
                   </div>
                 </div>
                 
-                <div className="grid gap-4">
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                <div className="grid gap-3 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                     <span className="text-sm font-medium text-gray-600">Rekeninghouer</span>
-                    <span className="font-semibold text-gray-900">Derrick Venter</span>
+                    <span className="font-semibold text-gray-900">Storm</span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                     <span className="text-sm font-medium text-gray-600">Rekeningnommer</span>
                     <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">1229368612</span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                     <span className="text-sm font-medium text-gray-600">Rekeningtipe</span>
                     <span className="font-semibold text-gray-900">Lopende Rekening</span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
                     <span className="text-sm font-medium text-gray-600">Banknaam</span>
                     <span className="font-semibold text-gray-900">Nedbank</span>
                   </div>
-                  <div className="flex justify-between items-center py-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3">
                     <span className="text-sm font-medium text-gray-600">Takkode</span>
                     <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">198765</span>
                   </div>
