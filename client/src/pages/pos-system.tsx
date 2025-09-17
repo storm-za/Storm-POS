@@ -2845,7 +2845,7 @@ export default function PosSystem() {
                           onClick={() => setIsBankDetailsOpen(true)}
                           variant="outline"
                           size="sm"
-                          className="mt-3 border-blue-200 text-white hover:bg-blue-600 hover:border-blue-300"
+                          className="mt-3 bg-blue-500/20 border-blue-300 text-white hover:bg-blue-600 hover:border-blue-400 shadow-sm backdrop-blur-sm"
                         >
                           <CreditCard className="w-4 h-4 mr-2" />
                           View Payment Details
