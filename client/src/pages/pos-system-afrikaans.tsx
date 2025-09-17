@@ -114,6 +114,7 @@ export default function PosSystemAfrikaans() {
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
+  const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -2000,6 +2001,15 @@ ${dateFilteredSales.map(sale =>
                       <div className="text-right">
                         <div className="text-3xl font-bold">R{stormFee.toFixed(2)}</div>
                         <div className="text-blue-100 text-sm">Bedrag verskuldig aan Storm</div>
+                        <Button
+                          onClick={() => setIsBankDetailsOpen(true)}
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 border-blue-200 text-white hover:bg-blue-600 hover:border-blue-300"
+                        >
+                          <CreditCard className="w-4 h-4 mr-2" />
+                          Bekyk Betalingsbesonderhede
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -2790,6 +2800,92 @@ ${dateFilteredSales.map(sale =>
                   )}
                 </div>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bank Details Dialog - Afrikaans */}
+        <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                Betalingsbesonderhede
+              </DialogTitle>
+              <DialogDescription>
+                Bankrekeningbesonderhede vir Storm POS diensfooi betalings
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Bank Details Card */}
+              <div className="bg-gradient-to-br from-blue-50 to-gray-50 rounded-lg border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
+                    <CreditCard className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Nedbank Rekening</h3>
+                    <p className="text-sm text-gray-600">Vir Storm POS diensfooi betalings</p>
+                  </div>
+                </div>
+                
+                <div className="grid gap-4">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                    <span className="text-sm font-medium text-gray-600">Rekeninghouer</span>
+                    <span className="font-semibold text-gray-900">Derrick Venter</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                    <span className="text-sm font-medium text-gray-600">Rekeningnommer</span>
+                    <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">1229368612</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                    <span className="text-sm font-medium text-gray-600">Rekeningtipe</span>
+                    <span className="font-semibold text-gray-900">Lopende Rekening</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                    <span className="text-sm font-medium text-gray-600">Banknaam</span>
+                    <span className="font-semibold text-gray-900">Nedbank</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-sm font-medium text-gray-600">Takkode</span>
+                    <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">198765</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Instructions */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 text-amber-600 mt-0.5">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-amber-900 mb-2">Betalingsinstruksies</h4>
+                    <ul className="text-sm text-amber-800 space-y-1">
+                      <li>• Gebruik jou geregistreerde besigheidsnaam as betalingsverwysing</li>
+                      <li>• Betaal maandelikse diensfooie teen die laaste dag van elke maand</li>
+                      <li>• Hou bewys van betaling vir jou rekords</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="text-center text-sm text-gray-600">
+                <p>Vrae oor fakturering of betalings?</p>
+                <p className="font-medium text-[hsl(217,90%,40%)] mt-1">
+                  E-pos: softwarebystorm@gmail.com
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <Button onClick={() => setIsBankDetailsOpen(false)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+                Sluit
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

@@ -98,6 +98,7 @@ export default function PosSystem() {
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
   const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
+  const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
 
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
@@ -2840,6 +2841,15 @@ export default function PosSystem() {
                       <div className="text-right">
                         <div className="text-3xl font-bold">R{stormFee.toFixed(2)}</div>
                         <div className="text-blue-100 text-sm">Amount due to Storm</div>
+                        <Button
+                          onClick={() => setIsBankDetailsOpen(true)}
+                          variant="outline"
+                          size="sm"
+                          className="mt-3 border-blue-200 text-white hover:bg-blue-600 hover:border-blue-300"
+                        >
+                          <CreditCard className="w-4 h-4 mr-2" />
+                          View Payment Details
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -3766,6 +3776,92 @@ export default function PosSystem() {
                 Close
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bank Details Dialog */}
+      <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+              Payment Details
+            </DialogTitle>
+            <DialogDescription>
+              Bank account details for Storm POS service fee payments
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Bank Details Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-gray-50 rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Nedbank Account</h3>
+                  <p className="text-sm text-gray-600">For Storm POS service fee payments</p>
+                </div>
+              </div>
+              
+              <div className="grid gap-4">
+                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <span className="text-sm font-medium text-gray-600">Account Holder</span>
+                  <span className="font-semibold text-gray-900">Derrick Venter</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <span className="text-sm font-medium text-gray-600">Account Number</span>
+                  <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">1229368612</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <span className="text-sm font-medium text-gray-600">Account Type</span>
+                  <span className="font-semibold text-gray-900">Current Account</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-0">
+                  <span className="text-sm font-medium text-gray-600">Bank Name</span>
+                  <span className="font-semibold text-gray-900">Nedbank</span>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-sm font-medium text-gray-600">Branch Code</span>
+                  <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">198765</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Instructions */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 text-amber-600 mt-0.5">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-amber-900 mb-2">Payment Instructions</h4>
+                  <ul className="text-sm text-amber-800 space-y-1">
+                    <li>• Use your registered business name as payment reference</li>
+                    <li>• Pay monthly service fees by the last day of each month</li>
+                    <li>• Keep proof of payment for your records</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="text-center text-sm text-gray-600">
+              <p>Questions about billing or payments?</p>
+              <p className="font-medium text-[hsl(217,90%,40%)] mt-1">
+                Email: softwarebystorm@gmail.com
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button onClick={() => setIsBankDetailsOpen(false)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+              Close
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
