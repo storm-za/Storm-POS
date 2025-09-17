@@ -980,7 +980,7 @@ ${dateFilteredSales.map(sale =>
     return total + parseFloat(sale.total);
   }, 0);
 
-  const stormFee = monthlyRevenue * 0.01;
+  const stormFee = monthlyRevenue * 0.005;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1971,8 +1971,8 @@ ${dateFilteredSales.map(sale =>
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (1% of revenue)
-              const stormFee = currentMonthRevenue * 0.01;
+              // Calculate Storm fee (0.5% of revenue)
+              const stormFee = currentMonthRevenue * 0.005;
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -2041,7 +2041,7 @@ ${dateFilteredSales.map(sale =>
                       <CardContent>
                         <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
                         <div className="text-sm text-gray-500 mt-1">
-                          1% van maandelikse omset
+                          0.5% van maandelikse omset
                         </div>
                       </CardContent>
                     </Card>
@@ -2102,7 +2102,7 @@ ${dateFilteredSales.map(sale =>
                             <div>
                               <h4 className="font-medium text-blue-900">Maandelikse Fakturering</h4>
                               <p className="text-sm text-blue-700 mt-1">
-                                Storm POS hef 1% van jou maandelikse omset vir die gebruik van ons platform. 
+                                Storm POS hef 0.5% van jou maandelikse omset vir die gebruik van ons platform. 
                                 Betaling word outomaties bereken en is verskuldig aan die einde van elke maand.
                               </p>
                             </div>
@@ -2196,7 +2196,7 @@ ${dateFilteredSales.map(sale =>
                               </li>
                               <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
-                                Diensfooi: 1% van bruto maandelikse omset
+                                Diensfooi: 0.5% van bruto maandelikse omset
                               </li>
                               <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>

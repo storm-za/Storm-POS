@@ -2811,8 +2811,8 @@ export default function PosSystem() {
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (1% of revenue)
-              const stormFee = currentMonthRevenue * 0.01;
+              // Calculate Storm fee (0.5% of revenue)
+              const stormFee = currentMonthRevenue * 0.005;
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -2881,7 +2881,7 @@ export default function PosSystem() {
                       <CardContent>
                         <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
                         <div className="text-sm text-gray-500 mt-1">
-                          1% of monthly revenue
+                          0.5% of monthly revenue
                         </div>
                       </CardContent>
                     </Card>
@@ -2942,7 +2942,7 @@ export default function PosSystem() {
                             <div>
                               <h4 className="font-medium text-blue-900">Monthly Billing</h4>
                               <p className="text-sm text-blue-700 mt-1">
-                                Storm POS charges 1% of your monthly revenue for using our platform. 
+                                Storm POS charges 0.5% of your monthly revenue for using our platform. 
                                 Payment is automatically calculated and due at the end of each month.
                               </p>
                             </div>
@@ -3036,7 +3036,7 @@ export default function PosSystem() {
                               </li>
                               <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
-                                Service fee: 1% of gross monthly revenue
+                                Service fee: 0.5% of gross monthly revenue
                               </li>
                               <li className="flex items-start gap-2">
                                 <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
