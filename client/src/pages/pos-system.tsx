@@ -853,7 +853,7 @@ export default function PosSystem() {
         throw new Error(errorData.message || "Failed to close account");
       }
 
-      return { ...await saleResponse.json(), tipEnabled };
+      return { ...(await saleResponse.json()), tipEnabled };
     },
     onSuccess: (data) => {
       // Generate PDF receipt for closed account
@@ -1641,7 +1641,6 @@ export default function PosSystem() {
           </div>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Company Banner */}
         <div className="mb-6">
@@ -2853,7 +2852,6 @@ export default function PosSystem() {
                       </div>
                     </div>
                   </div>
-
                   {/* Key Metrics */}
                   <div className="grid md:grid-cols-3 gap-6">
                     <Card className="border-l-4 border-l-green-500">
@@ -2907,7 +2905,6 @@ export default function PosSystem() {
                       </CardContent>
                     </Card>
                   </div>
-
                   {/* Billing Breakdown */}
                   <div className="grid lg:grid-cols-2 gap-6">
                     {/* Fee Calculation */}
@@ -2926,7 +2923,7 @@ export default function PosSystem() {
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-600">Storm Service Rate</span>
-                            <span className="font-semibold">1.0%</span>
+                            <span className="font-semibold">0.5%</span>
                           </div>
                           <div className="border-t pt-3">
                             <div className="flex justify-between items-center">
@@ -3015,7 +3012,6 @@ export default function PosSystem() {
                       </CardContent>
                     </Card>
                   </div>
-
                   {/* Payment Information */}
                   <Card>
                     <CardHeader>
@@ -3067,7 +3063,6 @@ export default function PosSystem() {
           </TabsContent>
         </Tabs>
       </div>
-
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
         <DialogContent className="sm:max-w-[500px]" aria-describedby="customer-dialog-description">
@@ -3157,7 +3152,6 @@ export default function PosSystem() {
           </Form>
         </DialogContent>
       </Dialog>
-
       {/* Open Account Creation Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -3240,7 +3234,6 @@ export default function PosSystem() {
           </Form>
         </DialogContent>
       </Dialog>
-
       {/* Account Details Dialog */}
       <Dialog open={!!selectedOpenAccount} onOpenChange={() => {
         setSelectedOpenAccount(null);
@@ -3394,9 +3387,6 @@ export default function PosSystem() {
           )}
         </DialogContent>
       </Dialog>
-
-
-
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -3467,7 +3457,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Staff Authentication Dialog */}
       <Dialog open={isStaffAuthOpen} onOpenChange={setIsStaffAuthOpen}>
         <DialogContent className="sm:max-w-md">
@@ -3527,7 +3516,6 @@ export default function PosSystem() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* User Management Dialog */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
         <DialogContent className="sm:max-w-2xl">
@@ -3661,7 +3649,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Management Access Notification Dialog */}
       <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
         <DialogContent className="sm:max-w-[400px]">
@@ -3681,7 +3668,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Void Sale Dialog */}
       <Dialog open={voidSaleDialog.open} onOpenChange={(open) => {
         if (!open) {
@@ -3737,7 +3723,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* View Void Reason Dialog */}
       <Dialog open={viewVoidDialog.open} onOpenChange={(open) => {
         if (!open) {
@@ -3779,7 +3764,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Bank Details Dialog */}
       <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
         <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
