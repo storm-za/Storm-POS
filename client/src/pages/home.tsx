@@ -355,7 +355,6 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Michael Van Der Merwe</div>
-                    <div className="text-sm text-gray-600">Owner, Johannesburg Electronics</div>
                   </div>
                 </div>
               </Card>
@@ -377,7 +376,6 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Thabo Mthembu</div>
-                    <div className="text-sm text-gray-600">Manager, Durban Restaurant Chain</div>
                   </div>
                 </div>
               </Card>
