@@ -112,34 +112,49 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
   useEffect(() => {
     if (!isOpen || !currentStep) return;
 
-    const element = document.querySelector(currentStep.target);
-    if (element) {
-      setHighlightedElement(element);
-      
-      // Mobile-specific scrolling and positioning
-      const isMobile = window.innerWidth < 768;
-      
-      if (isMobile) {
-        // For mobile, always scroll to top first to ensure all elements are accessible, then scroll to element
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => {
-          // Then scroll to the specific element 
+    const findAndHighlightElement = () => {
+      const element = document.querySelector(currentStep.target);
+      if (element) {
+        setHighlightedElement(element);
+        
+        // Mobile-specific scrolling and positioning
+        const isMobile = window.innerWidth < 768;
+        
+        if (isMobile) {
+          // For mobile, always scroll to top first to ensure all elements are accessible
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            // Find element again after scrolling (it might be re-rendered)
+            const updatedElement = document.querySelector(currentStep.target);
+            if (updatedElement) {
+              setHighlightedElement(updatedElement);
+              // Then scroll to the specific element 
+              updatedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // Calculate position after scroll
+              setTimeout(() => {
+                const position = calculateTooltipPosition(updatedElement);
+                setTooltipPosition(position);
+              }, 500);
+            }
+          }, 800);
+        } else {
+          // Desktop behavior (unchanged)
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Calculate position after scroll
           setTimeout(() => {
             const position = calculateTooltipPosition(element);
             setTooltipPosition(position);
-          }, 400);
-        }, 600);
+          }, 50);
+        }
       } else {
-        // Desktop behavior (unchanged)
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => {
-          const position = calculateTooltipPosition(element);
-          setTooltipPosition(position);
-        }, 50);
+        // Element not found, try again after a short delay (for mobile re-rendering)
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+          setTimeout(findAndHighlightElement, 500);
+        }
       }
-    }
+    };
+
+    findAndHighlightElement();
   }, [currentStepIndex, isOpen, currentStep]);
 
   const handleNext = () => {
