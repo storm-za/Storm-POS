@@ -66,51 +66,34 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     const position = currentStep.position || 'bottom';
     
     if (isMobile) {
-      // Mobile-specific positioning to completely avoid covering highlighted elements
-      const elementVCenter = rect.top + (rect.height / 2); // Vertical center
-      const elementHCenter = rect.left + (rect.width / 2); // Horizontal center  
-      const elementBottom = rect.bottom;
-      const elementTop = rect.top;
-      const elementLeft = rect.left;
-      const elementRight = rect.right;
+      // Simple mobile positioning - steps 4, 5, 11, 12 work perfectly, keep their logic
+      // All other steps: just move to lower half of screen so highlighted elements are visible
+      const stepIndex = currentStepIndex;
+      const workingSteps = [3, 4, 10, 11]; // Steps 4, 5, 11, 12 (0-indexed: 3, 4, 10, 11)
       
-      // More aggressive spacing for mobile
-      const minMargin = 40;
-      const spaceBelow = viewportHeight - elementBottom;
-      const spaceAbove = elementTop;
-      const spaceRight = viewportWidth - elementRight;
-      const spaceLeft = elementLeft;
-      
-      // Try positioning below first (most natural)
-      if (spaceBelow >= tooltipHeight + minMargin) {
-        top = elementBottom + minMargin;
-        left = Math.max(20, Math.min(elementLeft, viewportWidth - tooltipWidth - 20));
-      }
-      // Try positioning above
-      else if (spaceAbove >= tooltipHeight + minMargin) {
-        top = elementTop - tooltipHeight - minMargin;
-        left = Math.max(20, Math.min(elementLeft, viewportWidth - tooltipWidth - 20));
-      }
-      // Try positioning to the right (if element is in left half of screen)
-      else if (elementHCenter < viewportWidth / 2 && spaceRight >= tooltipWidth + minMargin) {
-        top = Math.max(20, Math.min(elementVCenter - tooltipHeight / 2, viewportHeight - tooltipHeight - 20));
-        left = elementRight + minMargin;
-      }
-      // Try positioning to the left (if element is in right half of screen)
-      else if (elementHCenter >= viewportWidth / 2 && spaceLeft >= tooltipWidth + minMargin) {
-        top = Math.max(20, Math.min(elementVCenter - tooltipHeight / 2, viewportHeight - tooltipHeight - 20));
-        left = elementLeft - tooltipWidth - minMargin;
-      }
-      // Last resort: position at bottom of screen, ensuring no overlap
-      else {
-        // Check if bottom positioning would work
-        if (viewportHeight - 20 - tooltipHeight > elementBottom + minMargin) {
-          top = viewportHeight - tooltipHeight - 20;
+      if (workingSteps.includes(stepIndex)) {
+        // Keep existing logic for working steps (4, 5, 11, 12)
+        const elementBottom = rect.bottom;
+        const elementTop = rect.top;
+        const minMargin = 40;
+        const spaceBelow = viewportHeight - elementBottom;
+        const spaceAbove = elementTop;
+        
+        if (spaceBelow >= tooltipHeight + minMargin) {
+          top = elementBottom + minMargin;
+          left = Math.max(20, Math.min(rect.left, viewportWidth - tooltipWidth - 20));
+        } else if (spaceAbove >= tooltipHeight + minMargin) {
+          top = elementTop - tooltipHeight - minMargin;
+          left = Math.max(20, Math.min(rect.left, viewportWidth - tooltipWidth - 20));
         } else {
-          // Position at top of screen
-          top = 20;
+          // Fallback to lower half
+          top = viewportHeight - tooltipHeight - 40;
+          left = Math.max(20, viewportWidth - tooltipWidth - 20);
         }
-        left = Math.max(20, Math.min(elementHCenter - tooltipWidth / 2, viewportWidth - tooltipWidth - 20));
+      } else {
+        // For all other steps: simply position in lower half of screen
+        top = viewportHeight - tooltipHeight - 40;
+        left = Math.max(20, Math.min((viewportWidth - tooltipWidth) / 2, viewportWidth - tooltipWidth - 20));
       }
     } else {
       // Desktop positioning (original logic)
