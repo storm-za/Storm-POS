@@ -50,6 +50,7 @@ export interface IStorage {
   getPosUserByEmail(email: string): Promise<PosUser | undefined>;
   createPosUser(user: InsertPosUser): Promise<PosUser>;
   updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined>;
+  updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined>;
   
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
@@ -262,6 +263,15 @@ export class MemStorage implements IStorage {
     if (!user) return undefined;
     
     const updatedUser: PosUser = { ...user, companyLogo: logo };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, tutorialCompleted: completed };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
   }
@@ -511,6 +521,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(posUsers)
       .set({ companyLogo: logo })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ tutorialCompleted: completed })
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;

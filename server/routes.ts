@@ -200,6 +200,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user tutorial completion status
+  app.put("/api/pos/user/:id/tutorial", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { completed } = req.body;
+      
+      if (typeof completed !== 'boolean') {
+        return res.status(400).json({ message: "Completed status is required" });
+      }
+      
+      const updatedUser = await storage.updatePosUserTutorialStatus(userId, completed);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating tutorial status:", error);
+      res.status(500).json({ message: "Failed to update tutorial status" });
+    }
+  });
+
   // POS Products
   app.get("/api/pos/products", async (req, res) => {
     try {

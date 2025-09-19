@@ -21,10 +21,12 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, Globe
+  ChevronDown, Globe, BookOpen, HelpCircle
 } from "lucide-react";
 import stormLogo from "@assets/STORM (1)_1757446684640.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { TutorialGuide } from "@/components/TutorialGuide";
+import { englishTutorialSteps } from "@/data/tutorialSteps";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 
@@ -114,6 +116,8 @@ export default function PosSystem() {
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -1545,6 +1549,18 @@ export default function PosSystem() {
             
             {/* Right side controls */}
             <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Tutorial Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsTutorialOpen(true)}
+                className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,35%)] hover:bg-blue-50"
+                data-testid="tutorial-button"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Tutorial</span>
+              </Button>
+
               {/* Staff Account Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1552,6 +1568,7 @@ export default function PosSystem() {
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
+                    data-testid="staff-dropdown"
                   >
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Select Staff'}</span>
