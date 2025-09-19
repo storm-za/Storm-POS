@@ -57,6 +57,7 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const isMobile = viewportWidth < 768; // Mobile breakpoint
     
     let top = 0;
     let left = 0;
@@ -64,30 +65,62 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     // Default position preference based on step configuration
     const position = currentStep.position || 'bottom';
     
-    switch (position) {
-      case 'top':
-        top = rect.top - tooltipHeight - 20;
-        left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-        break;
-      case 'bottom':
-        top = rect.bottom + 20;
-        left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-        break;
-      case 'left':
-        top = rect.top + (rect.height / 2) - (tooltipHeight / 2);
-        left = rect.left - tooltipWidth - 20;
-        break;
-      case 'right':
-        top = rect.top + (rect.height / 2) - (tooltipHeight / 2);
-        left = rect.right + 20;
-        break;
-      case 'center':
-        top = viewportHeight / 2 - tooltipHeight / 2;
-        left = viewportWidth / 2 - tooltipWidth / 2;
-        break;
+    if (isMobile) {
+      // Mobile-specific positioning to avoid covering highlighted elements
+      const elementCenter = rect.top + (rect.height / 2);
+      const elementBottom = rect.bottom;
+      const elementTop = rect.top;
+      
+      // Check if there's enough space below the element
+      const spaceBelow = viewportHeight - elementBottom;
+      const spaceAbove = elementTop;
+      
+      if (spaceBelow >= tooltipHeight + 40) {
+        // Position below with some margin
+        top = elementBottom + 20;
+        left = 20; // Always use left margin on mobile for consistency
+      } else if (spaceAbove >= tooltipHeight + 40) {
+        // Position above with some margin
+        top = elementTop - tooltipHeight - 20;
+        left = 20;
+      } else {
+        // Not enough space above or below, use side positioning
+        if (elementCenter > viewportHeight / 2) {
+          // Element in lower half, position tooltip in upper area
+          top = 20;
+        } else {
+          // Element in upper half, position tooltip in lower area
+          top = viewportHeight - tooltipHeight - 20;
+        }
+        left = 20;
+      }
+    } else {
+      // Desktop positioning (original logic)
+      switch (position) {
+        case 'top':
+          top = rect.top - tooltipHeight - 20;
+          left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+          break;
+        case 'bottom':
+          top = rect.bottom + 20;
+          left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+          break;
+        case 'left':
+          top = rect.top + (rect.height / 2) - (tooltipHeight / 2);
+          left = rect.left - tooltipWidth - 20;
+          break;
+        case 'right':
+          top = rect.top + (rect.height / 2) - (tooltipHeight / 2);
+          left = rect.right + 20;
+          break;
+        case 'center':
+          top = viewportHeight / 2 - tooltipHeight / 2;
+          left = viewportWidth / 2 - tooltipWidth / 2;
+          break;
+      }
     }
     
-    // Adjust if tooltip goes outside viewport
+    // Final viewport boundary checks
     if (left < 20) left = 20;
     if (left + tooltipWidth > viewportWidth - 20) left = viewportWidth - tooltipWidth - 20;
     if (top < 20) top = 20;
