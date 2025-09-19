@@ -1198,7 +1198,7 @@ ${dateFilteredSales.map(sale =>
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
             {/* Mobile Tab Navigation */}
-            <div className="block md:hidden">
+            <div className="block md:hidden tabs-navigation">
               <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-x-auto scrollbar-hide">
                 <button
                   onClick={() => handleTabChange("verkope")}
@@ -1207,6 +1207,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-sales"
                 >
                   <ShoppingCart className="h-4 w-4 mb-1" />
                   <span>Verkope</span>
@@ -1218,6 +1219,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-products"
                 >
                   <Package className="h-4 w-4 mb-1" />
                   <span>Produkte</span>
@@ -1229,6 +1231,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-customers"
                 >
                   <Users className="h-4 w-4 mb-1" />
                   <span>Kliente</span>
@@ -1240,6 +1243,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-open-accounts"
                 >
                   <FileText className="h-4 w-4 mb-1" />
                   <span>Rekeninge</span>
@@ -1251,6 +1255,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-reports"
                 >
                   <BarChart3 className="h-4 w-4 mb-1" />
                   <span>Verslae</span>
@@ -1262,6 +1267,7 @@ ${dateFilteredSales.map(sale =>
                       ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
                       : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                   }`}
+                  data-testid="tab-usage"
                 >
                   <CreditCard className="h-4 w-4 mb-1" />
                   <span>Gebruik</span>
