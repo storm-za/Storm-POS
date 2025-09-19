@@ -334,7 +334,6 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">Sarah Anderson</div>
-                    <div className="text-sm text-gray-600">CEO, Cape Town Boutique</div>
                   </div>
                 </div>
               </Card>
