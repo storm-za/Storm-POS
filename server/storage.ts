@@ -21,8 +21,15 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-  // Handle legacy plaintext passwords (temporary backward compatibility)
+  // SECURITY: Disable plaintext passwords in production
+  // Only allow for development/demo purposes
   if (!storedHash.includes(':')) {
+    console.warn('WARNING: Plaintext password detected. This should not be used in production!');
+    // Only allow in development environment
+    if (process.env.NODE_ENV === 'production') {
+      console.error('SECURITY ERROR: Plaintext passwords not allowed in production');
+      return false;
+    }
     return password === storedHash;
   }
   

@@ -21,10 +21,12 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, Globe
+  ChevronDown, Globe, BookOpen, HelpCircle
 } from "lucide-react";
 import stormLogo from "@assets/STORM (1)_1757446684640.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { TutorialGuide } from "@/components/TutorialGuide";
+import { afrikaansTutorialSteps } from "@/data/tutorialSteps";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 
@@ -103,11 +105,13 @@ export default function PosSystemAfrikaans() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("verkope");
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
   const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
@@ -206,7 +210,8 @@ export default function PosSystemAfrikaans() {
           email: 'demo@storm.co.za',
           paid: true,
           companyLogo: undefined,
-          companyName: 'Demo Rekening'
+          companyName: 'Demo Rekening',
+          tutorialCompleted: false
         });
       }
     } else {
@@ -216,7 +221,8 @@ export default function PosSystemAfrikaans() {
         email: 'demo@storm.co.za',
         paid: true,
         companyLogo: undefined,
-        companyName: 'Demo Rekening'
+        companyName: 'Demo Rekening',
+        tutorialCompleted: false
       });
     }
   }, []);
@@ -552,6 +558,66 @@ export default function PosSystemAfrikaans() {
       });
     },
   });
+
+  // Tutorial completion mutation  
+  const completeTutorialMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser) throw new Error("Geen gebruiker gevind nie");
+      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/tutorial`, {
+        completed: true,
+        userEmail: currentUser.email,
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Kon nie tutoriaal voltooi nie");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Update current user state with tutorial completion
+      if (currentUser && data.user) {
+        setCurrentUser({ ...currentUser, tutorialCompleted: true });
+        // Also update localStorage if it exists
+        const userData = localStorage.getItem('posUser');
+        if (userData) {
+          try {
+            const parsedUser = JSON.parse(userData);
+            parsedUser.tutorialCompleted = true;
+            localStorage.setItem('posUser', JSON.stringify(parsedUser));
+          } catch (error) {
+            console.error('Fout met opdatering van localStorage:', error);
+          }
+        }
+      }
+      
+      setShouldShowTutorial(false);
+      setIsTutorialOpen(false);
+      toast({ 
+        title: "Tutoriaal Voltooi!", 
+        description: "Jy kan hierdie tutoriaal enige tyd herspeel vanaf die Tutoriaal knoppie." 
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Fout met tutoriaal voltooiing:", error);
+      toast({ 
+        title: "Fout", 
+        description: error.message || "Kon nie tutoriaal voltooiing stoor nie. Probeer asseblief weer.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  // Check if user should see tutorial on first load
+  useEffect(() => {
+    if (currentUser && !currentUser.tutorialCompleted) {
+      setShouldShowTutorial(true);
+      setIsTutorialOpen(true);
+    }
+  }, [currentUser]);
+
+  const handleTutorialComplete = () => {
+    completeTutorialMutation.mutate();
+  };
 
   // Sale functions
   const addToSale = (product: Product) => {
@@ -989,7 +1055,7 @@ ${dateFilteredSales.map(sale =>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 company-banner">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
@@ -1000,6 +1066,18 @@ ${dateFilteredSales.map(sale =>
             
             {/* Right side controls */}
             <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Tutorial Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsTutorialOpen(true)}
+                className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,35%)] hover:bg-blue-50"
+                data-testid="tutorial-button"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Tutoriaal</span>
+              </Button>
+
               {/* Staff Account Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1190,10 +1268,11 @@ ${dateFilteredSales.map(sale =>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 tabs-navigation">
               <TabsTrigger 
                 value="verkope" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-sales"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Verkope</span>
@@ -1241,7 +1320,7 @@ ${dateFilteredSales.map(sale =>
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Product Selection */}
               <div>
-                <Card>
+                <Card data-testid="product-selection-card">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Package className="h-5 w-5" />
@@ -1291,7 +1370,7 @@ ${dateFilteredSales.map(sale =>
 
               {/* Current Sale */}
               <div>
-                <Card>
+                <Card data-testid="current-sale-card">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <ShoppingCart className="h-5 w-5" />
@@ -2889,6 +2968,15 @@ ${dateFilteredSales.map(sale =>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Tutorial Guide */}
+        <TutorialGuide
+          isOpen={isTutorialOpen}
+          onClose={() => setIsTutorialOpen(false)}
+          steps={afrikaansTutorialSteps}
+          onComplete={handleTutorialComplete}
+          language="af"
+        />
       </div>
     </div>
   );

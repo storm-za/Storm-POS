@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In production, you'd use proper session management here
       res.json({ 
         success: true, 
-        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo, companyName: user.companyName }
+        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo, companyName: user.companyName, tutorialCompleted: user.tutorialCompleted }
       });
     } catch (error) {
       console.error("POS login error:", error);
@@ -204,15 +204,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pos/user/:id/tutorial", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      const { completed } = req.body;
+      const { completed, userEmail } = req.body;
       
+      // Validate request parameters
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
       if (typeof completed !== 'boolean') {
         return res.status(400).json({ message: "Completed status is required" });
+      }
+      if (!userEmail) {
+        return res.status(400).json({ message: "User email is required for authentication" });
+      }
+      
+      // Get user from database
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // SECURITY: Verify that the email matches the user - basic authorization
+      // This prevents IDOR attacks by ensuring users can only update their own tutorial status
+      if (existingUser.email !== userEmail) {
+        return res.status(403).json({ message: "Unauthorized: You can only update your own tutorial status" });
       }
       
       const updatedUser = await storage.updatePosUserTutorialStatus(userId, completed);
       if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(500).json({ message: "Failed to update tutorial status" });
       }
       
       res.json({ success: true, user: updatedUser });

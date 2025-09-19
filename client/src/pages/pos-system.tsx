@@ -105,7 +105,7 @@ export default function PosSystem() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
@@ -162,6 +162,7 @@ export default function PosSystem() {
           email: 'demo@storm.co.za',
           paid: true,
           companyLogo: null,
+          tutorialCompleted: false,
           companyName: 'Demo Account'
         });
       }
@@ -172,10 +173,23 @@ export default function PosSystem() {
         email: 'demo@storm.co.za',
         paid: true,
         companyLogo: null,
-        companyName: 'Demo Account'
+        companyName: 'Demo Account',
+        tutorialCompleted: false
       });
     }
   }, []);
+
+  // Check if user should see tutorial on first load
+  useEffect(() => {
+    if (currentUser && !currentUser.tutorialCompleted) {
+      setShouldShowTutorial(true);
+      setIsTutorialOpen(true);
+    }
+  }, [currentUser]);
+
+  const handleTutorialComplete = () => {
+    completeTutorialMutation.mutate();
+  };
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
@@ -1350,6 +1364,54 @@ export default function PosSystem() {
     },
   });
 
+  // Tutorial completion mutation
+  const completeTutorialMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser) throw new Error("No user found");
+      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/tutorial`, {
+        completed: true,
+        userEmail: currentUser.email,
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to complete tutorial");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Update current user state with tutorial completion
+      if (currentUser && data.user) {
+        setCurrentUser({ ...currentUser, tutorialCompleted: true });
+        // Also update localStorage if it exists
+        const userData = localStorage.getItem('posUser');
+        if (userData) {
+          try {
+            const parsedUser = JSON.parse(userData);
+            parsedUser.tutorialCompleted = true;
+            localStorage.setItem('posUser', JSON.stringify(parsedUser));
+          } catch (error) {
+            console.error('Error updating localStorage:', error);
+          }
+        }
+      }
+      
+      setShouldShowTutorial(false);
+      setIsTutorialOpen(false);
+      toast({ 
+        title: "Tutorial Completed!", 
+        description: "You can replay this tutorial anytime from the Tutorial button." 
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Error completing tutorial:", error);
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to save tutorial completion. Please try again.", 
+        variant: "destructive" 
+      });
+    },
+  });
+
   // Void sale handlers
   const handleVoidSaleClick = (sale: Sale) => {
     if (currentStaff?.userType !== 'management') {
@@ -1538,7 +1600,7 @@ export default function PosSystem() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 company-banner">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
@@ -1620,7 +1682,7 @@ export default function PosSystem() {
               {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center" data-testid="profile-dropdown">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1751,10 +1813,11 @@ export default function PosSystem() {
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 tabs-navigation">
               <TabsTrigger 
                 value="sales" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-sales"
               >
                 <ShoppingCart className="h-4 w-4" />
                 <span>Sales</span>
@@ -1762,6 +1825,7 @@ export default function PosSystem() {
               <TabsTrigger 
                 value="products" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-products"
               >
                 <Package className="h-4 w-4" />
                 <span>Products</span>
@@ -1769,6 +1833,7 @@ export default function PosSystem() {
               <TabsTrigger 
                 value="customers" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-customers"
               >
                 <Users className="h-4 w-4" />
                 <span>Customers</span>
@@ -1776,6 +1841,7 @@ export default function PosSystem() {
               <TabsTrigger 
                 value="open-accounts" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-open-accounts"
               >
                 <FileText className="h-4 w-4" />
                 <span>Open Accounts</span>
@@ -1783,6 +1849,7 @@ export default function PosSystem() {
               <TabsTrigger 
                 value="reports" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-reports"
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Reports</span>
@@ -1790,6 +1857,7 @@ export default function PosSystem() {
               <TabsTrigger 
                 value="usage" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-usage"
               >
                 <CreditCard className="h-4 w-4" />
                 <span>Usage</span>
@@ -1802,7 +1870,7 @@ export default function PosSystem() {
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Product Selection */}
               <div>
-                <Card>
+                <Card data-testid="product-selection-card">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Package className="h-5 w-5" />
@@ -1852,7 +1920,7 @@ export default function PosSystem() {
 
               {/* Current Sale */}
               <div>
-                <Card>
+                <Card data-testid="current-sale-card">
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <ShoppingCart className="h-5 w-5" />
@@ -3870,6 +3938,15 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Tutorial Guide */}
+      <TutorialGuide
+        isOpen={isTutorialOpen}
+        onClose={() => setIsTutorialOpen(false)}
+        steps={englishTutorialSteps}
+        onComplete={handleTutorialComplete}
+        language="en"
+      />
     </div>
   );
 }
