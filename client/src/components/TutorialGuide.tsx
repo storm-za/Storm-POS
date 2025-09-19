@@ -66,33 +66,51 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     const position = currentStep.position || 'bottom';
     
     if (isMobile) {
-      // Mobile-specific positioning to avoid covering highlighted elements
-      const elementCenter = rect.top + (rect.height / 2);
+      // Mobile-specific positioning to completely avoid covering highlighted elements
+      const elementVCenter = rect.top + (rect.height / 2); // Vertical center
+      const elementHCenter = rect.left + (rect.width / 2); // Horizontal center  
       const elementBottom = rect.bottom;
       const elementTop = rect.top;
+      const elementLeft = rect.left;
+      const elementRight = rect.right;
       
-      // Check if there's enough space below the element
+      // More aggressive spacing for mobile
+      const minMargin = 40;
       const spaceBelow = viewportHeight - elementBottom;
       const spaceAbove = elementTop;
+      const spaceRight = viewportWidth - elementRight;
+      const spaceLeft = elementLeft;
       
-      if (spaceBelow >= tooltipHeight + 40) {
-        // Position below with some margin
-        top = elementBottom + 20;
-        left = 20; // Always use left margin on mobile for consistency
-      } else if (spaceAbove >= tooltipHeight + 40) {
-        // Position above with some margin
-        top = elementTop - tooltipHeight - 20;
-        left = 20;
-      } else {
-        // Not enough space above or below, use side positioning
-        if (elementCenter > viewportHeight / 2) {
-          // Element in lower half, position tooltip in upper area
-          top = 20;
-        } else {
-          // Element in upper half, position tooltip in lower area
+      // Try positioning below first (most natural)
+      if (spaceBelow >= tooltipHeight + minMargin) {
+        top = elementBottom + minMargin;
+        left = Math.max(20, Math.min(elementLeft, viewportWidth - tooltipWidth - 20));
+      }
+      // Try positioning above
+      else if (spaceAbove >= tooltipHeight + minMargin) {
+        top = elementTop - tooltipHeight - minMargin;
+        left = Math.max(20, Math.min(elementLeft, viewportWidth - tooltipWidth - 20));
+      }
+      // Try positioning to the right (if element is in left half of screen)
+      else if (elementHCenter < viewportWidth / 2 && spaceRight >= tooltipWidth + minMargin) {
+        top = Math.max(20, Math.min(elementVCenter - tooltipHeight / 2, viewportHeight - tooltipHeight - 20));
+        left = elementRight + minMargin;
+      }
+      // Try positioning to the left (if element is in right half of screen)
+      else if (elementHCenter >= viewportWidth / 2 && spaceLeft >= tooltipWidth + minMargin) {
+        top = Math.max(20, Math.min(elementVCenter - tooltipHeight / 2, viewportHeight - tooltipHeight - 20));
+        left = elementLeft - tooltipWidth - minMargin;
+      }
+      // Last resort: position at bottom of screen, ensuring no overlap
+      else {
+        // Check if bottom positioning would work
+        if (viewportHeight - 20 - tooltipHeight > elementBottom + minMargin) {
           top = viewportHeight - tooltipHeight - 20;
+        } else {
+          // Position at top of screen
+          top = 20;
         }
-        left = 20;
+        left = Math.max(20, Math.min(elementHCenter - tooltipWidth / 2, viewportWidth - tooltipWidth - 20));
       }
     } else {
       // Desktop positioning (original logic)
@@ -137,14 +155,38 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     if (element) {
       setHighlightedElement(element);
       
-      // Wait for tooltip to render, then calculate position
-      setTimeout(() => {
-        const position = calculateTooltipPosition(element);
-        setTooltipPosition(position);
-      }, 50);
+      // Mobile-specific scrolling and positioning
+      const isMobile = window.innerWidth < 768;
       
-      // Scroll element into view
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (isMobile) {
+        // For mobile, scroll to top first to ensure tabs are visible, then scroll to element
+        if (currentStep.target.includes('tab-') || currentStep.target.includes('tabs-navigation')) {
+          // Scroll to top of page first to show navigation
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Calculate position after scroll
+            setTimeout(() => {
+              const position = calculateTooltipPosition(element);
+              setTooltipPosition(position);
+            }, 300);
+          }, 500);
+        } else {
+          // For other elements, use normal scroll
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => {
+            const position = calculateTooltipPosition(element);
+            setTooltipPosition(position);
+          }, 300);
+        }
+      } else {
+        // Desktop behavior (unchanged)
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          const position = calculateTooltipPosition(element);
+          setTooltipPosition(position);
+        }, 50);
+      }
     }
   }, [currentStepIndex, isOpen, currentStep]);
 
