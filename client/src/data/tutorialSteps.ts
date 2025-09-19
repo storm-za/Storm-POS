@@ -111,70 +111,70 @@ export const afrikaansTutorialSteps: TutorialStep[] = [
   {
     id: 'navigation',
     target: '.tabs-navigation',
-    title: 'Navigasie Oortjies',
-    description: 'Hierdie oortjies gee jou toegang tot alle POS-funksies: Verkope, Produkte, Kliënte, Oop Rekeninge, Verslae, en Gebruiksnakoming.',
+    title: 'Navigasie Afdelings',
+    description: 'Hierdie afdelings gee jou toegang tot alle POS-funksies: Verkope, Produkte, Kliënte, Oop Rekeninge, Verslae, en Gebruiksdata.',
     position: 'bottom'
   },
   {
     id: 'sales-tab',
     target: '[data-testid="tab-sales"]',
-    title: 'Verkope Oortjie - Jou Hoof Werkspasie',
-    description: 'Hier sal jy die meeste transaksies verwerk. Voeg produkte by die mandjie, pas afslag toe, en voltooi verkope.',
+    title: 'Verkope Afdeling - Jou Hoof Werkspasie',
+    description: 'Hier verwerk jy die meeste transaksies. Voeg produkte by die winkelmandjie, pas afslag toe, en voltooi verkope.',
     position: 'bottom'
   },
   {
     id: 'product-selection',
     target: '[data-testid="product-selection-card"]',
-    title: 'Produk Keuse',
-    description: 'Blaai en soek jou voorraad hier. Kliek op enige produk om dit by die huidige verkoop te voeg.',
+    title: 'Produkkeuse',
+    description: 'Blaai deur jou voorraad en soek hier. Kliek op enige produk om dit by die huidige verkoop te voeg.',
     position: 'right'
   },
   {
     id: 'current-sale',
     target: '[data-testid="current-sale-card"]',
-    title: 'Huidige Verkoop Mandjie',
-    description: 'Jou aktiewe verkoop verskyn hier. Stel hoeveelhede aan, kies kliënte, kies betaalmetodes, en voltooi transaksies.',
+    title: 'Huidige Winkelmandjie',
+    description: 'Jou aktiewe verkoop verskyn hier. Pas hoeveelhede aan, kies kliënte, kies betaalmetodes, en voltooi transaksies.',
     position: 'left'
   },
   {
     id: 'products-tab',
     target: '[data-testid="tab-products"]',
-    title: 'Produk Bestuur',
-    description: 'Bestuur jou voorraad hier - voeg nuwe produkte by, wysig pryse, volg voorraadvlakke, en organiseer jou katalogus.',
+    title: 'Produkbestuur',
+    description: 'Bestuur jou voorraad hier - voeg nuwe produkte by, wysig pryse, hou voorraadvlakke dop, en organiseer jou katalogus.',
     position: 'bottom'
   },
   {
     id: 'customers-tab',
     target: '[data-testid="tab-customers"]',
-    title: 'Kliënt Bestuur',
-    description: 'Stoor kliënt inligting, bestuur handels- vs kleinhandel kliënte, en volg kliënt aankoopgeskiedenis.',
+    title: 'Kliëntebestuur',
+    description: 'Stoor kliëntinligting, bestuur handels- vs kleinhandelkliënte, en hou kliënte se aankoopgeskiedenis dop.',
     position: 'bottom'
   },
   {
     id: 'open-accounts',
     target: '[data-testid="tab-open-accounts"]',
     title: 'Oop Rekeninge',
-    description: 'Hanteer tafelbediening of kliënt rekeninge. Skep lopende rekening wat later betaal kan word.',
+    description: 'Hanteer tafelbediening of kliënterekeninge. Skep lopende rekeninge wat later betaal kan word.',
     position: 'bottom'
   },
   {
     id: 'reports',
     target: '[data-testid="tab-reports"]',
-    title: 'Verslae & Analise',
-    description: 'Bekyk gedetailleerde verkope verslae, volg daaglikse prestasie, analiseer tendense, en monitor jou besigheidsgroei.',
+    title: 'Verslae & Ontleding',
+    description: 'Bekyk gedetailleerde verkopeverslae, hou daaglikse prestasie dop, ontleed tendense, en monitor jou besigheidsgroei.',
     position: 'bottom'
   },
   {
     id: 'usage',
     target: '[data-testid="tab-usage"]',
     title: 'Gebruik & Fakturering',
-    description: 'Monitor jou Storm POS diens gebruik en faktureringsinligting. Volg jou 0.5% maandelikse fooi.',
+    description: 'Hou jou Storm POS diensgebruik en faktureringsinligting dop. Volg jou 0.5% maandelikse fooi.',
     position: 'bottom'
   },
   {
     id: 'staff-management',
     target: '[data-testid="staff-dropdown"]',
-    title: 'Personeel Bestuur',
+    title: 'Personeelbestuur',
     description: 'Wissel tussen personeelrekeninge, skep bestuursrekeninge, en beheer toegangsvlakke.',
     position: 'bottom'
   },
@@ -182,14 +182,14 @@ export const afrikaansTutorialSteps: TutorialStep[] = [
     id: 'profile-menu',
     target: '[data-testid="profile-dropdown"]',
     title: 'Profiel & Instellings',
-    description: 'Kry toegang tot jou profiel instellings, verander jou maatskappy logo, wissel tale, of meld af.',
+    description: 'Kry toegang tot jou profielinstellings, verander jou maatskappy se logo, wissel tale, of meld af.',
     position: 'bottom'
   },
   {
     id: 'complete',
     target: '.company-banner',
-    title: 'Jy is Alles Gereed!',
-    description: 'Jy het die toer voltooi! Begin deur \'n paar produkte by te voeg, dan begin om jou eerste verkoop te verwerk. Jy kan hierdie tutoriaal enige tyd herhaal vanaf die Tutoriaal knoppie.',
+    title: 'Jy is Klaar!',
+    description: 'Jy het die toer voltooi! Begin deur \"n paar produkte by te voeg, dan kan jy jou eerste verkoop verwerk. Jy kan hierdie tutoriaal enige tyd herhaal vanaf die Tutoriaal-knoppie.',
     position: 'center'
   }
 ];

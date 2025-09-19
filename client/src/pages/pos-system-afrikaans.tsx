@@ -1085,6 +1085,7 @@ ${dateFilteredSales.map(sale =>
                     variant="outline"
                     size="sm"
                     className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
+                    data-testid="staff-dropdown"
                   >
                     <User className="h-4 w-4" />
                     <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Kies Personeel'}</span>
@@ -1141,6 +1142,7 @@ ${dateFilteredSales.map(sale =>
                       variant="ghost"
                       size="sm"
                       className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
+                      data-testid="profile-dropdown"
                     >
                       {currentUser?.companyLogo ? (
                         <img 
@@ -1280,6 +1282,7 @@ ${dateFilteredSales.map(sale =>
               <TabsTrigger 
                 value="produkte" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-products"
               >
                 <Package className="h-4 w-4" />
                 <span>Produkte</span>
@@ -1287,6 +1290,7 @@ ${dateFilteredSales.map(sale =>
               <TabsTrigger 
                 value="kliente" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-customers"
               >
                 <Users className="h-4 w-4" />
                 <span>Kliente</span>
@@ -1294,6 +1298,7 @@ ${dateFilteredSales.map(sale =>
               <TabsTrigger 
                 value="oop-rekeninge" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-open-accounts"
               >
                 <FileText className="h-4 w-4" />
                 <span>Oop Rekeninge</span>
@@ -1301,6 +1306,7 @@ ${dateFilteredSales.map(sale =>
               <TabsTrigger 
                 value="verslae" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-reports"
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Verslae</span>
@@ -1308,6 +1314,7 @@ ${dateFilteredSales.map(sale =>
               <TabsTrigger 
                 value="gebruik" 
                 className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                data-testid="tab-usage"
               >
                 <CreditCard className="h-4 w-4" />
                 <span>Gebruik</span>
