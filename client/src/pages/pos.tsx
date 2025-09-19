@@ -232,8 +232,8 @@ export default function POS() {
               <div className="w-16 h-16 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Smartphone className="text-white h-8 w-8" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Mobile-First Design</h3>
-              <p className="text-gray-600">Works perfectly on smartphones, tablets, and desktops. Sell anywhere.</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">All Device Design</h3>
+              <p className="text-gray-600">Works perfectly on smartphones, tablets, and desktops. Comfortable on any device.</p>
             </motion.div>
             
             <motion.div className="text-center" variants={fadeInUp}>

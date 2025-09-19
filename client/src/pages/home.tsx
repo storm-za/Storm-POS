@@ -148,7 +148,7 @@ export default function Home() {
                     <ScanBarcode className="text-white h-10 w-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors duration-300">Storm POS</h3>
-                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Revolutionary mobile-first point of sale system designed specifically for South African retailers</p>
+                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Revolutionary all device design point of sale system designed specifically for South African retailers</p>
                   <Button 
                     asChild 
                     className="bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300"
@@ -347,7 +347,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "Storm POS revolutionized our retail operations. The mobile-first design means we can serve customers anywhere in our store. It's incredibly intuitive and reliable."
+                  "Storm POS revolutionized our retail operations. The all device design means we can serve customers anywhere in our store. It's incredibly intuitive and reliable."
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mr-4">
@@ -423,12 +423,8 @@ export default function Home() {
                 answer: "Yes, we offer 24/7 support for all our solutions. Whether you need technical assistance, training, or have questions about features, our South African support team is always ready to help."
               },
               {
-                question: "Can I customize my website or POS system?",
-                answer: "Definitely! All our solutions are highly customizable. We work closely with you to ensure the final product matches your brand, workflow, and specific business requirements."
-              },
-              {
                 question: "What makes Storm different from competitors?",
-                answer: "We're proudly South African, understanding local business needs. Our usage-based pricing, mobile-first design, and commitment to quality set us apart. Plus, we provide personal service with real people, not chatbots."
+                answer: "We're proudly South African, understanding local business needs. Our usage-based pricing, all device design, and commitment to quality set us apart. Plus, we provide personal service with real people, not chatbots."
               },
               {
                 question: "How secure are your systems?",

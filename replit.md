@@ -60,7 +60,7 @@ POS System tables:
 ## POS System Features
 
 ### Core Functionality
-- **Mobile-First Design**: Optimized for smartphones, tablets, and desktops
+- **All Device Design**: Optimized for smartphones, tablets, and desktops
 - **Real-Time Sales**: Add products to cart, apply discounts, process payments
 - **Inventory Management**: Track products with SKU, pricing, and stock levels
 - **Customer Directory**: Store customer information and purchase history
@@ -126,7 +126,7 @@ POS System tables:
   - POS landing page with pricing tiers (R199, R349, R499/month)
   - Secure authentication with subscription status validation
   - Full-featured POS dashboard with sales, products, customers, and reports
-  - Mobile-first responsive design optimized for touch devices
+  - All device responsive design optimized for touch devices
   - Real-time inventory management and sales processing
   - Demo account (demo@storm.co.za/demo123) with sample coffee shop data
   - Updated homepage to showcase available POS system
