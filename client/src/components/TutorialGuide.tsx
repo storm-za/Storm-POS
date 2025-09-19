@@ -66,35 +66,13 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
     const position = currentStep.position || 'bottom';
     
     if (isMobile) {
-      // Simple mobile positioning - steps 4, 5, 11, 12 work perfectly, keep their logic
-      // All other steps: just move to lower half of screen so highlighted elements are visible
-      const stepIndex = currentStepIndex;
-      const workingSteps = [3, 4, 10, 11]; // Steps 4, 5, 11, 12 (0-indexed: 3, 4, 10, 11)
+      // Mobile: Center all steps on screen
+      top = (viewportHeight - tooltipHeight) / 2;
+      left = (viewportWidth - tooltipWidth) / 2;
       
-      if (workingSteps.includes(stepIndex)) {
-        // Keep existing logic for working steps (4, 5, 11, 12)
-        const elementBottom = rect.bottom;
-        const elementTop = rect.top;
-        const minMargin = 40;
-        const spaceBelow = viewportHeight - elementBottom;
-        const spaceAbove = elementTop;
-        
-        if (spaceBelow >= tooltipHeight + minMargin) {
-          top = elementBottom + minMargin;
-          left = Math.max(20, Math.min(rect.left, viewportWidth - tooltipWidth - 20));
-        } else if (spaceAbove >= tooltipHeight + minMargin) {
-          top = elementTop - tooltipHeight - minMargin;
-          left = Math.max(20, Math.min(rect.left, viewportWidth - tooltipWidth - 20));
-        } else {
-          // Fallback to lower half
-          top = viewportHeight - tooltipHeight - 40;
-          left = Math.max(20, viewportWidth - tooltipWidth - 20);
-        }
-      } else {
-        // For all other steps: simply position in lower half of screen
-        top = viewportHeight - tooltipHeight - 40;
-        left = Math.max(20, Math.min((viewportWidth - tooltipWidth) / 2, viewportWidth - tooltipWidth - 20));
-      }
+      // Ensure tooltip stays within viewport
+      top = Math.max(20, Math.min(top, viewportHeight - tooltipHeight - 20));
+      left = Math.max(20, Math.min(left, viewportWidth - tooltipWidth - 20));
     } else {
       // Desktop positioning (original logic)
       switch (position) {
@@ -142,26 +120,17 @@ export function TutorialGuide({ isOpen, onClose, onComplete, steps, language = '
       const isMobile = window.innerWidth < 768;
       
       if (isMobile) {
-        // For mobile, scroll to top first to ensure tabs are visible, then scroll to element
-        if (currentStep.target.includes('tab-') || currentStep.target.includes('tabs-navigation')) {
-          // Scroll to top of page first to show navigation
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Calculate position after scroll
-            setTimeout(() => {
-              const position = calculateTooltipPosition(element);
-              setTooltipPosition(position);
-            }, 300);
-          }, 500);
-        } else {
-          // For other elements, use normal scroll
+        // For mobile, always scroll to top first to ensure all elements are accessible, then scroll to element
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => {
+          // Then scroll to the specific element 
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Calculate position after scroll
           setTimeout(() => {
             const position = calculateTooltipPosition(element);
             setTooltipPosition(position);
-          }, 300);
-        }
+          }, 400);
+        }, 600);
       } else {
         // Desktop behavior (unchanged)
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
