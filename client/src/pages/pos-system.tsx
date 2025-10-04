@@ -118,6 +118,7 @@ export default function PosSystem() {
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
+  const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -144,6 +145,14 @@ export default function PosSystem() {
   const closeManagementDialog = () => {
     setManagementPasswordDialog(false);
     setManagementPassword("");
+    
+    // Highlight the staff button to guide user
+    setHighlightStaffButton(true);
+    
+    // Clear highlight after 5 seconds
+    setTimeout(() => {
+      setHighlightStaffButton(false);
+    }, 5000);
   };
 
   // Get current user from localStorage or session
@@ -1624,24 +1633,40 @@ export default function PosSystem() {
               </Button>
 
               {/* Staff Account Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
-                    data-testid="staff-dropdown"
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Select Staff'}</span>
-                    <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Staff'}</span>
-                    {currentStaff && (
-                      <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
-                        {currentStaff.userType}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
+              <motion.div
+                animate={highlightStaffButton ? {
+                  scale: [1, 1.1, 1, 1.1, 1],
+                  boxShadow: [
+                    "0 0 0 0px rgba(59, 130, 246, 0)",
+                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
+                    "0 0 0 8px rgba(59, 130, 246, 0)",
+                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
+                    "0 0 0 0px rgba(59, 130, 246, 0)"
+                  ]
+                } : {}}
+                transition={{ duration: 0.8, repeat: highlightStaffButton ? 5 : 0, repeatType: "loop" }}
+                className={highlightStaffButton ? "rounded-md" : ""}
+              >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm transition-all ${
+                        highlightStaffButton ? 'ring-4 ring-blue-400 ring-opacity-50 bg-blue-50 border-blue-400' : ''
+                      }`}
+                      data-testid="staff-dropdown"
+                    >
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Select Staff'}</span>
+                      <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Staff'}</span>
+                      {currentStaff && (
+                        <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
+                          {currentStaff.userType}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   {!currentStaff ? (
                     <>
@@ -1678,6 +1703,7 @@ export default function PosSystem() {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
+              </motion.div>
 
               {/* Profile Dropdown */}
               <DropdownMenu>
