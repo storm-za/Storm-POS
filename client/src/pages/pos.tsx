@@ -63,7 +63,25 @@ export default function POS() {
                 <Button 
                   asChild
                   size="lg"
+                  className="group bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
+                  data-testid="button-start-free-trial"
+                >
+                  <Link href="/pos/signup">
+                    Start 7-Day Free Trial
+                    <motion.span 
+                      className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
+                      initial={{ x: 0 }}
+                    >
+                      →
+                    </motion.span>
+                  </Link>
+                </Button>
+                
+                <Button 
+                  asChild
+                  size="lg"
                   className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
+                  data-testid="button-login-pos"
                 >
                   <Link href="/pos/login">
                     Log In to POS
