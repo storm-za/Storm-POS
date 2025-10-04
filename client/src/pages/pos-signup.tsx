@@ -26,8 +26,13 @@ export default function PosSignup() {
       const response = await apiRequest("POST", "/api/pos/signup", userData);
       return response.json();
     },
-    onSuccess: () => {
-      setSignupSuccess(true);
+    onSuccess: (data) => {
+      localStorage.setItem('posUser', JSON.stringify(data.user));
+      toast({
+        title: "Account created successfully!",
+        description: "Welcome to Storm POS - Your 7-day free trial has started!",
+      });
+      setLocation("/pos/system");
     },
     onError: (error: Error) => {
       toast({
@@ -108,13 +113,13 @@ export default function PosSignup() {
         className="w-full max-w-md"
       >
         <Card className="shadow-2xl border-0">
-          <CardHeader className="text-center space-y-4 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,54%)] text-white rounded-t-lg">
+          <CardHeader className="text-center space-y-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto">
-              <User className="h-8 w-8 text-[hsl(217,90%,40%)]" />
+              <User className="h-8 w-8 text-green-500" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Create Account</h1>
-              <p className="text-blue-100">Join Storm POS for free</p>
+              <h1 className="text-2xl font-bold">Start Your Free Trial</h1>
+              <p className="text-green-100">7 days free - No credit card required</p>
             </div>
           </CardHeader>
           
@@ -221,10 +226,11 @@ export default function PosSignup() {
               
               <Button
                 type="submit"
-                className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
+                className="w-full h-12 bg-green-500 hover:bg-green-600 text-white font-semibold"
                 disabled={signupMutation.isPending}
+                data-testid="button-signup"
               >
-                {signupMutation.isPending ? "Creating Account..." : "Create Account"}
+                {signupMutation.isPending ? "Creating Account..." : "Start Free Trial"}
               </Button>
             </form>
             

@@ -126,17 +126,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already registered" });
       }
       
-      // Create new user with paid = true by default
+      // Create new user with paid = true by default and set trial start date
       const newUser = await storage.createPosUser({
         ...validatedData,
         paid: true,
-        companyLogo: null
+        companyLogo: null,
+        trialStartDate: new Date() // Start 7-day free trial
       });
       
       res.json({ 
         success: true, 
-        message: "Account created successfully! You can now sign in.",
-        user: { id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName, companyName: newUser.companyName }
+        message: "Account created successfully! Your 7-day free trial has started.",
+        user: { 
+          id: newUser.id, 
+          email: newUser.email, 
+          firstName: newUser.firstName, 
+          lastName: newUser.lastName, 
+          companyName: newUser.companyName,
+          companyLogo: newUser.companyLogo,
+          paid: newUser.paid,
+          tutorialCompleted: newUser.tutorialCompleted,
+          trialStartDate: newUser.trialStartDate
+        }
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -170,7 +181,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In production, you'd use proper session management here
       res.json({ 
         success: true, 
-        user: { id: user.id, email: user.email, paid: user.paid, companyLogo: user.companyLogo, companyName: user.companyName, tutorialCompleted: user.tutorialCompleted }
+        user: { 
+          id: user.id, 
+          email: user.email, 
+          paid: user.paid, 
+          companyLogo: user.companyLogo, 
+          companyName: user.companyName, 
+          tutorialCompleted: user.tutorialCompleted,
+          trialStartDate: user.trialStartDate
+        }
       });
     } catch (error) {
       console.error("POS login error:", error);

@@ -31,6 +31,7 @@ export const posUsers = pgTable("pos_users", {
   companyLogo: text("company_logo"), // Base64 encoded image
   currentUsage: decimal("current_usage", { precision: 10, scale: 2 }).notNull().default("0.00"), // Current month usage amount
   tutorialCompleted: boolean("tutorial_completed").notNull().default(false), // Track if user has completed the welcome tutorial
+  trialStartDate: timestamp("trial_start_date"), // Track when the 7-day free trial started
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
