@@ -63,7 +63,7 @@ export default function POS() {
                 <Button 
                   asChild
                   size="lg"
-                  className="group bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
+                  className="group bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,54%)] text-white hover:from-[hsl(217,90%,35%)] hover:to-[hsl(217,90%,49%)] transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
                   data-testid="button-start-free-trial"
                 >
                   <Link href="/pos/signup">

@@ -430,11 +430,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create the sale - staffAccountId will be handled in frontend if needed
       const sale = await storage.createPosSale(validatedData);
       
-      // Automatically increment user usage by 0.5% of sale total
+      // Automatically increment user usage by 0.5% of sale total (unless in trial period)
       try {
-        const saleTotal = parseFloat(validatedData.total);
-        const usageAmount = (saleTotal * 0.005).toFixed(2); // 0.5% of sale total
-        await storage.incrementUserUsage(userIdToUse, usageAmount);
+        const user = await storage.getPosUser(userIdToUse);
+        if (user) {
+          // Check if user is still in 7-day trial period
+          const isInTrial = user.trialStartDate && 
+            (new Date().getTime() - new Date(user.trialStartDate).getTime()) < (7 * 24 * 60 * 60 * 1000);
+          
+          if (!isInTrial) {
+            // Only charge usage fee if not in trial
+            const saleTotal = parseFloat(validatedData.total);
+            const usageAmount = (saleTotal * 0.005).toFixed(2); // 0.5% of sale total
+            await storage.incrementUserUsage(userIdToUse, usageAmount);
+          }
+        }
       } catch (usageError) {
         console.error("Error tracking usage for sale:", usageError);
         // Don't fail the sale if usage tracking fails
