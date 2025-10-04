@@ -1213,7 +1213,6 @@ ${dateFilteredSales.map(sale =>
           </div>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Company Banner */}
         <div className="mb-6">
@@ -2199,7 +2198,6 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     </div>
                   )}
-                  
                   {/* Header */}
                   <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
                     <div className="flex items-center justify-between">
@@ -2222,7 +2220,6 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     </div>
                   </div>
-
                   {/* Key Metrics */}
                   <div className="grid md:grid-cols-3 gap-6">
                     <Card className="border-l-4 border-l-green-500">
@@ -2276,7 +2273,6 @@ ${dateFilteredSales.map(sale =>
                       </CardContent>
                     </Card>
                   </div>
-
                   {/* Billing Breakdown */}
                   <div className="grid lg:grid-cols-2 gap-6">
                     {/* Fee Calculation */}
@@ -2295,7 +2291,7 @@ ${dateFilteredSales.map(sale =>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-600">Storm Dienskoers</span>
-                            <span className="font-semibold">1.0%</span>
+                            <span className="font-semibold">0.5%</span>
                           </div>
                           <div className="border-t pt-3">
                             <div className="flex justify-between items-center">
@@ -2384,7 +2380,6 @@ ${dateFilteredSales.map(sale =>
                       </CardContent>
                     </Card>
                   </div>
-
                   {/* Payment Information */}
                   <Card>
                     <CardHeader>
