@@ -95,8 +95,11 @@ export default function PosSystemAfrikaans() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
-  const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
+  const [selectedStaffForAuth, setSelectedStaffForAuth] = useState<StaffAccount | null>(null);
+  const [isStaffPasswordDialogOpen, setIsStaffPasswordDialogOpen] = useState(false);
+  const [staffPassword, setStaffPassword] = useState("");
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+  const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<number | "all">("all");
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
@@ -105,7 +108,7 @@ export default function PosSystemAfrikaans() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
@@ -186,12 +189,6 @@ export default function PosSystemAfrikaans() {
     }
 
     setCurrentTab(tabValue);
-  };
-
-  const closeManagementDialog = () => {
-    setManagementPasswordDialog(false);
-    setPendingTab(null);
-    setManagementPassword("");
   };
 
   // Get current user from localStorage or session
@@ -299,6 +296,13 @@ export default function PosSystemAfrikaans() {
       console.error('Fout met uitlog:', error);
       window.location.href = '/pos/login';
     }
+  };
+
+  const closeManagementDialog = () => {
+    setManagementPasswordDialog(false);
+    setPendingTab(null);
+    setHighlightStaffButton(true);
+    setTimeout(() => setHighlightStaffButton(false), 5000);
   };
 
   // Product mutations
@@ -454,6 +458,7 @@ export default function PosSystemAfrikaans() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts", currentUser?.id] });
       setIsUserManagementOpen(false);
+      setIsStaffDialogOpen(false);
       toast({
         title: "Personeelrekening geskep",
         description: "Personeelrekening is suksesvol geskep.",
@@ -475,7 +480,9 @@ export default function PosSystemAfrikaans() {
     },
     onSuccess: (data) => {
       setCurrentStaff(data.staffAccount);
-      setIsStaffAuthOpen(false);
+      setIsStaffPasswordDialogOpen(false);
+      setStaffPassword("");
+      setSelectedStaffForAuth(null);
       toast({
         title: "Welkom terug",
         description: `Ingemeld as ${data.staffAccount.username}`,
@@ -1079,60 +1086,86 @@ ${dateFilteredSales.map(sale =>
               </Button>
 
               {/* Staff Account Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm"
-                    data-testid="staff-dropdown"
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Kies Personeel'}</span>
-                    <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Personeel'}</span>
-                    {currentStaff && (
-                      <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
-                        {currentStaff.userType === 'management' ? 'bestuur' : 'personeel'}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {!currentStaff ? (
-                    <>
-                      {staffAccounts.length === 0 ? (
-                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
+              <motion.div
+                animate={highlightStaffButton ? {
+                  scale: [1, 1.1, 1, 1.1, 1],
+                  boxShadow: [
+                    "0 0 0 0px rgba(59, 130, 246, 0)",
+                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
+                    "0 0 0 8px rgba(59, 130, 246, 0)",
+                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
+                    "0 0 0 0px rgba(59, 130, 246, 0)"
+                  ]
+                } : {}}
+                transition={{ duration: 0.8, repeat: highlightStaffButton ? 5 : 0, repeatType: "loop" }}
+                className={highlightStaffButton ? "rounded-md" : ""}
+              >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm transition-all ${
+                        highlightStaffButton ? 'ring-4 ring-blue-400 ring-opacity-50 bg-blue-50 border-blue-400' : ''
+                      }`}
+                      data-testid="staff-dropdown"
+                    >
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Kies Personeel'}</span>
+                      <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Personeel'}</span>
+                      {currentStaff && (
+                        <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
+                          {currentStaff.userType === 'management' ? 'bestuur' : 'personeel'}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {!currentStaff ? (
+                      <>
+                        {staffAccounts.map((staff) => (
+                          <DropdownMenuItem 
+                            key={staff.id} 
+                            onClick={() => {
+                              setSelectedStaffForAuth(staff);
+                              setIsStaffPasswordDialogOpen(true);
+                            }}
+                          >
+                            <User className="mr-2 h-4 w-4" />
+                            <div className="flex-1">
+                              <div className="font-medium">{staff.username}</div>
+                              <div className="text-xs text-muted-foreground capitalize">{staff.userType === 'management' ? 'bestuur' : 'personeel'}</div>
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                        {staffAccounts.length > 0 && <DropdownMenuSeparator />}
+                        <DropdownMenuItem onClick={() => setIsStaffDialogOpen(true)}>
                           <UserPlus className="mr-2 h-4 w-4" />
-                          Skep Bestuursakount
+                          Skep Nuwe Gebruiker
                         </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
-                          <User className="mr-2 h-4 w-4" />
-                          Meld aan as Personeel
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-2 py-2 text-sm">
+                          <div className="font-medium">{currentStaff.username}</div>
+                          <div className="text-muted-foreground capitalize">{currentStaff.userType === 'management' ? 'bestuur' : 'personeel'}</div>
+                        </div>
+                        <DropdownMenuSeparator />
+                        {currentStaff.userType === 'management' && (
+                          <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
+                            <Settings className="mr-2 h-4 w-4" />
+                            Gebruikersbestuur
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => setCurrentStaff(null)}>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Wissel Gebruiker
                         </DropdownMenuItem>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <div className="px-2 py-2 text-sm">
-                        <div className="font-medium">{currentStaff.username}</div>
-                        <div className="text-muted-foreground capitalize">{currentStaff.userType === 'management' ? 'bestuur' : 'personeel'}</div>
-                      </div>
-                      <DropdownMenuSeparator />
-                      {currentStaff.userType === 'management' && (
-                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Gebruikersbestuur
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={() => setCurrentStaff(null)}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Wissel Gebruiker
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </motion.div>
 
               {/* Profile Dropdown */}
               <DropdownMenu>
@@ -2051,6 +2084,17 @@ ${dateFilteredSales.map(sale =>
               const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
               const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
               
+              // Check if user is in trial period
+              const userTrialStartDate = currentUser?.trialStartDate ? new Date(currentUser.trialStartDate) : null;
+              const isInTrial = userTrialStartDate && 
+                (now.getTime() - userTrialStartDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
+              
+              let daysRemaining = 0;
+              if (isInTrial && userTrialStartDate) {
+                const trialEndDate = new Date(userTrialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                daysRemaining = Math.ceil((trialEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+              }
+              
               // Filter sales for current month and current user
               const currentMonthSales = sales.filter(sale => {
                 if (sale.isVoided) return false;
@@ -2063,8 +2107,8 @@ ${dateFilteredSales.map(sale =>
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (0.5% of revenue)
-              const stormFee = currentMonthRevenue * 0.005;
+              // Calculate Storm fee (0.5% of revenue) - but show R0.00 during trial
+              const stormFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -2083,6 +2127,79 @@ ${dateFilteredSales.map(sale =>
 
               return (
                 <div className="space-y-6">
+                  {/* 7-Day Trial Banner */}
+                  {isInTrial && (
+                    <div className="bg-gradient-to-br from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,50%)] rounded-xl p-8 text-white shadow-xl border border-blue-400/30 relative overflow-hidden" data-testid="trial-banner">
+                      {/* Background decoration */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
+                      
+                      <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                        <div className="flex-1 space-y-4">
+                          {/* Header with icon */}
+                          <div className="flex items-center gap-4">
+                            <div className="bg-white/20 backdrop-blur-lg rounded-xl p-3 shadow-lg">
+                              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 className="text-2xl font-bold">Gratis Proeftydperk Aktief</h3>
+                              <p className="text-blue-100 text-sm font-medium">{daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor</p>
+                            </div>
+                          </div>
+                          
+                          {/* Benefits */}
+                          <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 space-y-3 shadow-inner">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">Geen gebruiksfooie tydens proeftydperk</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">Onbeperkte verkope teen R0.00 koste</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">Volle toegang tot alle funksies</span>
+                            </div>
+                          </div>
+                          
+                          {/* Footer message */}
+                          <p className="text-blue-100 text-sm leading-relaxed">
+                            Na jou proeftydperk begin ons eenvoudige 0.5% per verkoop pryse outomaties. Jy sal jou eerste gebruiksgeld op dag 8 sien.
+                          </p>
+                        </div>
+                        
+                        {/* Countdown card */}
+                        <div className="text-center bg-white/15 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-white/20 min-w-[140px]">
+                          <div className="text-5xl font-bold mb-2">{daysRemaining}</div>
+                          <div className="text-blue-100 text-sm font-semibold uppercase tracking-wide">
+                            {daysRemaining === 1 ? 'Dag Oor' : 'Dae Oor'}
+                          </div>
+                          <div className="mt-4 pt-4 border-t border-white/20">
+                            <div className="text-xs text-blue-200">Proeftydperk eindig</div>
+                            <div className="text-sm font-medium mt-1">
+                              {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Header */}
                   <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
                     <div className="flex items-center justify-between">
@@ -2702,50 +2819,53 @@ ${dateFilteredSales.map(sale =>
           </DialogContent>
         </Dialog>
 
-        {/* Staff Authentication Dialog */}
-        <Dialog open={isStaffAuthOpen} onOpenChange={setIsStaffAuthOpen}>
+        {/* Staff Password Verification Dialog */}
+        <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {
+          setIsStaffPasswordDialogOpen(open);
+          if (!open) {
+            setStaffPassword("");
+            setSelectedStaffForAuth(null);
+          }
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Personeel Aanmelding</DialogTitle>
+              <DialogTitle>Voer Wagwoord In</DialogTitle>
               <DialogDescription>
-                Voer jou gebruikersnaam en wagwoord in om aan te meld as 'n personeellid.
+                Voer die wagwoord in vir {selectedStaffForAuth?.username}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={(e) => {
               e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const username = formData.get('username') as string;
-              const password = formData.get('password') as string;
-              if (username && password) {
-                authenticateStaffMutation.mutate({ username, password, userId: currentUser?.id });
+              if (selectedStaffForAuth && staffPassword) {
+                authenticateStaffMutation.mutate({ 
+                  username: selectedStaffForAuth.username, 
+                  password: staffPassword, 
+                  userId: currentUser?.id 
+                });
               }
             }}>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="staff-username">Gebruikersnaam</Label>
+                  <Label htmlFor="staff-password-input">Wagwoord</Label>
                   <Input
-                    id="staff-username"
-                    name="username"
-                    type="text"
-                    required
-                    placeholder="Voer gebruikersnaam in"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="staff-password">Wagwoord</Label>
-                  <Input
-                    id="staff-password"
-                    name="password"
+                    id="staff-password-input"
                     type="password"
                     required
+                    value={staffPassword}
+                    onChange={(e) => setStaffPassword(e.target.value)}
                     placeholder="Voer wagwoord in"
+                    autoFocus
                   />
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button 
                     type="button"
                     variant="outline" 
-                    onClick={() => setIsStaffAuthOpen(false)}
+                    onClick={() => {
+                      setIsStaffPasswordDialogOpen(false);
+                      setStaffPassword("");
+                      setSelectedStaffForAuth(null);
+                    }}
                   >
                     Kanselleer
                   </Button>
@@ -2754,7 +2874,97 @@ ${dateFilteredSales.map(sale =>
                     disabled={authenticateStaffMutation.isPending}
                     className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                   >
-                    {authenticateStaffMutation.isPending ? "Meld aan..." : "Meld aan"}
+                    {authenticateStaffMutation.isPending ? "Verifieer..." : "Meld aan"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+        {/* Simplified Staff Creation Dialog */}
+        <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Skep Nuwe Gebruiker</DialogTitle>
+              <DialogDescription>
+                Voeg 'n nuwe personeel of bestuurder by jou POS-stelsel.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const username = formData.get('username') as string;
+              const password = formData.get('password') as string;
+              const userType = formData.get('user-type') as 'staff' | 'management';
+              const managementPassword = formData.get('management-password') as string;
+              
+              if (username && password && userType) {
+                createStaffAccountMutation.mutate({
+                  username,
+                  password,
+                  userType,
+                  managementPassword: userType === 'management' ? managementPassword : undefined,
+                  userId: currentUser?.id
+                });
+              }
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="create-username">Naam</Label>
+                  <Input
+                    id="create-username"
+                    name="username"
+                    type="text"
+                    required
+                    placeholder="Voer gebruikersnaam in"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-user-type">Rol</Label>
+                  <Select name="user-type" required defaultValue="staff">
+                    <SelectTrigger id="create-user-type">
+                      <SelectValue placeholder="Kies rol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="staff">Personeel</SelectItem>
+                      <SelectItem value="management">Bestuur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="create-password">Wagwoord</Label>
+                  <Input
+                    id="create-password"
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="Voer wagwoord in"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="create-management-password">Bestuurswagwoord</Label>
+                  <Input
+                    id="create-management-password"
+                    name="management-password"
+                    type="password"
+                    placeholder="Vereis vir bestuurrol"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Slegs nodig indien 'n bestuurder geskep word</p>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    onClick={() => setIsStaffDialogOpen(false)}
+                  >
+                    Kanselleer
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={createStaffAccountMutation.isPending}
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  >
+                    {createStaffAccountMutation.isPending ? "Skep..." : "Skep Gebruiker"}
                   </Button>
                 </div>
               </div>
