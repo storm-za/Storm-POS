@@ -2887,6 +2887,17 @@ export default function PosSystem() {
               const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
               const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
               
+              // Check if user is in trial period
+              const userTrialStartDate = user?.trialStartDate ? new Date(user.trialStartDate) : null;
+              const isInTrial = userTrialStartDate && 
+                (now.getTime() - userTrialStartDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
+              
+              let daysRemaining = 0;
+              if (isInTrial && userTrialStartDate) {
+                const trialEndDate = new Date(userTrialStartDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                daysRemaining = Math.ceil((trialEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+              }
+              
               // Filter sales for current month and current user
               const currentMonthSales = sales.filter(sale => {
                 if (sale.isVoided) return false;
@@ -2899,8 +2910,8 @@ export default function PosSystem() {
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (0.5% of revenue)
-              const stormFee = currentMonthRevenue * 0.005;
+              // Calculate Storm fee (0.5% of revenue) - but show R0.00 during trial
+              const stormFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -2919,6 +2930,48 @@ export default function PosSystem() {
 
               return (
                 <div className="space-y-6">
+                  {/* 7-Day Trial Banner */}
+                  {isInTrial && (
+                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg border-2 border-green-400" data-testid="trial-banner">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-4">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-2xl font-bold mb-2">🎉 Your Free Trial is Active!</h3>
+                            <p className="text-green-100 text-lg mb-3">
+                              You have <span className="font-bold text-white text-xl">{daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}</span> remaining in your free trial
+                            </p>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-3">
+                              <div className="flex items-center gap-3 mb-2">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span className="font-semibold">No usage fees during your trial</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span className="font-semibold">Make unlimited sales at R0.00 cost</span>
+                              </div>
+                            </div>
+                            <p className="text-green-100 text-sm">
+                              After your trial ends, our simple 0.5% per sale pricing will start automatically. You'll see your first usage charge on day 8.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4 min-w-[120px]">
+                          <div className="text-4xl font-bold mb-1">{daysRemaining}</div>
+                          <div className="text-green-100 text-sm font-medium">{daysRemaining === 1 ? 'Day Left' : 'Days Left'}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Header */}
                   <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
                     <div className="flex items-center justify-between">

@@ -272,6 +272,97 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
+
+      {/* 7-Day Free Trial Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Try Storm POS Risk-Free for 7 Days
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+              Start selling today with full access to every feature. No credit card required.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid md:grid-cols-3 gap-8 mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Full 7 Days Free</h3>
+              <p className="text-blue-100 leading-relaxed">
+                Complete access to all features with zero charges for your entire first week
+              </p>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">No Credit Card Needed</h3>
+              <p className="text-blue-100 leading-relaxed">
+                Sign up instantly without any payment information. Start selling right away
+              </p>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">R0.00 Usage Fees</h3>
+              <p className="text-blue-100 leading-relaxed">
+                Make as many sales as you want during your trial - no 0.5% fee until day 8
+              </p>
+            </motion.div>
+          </motion.div>
+
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <Button 
+              asChild
+              size="lg"
+              className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 font-bold px-12 py-6 text-lg shadow-2xl"
+              data-testid="button-trial-cta"
+            >
+              <Link href="/pos/signup">Start Your Free Trial Now →</Link>
+            </Button>
+            <p className="mt-6 text-blue-100 text-sm">
+              After 7 days, our simple 0.5% per sale pricing starts automatically. No surprises, no contracts.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Usage-Based Pricing Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
         <div className="max-w-6xl mx-auto">
