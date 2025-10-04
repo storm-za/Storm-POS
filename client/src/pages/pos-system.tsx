@@ -2958,41 +2958,72 @@ export default function PosSystem() {
                 <div className="space-y-6">
                   {/* 7-Day Trial Banner */}
                   {isInTrial && (
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg border-2 border-green-400" data-testid="trial-banner">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-2xl font-bold mb-2">🎉 Your Free Trial is Active!</h3>
-                            <p className="text-green-100 text-lg mb-3">
-                              You have <span className="font-bold text-white text-xl">{daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}</span> remaining in your free trial
-                            </p>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-3">
-                              <div className="flex items-center gap-3 mb-2">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-semibold">No usage fees during your trial</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-semibold">Make unlimited sales at R0.00 cost</span>
-                              </div>
+                    <div className="bg-gradient-to-br from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,50%)] rounded-xl p-8 text-white shadow-xl border border-blue-400/30 relative overflow-hidden" data-testid="trial-banner">
+                      {/* Background decoration */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
+                      
+                      <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                        <div className="flex-1 space-y-4">
+                          {/* Header with icon */}
+                          <div className="flex items-center gap-4">
+                            <div className="bg-white/20 backdrop-blur-lg rounded-xl p-3 shadow-lg">
+                              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
                             </div>
-                            <p className="text-green-100 text-sm">
-                              After your trial ends, our simple 0.5% per sale pricing will start automatically. You'll see your first usage charge on day 8.
-                            </p>
+                            <div>
+                              <h3 className="text-2xl font-bold">Free Trial Active</h3>
+                              <p className="text-blue-100 text-sm font-medium">{daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining</p>
+                            </div>
                           </div>
+                          
+                          {/* Benefits */}
+                          <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 space-y-3 shadow-inner">
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">No usage fees during trial period</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">Unlimited sales at R0.00 cost</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                              <span className="font-medium">Full access to all features</span>
+                            </div>
+                          </div>
+                          
+                          {/* Footer message */}
+                          <p className="text-blue-100 text-sm leading-relaxed">
+                            After your trial, our simple 0.5% per sale pricing starts automatically. You'll see your first usage charge on day 8.
+                          </p>
                         </div>
-                        <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-4 min-w-[120px]">
-                          <div className="text-4xl font-bold mb-1">{daysRemaining}</div>
-                          <div className="text-green-100 text-sm font-medium">{daysRemaining === 1 ? 'Day Left' : 'Days Left'}</div>
+                        
+                        {/* Countdown card */}
+                        <div className="text-center bg-white/15 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-white/20 min-w-[140px]">
+                          <div className="text-5xl font-bold mb-2">{daysRemaining}</div>
+                          <div className="text-blue-100 text-sm font-semibold uppercase tracking-wide">
+                            {daysRemaining === 1 ? 'Day Left' : 'Days Left'}
+                          </div>
+                          <div className="mt-4 pt-4 border-t border-white/20">
+                            <div className="text-xs text-blue-200">Trial ends</div>
+                            <div className="text-sm font-medium mt-1">
+                              {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
