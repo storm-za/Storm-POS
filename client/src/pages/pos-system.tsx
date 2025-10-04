@@ -2888,7 +2888,7 @@ export default function PosSystem() {
               const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
               
               // Check if user is in trial period
-              const userTrialStartDate = user?.trialStartDate ? new Date(user.trialStartDate) : null;
+              const userTrialStartDate = currentUser?.trialStartDate ? new Date(currentUser.trialStartDate) : null;
               const isInTrial = userTrialStartDate && 
                 (now.getTime() - userTrialStartDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
               
