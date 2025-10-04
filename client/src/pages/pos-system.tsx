@@ -93,7 +93,9 @@ export default function PosSystem() {
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
-  const [isStaffAuthOpen, setIsStaffAuthOpen] = useState(false);
+  const [selectedStaffForAuth, setSelectedStaffForAuth] = useState<StaffAccount | null>(null);
+  const [isStaffPasswordDialogOpen, setIsStaffPasswordDialogOpen] = useState(false);
+  const [staffPassword, setStaffPassword] = useState("");
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<number | "all">("all");
@@ -470,6 +472,7 @@ export default function PosSystem() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/staff-accounts", currentUser?.id] });
       setIsUserManagementOpen(false);
+      setIsStaffDialogOpen(false);
       toast({
         title: "Staff account created",
         description: "Staff account has been successfully created.",
@@ -491,7 +494,9 @@ export default function PosSystem() {
     },
     onSuccess: (data) => {
       setCurrentStaff(data.staffAccount);
-      setIsStaffAuthOpen(false);
+      setIsStaffPasswordDialogOpen(false);
+      setStaffPassword("");
+      setSelectedStaffForAuth(null);
       toast({
         title: "Welcome back",
         description: `Logged in as ${data.staffAccount.username}`,
@@ -1670,17 +1675,26 @@ export default function PosSystem() {
                 <DropdownMenuContent align="end" className="w-56">
                   {!currentStaff ? (
                     <>
-                      {staffAccounts.length === 0 ? (
-                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          Create Management Account
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem onClick={() => setIsStaffAuthOpen(true)}>
+                      {staffAccounts.map((staff) => (
+                        <DropdownMenuItem 
+                          key={staff.id} 
+                          onClick={() => {
+                            setSelectedStaffForAuth(staff);
+                            setIsStaffPasswordDialogOpen(true);
+                          }}
+                        >
                           <User className="mr-2 h-4 w-4" />
-                          Login as Staff
+                          <div className="flex-1">
+                            <div className="font-medium">{staff.username}</div>
+                            <div className="text-xs text-muted-foreground capitalize">{staff.userType}</div>
+                          </div>
                         </DropdownMenuItem>
-                      )}
+                      ))}
+                      {staffAccounts.length > 0 && <DropdownMenuSeparator />}
+                      <DropdownMenuItem onClick={() => setIsStaffDialogOpen(true)}>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Create New User
+                      </DropdownMenuItem>
                     </>
                   ) : (
                     <>
@@ -3656,50 +3670,53 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-      {/* Staff Authentication Dialog */}
-      <Dialog open={isStaffAuthOpen} onOpenChange={setIsStaffAuthOpen}>
+      {/* Staff Password Verification Dialog */}
+      <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {
+        setIsStaffPasswordDialogOpen(open);
+        if (!open) {
+          setStaffPassword("");
+          setSelectedStaffForAuth(null);
+        }
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Staff Login</DialogTitle>
+            <DialogTitle>Enter Password</DialogTitle>
             <DialogDescription>
-              Enter your username and password to log in as a staff member.
+              Enter the password for {selectedStaffForAuth?.username}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const username = formData.get('username') as string;
-            const password = formData.get('password') as string;
-            if (username && password) {
-              authenticateStaffMutation.mutate({ username, password, userId: currentUser?.id });
+            if (selectedStaffForAuth && staffPassword) {
+              authenticateStaffMutation.mutate({ 
+                username: selectedStaffForAuth.username, 
+                password: staffPassword, 
+                userId: currentUser?.id 
+              });
             }
           }}>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="staff-username">Username</Label>
+                <Label htmlFor="staff-password-input">Password</Label>
                 <Input
-                  id="staff-username"
-                  name="username"
-                  type="text"
-                  required
-                  placeholder="Enter username"
-                />
-              </div>
-              <div>
-                <Label htmlFor="staff-password">Password</Label>
-                <Input
-                  id="staff-password"
-                  name="password"
+                  id="staff-password-input"
                   type="password"
                   required
+                  value={staffPassword}
+                  onChange={(e) => setStaffPassword(e.target.value)}
                   placeholder="Enter password"
+                  autoFocus
                 />
               </div>
               <div className="flex justify-end space-x-2">
                 <Button 
                   type="button"
                   variant="outline" 
-                  onClick={() => setIsStaffAuthOpen(false)}
+                  onClick={() => {
+                    setIsStaffPasswordDialogOpen(false);
+                    setStaffPassword("");
+                    setSelectedStaffForAuth(null);
+                  }}
                 >
                   Cancel
                 </Button>
@@ -3708,7 +3725,97 @@ export default function PosSystem() {
                   disabled={authenticateStaffMutation.isPending}
                   className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                 >
-                  {authenticateStaffMutation.isPending ? "Logging in..." : "Login"}
+                  {authenticateStaffMutation.isPending ? "Verifying..." : "Login"}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {/* Simplified Staff Creation Dialog */}
+      <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Add a new staff or management user to your POS system.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const username = formData.get('username') as string;
+            const password = formData.get('password') as string;
+            const userType = formData.get('user-type') as 'staff' | 'management';
+            const managementPassword = formData.get('management-password') as string;
+            
+            if (username && password && userType) {
+              createStaffAccountMutation.mutate({
+                username,
+                password,
+                userType,
+                managementPassword: userType === 'management' ? managementPassword : undefined,
+                userId: currentUser?.id
+              });
+            }
+          }}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="create-username">Name</Label>
+                <Input
+                  id="create-username"
+                  name="username"
+                  type="text"
+                  required
+                  placeholder="Enter user name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="create-user-type">Role</Label>
+                <Select name="user-type" required defaultValue="staff">
+                  <SelectTrigger id="create-user-type">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="staff">Staff</SelectItem>
+                    <SelectItem value="management">Management</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="create-password">Password</Label>
+                <Input
+                  id="create-password"
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Enter password"
+                />
+              </div>
+              <div>
+                <Label htmlFor="create-management-password">Management Password</Label>
+                <Input
+                  id="create-management-password"
+                  name="management-password"
+                  type="password"
+                  placeholder="Required for management role"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Only required if creating a management user</p>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => setIsStaffDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={createStaffAccountMutation.isPending}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                >
+                  {createStaffAccountMutation.isPending ? "Creating..." : "Create User"}
                 </Button>
               </div>
             </div>
