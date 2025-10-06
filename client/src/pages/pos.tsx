@@ -63,9 +63,9 @@ export default function POS() {
                 <motion.div
                   animate={{
                     boxShadow: [
-                      "0 0 20px 0px rgba(59, 130, 246, 0.4)",
-                      "0 0 40px 8px rgba(59, 130, 246, 0.6)",
-                      "0 0 20px 0px rgba(59, 130, 246, 0.4)"
+                      "0 0 30px 5px rgba(255, 255, 255, 0.5)",
+                      "0 0 50px 10px rgba(255, 255, 255, 0.8)",
+                      "0 0 30px 5px rgba(255, 255, 255, 0.5)"
                     ]
                   }}
                   transition={{
@@ -75,19 +75,10 @@ export default function POS() {
                   }}
                   className="relative rounded-lg"
                 >
-                  {/* FREE Badge */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -12 }}
-                    animate={{ scale: 1, rotate: -12 }}
-                    transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                    className="absolute -top-3 -right-3 z-10 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border-2 border-white"
-                  >
-                    FREE
-                  </motion.div>
                   <Button 
                     asChild
                     size="lg"
-                    className="group relative bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,54%)] text-white hover:from-[hsl(217,90%,35%)] hover:to-[hsl(217,90%,49%)] transform hover:scale-110 transition-all duration-300 shadow-2xl border-0 px-10 py-6 text-xl font-bold"
+                    className="group relative bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 transform hover:scale-110 transition-all duration-300 shadow-2xl border-0 px-10 py-6 text-xl font-bold"
                     data-testid="button-start-free-trial"
                   >
                     <Link href="/pos/signup">
