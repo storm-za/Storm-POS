@@ -42,7 +42,7 @@ export default function POS() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto mt-63">
+        <div className="relative max-w-7xl mx-auto mt-60">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
