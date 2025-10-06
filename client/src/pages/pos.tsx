@@ -60,40 +60,24 @@ export default function POS() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <motion.div
-                  animate={{
-                    boxShadow: [
-                      "0 0 30px 5px rgba(255, 255, 255, 0.5)",
-                      "0 0 50px 10px rgba(255, 255, 255, 0.8)",
-                      "0 0 30px 5px rgba(255, 255, 255, 0.5)"
-                    ]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="relative rounded-lg"
+                <Button 
+                  asChild
+                  size="lg"
+                  className="group relative bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 transform hover:scale-105 transition-all duration-300 border-0 px-10 py-6 text-xl font-bold animate-pulse-glow"
+                  data-testid="button-start-free-trial"
                 >
-                  <Button 
-                    asChild
-                    size="lg"
-                    className="group relative bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 transform hover:scale-110 transition-all duration-300 shadow-2xl border-0 px-10 py-6 text-xl font-bold"
-                    data-testid="button-start-free-trial"
-                  >
-                    <Link href="/pos/signup">
-                      Start 7-Day Free Trial
-                      <motion.span 
-                        className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                        initial={{ x: 0 }}
-                        animate={{ x: [0, 3, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
-                        →
-                      </motion.span>
-                    </Link>
-                  </Button>
-                </motion.div>
+                  <Link href="/pos/signup">
+                    Start 7-Day Free Trial
+                    <motion.span 
+                      className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
+                      initial={{ x: 0 }}
+                      animate={{ x: [0, 3, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      →
+                    </motion.span>
+                  </Link>
+                </Button>
                 
                 <Button 
                   asChild
