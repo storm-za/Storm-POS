@@ -25,6 +25,16 @@ export default function POS() {
     <div className="min-h-screen overflow-x-hidden w-full">
       {/* Hero Section */}
       <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 hero-gradient text-white overflow-hidden">
+        {/* Storm Logo - Centered at very top */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute top-0 left-0 right-0 flex justify-center z-50 pt-4"
+        >
+          <img src={stormLogo} alt="Storm" className="h-48 w-auto" />
+        </motion.div>
+
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
@@ -32,17 +42,7 @@ export default function POS() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto">
-          {/* Storm Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20"
-          >
-            <img src={stormLogo} alt="Storm" className="h-48 w-auto" />
-          </motion.div>
-
+        <div className="relative max-w-7xl mx-auto mt-52">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
