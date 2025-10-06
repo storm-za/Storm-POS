@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap } from "lucide-react";
 import Footer from "@/components/footer";
+import stormLogo from "@assets/STORM (10)_1759748743787.png";
 
 export default function POS() {
   const fadeInUp = {
@@ -32,6 +33,16 @@ export default function POS() {
         </div>
 
         <div className="relative max-w-7xl mx-auto">
+          {/* Storm Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute top-0 left-0 z-20"
+          >
+            <img src={stormLogo} alt="Storm" className="h-16 w-auto" />
+          </motion.div>
+
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div 
               initial={{ opacity: 0, x: -50 }}

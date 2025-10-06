@@ -4,8 +4,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code, ScanBarcode, TrendingUp, Users, Award, Shield, CheckCircle, Star, ChevronDown, ChevronUp } from "lucide-react";
-import HeroSVG from "@/components/hero-svg";
 import Footer from "@/components/footer";
+import stormLogo from "@assets/STORM (10)_1759748743787.png";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -35,7 +35,14 @@ export default function Home() {
             animate="animate"
             variants={staggerContainer}
           >
-            <HeroSVG />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex justify-center mb-8"
+            >
+              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
+            </motion.div>
             
             <motion.h1 
               className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
