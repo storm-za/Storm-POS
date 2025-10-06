@@ -38,9 +38,9 @@ export default function POS() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="absolute top-0 left-0 z-20"
+            className="absolute top-0 left-1/2 transform -translate-x-1/2 z-20"
           >
-            <img src={stormLogo} alt="Storm" className="h-16 w-auto" />
+            <img src={stormLogo} alt="Storm" className="h-48 w-auto" />
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
