@@ -60,22 +60,49 @@ export default function POS() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  asChild
-                  size="lg"
-                  className="group bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,54%)] text-white hover:from-[hsl(217,90%,35%)] hover:to-[hsl(217,90%,49%)] transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
-                  data-testid="button-start-free-trial"
+                <motion.div
+                  animate={{
+                    boxShadow: [
+                      "0 0 20px 0px rgba(59, 130, 246, 0.4)",
+                      "0 0 40px 8px rgba(59, 130, 246, 0.6)",
+                      "0 0 20px 0px rgba(59, 130, 246, 0.4)"
+                    ]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="relative rounded-lg"
                 >
-                  <Link href="/pos/signup">
-                    Start 7-Day Free Trial
-                    <motion.span 
-                      className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                      initial={{ x: 0 }}
-                    >
-                      →
-                    </motion.span>
-                  </Link>
-                </Button>
+                  {/* FREE Badge */}
+                  <motion.div
+                    initial={{ scale: 0, rotate: -12 }}
+                    animate={{ scale: 1, rotate: -12 }}
+                    transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                    className="absolute -top-3 -right-3 z-10 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border-2 border-white"
+                  >
+                    FREE
+                  </motion.div>
+                  <Button 
+                    asChild
+                    size="lg"
+                    className="group relative bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,54%)] text-white hover:from-[hsl(217,90%,35%)] hover:to-[hsl(217,90%,49%)] transform hover:scale-110 transition-all duration-300 shadow-2xl border-0 px-10 py-6 text-xl font-bold"
+                    data-testid="button-start-free-trial"
+                  >
+                    <Link href="/pos/signup">
+                      Start 7-Day Free Trial
+                      <motion.span 
+                        className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
+                        initial={{ x: 0 }}
+                        animate={{ x: [0, 3, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </Link>
+                  </Button>
+                </motion.div>
                 
                 <Button 
                   asChild
