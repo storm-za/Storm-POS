@@ -30,7 +30,7 @@ export default function POS() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="absolute top-0 left-0 right-0 flex justify-center z-50 pt-4"
+          className="absolute top-0 left-0 right-0 flex justify-center z-50 pt-[0px] pb-[0px]"
         >
           <img src={stormLogo} alt="Storm" className="h-48 w-auto" />
         </motion.div>
@@ -285,7 +285,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* 7-Day Free Trial Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
         {/* Background Elements */}
@@ -375,7 +374,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Usage-Based Pricing Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
         <div className="max-w-6xl mx-auto">
