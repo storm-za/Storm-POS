@@ -97,12 +97,13 @@ export default function WebDevelopment() {
       <section className="pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div 
-            className="text-center relative"
+            className="flex justify-center items-center relative"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <WebDevSVG />
+            <div className="relative max-w-2xl mx-auto">
+              <WebDevSVG />
               
               {/* Floating Icons with Text - Mobile Safe Positioning */}
               <motion.div
@@ -166,6 +167,7 @@ export default function WebDevelopment() {
                 </div>
                 <span className="text-xs font-semibold text-gray-800 truncate">Growth</span>
               </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
