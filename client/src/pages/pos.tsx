@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap } from "lucide-react";
+import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 
@@ -23,54 +23,59 @@ export default function POS() {
 
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-20 px-4 sm:px-6 lg:px-8 hero-gradient text-white overflow-hidden">
-        {/* Storm Logo - Centered at very top */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="absolute top-0 left-0 right-0 flex justify-center z-50 pt-[0px] pb-[0px]"
+      {/* Return to Home Button */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-6 left-6 z-50"
+      >
+        <Button
+          asChild
+          variant="ghost"
+          className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg border border-gray-200 text-gray-700 hover:text-[hsl(217,90%,40%)]"
         >
-          <img src={stormLogo} alt="Storm" className="h-48 w-auto" />
-        </motion.div>
+          <Link href="/">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Home
+          </Link>
+        </Button>
+      </motion.div>
 
-        {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto mt-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
-              className="relative z-10"
+      {/* Hero Section */}
+      <section className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex justify-center mb-8"
             >
-              {/* Floating Badge */}
-              <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-white/20"
-              >
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-                Live • Always Online
-              </motion.div>
-
-              <h1 className="text-4xl md:text-7xl font-extrabold mb-8 leading-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
-                Point of Sale That Goes 
-                <span className="block text-white drop-shadow-lg">Wherever You Do</span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl mb-10 text-blue-100/90 font-medium leading-relaxed max-w-xl">
-                Storm POS is the <span className="text-cyan-300 font-semibold">always-online solution</span> for South African businesses
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
+              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
+            </motion.div>
+            
+            <motion.h1 
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+              variants={fadeInUp}
+            >
+              <span className="text-[hsl(217,90%,40%)]">Point of Sale</span> That Goes<br />
+              Wherever You Do
+            </motion.h1>
+            
+            <motion.p 
+              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
+              variants={fadeInUp}
+            >
+              Storm POS is the <span className="text-[hsl(217,90%,40%)] font-semibold">always-online solution</span> for South African businesses
+            </motion.p>
+            
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   asChild
                   size="lg"
@@ -118,15 +123,20 @@ export default function POS() {
                   </svg>
                   No setup fees • Start immediately
                 </motion.div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              className="lg:text-right text-center relative"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
+              </motion.div>
+          </motion.div>
+        </div>
+      </section>
+      
+      {/* SVG Section */}
+      <section className="pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center relative"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
               <div className="relative">
                 {/* Glassmorphism Container */}
                 <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
@@ -236,8 +246,8 @@ export default function POS() {
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
+        
       {/* Features Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">

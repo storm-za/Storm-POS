@@ -23,12 +23,8 @@ function Router() {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Show navigation only on /web-development and /pos pages (not on /pos/login, /pos/signup, /pos/system, etc.)
-  const showNavigation = location === '/web-development' || location === '/pos';
-
   return (
     <>
-      {showNavigation && <Navigation />}
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/web-development" component={WebDevelopment} />

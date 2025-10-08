@@ -2,9 +2,10 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Users, MapPin, TrendingUp, CheckCircle, XCircle } from "lucide-react";
+import { Check, Users, MapPin, TrendingUp, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 import WebDevSVG from "@/components/web-dev-svg";
 import ContactForm from "@/components/contact-form";
+import stormLogo from "@assets/STORM (10)_1759748743787.png";
 
 export default function WebDevelopment() {
   const fadeInUp = {
@@ -27,35 +28,81 @@ export default function WebDevelopment() {
 
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
+      {/* Return to Home Button */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="fixed top-6 left-6 z-50"
+      >
+        <Button
+          asChild
+          variant="ghost"
+          className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg border border-gray-200 text-gray-700 hover:text-[hsl(217,90%,40%)]"
+        >
+          <Link href="/">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Home
+          </Link>
+        </Button>
+      </motion.div>
+
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
+      <section className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1 }}
+          <motion.div 
+            className="text-center"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex justify-center mb-8"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                Professional Websites Without High Upfront Costs
-              </h1>
-              <p className="text-xl mb-8 text-blue-100">
-                Storm helps South African businesses grow online with powerful monthly web solutions.
-              </p>
+              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
+            </motion.div>
+            
+            <motion.h1 
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+              variants={fadeInUp}
+            >
+              <span className="text-[hsl(217,90%,40%)]">Professional Websites</span><br />
+              Without High Upfront Costs
+            </motion.h1>
+            
+            <motion.p 
+              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
+              variants={fadeInUp}
+            >
+              Storm helps South African businesses grow online with powerful monthly web solutions.
+            </motion.p>
+            
+            <motion.div variants={fadeInUp}>
               <Button 
                 onClick={scrollToContact}
                 size="lg"
-                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
-              >Get Your Website Today</Button>
+                className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] transform hover:scale-105 transition-all duration-200 shadow-lg"
+              >
+                Get Your Website Today
+              </Button>
             </motion.div>
-            
-            <motion.div 
-              className="lg:text-right text-center relative overflow-hidden"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
-              <WebDevSVG />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* SVG Section */}
+      <section className="pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center relative"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <WebDevSVG />
               
               {/* Floating Icons with Text - Mobile Safe Positioning */}
               <motion.div
@@ -119,8 +166,7 @@ export default function WebDevelopment() {
                 </div>
                 <span className="text-xs font-semibold text-gray-800 truncate">Growth</span>
               </motion.div>
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
       
