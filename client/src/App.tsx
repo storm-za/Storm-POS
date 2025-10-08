@@ -12,7 +12,6 @@ import PosSignup from "@/pages/pos-signup";
 import PosSystem from "@/pages/pos-system";
 import PosSystemAfrikaans from "@/pages/pos-system-afrikaans";
 import PosInactive from "@/pages/pos-inactive";
-import Navigation from "@/components/navigation";
 import { useEffect } from "react";
 
 function Router() {
@@ -23,12 +22,8 @@ function Router() {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Check if we're in POS routes to conditionally show navigation
-  const isPosRoute = location.startsWith('/pos');
-
   return (
     <>
-      {!isPosRoute && <Navigation />}
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/web-development" component={WebDevelopment} />
