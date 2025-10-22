@@ -186,6 +186,14 @@ POS System tables:
   - Tip options reset after each sale/account closure to prevent unintended usage
   - Fixed closure issue where open account tip state wasn't being captured correctly
   - Designed for pen-and-paper tip collection to make it easy for wait staff to receive tips
+- October 22, 2025. Implemented automated welcome email system:
+  - New users receive professional welcome email immediately after signup
+  - Email sent from softwarebystorm@gmail.com using existing Gmail integration
+  - Personalized with user's name and company information
+  - Includes trial details, feature highlights, and quick login link
+  - Beautiful HTML template with Storm branding and responsive design
+  - Plain text fallback for email clients that don't support HTML
+  - Email delivery tracked in server logs for monitoring
 
 ## User Preferences
 
