@@ -185,7 +185,7 @@ Storm Contact System
 
     console.log('✅ Contact submission email sent successfully via Gmail');
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Gmail authentication failed. Please check:');
     console.error('1. 2-factor authentication is enabled on softwarebystorm@gmail.com');
     console.error('2. App password is correctly generated and copied');
