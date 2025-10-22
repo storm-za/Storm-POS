@@ -9,7 +9,7 @@ import {
   insertPosOpenAccountSchema,
   signupPosUserSchema
 } from "@shared/schema";
-import { sendContactSubmissionEmail } from "./email";
+import { sendContactSubmissionEmail, sendWelcomeEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -133,6 +133,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyLogo: null,
         trialStartDate: new Date() // Start 7-day free trial
       });
+      
+      // Send welcome email
+      const emailSent = await sendWelcomeEmail(
+        newUser.email, 
+        newUser.firstName || newUser.companyName
+      );
+      
+      if (emailSent) {
+        console.log(`✅ Welcome email sent to ${newUser.email}`);
+      } else {
+        console.log(`⚠️ User created but welcome email failed for ${newUser.email}`);
+      }
       
       res.json({ 
         success: true, 
