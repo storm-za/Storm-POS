@@ -637,14 +637,14 @@ export default function POS() {
               className="inline-block mb-6"
             >
               <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
-                Risk-Free Trial
+                Zero Risk Forever
               </span>
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Try Storm POS <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Risk-Free</span> for 7 Days
+              7 Days <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Completely Free</span>, Then Only Pay When You Sell
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Start selling today with full access to every feature. No credit card required.
+              No credit card. No monthly fees. No risk—ever. If you don't make sales, you don't pay a cent.
             </p>
           </motion.div>
 
@@ -685,9 +685,9 @@ export default function POS() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">R0.00 Usage Fees</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pay Only What You Sell</h3>
               <p className="text-gray-600 leading-relaxed">
-                Make as many sales as you want during your trial - no 0.5% fee until day 8
+                Don't use it? Don't pay. Simple as that—only 0.5% when you make sales
               </p>
             </motion.div>
           </motion.div>
@@ -708,7 +708,7 @@ export default function POS() {
               <Link href="/pos/signup">Start Your Free Trial Now →</Link>
             </Button>
             <p className="mt-6 text-gray-600 text-sm">
-              After 7 days, our simple 0.5% per sale pricing starts automatically. No surprises, no contracts.
+              After 7 days: 0.5% per sale. No sales? No charge. Ever. No contracts, no commitments.
             </p>
           </motion.div>
         </div>
