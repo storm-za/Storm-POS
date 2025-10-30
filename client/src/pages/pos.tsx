@@ -589,11 +589,36 @@ export default function POS() {
         </div>
       </section>
       {/* 7-Day Free Trial Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
-        {/* Background Elements */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
+        {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+          <motion.div 
+            className="absolute -top-40 -right-32 w-96 h-96 bg-[hsl(217,90%,40%)]/15 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.2, 0.4]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"
+            animate={{ 
+              rotate: 360,
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
         </div>
 
         <div className="relative max-w-6xl mx-auto">
@@ -604,10 +629,21 @@ export default function POS() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Try Storm POS Risk-Free for 7 Days
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Risk-Free Trial
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Try Storm POS <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Risk-Free</span> for 7 Days
             </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Start selling today with full access to every feature. No credit card required.
             </p>
           </motion.div>
@@ -619,38 +655,38 @@ export default function POS() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4">Full 7 Days Free</h3>
-              <p className="text-blue-100 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Full 7 Days Free</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Complete access to all features with zero charges for your entire first week
               </p>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4">No Credit Card Needed</h3>
-              <p className="text-blue-100 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">No Credit Card Needed</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Sign up instantly without any payment information. Start selling right away
               </p>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-4">R0.00 Usage Fees</h3>
-              <p className="text-blue-100 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">R0.00 Usage Fees</h3>
+              <p className="text-gray-600 leading-relaxed">
                 Make as many sales as you want during your trial - no 0.5% fee until day 8
               </p>
             </motion.div>
@@ -666,20 +702,43 @@ export default function POS() {
             <Button 
               asChild
               size="lg"
-              className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 font-bold px-12 py-6 text-lg shadow-2xl"
+              className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] font-bold px-12 py-6 text-lg shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all"
               data-testid="button-trial-cta"
             >
               <Link href="/pos/signup">Start Your Free Trial Now →</Link>
             </Button>
-            <p className="mt-6 text-blue-100 text-sm">
+            <p className="mt-6 text-gray-600 text-sm">
               After 7 days, our simple 0.5% per sale pricing starts automatically. No surprises, no contracts.
             </p>
           </motion.div>
         </div>
       </section>
       {/* Usage-Based Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-gray-50 to-blue-50 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            className="absolute top-0 right-1/4 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-0 left-1/4 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.2, 0.4]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="max-w-6xl mx-auto relative">
           <motion.div 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
@@ -687,9 +746,20 @@ export default function POS() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Fair Pricing Model
+              </span>
+            </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               We Only Make Money<br />
-              <span className="text-[hsl(217,90%,40%)]">When You Do</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">When You Do</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               No upfront costs, no monthly fees, no hidden charges. Pay only when you succeed with our revolutionary usage-based model.
@@ -706,7 +776,7 @@ export default function POS() {
             {/* Left Side - Main Value Prop */}
             <motion.div variants={fadeInUp} className="space-y-8">
               <div className="text-center md:text-left">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl mb-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl mb-6 shadow-lg">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                   </svg>
@@ -719,11 +789,11 @@ export default function POS() {
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="text-center p-6 bg-white rounded-xl shadow-lg">
+                <div className="text-center p-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
                   <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
                   <div className="text-sm text-gray-600">Setup Fee</div>
                 </div>
-                <div className="text-center p-6 bg-white rounded-xl shadow-lg">
+                <div className="text-center p-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
                   <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
                   <div className="text-sm text-gray-600">Monthly Fee</div>
                 </div>
@@ -732,7 +802,7 @@ export default function POS() {
 
             {/* Right Side - Benefits */}
             <motion.div variants={fadeInUp}>
-              <Card className="p-8 shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+              <Card className="p-8 shadow-2xl border border-[hsl(217,90%,40%)]/20 bg-white/70 backdrop-blur-xl">
                 <h4 className="text-2xl font-bold text-gray-900 mb-6">Everything Included</h4>
                 <ul className="space-y-4">
                   <li className="flex items-start">
@@ -782,31 +852,31 @@ export default function POS() {
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl p-8 text-white"
+            className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-2xl"
           >
-            <h4 className="text-2xl font-bold text-center mb-8">See How Affordable It Really Is</h4>
+            <h4 className="text-2xl font-bold text-center text-gray-900 mb-8">See How Affordable It Really Is</h4>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-white/10 rounded-xl backdrop-blur-sm">
-                <div className="text-3xl font-bold mb-2">R1,000</div>
-                <div className="text-blue-100 mb-2">Daily Sales</div>
-                <div className="text-sm">You pay only <strong>R5/day</strong></div>
+              <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl border border-[hsl(217,90%,40%)]/20 hover:shadow-lg transition-all">
+                <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">R1,000</div>
+                <div className="text-gray-600 mb-2">Daily Sales</div>
+                <div className="text-sm text-gray-700">You pay only <strong className="text-[hsl(217,90%,40%)]">R5/day</strong></div>
               </div>
-              <div className="text-center p-6 bg-white/20 rounded-xl backdrop-blur-sm transform scale-105">
+              <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl shadow-xl transform scale-105 text-white">
                 <div className="text-3xl font-bold mb-2">R5,000</div>
                 <div className="text-blue-100 mb-2">Daily Sales</div>
                 <div className="text-sm">You pay only <strong>R25/day</strong></div>
               </div>
-              <div className="text-center p-6 bg-white/10 rounded-xl backdrop-blur-sm">
-                <div className="text-3xl font-bold mb-2">R10,000</div>
-                <div className="text-blue-100 mb-2">Daily Sales</div>
-                <div className="text-sm">You pay only <strong>R50/day</strong></div>
+              <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl border border-[hsl(217,90%,40%)]/20 hover:shadow-lg transition-all">
+                <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">R10,000</div>
+                <div className="text-gray-600 mb-2">Daily Sales</div>
+                <div className="text-sm text-gray-700">You pay only <strong className="text-[hsl(217,90%,40%)]">R50/day</strong></div>
               </div>
             </div>
             <div className="text-center mt-8">
               <Button 
                 asChild
                 size="lg"
-                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 font-semibold px-8"
+                className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] font-semibold px-8 shadow-lg transform hover:scale-105 transition-all"
               >
                 <Link href="/pos/login">Start Selling Today - Free Setup</Link>
               </Button>
