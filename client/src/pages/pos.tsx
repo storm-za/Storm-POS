@@ -261,13 +261,13 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2, duration: 0.5 }}
-                  className="absolute top-4 right-2 lg:-top-8 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl z-30"
+                  className="absolute top-4 right-2 lg:-top-8 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-[1.125rem] py-3 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl z-30"
                 >
-                  <div className="flex items-center gap-1.5 lg:gap-3">
-                    <div className="w-1.5 h-1.5 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-2 lg:gap-3">
+                    <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
                     <div>
-                      <div className="text-[0.5rem] lg:text-xs font-medium opacity-90">System Status</div>
-                      <div className="text-xs lg:text-lg font-bold">99.9%</div>
+                      <div className="text-[0.75rem] lg:text-xs font-medium opacity-90">System Status</div>
+                      <div className="text-sm lg:text-lg font-bold">99.9%</div>
                     </div>
                   </div>
                 </motion.div>
