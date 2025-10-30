@@ -236,7 +236,7 @@ export default function POS() {
                   initial={{ y: 50, opacity: 0, scale: 0.8 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8, duration: 0.8 }}
-                  className="absolute -bottom-12 -left-12 lg:-left-16 w-40 lg:w-48 z-20"
+                  className="absolute -bottom-12 -left-6 lg:-left-16 w-40 lg:w-48 z-20"
                 >
                   <div className="relative bg-white/70 backdrop-blur-2xl rounded-3xl p-4 border border-[hsl(217,90%,40%)]/30 shadow-2xl">
                     <motion.img
@@ -261,13 +261,13 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2, duration: 0.5 }}
-                  className="absolute -top-8 -right-4 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-6 py-4 rounded-2xl shadow-2xl z-30"
+                  className="absolute -top-8 -right-4 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl z-30"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-1.5 lg:gap-3">
+                    <div className="w-1.5 h-1.5 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
                     <div>
-                      <div className="text-xs font-medium opacity-90">System Status</div>
-                      <div className="text-lg font-bold">99.9% Uptime</div>
+                      <div className="text-[0.5rem] lg:text-xs font-medium opacity-90">System Status</div>
+                      <div className="text-xs lg:text-lg font-bold">99.9%</div>
                     </div>
                   </div>
                 </motion.div>
@@ -276,13 +276,13 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.4, duration: 0.5 }}
-                  className="absolute top-1/3 -left-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-6 py-4 rounded-2xl shadow-2xl border-2 border-[hsl(217,90%,40%)] z-30"
+                  className="absolute top-1/3 -left-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-[hsl(217,90%,40%)] lg:border-2 z-30"
                 >
-                  <div className="flex items-center gap-3">
-                    <Cloud className="w-6 h-6" />
+                  <div className="flex items-center gap-1.5 lg:gap-3">
+                    <Cloud className="w-3 h-3 lg:w-6 lg:h-6" />
                     <div>
-                      <div className="text-xs font-medium opacity-90">Infrastructure</div>
-                      <div className="text-lg font-bold">Cloud-Native</div>
+                      <div className="text-[0.5rem] lg:text-xs font-medium opacity-90">Infrastructure</div>
+                      <div className="text-xs lg:text-lg font-bold">Cloud</div>
                     </div>
                   </div>
                 </motion.div>
@@ -291,13 +291,13 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.6, duration: 0.5 }}
-                  className="absolute bottom-1/4 -right-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-6 py-4 rounded-2xl shadow-2xl border-2 border-green-500 z-30"
+                  className="absolute bottom-1/4 -right-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-green-500 lg:border-2 z-30"
                 >
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-6 h-6 text-green-500" />
+                  <div className="flex items-center gap-1.5 lg:gap-3">
+                    <Shield className="w-3 h-3 lg:w-6 lg:h-6 text-green-500" />
                     <div>
-                      <div className="text-xs font-medium opacity-90">Security</div>
-                      <div className="text-lg font-bold">Bank-Grade</div>
+                      <div className="text-[0.5rem] lg:text-xs font-medium opacity-90">Security</div>
+                      <div className="text-xs lg:text-lg font-bold">Bank-Grade</div>
                     </div>
                   </div>
                 </motion.div>
