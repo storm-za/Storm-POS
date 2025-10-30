@@ -8,6 +8,8 @@ import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_17618567448
 import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
 import laptopMockup from "@assets/STORM__17_-removebg-preview_1761855220519.png";
 import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
+import laptopScene from "@assets/STORM (500 x 250 px) (1)_1761857579860.png";
+import mobileScene from "@assets/STORM (19)_1761857582315.png";
 
 export default function POS() {
   const fadeInUp = {
@@ -541,50 +543,225 @@ export default function POS() {
         </div>
       </section>
         
-      {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
+      {/* Features Section - High-Tech Redesign */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-gray-50 to-blue-50 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.2, 0.4]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Built for Modern Retailers</h2>
-            <p className="text-xl text-gray-600">Everything you need to run your business, anywhere in South Africa</p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Built for Modern Retailers
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Everything You Need,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Anywhere in South Africa</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Professional point-of-sale technology designed for real businesses. Work seamlessly across all your devices.
+            </p>
           </motion.div>
-          
-          <motion.div 
-            className="grid md:grid-cols-3 gap-8"
-            initial="initial"
-            whileInView="animate"
+
+          {/* Image Grid with Features */}
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            {/* Laptop Scene */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="relative bg-white/40 backdrop-blur-xl rounded-3xl p-6 border border-white/60 shadow-2xl overflow-hidden">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 blur-2xl"></div>
+                
+                <motion.img 
+                  src={laptopScene} 
+                  alt="Storm POS on Desktop" 
+                  className="w-full h-auto relative z-10 rounded-xl"
+                  initial={{ scale: 0.95 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+
+                {/* Floating Badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="absolute -top-4 -right-4 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-6 py-3 rounded-2xl shadow-2xl"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">Desktop</div>
+                    <div className="text-xs font-medium opacity-90">Full Power</div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Feature Highlight */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="mt-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-6 shadow-lg"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Cloud className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Always Online</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Cloud-based system syncs instantly. Access from anywhere, never lose a sale.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Mobile Scene */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="relative bg-white/40 backdrop-blur-xl rounded-3xl p-6 border border-white/60 shadow-2xl overflow-hidden">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-tl from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 blur-2xl"></div>
+                
+                <motion.img 
+                  src={mobileScene} 
+                  alt="Storm POS on Mobile" 
+                  className="w-full h-auto relative z-10 rounded-xl"
+                  initial={{ scale: 0.95 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+
+                {/* Floating Badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="absolute -top-4 -left-4 bg-white text-[hsl(217,90%,40%)] px-6 py-3 rounded-2xl shadow-2xl border-2 border-[hsl(217,90%,40%)]"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">Mobile</div>
+                    <div className="text-xs font-medium opacity-90">Anywhere</div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Feature Highlight */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="mt-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-6 shadow-lg"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Smartphone className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">All Device Design</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Works perfectly on smartphones, tablets, and desktops. Comfortable everywhere.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Bottom Feature Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            variants={staggerContainer}
+            transition={{ delay: 0.4 }}
+            className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-2xl"
           >
-            <motion.div className="text-center" variants={fadeInUp}>
-              <div className="w-16 h-16 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Smartphone className="text-white h-8 w-8" />
+            <div className="flex flex-col md:flex-row items-center md:items-start justify-center space-y-6 md:space-y-0 md:space-x-12">
+              <div className="flex items-start space-x-4 text-center md:text-left">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">Smart Reports</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Real-time analytics and insights to grow your business
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">All Device Design</h3>
-              <p className="text-gray-600">Works perfectly on smartphones, tablets, and desktops. Comfortable on any device.</p>
-            </motion.div>
-            
-            <motion.div className="text-center" variants={fadeInUp}>
-              <div className="w-16 h-16 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Cloud className="text-white h-8 w-8" />
+
+              <div className="flex items-start space-x-4 text-center md:text-left">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">Bank-Grade Security</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Your data protected with enterprise-level encryption
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Always Online</h3>
-              <p className="text-gray-600">Cloud-based system that syncs instantly. Never lose a sale.</p>
-            </motion.div>
-            
-            <motion.div className="text-center" variants={fadeInUp}>
-              <div className="w-16 h-16 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="text-white h-8 w-8" />
+
+              <div className="flex items-start space-x-4 text-center md:text-left">
+                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                  <Zap className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">Lightning Fast</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Process transactions in milliseconds, no delays
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Smart Reports</h3>
-              <p className="text-gray-600">Real-time analytics and insights to grow your business.</p>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
