@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft } from "lucide-react";
 import Footer from "@/components/footer";
-import stormLogo from "@assets/STORM (10)_1759748743787.png";
+import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
 import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
 import laptopMockup from "@assets/STORM__17_-removebg-preview_1761855220519.png";
 import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
