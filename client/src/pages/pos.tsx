@@ -45,52 +45,109 @@ export default function POS() {
         </Button>
       </motion.div>
 
-      {/* Hero Section */}
-      <section className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* Hero Section - High-Tech Design */}
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-gray-900 via-[hsl(217,90%,15%)] to-gray-900">
+        {/* Animated Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Gradient Orbs */}
           <motion.div 
-            className="text-center"
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-          >
+            className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/30 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.3, 1],
+              x: [0, 50, 0],
+              y: [0, -30, 0]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/20 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              x: [0, -50, 0],
+              y: [0, 30, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              rotate: 360,
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto w-full py-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="flex justify-center mb-8"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1 }}
+              className="text-white space-y-8 z-10"
             >
-              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
-            </motion.div>
-            
-            <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
-              variants={fadeInUp}
-            >
-              <span className="text-[hsl(217,90%,40%)]">Point of Sale</span> That Goes<br />
-              Wherever You Do
-            </motion.h1>
-            
-            <motion.p 
-              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
-              variants={fadeInUp}
-            >
-              Storm POS is the <span className="text-[hsl(217,90%,40%)] font-semibold">always-online solution</span> for South African businesses
-            </motion.p>
-            
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
+              {/* Logo */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+              >
+                <img src={stormLogo} alt="Storm" className="h-24 w-auto mb-6" />
+              </motion.div>
+
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="inline-block"
+              >
+                <span className="text-xs font-bold uppercase tracking-wider text-white bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                  Next-Gen Cloud POS
+                </span>
+              </motion.div>
+
+              {/* Heading */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
+                  Point of Sale<br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-300 to-blue-500">
+                    That Goes<br />Everywhere
+                  </span>
+                </h1>
+                <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-xl">
+                  The always-online, cloud-powered solution engineered for modern South African businesses. 
+                  Process sales instantly from any device, anywhere.
+                </p>
+              </motion.div>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
                 <Button 
                   asChild
                   size="lg"
-                  className="group relative bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 transform hover:scale-105 transition-all duration-300 border-0 px-10 py-6 text-xl font-bold animate-pulse-glow"
+                  className="group relative bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] transform hover:scale-105 transition-all duration-300 border-0 px-10 py-7 text-xl font-bold shadow-2xl shadow-blue-500/50"
                   data-testid="button-start-free-trial"
                 >
                   <Link href="/pos/signup">
+                    <Zap className="w-5 h-5 mr-2" />
                     Start 7-Day Free Trial
                     <motion.span 
-                      className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                      initial={{ x: 0 }}
-                      animate={{ x: [0, 3, 0] }}
+                      className="ml-2"
+                      animate={{ x: [0, 4, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
                       →
@@ -101,34 +158,175 @@ export default function POS() {
                 <Button 
                   asChild
                   size="lg"
-                  className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl border-0 px-8 py-4 text-lg font-semibold"
+                  className="group bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 border-2 border-white/30 hover:border-white/50 transform hover:scale-105 transition-all duration-300 px-8 py-7 text-lg font-semibold"
                   data-testid="button-login-pos"
                 >
                   <Link href="/pos/login">
                     Log In to POS
                     <motion.span 
                       className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                      initial={{ x: 0 }}
                     >
                       →
                     </motion.span>
                   </Link>
                 </Button>
-                
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex items-center text-gray-600 text-sm"
-                >
-                  <svg className="w-5 h-5 mr-2 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  No setup fees • Start immediately
-                </motion.div>
               </motion.div>
-          </motion.div>
+
+              {/* Trust Indicators */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/10"
+              >
+                <div className="flex items-center gap-2 text-blue-200">
+                  <Check className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">No Setup Fees</span>
+                </div>
+                <div className="flex items-center gap-2 text-blue-200">
+                  <Check className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">7-Day Free Trial</span>
+                </div>
+                <div className="flex items-center gap-2 text-blue-200">
+                  <Check className="w-5 h-5 text-green-400" />
+                  <span className="text-sm font-medium">No Credit Card</span>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Side - Device Showcase */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.3 }}
+              className="relative"
+            >
+              {/* Main Device Display */}
+              <div className="relative">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-blue-400/20 blur-3xl scale-110 rounded-full"></div>
+                
+                {/* Laptop */}
+                <motion.div
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="relative"
+                >
+                  <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl p-8 border border-white/10 shadow-2xl">
+                    <motion.img
+                      src={laptopMockup}
+                      alt="Storm POS Dashboard"
+                      className="w-full h-auto relative z-10"
+                      animate={{ 
+                        y: [0, -8, 0]
+                      }}
+                      transition={{ 
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Floating Mobile Device */}
+                <motion.div
+                  initial={{ y: 50, opacity: 0, scale: 0.8 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                  className="absolute -bottom-12 -left-12 lg:-left-16 w-40 lg:w-48 z-20"
+                >
+                  <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl p-4 border border-white/20 shadow-2xl">
+                    <motion.img
+                      src={mobileMockup}
+                      alt="Storm POS Mobile"
+                      className="w-full h-auto"
+                      animate={{ 
+                        y: [0, -12, 0],
+                        rotate: [0, 2, 0]
+                      }}
+                      transition={{ 
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Floating Stat Cards */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                  className="absolute -top-8 -right-4 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-6 py-4 rounded-2xl shadow-2xl z-30"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <div>
+                      <div className="text-xs font-medium opacity-90">System Status</div>
+                      <div className="text-lg font-bold">99.9% Uptime</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.4, duration: 0.5 }}
+                  className="absolute top-1/3 -left-8 bg-white/10 backdrop-blur-xl text-white px-6 py-4 rounded-2xl shadow-2xl border border-white/20 z-30"
+                >
+                  <div className="flex items-center gap-3">
+                    <Cloud className="w-6 h-6 text-blue-300" />
+                    <div>
+                      <div className="text-xs font-medium opacity-90">Infrastructure</div>
+                      <div className="text-lg font-bold">Cloud-Native</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.6, duration: 0.5 }}
+                  className="absolute bottom-1/4 -right-8 bg-white/10 backdrop-blur-xl text-white px-6 py-4 rounded-2xl shadow-2xl border border-white/20 z-30"
+                >
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-6 h-6 text-green-300" />
+                    <div>
+                      <div className="text-xs font-medium opacity-90">Security</div>
+                      <div className="text-lg font-bold">Bank-Grade</div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Bottom Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-white/40 text-center"
+          >
+            <div className="text-xs font-medium mb-2">Scroll to explore</div>
+            <div className="w-6 h-10 border-2 border-white/20 rounded-full mx-auto flex items-start justify-center p-2">
+              <motion.div
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-1.5 h-1.5 bg-white/40 rounded-full"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
       
       {/* High-Tech Product Showcase Hero */}
