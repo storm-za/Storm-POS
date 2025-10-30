@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
+import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
 
 export default function POS() {
   const fadeInUp = {
@@ -247,6 +248,217 @@ export default function POS() {
             </motion.div>
           </div>
         </section>
+
+      {/* What is Storm POS Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 right-0 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-4"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Next-Generation Technology
+              </span>
+            </motion.div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              What is <span className="text-[hsl(217,90%,40%)]">Storm POS</span>?
+            </h2>
+            
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-4">
+              Storm POS is a revolutionary cloud-based Point of Sale system engineered for the modern South African retailer. 
+              Built on cutting-edge infrastructure, it delivers enterprise-grade performance with consumer-grade simplicity.
+            </p>
+          </motion.div>
+
+          {/* Device Mockup with Features Grid */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Side - Device Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="relative">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 blur-3xl rounded-full scale-110"></div>
+                
+                {/* Glass Container */}
+                <div className="relative bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-white/60 shadow-2xl">
+                  <motion.img 
+                    src={deviceMockup} 
+                    alt="Storm POS on Multiple Devices" 
+                    className="w-full h-auto relative z-10"
+                    initial={{ scale: 0.95 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                  />
+                </div>
+
+                {/* Floating Badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="absolute -top-6 -right-6 bg-[hsl(217,90%,40%)] text-white px-6 py-3 rounded-2xl shadow-2xl"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">100%</div>
+                    <div className="text-xs font-medium">Cloud-Based</div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Badge 2 */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.7, duration: 0.5 }}
+                  className="absolute -bottom-6 -left-6 bg-white text-[hsl(217,90%,40%)] px-6 py-3 rounded-2xl shadow-2xl border-2 border-[hsl(217,90%,40%)]"
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">24/7</div>
+                    <div className="text-xs font-medium">Always Online</div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Right Side - Features */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="space-y-6"
+            >
+              <div className="space-y-8">
+                {/* Feature 1 */}
+                <motion.div 
+                  className="flex items-start space-x-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Zap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Lightning-Fast Performance</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Process transactions in milliseconds with our optimized cloud architecture. 
+                      No lag, no delays—just instant responsiveness across all devices.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Feature 2 */}
+                <motion.div 
+                  className="flex items-start space-x-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise-Grade Security</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Bank-level encryption protects your data. Multi-tenant architecture ensures 
+                      complete isolation between businesses with zero data crossover.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Feature 3 */}
+                <motion.div 
+                  className="flex items-start space-x-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Smartphone className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Universal Device Compatibility</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      One system, every screen. Seamlessly transition between smartphone, tablet, 
+                      and desktop with automatic sync and responsive design.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* Feature 4 */}
+                <motion.div 
+                  className="flex items-start space-x-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                    <Cloud className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Real-Time Intelligence</h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Live analytics, instant inventory updates, and synchronized data across your entire 
+                      operation. Make informed decisions with up-to-the-second insights.
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Tech Stack Badge */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="pt-8 border-t border-gray-200"
+              >
+                <p className="text-sm text-gray-500 mb-3 font-medium">Powered by</p>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-4 py-2 bg-white border border-[hsl(217,90%,40%)]/30 rounded-lg text-sm font-medium text-gray-700">
+                    PostgreSQL Cloud
+                  </span>
+                  <span className="px-4 py-2 bg-white border border-[hsl(217,90%,40%)]/30 rounded-lg text-sm font-medium text-gray-700">
+                    Real-Time Sync
+                  </span>
+                  <span className="px-4 py-2 bg-white border border-[hsl(217,90%,40%)]/30 rounded-lg text-sm font-medium text-gray-700">
+                    Advanced Encryption
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
         
       {/* Features Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
