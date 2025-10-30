@@ -6,6 +6,8 @@ import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft } f
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
+import laptopMockup from "@assets/STORM__17_-removebg-preview_1761855220519.png";
+import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
 
 export default function POS() {
   const fadeInUp = {
@@ -129,125 +131,243 @@ export default function POS() {
         </div>
       </section>
       
-      {/* SVG Section */}
-      <section className="pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* High-Tech Product Showcase Hero */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 via-white to-[hsl(217,90%,40%)]/10 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div 
-            className="text-center relative"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          >
+            className="absolute top-0 right-1/4 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-0 left-1/4 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.2, 0.4]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Product Showcase */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1 }}
+              className="relative"
+            >
+              {/* Laptop Mockup */}
               <div className="relative">
-                {/* Glassmorphism Container */}
-                <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
-                  <svg className="w-full h-auto max-w-lg mx-auto" viewBox="0 0 500 400" fill="none">
-                    {/* Enhanced Mobile Phone */}
-                    <defs>
-                      <linearGradient id="phoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#1f2937"/>
-                        <stop offset="100%" stopColor="#374151"/>
-                      </linearGradient>
-                      <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#3b82f6"/>
-                        <stop offset="100%" stopColor="#1d4ed8"/>
-                      </linearGradient>
-                    </defs>
-                    
-                    {/* Phone Shadow */}
-                    <ellipse cx="205" cy="340" rx="50" ry="8" fill="#000" opacity="0.2"/>
-                    
-                    {/* Main Phone */}
-                    <rect x="175" y="60" width="120" height="220" rx="20" fill="url(#phoneGradient)" stroke="#60a5fa" strokeWidth="3"/>
-                    <rect x="185" y="85" width="100" height="150" rx="8" fill="url(#screenGradient)"/>
-                    
-                    {/* Phone Details */}
-                    <rect x="190" y="95" width="90" height="60" rx="4" fill="#1e40af" opacity="0.8"/>
-                    <rect x="195" y="100" width="35" height="8" rx="2" fill="#60a5fa"/>
-                    <rect x="195" y="112" width="25" height="6" rx="1" fill="#93c5fd"/>
-                    <rect x="195" y="122" width="45" height="6" rx="1" fill="#dbeafe"/>
-                    
-                    {/* Modern POS Terminal */}
-                    <rect x="90" y="150" width="100" height="80" rx="12" fill="#f8fafc" stroke="#3b82f6" strokeWidth="3"/>
-                    <rect x="100" y="165" width="80" height="30" rx="6" fill="url(#screenGradient)"/>
-                    <circle cx="110" cy="215" r="8" fill="#10b981"/>
-                    <circle cx="130" cy="215" r="8" fill="#f59e0b"/>
-                    <circle cx="150" cy="215" r="8" fill="#ef4444"/>
-                    <circle cx="170" cy="215" r="8" fill="#8b5cf6"/>
-                    
-                    {/* Enhanced Credit Card */}
-                    <rect x="310" y="170" width="80" height="50" rx="8" fill="#1f2937" stroke="#fbbf24" strokeWidth="2"/>
-                    <rect x="320" y="185" width="50" height="8" rx="3" fill="#fbbf24"/>
-                    <rect x="320" y="200" width="30" height="5" rx="2" fill="#d1d5db"/>
-                    <circle cx="365" cy="205" r="12" fill="#fbbf24" opacity="0.3"/>
-                    <circle cx="365" cy="205" r="8" fill="#fbbf24" opacity="0.6"/>
-                    
-                    {/* Floating Data Particles */}
-                    <motion.circle 
-                      cx="120" cy="100" r="18" fill="#10b981" opacity="0.8"
-                      animate={{ y: [0, -15, 0], opacity: [0.8, 1, 0.8] }}
-                      transition={{ duration: 4, repeat: Infinity }}
-                    />
-                    <motion.circle 
-                      cx="380" cy="120" r="15" fill="#f59e0b" opacity="0.7"
-                      animate={{ y: [0, 12, 0], opacity: [0.7, 1, 0.7] }}
-                      transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                    />
-                    <motion.circle 
-                      cx="140" cy="80" r="12" fill="#8b5cf6" opacity="0.6"
-                      animate={{ y: [0, -8, 0], opacity: [0.6, 1, 0.6] }}
-                      transition={{ duration: 3.5, repeat: Infinity, delay: 2 }}
-                    />
-                    <motion.circle 
-                      cx="350" cy="280" r="20" fill="#06b6d4" opacity="0.5"
-                      animate={{ y: [0, 10, 0], opacity: [0.5, 0.9, 0.5] }}
-                      transition={{ duration: 4.5, repeat: Infinity, delay: 0.5 }}
-                    />
-                    
-                    {/* Connection Lines */}
-                    <motion.path 
-                      d="M195 180 L310 190" 
-                      stroke="#60a5fa" 
-                      strokeWidth="2" 
-                      strokeDasharray="5,5"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-                    />
-                    <motion.path 
-                      d="M150 190 L175 200" 
-                      stroke="#10b981" 
-                      strokeWidth="2" 
-                      strokeDasharray="3,3"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse", delay: 0.5 }}
-                    />
-                  </svg>
-                </div>
+                {/* Glow Effect Behind Laptop */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-transparent blur-3xl scale-110"></div>
                 
-                {/* Floating Stats */}
-                <motion.div 
+                {/* Laptop Container */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.8 }}
+                  className="relative z-10"
+                >
+                  <div className="relative bg-white/30 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/50">
+                    <motion.img
+                      src={laptopMockup}
+                      alt="Storm POS on Laptop"
+                      className="w-full h-auto"
+                      initial={{ scale: 0.95 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.4, duration: 1, ease: "easeOut" }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Mobile Mockup - Floating Overlay */}
+                <motion.div
+                  initial={{ y: 50, opacity: 0, scale: 0.8 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="absolute -bottom-8 -right-8 lg:-right-12 w-48 lg:w-56 z-20"
+                >
+                  <div className="relative bg-white/40 backdrop-blur-2xl rounded-3xl p-4 shadow-2xl border border-white/60">
+                    <motion.img
+                      src={mobileMockup}
+                      alt="Storm POS on Mobile"
+                      className="w-full h-auto"
+                      animate={{ 
+                        y: [0, -10, 0]
+                      }}
+                      transition={{ 
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Floating Metric Badges */}
+                <motion.div
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1, duration: 0.5 }}
-                  className="absolute -top-4 -left-4 bg-green-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-xl"
+                  className="absolute top-4 -left-4 lg:left-0 bg-[hsl(217,90%,40%)] text-white px-6 py-3 rounded-2xl shadow-2xl z-20"
                 >
-                  99.9% Uptime
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    <div>
+                      <div className="text-xs font-medium opacity-90">Live Status</div>
+                      <div className="text-lg font-bold">99.9% Uptime</div>
+                    </div>
+                  </div>
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.3, duration: 0.5 }}
-                  className="absolute -bottom-4 -right-4 bg-purple-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-xl"
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                  className="absolute top-32 -right-6 bg-white text-[hsl(217,90%,40%)] px-6 py-3 rounded-2xl shadow-2xl border-2 border-[hsl(217,90%,40%)] z-20"
                 >
-                  Real-time Sync
+                  <div className="flex items-center gap-2">
+                    <Cloud className="w-5 h-5" />
+                    <div>
+                      <div className="text-xs font-medium">Real-Time</div>
+                      <div className="text-lg font-bold">Cloud Sync</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.4, duration: 0.5 }}
+                  className="hidden lg:block absolute bottom-32 -left-8 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-6 py-3 rounded-2xl shadow-2xl z-20"
+                >
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    <div>
+                      <div className="text-xs font-medium">Secure</div>
+                      <div className="text-lg font-bold">Bank-Grade</div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Right Side - Feature Highlights */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.3 }}
+              className="space-y-8 lg:pl-8"
+            >
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <span className="inline-block text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-2 rounded-full mb-4">
+                    Cross-Platform Excellence
+                  </span>
+                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                    One Platform.<br />
+                    <span className="text-[hsl(217,90%,40%)]">Every Device.</span>
+                  </h2>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    Experience seamless performance whether you're on desktop, tablet, or smartphone. 
+                    Storm POS adapts perfectly to your workflow, wherever business takes you.
+                  </p>
+                </motion.div>
+
+                {/* Feature Pills */}
+                <motion.div 
+                  className="grid grid-cols-2 gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <div className="bg-white/60 backdrop-blur-sm border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-gray-900">Instant</div>
+                        <div className="text-sm text-gray-600">Processing</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/60 backdrop-blur-sm border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                        <Cloud className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-gray-900">Cloud</div>
+                        <div className="text-sm text-gray-600">Powered</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/60 backdrop-blur-sm border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-gray-900">Secure</div>
+                        <div className="text-sm text-gray-600">Encrypted</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/60 backdrop-blur-sm border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-gray-900">Smart</div>
+                        <div className="text-sm text-gray-600">Analytics</div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Tech Specs */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="pt-6 border-t border-gray-200"
+                >
+                  <p className="text-sm text-gray-500 mb-3 font-medium">Technical Excellence</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] rounded-full text-xs font-semibold">
+                      PostgreSQL Database
+                    </span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] rounded-full text-xs font-semibold">
+                      256-bit Encryption
+                    </span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] rounded-full text-xs font-semibold">
+                      Sub-100ms Latency
+                    </span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] rounded-full text-xs font-semibold">
+                      ISO 27001 Compliant
+                    </span>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
           </div>
-        </section>
+        </div>
+      </section>
 
       {/* What is Storm POS Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
