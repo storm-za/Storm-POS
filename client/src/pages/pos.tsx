@@ -261,7 +261,7 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2, duration: 0.5 }}
-                  className="absolute -top-8 -right-4 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl z-30"
+                  className="absolute top-4 right-2 lg:-top-8 lg:right-0 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl z-30"
                 >
                   <div className="flex items-center gap-1.5 lg:gap-3">
                     <div className="w-1.5 h-1.5 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -276,7 +276,7 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.4, duration: 0.5 }}
-                  className="absolute top-1/3 -left-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-[hsl(217,90%,40%)] lg:border-2 z-30"
+                  className="absolute top-[calc(33.333%-20px)] lg:top-1/3 left-2 lg:-left-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-[hsl(217,90%,40%)] lg:border-2 z-30"
                 >
                   <div className="flex items-center gap-1.5 lg:gap-3">
                     <Cloud className="w-3 h-3 lg:w-6 lg:h-6" />
@@ -291,7 +291,7 @@ export default function POS() {
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.6, duration: 0.5 }}
-                  className="absolute bottom-1/4 -right-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-green-500 lg:border-2 z-30"
+                  className="absolute bottom-[calc(25%-20px)] lg:bottom-1/4 right-2 lg:-right-8 bg-white backdrop-blur-xl text-[hsl(217,90%,40%)] px-3 py-2 lg:px-6 lg:py-4 rounded-xl lg:rounded-2xl shadow-2xl border border-green-500 lg:border-2 z-30"
                 >
                   <div className="flex items-center gap-1.5 lg:gap-3">
                     <Shield className="w-3 h-3 lg:w-6 lg:h-6 text-green-500" />
