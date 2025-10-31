@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Code, ScanBarcode, TrendingUp, Users, Award, Shield, CheckCircle, Star, ChevronDown, ChevronUp } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
+import { updatePageSEO } from "@/lib/seo";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Storm - Smart Software. Built for Growth.',
+      description: 'Professional websites and software solutions for South African businesses. Monthly packages starting from R799. Get a stunning website or powerful POS system today.',
+      canonical: window.location.origin + '/'
+    });
+  }, []);
 
   const fadeInUp = {
     initial: { opacity: 0, y: 50 },

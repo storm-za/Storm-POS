@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -10,9 +10,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { updatePageSEO } from "@/lib/seo";
 
 export default function PosLogin() {
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Login - Storm POS | Access Your Point of Sale System',
+      description: 'Log in to your Storm POS account. Manage sales, inventory, customers, and reports from any device. Secure cloud-based access.',
+      canonical: window.location.origin + '/pos/login'
+    });
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

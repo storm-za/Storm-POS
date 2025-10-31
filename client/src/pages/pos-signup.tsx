@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,18 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Lock, Mail, User, Building } from "lucide-react";
+import { updatePageSEO } from "@/lib/seo";
 
 export default function PosSignup() {
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Sign Up - Storm POS | Start Your 7-Day Free Trial',
+      description: 'Create your Storm POS account today. 7 days completely free, then only pay 0.5% per sale. No credit card required. No monthly fees. Start selling now.',
+      canonical: window.location.origin + '/pos/signup'
+    });
+  }, []);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");

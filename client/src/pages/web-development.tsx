@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,8 +7,17 @@ import { Check, Users, MapPin, TrendingUp, CheckCircle, XCircle, ArrowLeft } fro
 import WebDevSVG from "@/components/web-dev-svg";
 import ContactForm from "@/components/contact-form";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
+import { updatePageSEO } from "@/lib/seo";
 
 export default function WebDevelopment() {
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Professional Web Development - Storm | Monthly Packages from R799',
+      description: 'Get a professional website for your South African business with monthly packages starting at R799. Custom design, mobile-optimized, SEO-ready. No large upfront costs.',
+      canonical: window.location.origin + '/web-development'
+    });
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 50 },
     animate: { opacity: 1, y: 0 },

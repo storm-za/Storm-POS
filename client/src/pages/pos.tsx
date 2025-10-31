@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,17 @@ import laptopMockup from "@assets/STORM__17_-removebg-preview_1761855220519.png"
 import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
 import laptopScene from "@assets/STORM (500 x 250 px) (1)_1761857579860.png";
 import mobileScene from "@assets/STORM (19)_1761857582315.png";
+import { updatePageSEO } from "@/lib/seo";
 
 export default function POS() {
+  useEffect(() => {
+    updatePageSEO({
+      title: 'Storm POS - Cloud Point of Sale System | 7 Days Free, Pay Only 0.5% Per Sale',
+      description: 'The smartest POS system for South African retailers. No monthly fees, no setup costs. Just 0.5% per sale. Try free for 7 days. Always online, works on any device.',
+      canonical: window.location.origin + '/pos'
+    });
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 50 },
     animate: { opacity: 1, y: 0 },
