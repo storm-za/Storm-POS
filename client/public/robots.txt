@@ -1,0 +1,18 @@
+# Storm SaaS Website - Robots.txt
+# Allow all search engines to crawl public pages
+
+User-agent: *
+Allow: /
+Allow: /web-development
+Allow: /pos
+Allow: /pos/signup
+Allow: /pos/login
+
+# Block authenticated/private pages from search engines
+Disallow: /pos/system
+Disallow: /pos/system/afrikaans
+Disallow: /pos/inactive
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://storm.co.za/sitemap.xml
