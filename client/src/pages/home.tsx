@@ -87,10 +87,107 @@ export default function Home() {
       </section>
       {/* Solutions Section with Modern Design */}
       <section id="solutions-section" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-        {/* Background Elements */}
+        {/* High-Tech Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-cyan-400/10 to-blue-600/10 rounded-full blur-3xl"></div>
+          {/* Animated Gradient Orbs */}
+          <motion.div 
+            className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-tr from-cyan-400/15 to-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.6, 0.4],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          {/* Animated Grid Pattern */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `
+                linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px),
+                linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)
+              `,
+              backgroundSize: '60px 60px'
+            }} />
+          </div>
+          
+          {/* Floating Tech Particles */}
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-[hsl(217,90%,40%)]/40 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0, 1, 0],
+                scale: [0, 1.5, 0],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+          
+          {/* Pulsing Rings */}
+          <motion.div
+            className="absolute top-1/2 left-1/4 w-64 h-64 border border-[hsl(217,90%,40%)]/10 rounded-full"
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.3, 0, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-1/3 right-1/4 w-48 h-48 border border-[hsl(217,90%,40%)]/10 rounded-full"
+            animate={{
+              scale: [1, 1.8, 1],
+              opacity: [0.4, 0, 0.4],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              delay: 1,
+              ease: "easeOut"
+            }}
+          />
+          
+          {/* Scanning Lines Effect */}
+          <motion.div
+            className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-[hsl(217,90%,40%)]/30 to-transparent"
+            animate={{
+              top: ['0%', '100%'],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
         </div>
         
         <div className="relative max-w-7xl mx-auto">
@@ -155,19 +252,19 @@ export default function Home() {
             {/* POS Software Card */}
             <motion.div variants={fadeInUp}>
               <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg z-10">
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg z-10">
                   Available Now
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <ScanBarcode className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors duration-300">Storm POS</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-[hsl(217,90%,40%)] transition-colors duration-300">Storm POS</h3>
                   <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Revolutionary all device design point of sale system designed specifically for South African retailers</p>
                   <Button 
                     asChild 
-                    className="bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="bg-[hsl(217,90%,45%)] text-white hover:bg-[hsl(217,90%,40%)] shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <Link href="/pos">
                       Explore POS System
@@ -253,8 +350,8 @@ export default function Home() {
                   <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">500+</div>
                   <div className="text-sm text-gray-600">Happy Clients</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-green-500/5 to-transparent rounded-2xl border border-green-500/10">
-                  <div className="text-3xl font-bold text-green-600 mb-2">99.9%</div>
+                <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,45%)]/5 to-transparent rounded-2xl border border-[hsl(217,90%,45%)]/10">
+                  <div className="text-3xl font-bold text-[hsl(217,90%,45%)] mb-2">99.9%</div>
                   <div className="text-sm text-gray-600">Uptime</div>
                 </div>
                 <div className="text-center p-6 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl border border-purple-500/10">
@@ -285,7 +382,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div variants={fadeInUp} className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="text-white h-8 w-8" />
               </div>
               <h4 className="text-xl font-bold text-gray-900 mb-2">Quality First</h4>
