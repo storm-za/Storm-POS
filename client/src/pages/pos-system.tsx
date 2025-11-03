@@ -25,8 +25,6 @@ import {
 } from "lucide-react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { TutorialGuide } from "@/components/TutorialGuide";
-import { englishTutorialSteps } from "@/data/tutorialSteps";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
@@ -119,8 +117,6 @@ export default function PosSystem() {
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const { toast } = useToast();
@@ -192,17 +188,6 @@ export default function PosSystem() {
     }
   }, []);
 
-  // Check if user should see tutorial on first load
-  useEffect(() => {
-    if (currentUser && !currentUser.tutorialCompleted) {
-      setShouldShowTutorial(true);
-      setIsTutorialOpen(true);
-    }
-  }, [currentUser]);
-
-  const handleTutorialComplete = () => {
-    completeTutorialMutation.mutate();
-  };
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
@@ -1494,53 +1479,6 @@ export default function PosSystem() {
     },
   });
 
-  // Tutorial completion mutation
-  const completeTutorialMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentUser) throw new Error("No user found");
-      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/tutorial`, {
-        completed: true,
-        userEmail: currentUser.email,
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to complete tutorial");
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      // Update current user state with tutorial completion
-      if (currentUser && data.user) {
-        setCurrentUser({ ...currentUser, tutorialCompleted: true });
-        // Also update localStorage if it exists
-        const userData = localStorage.getItem('posUser');
-        if (userData) {
-          try {
-            const parsedUser = JSON.parse(userData);
-            parsedUser.tutorialCompleted = true;
-            localStorage.setItem('posUser', JSON.stringify(parsedUser));
-          } catch (error) {
-            console.error('Error updating localStorage:', error);
-          }
-        }
-      }
-      
-      setShouldShowTutorial(false);
-      setIsTutorialOpen(false);
-      toast({ 
-        title: "Tutorial Completed!", 
-        description: "You can replay this tutorial anytime from the Tutorial button." 
-      });
-    },
-    onError: (error: Error) => {
-      console.error("Error completing tutorial:", error);
-      toast({ 
-        title: "Error", 
-        description: error.message || "Failed to save tutorial completion. Please try again.", 
-        variant: "destructive" 
-      });
-    },
-  });
 
   // Void sale handlers
   const handleVoidSaleClick = (sale: Sale) => {
@@ -1814,16 +1752,16 @@ export default function PosSystem() {
             
             {/* Right side controls */}
             <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* Tutorial Button */}
+              {/* Help Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsTutorialOpen(true)}
+                onClick={() => window.location.href = '/pos/help'}
                 className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,35%)] hover:bg-blue-50"
-                data-testid="tutorial-button"
+                data-testid="help-button"
               >
-                <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Tutorial</span>
+                <HelpCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Help</span>
               </Button>
 
               {/* Staff Account Dropdown */}
@@ -4442,15 +4380,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Tutorial Guide */}
-      <TutorialGuide
-        isOpen={isTutorialOpen}
-        onClose={() => setIsTutorialOpen(false)}
-        steps={englishTutorialSteps}
-        onComplete={handleTutorialComplete}
-        language="en"
-      />
     </div>
   );
 }
