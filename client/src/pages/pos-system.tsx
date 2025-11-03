@@ -1692,7 +1692,7 @@ export default function PosSystem() {
                 src={stormLogo} 
                 alt="Storm POS" 
                 className="h-40 sm:h-60 w-auto mix-blend-multiply"
-                style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
+                style={{ filter: 'drop-shadow(0 0 0 transparent)', marginLeft: '-25px' }}
               />
             </div>
             
