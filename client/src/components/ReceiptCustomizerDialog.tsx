@@ -36,6 +36,7 @@ export function ReceiptCustomizerDialog({
 }: ReceiptCustomizerDialogProps) {
   const [settings, setSettings] = useState<ReceiptSettings>(defaultReceiptSettings());
   const [isSaving, setIsSaving] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   // Deep merge helper
   const deepMergeSettings = (defaults: ReceiptSettings, stored: any): ReceiptSettings => {
@@ -44,6 +45,7 @@ export function ReceiptCustomizerDialog({
       toggles: { ...defaults.toggles, ...stored?.toggles },
       businessInfo: { ...defaults.businessInfo, ...stored?.businessInfo },
       customMessages: { ...defaults.customMessages, ...stored?.customMessages },
+      logoDataUrl: stored?.logoDataUrl,
     };
   };
 
@@ -54,13 +56,19 @@ export function ReceiptCustomizerDialog({
         const parsedSettings = typeof currentUser.receiptSettings === 'string' 
           ? JSON.parse(currentUser.receiptSettings) 
           : currentUser.receiptSettings;
-        setSettings(deepMergeSettings(defaultReceiptSettings(), parsedSettings));
+        const merged = deepMergeSettings(defaultReceiptSettings(), parsedSettings);
+        setSettings(merged);
+        // Initialize logo preview from stored settings
+        if (merged.logoDataUrl) {
+          setLogoPreview(merged.logoDataUrl);
+        }
       } catch (error) {
         console.error("Error parsing receipt settings:", error);
         setSettings(defaultReceiptSettings());
       }
     } else {
       setSettings(defaultReceiptSettings());
+      setLogoPreview(null);
     }
   }, [currentUser, isOpen]);
 
@@ -107,13 +115,76 @@ export function ReceiptCustomizerDialog({
     });
   };
 
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ 
+        title: "File too large", 
+        description: "Please upload an image smaller than 2MB",
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setLogoPreview(base64);
+      
+      // Compress and resize the image
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set max dimensions
+        const maxSize = 200;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = height * (maxSize / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = width * (maxSize / height);
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          setLogoPreview(compressedBase64);
+        }
+      };
+      img.src = base64;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = async () => {
     try {
       setIsSaving(true);
+      
+      // Include logo in settings if it was uploaded
+      const settingsToSave = {
+        ...settings,
+        logoDataUrl: logoPreview || settings.logoDataUrl,
+      };
+      
       const response = await apiRequest(`/api/pos/user/${currentUser.id}/receipt-settings`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings }),
+        body: JSON.stringify({ settings: settingsToSave }),
       });
 
       if (response.success) {
@@ -181,6 +252,58 @@ export function ReceiptCustomizerDialog({
                   </motion.div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Logo Upload */}
+          <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white text-sm">Receipt Logo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {currentUser?.companyLogo && (
+                <div className="text-center">
+                  <p className="text-sm text-gray-300 mb-2">Current Logo:</p>
+                  <img 
+                    src={currentUser.companyLogo} 
+                    alt="Current Logo" 
+                    className="h-20 w-20 object-contain rounded-lg mx-auto border border-gray-600"
+                  />
+                </div>
+              )}
+              
+              <div>
+                <Label htmlFor="receiptLogoUpload" className="text-white">Upload Custom Logo (Optional)</Label>
+                <Input
+                  id="receiptLogoUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="mt-2 bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded"
+                />
+                <p className="text-xs text-gray-400 mt-2">
+                  Upload a custom logo for receipts. Recommended: Square images work best (PNG, JPG, max 2MB)
+                </p>
+              </div>
+              
+              {logoPreview && (
+                <div className="text-center">
+                  <p className="text-sm text-gray-300 mb-2">New Logo Preview:</p>
+                  <img 
+                    src={logoPreview} 
+                    alt="New Logo Preview" 
+                    className="h-20 w-20 object-contain rounded-lg mx-auto border border-gray-600"
+                  />
+                  <Button 
+                    size="sm"
+                    variant="outline" 
+                    onClick={() => setLogoPreview(null)}
+                    className="mt-2 text-gray-300 border-gray-600 hover:bg-gray-700"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 

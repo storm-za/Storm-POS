@@ -194,6 +194,7 @@ export const receiptSettingsSchema = z.object({
     footer: z.string().optional(),
     thankYou: z.string().default('Thank you for your business!'),
   }).default({}),
+  logoDataUrl: z.string().optional(),
 });
 
 export const defaultReceiptSettings = (): z.infer<typeof receiptSettingsSchema> => ({

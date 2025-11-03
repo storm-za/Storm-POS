@@ -808,6 +808,7 @@ export default function PosSystemAfrikaans() {
         toggles: { ...defaults.toggles, ...parsed.toggles },
         businessInfo: { ...defaults.businessInfo, ...parsed.businessInfo },
         customMessages: { ...defaults.customMessages, ...parsed.customMessages },
+        logoDataUrl: parsed.logoDataUrl,
       };
     } catch {
       return defaults;
@@ -825,12 +826,16 @@ export default function PosSystemAfrikaans() {
     
     // Section renderers - Afrikaans
     const renderLogo = () => {
-      if (settings.toggles.showLogo && currentUser?.companyLogo) {
-        try {
-          doc.addImage(currentUser.companyLogo, 'JPEG', 20, yPosition, 30, 30);
-          yPosition += 35;
-        } catch (error) {
-          console.error('Error adding logo to PDF:', error);
+      if (settings.toggles.showLogo) {
+        // Use custom logo from settings if available, otherwise use company logo
+        const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
+        if (logoToUse) {
+          try {
+            doc.addImage(logoToUse, 'JPEG', 20, yPosition, 30, 30);
+            yPosition += 35;
+          } catch (error) {
+            console.error('Error adding logo to PDF:', error);
+          }
         }
       }
     };
