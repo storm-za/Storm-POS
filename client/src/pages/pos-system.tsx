@@ -2727,29 +2727,34 @@ export default function PosSystem() {
 
           {/* Reports Tab */}
           <TabsContent value="reports">
-            <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
               {/* Date Filter */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                <CardHeader className="border-b border-white/10 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-white text-xl font-bold">
                     <Calendar className="w-5 h-5" />
                     Sales Analytics
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Label htmlFor="date-filter">Select Date:</Label>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <Label htmlFor="date-filter" className="text-gray-300">Select Date:</Label>
                       <Input
                         id="date-filter"
                         type="date"
                         value={selectedDate}
                         onChange={(e) => setSelectedDate(e.target.value)}
-                        className="w-auto"
+                        className="w-auto bg-white/10 border-white/20 text-white"
                       />
-                      <Label htmlFor="staff-filter">Filter by Staff:</Label>
+                      <Label htmlFor="staff-filter" className="text-gray-300">Filter by Staff:</Label>
                       <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="w-48 bg-white/10 border-white/20 text-white">
                           <SelectValue placeholder="All Staff" />
                         </SelectTrigger>
                         <SelectContent>
@@ -2765,7 +2770,7 @@ export default function PosSystem() {
                     </div>
                     <Button
                       onClick={() => handlePrintReport()}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Print
@@ -2841,61 +2846,69 @@ export default function PosSystem() {
                   return profit + saleProfit;
                 }, 0);
 
-                const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+                const COLORS = ['hsl(217,90%,50%)', 'hsl(217,90%,60%)', 'hsl(217,90%,70%)', 'hsl(217,90%,40%)'];
 
                 return (
                   <>
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium text-gray-600">Total Revenue</span>
-                          </div>
-                          <div className="text-2xl font-bold text-green-600">R{totalRevenue.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
+                      <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                        <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl">
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="w-4 h-4 text-blue-400" />
+                              <span className="text-sm font-medium text-gray-300">Total Revenue</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-400">R{totalRevenue.toFixed(2)}</div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                       
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-emerald-600" />
-                            <span className="text-sm font-medium text-gray-600">Total Profit</span>
-                          </div>
-                          <div className="text-2xl font-bold text-emerald-600">R{totalProfit.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
+                      <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                        <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl">
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-blue-500" />
+                              <span className="text-sm font-medium text-gray-300">Total Profit</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-500">R{totalProfit.toFixed(2)}</div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                       
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <Receipt className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-600">Transactions</span>
-                          </div>
-                          <div className="text-2xl font-bold text-blue-600">{totalTransactions}</div>
-                        </CardContent>
-                      </Card>
+                      <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                        <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl">
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <Receipt className="w-4 h-4 text-blue-300" />
+                              <span className="text-sm font-medium text-gray-300">Transactions</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-300">{totalTransactions}</div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                       
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm font-medium text-gray-600">Avg Transaction</span>
-                          </div>
-                          <div className="text-2xl font-bold text-purple-600">R{avgTransactionValue.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
+                      <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                        <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl">
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4 text-blue-400" />
+                              <span className="text-sm font-medium text-gray-300">Avg Transaction</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-400">R{avgTransactionValue.toFixed(2)}</div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     </div>
 
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Payment Methods Pie Chart */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Payment Methods Breakdown</CardTitle>
+                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                        <CardHeader className="border-b border-white/10 pb-4">
+                          <CardTitle className="text-white">Payment Methods Breakdown</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="pt-6">
                           {paymentChartData.length > 0 ? (
                             <ResponsiveContainer width="100%" height={300}>
                               <PieChart>
@@ -2906,7 +2919,7 @@ export default function PosSystem() {
                                   labelLine={false}
                                   label={({ name, value }) => `${name}: R${value.toFixed(2)}`}
                                   outerRadius={80}
-                                  fill="#8884d8"
+                                  fill="hsl(217,90%,50%)"
                                   dataKey="value"
                                 >
                                   {paymentChartData.map((entry, index) => (
@@ -2917,7 +2930,7 @@ export default function PosSystem() {
                               </PieChart>
                             </ResponsiveContainer>
                           ) : (
-                            <div className="h-[300px] flex items-center justify-center text-gray-500">
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
                               No sales data for selected date
                             </div>
                           )}
@@ -2925,23 +2938,24 @@ export default function PosSystem() {
                       </Card>
 
                       {/* 7-Day Trend Line Chart */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>7-Day Sales Trend</CardTitle>
+                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                        <CardHeader className="border-b border-white/10 pb-4">
+                          <CardTitle className="text-white">7-Day Sales Trend</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="pt-6">
                           <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={dailyTotals}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="date" />
-                              <YAxis />
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                              <XAxis dataKey="date" stroke="#9ca3af" />
+                              <YAxis stroke="#9ca3af" />
                               <Tooltip 
                                 formatter={(value, name) => [
                                   name === 'total' ? `R${Number(value).toFixed(2)}` : value,
                                   name === 'total' ? 'Revenue' : 'Transactions'
                                 ]}
+                                contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
                               />
-                              <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+                              <Line type="monotone" dataKey="total" stroke="hsl(217,90%,50%)" strokeWidth={3} />
                             </LineChart>
                           </ResponsiveContainer>
                         </CardContent>
@@ -2949,20 +2963,20 @@ export default function PosSystem() {
                     </div>
 
                     {/* Detailed Sales List */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
+                    <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                      <CardHeader className="border-b border-white/10 pb-4">
+                        <CardTitle className="text-white">Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-6">
                         <div className="space-y-2 max-h-64 overflow-y-auto">
                           {dateFilteredSales.length > 0 ? (
                             dateFilteredSales.map((sale) => (
-                              <div key={sale.id} className={`flex justify-between items-center p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
+                              <div key={sale.id} className={`flex justify-between items-center p-3 border rounded-lg ${sale.isVoided ? 'bg-red-900/20 border-red-500/30' : 'bg-white/5 border-white/10'}`}>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-4">
                                     <div>
                                       <div className="flex items-center gap-2">
-                                        <p className={`font-medium ${sale.isVoided ? 'line-through text-red-600' : ''}`}>
+                                        <p className={`font-medium ${sale.isVoided ? 'line-through text-red-400' : 'text-white'}`}>
                                           R{sale.total}
                                         </p>
                                         {sale.isVoided && (
@@ -2971,18 +2985,18 @@ export default function PosSystem() {
                                           </Badge>
                                         )}
                                       </div>
-                                      <p className="text-sm text-gray-500">
+                                      <p className="text-sm text-gray-400">
                                         {new Date(sale.createdAt).toLocaleTimeString()}
                                       </p>
                                     </div>
                                     {sale.customerName && (
                                       <div>
-                                        <p className="text-sm font-medium">{sale.customerName}</p>
-                                        <p className="text-xs text-gray-500">Customer</p>
+                                        <p className="text-sm font-medium text-white">{sale.customerName}</p>
+                                        <p className="text-xs text-gray-400">Customer</p>
                                       </div>
                                     )}
                                     <div>
-                                      <p className="text-sm font-medium">
+                                      <p className="text-sm font-medium text-white">
                                         Served by: {
                                           sale.staffAccountId 
                                             ? (() => {
@@ -2992,31 +3006,31 @@ export default function PosSystem() {
                                             : currentUser?.email?.split('@')[0] || 'Manager'
                                         }
                                       </p>
-                                      <p className="text-xs text-gray-500">Staff</p>
+                                      <p className="text-xs text-gray-400">Staff</p>
                                     </div>
                                   </div>
                                   <div className="mt-2">
-                                    <p className="text-xs text-gray-600">
+                                    <p className="text-xs text-gray-300">
                                       Items: {sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}
                                     </p>
                                     {sale.isVoided && sale.voidReason && (
-                                      <p className="text-xs text-red-600 mt-1">
+                                      <p className="text-xs text-red-400 mt-1">
                                         Void Reason: {sale.voidReason}
                                       </p>
                                     )}
                                   </div>
                                 </div>
                                 <div className="text-right flex flex-col items-end gap-1">
-                                  <Badge variant="outline" className="mb-1">
+                                  <Badge variant="outline" className="mb-1 bg-blue-600/20 text-blue-300 border-blue-500/30">
                                     {sale.paymentType.toUpperCase()}
                                   </Badge>
-                                  <p className="text-xs text-gray-500">#{sale.id}</p>
+                                  <p className="text-xs text-gray-400">#{sale.id}</p>
                                   {!sale.isVoided && (
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleVoidSaleClick(sale)}
-                                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      className="h-6 px-2 text-xs border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
                                     >
                                       <X className="h-3 w-3 mr-1" />
                                       Void
@@ -3027,7 +3041,7 @@ export default function PosSystem() {
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleViewVoidReason(sale)}
-                                      className="h-6 px-2 text-xs"
+                                      className="h-6 px-2 text-xs border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
                                     >
                                       <Eye className="h-3 w-3 mr-1" />
                                       View
@@ -3037,7 +3051,7 @@ export default function PosSystem() {
                               </div>
                             ))
                           ) : (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-gray-400">
                               No sales recorded for {new Date(selectedDate).toLocaleDateString()}
                             </div>
                           )}
@@ -3047,7 +3061,7 @@ export default function PosSystem() {
                   </>
                 );
               })()}
-            </div>
+            </motion.div>
           </TabsContent>
 
           {/* Usage Tab */}
