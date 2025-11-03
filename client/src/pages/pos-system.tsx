@@ -2111,7 +2111,7 @@ export default function PosSystem() {
                       {/* Sale Details */}
                       <div className="space-y-3 pt-4 border-t">
                         <div>
-                          <Label htmlFor="customer">Customer (Optional)</Label>
+                          <Label htmlFor="customer" className="text-white">Customer (Optional)</Label>
                           <Select 
                             value={selectedCustomerId?.toString() || "none"} 
                             onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}
@@ -2169,7 +2169,7 @@ export default function PosSystem() {
                         </div>
 
                         <div>
-                          <Label htmlFor="payment">Payment Method</Label>
+                          <Label htmlFor="payment" className="text-white">Payment Method</Label>
                           <Select value={paymentType} onValueChange={setPaymentType}>
                             <SelectTrigger>
                               <SelectValue />
@@ -2183,7 +2183,7 @@ export default function PosSystem() {
                         </div>
 
                         <div>
-                          <Label htmlFor="notes">Notes (Optional)</Label>
+                          <Label htmlFor="notes" className="text-white">Notes (Optional)</Label>
                           <Textarea
                             id="notes"
                             value={saleNotes}
@@ -2195,7 +2195,7 @@ export default function PosSystem() {
 
                         {/* Discount Section */}
                         <div>
-                          <Label>Discount</Label>
+                          <Label className="text-white">Discount</Label>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {[0, 5, 10, 20, 50].map((percentage) => (
                               <Button
@@ -2214,7 +2214,7 @@ export default function PosSystem() {
 
                         {/* Tip Option Section */}
                         <div>
-                          <Label>Tip Option</Label>
+                          <Label className="text-white">Tip Option</Label>
                           <div className="flex items-center gap-2 mt-2">
                             <button
                               type="button"
@@ -2231,7 +2231,7 @@ export default function PosSystem() {
                                 }`}
                               />
                             </button>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-300">
                               {tipOptionEnabled ? 'Tip lines enabled on receipt' : 'Add tip option to receipt'}
                             </span>
                           </div>
@@ -2240,8 +2240,8 @@ export default function PosSystem() {
                         {/* Total Section */}
                         <div className="pt-4 border-t space-y-2">
                           <div className="flex justify-between items-center text-lg">
-                            <span>Subtotal:</span>
-                            <span>R{calculateSubtotal().toFixed(2)}</span>
+                            <span className="text-[#ffffff]">Subtotal:</span>
+                            <span className="text-[#ffffff]">R{calculateSubtotal().toFixed(2)}</span>
                           </div>
                           {discountPercentage > 0 && (
                             <div className="flex justify-between items-center text-lg text-green-600">
@@ -2258,7 +2258,7 @@ export default function PosSystem() {
                         {/* Checkout Options */}
                         <div className="space-y-3">
                           <div>
-                            <Label>Checkout Option</Label>
+                            <Label className="text-white">Checkout Option</Label>
                             <div className="flex flex-wrap gap-2 mt-2">
                               <Button
                                 type="button"
@@ -2298,7 +2298,7 @@ export default function PosSystem() {
                           {/* Open Account Selection */}
                           {checkoutOption === 'add-to-account' && (
                             <div>
-                              <Label>Select Open Account</Label>
+                              <Label className="text-white">Select Open Account</Label>
                               <Select 
                                 value={selectedOpenAccountId?.toString() || ""} 
                                 onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}
