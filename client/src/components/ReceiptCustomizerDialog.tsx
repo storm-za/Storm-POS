@@ -181,20 +181,22 @@ export function ReceiptCustomizerDialog({
         logoDataUrl: logoPreview || settings.logoDataUrl,
       };
       
-      const response = await apiRequest(`/api/pos/user/${currentUser.id}/receipt-settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings: settingsToSave }),
-      });
+      const response = await apiRequest(
+        'PUT',
+        `/api/pos/user/${currentUser.id}/receipt-settings`,
+        { settings: settingsToSave }
+      );
 
-      if (response.success) {
-        setCurrentUser({ ...currentUser, receiptSettings: settings });
-        toast({ title: "Receipt settings saved successfully!" });
+      const data = await response.json();
+      
+      if (data.success) {
+        setCurrentUser({ ...currentUser, receiptSettings: settingsToSave });
+        toast({ title: labels.saveSuccess || "Receipt settings saved successfully!" });
         onClose();
       }
     } catch (error) {
       console.error("Error saving receipt settings:", error);
-      toast({ title: "Failed to save receipt settings", variant: "destructive" });
+      toast({ title: labels.saveError || "Failed to save receipt settings", variant: "destructive" });
     } finally {
       setIsSaving(false);
     }
@@ -323,9 +325,9 @@ export function ReceiptCustomizerDialog({
                     />
                   </div>
                   <Input
-                    value={settings.businessInfo.name || currentUser?.companyName || ''}
+                    value={settings.businessInfo.name || ''}
                     onChange={(e) => updateBusinessInfo('name', e.target.value)}
-                    placeholder="Your Business Name"
+                    placeholder={currentUser?.companyName || "Your Business Name"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
