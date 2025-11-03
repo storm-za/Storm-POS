@@ -1683,7 +1683,7 @@ export default function PosSystem() {
       </div>
 
       {/* Header */}
-      <header className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-800 shadow-lg shadow-blue-900/20 relative z-10">
+      <header className="bg-white backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-blue-900/10 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
