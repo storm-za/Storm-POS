@@ -2559,6 +2559,7 @@ export default function PosSystem() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           </TabsContent>
 
           {/* Customers Tab */}
