@@ -1608,9 +1608,82 @@ export default function PosSystem() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* High-Tech Animated Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Gradient Orbs */}
+        <motion.div
+          className="absolute top-20 left-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-[hsl(217,90%,40%)]/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.5, 0.3, 0.5],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        
+        {/* Grid Overlay */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(hsl(217,90%,40%) 1px, transparent 1px),
+                            linear-gradient(90deg, hsl(217,90%,40%) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px'
+          }}
+        />
+        
+        {/* Floating Particles */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+        
+        {/* Scanning Lines */}
+        <motion.div
+          className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
+          animate={{
+            top: ['0%', '100%'],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-800 shadow-lg shadow-blue-900/20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
@@ -1764,11 +1837,28 @@ export default function PosSystem() {
           </div>
         </div>
       </header>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Company Banner */}
-        <div className="mb-6">
-          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-lg px-6 py-4 shadow-lg">
-            <div className="flex items-center justify-center">
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl px-6 py-4 shadow-2xl shadow-blue-900/50 border border-blue-400/20 backdrop-blur-sm relative overflow-hidden">
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              animate={{
+                x: ['-100%', '200%'],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatDelay: 2,
+              }}
+            />
+            <div className="flex items-center justify-center relative z-10">
               <div className="text-center">
                 <h2 className="text-white text-lg font-semibold">
                   {currentUser?.companyName || "Demo Account"}
@@ -1776,19 +1866,19 @@ export default function PosSystem() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
             {/* Mobile Tab Navigation - Horizontal Scroll */}
             <div className="block md:hidden">
-              <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-x-auto scrollbar-hide">
+              <div className="flex space-x-1 p-1 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl overflow-x-auto scrollbar-hide shadow-lg shadow-blue-900/30">
                 <button
                   onClick={() => handleTabChange("sales")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "sales"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <ShoppingCart className="h-4 w-4 mb-1" />
@@ -1796,10 +1886,10 @@ export default function PosSystem() {
                 </button>
                 <button
                   onClick={() => handleTabChange("products")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "products"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <Package className="h-4 w-4 mb-1" />
@@ -1807,10 +1897,10 @@ export default function PosSystem() {
                 </button>
                 <button
                   onClick={() => handleTabChange("customers")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "customers"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <Users className="h-4 w-4 mb-1" />
@@ -1818,10 +1908,10 @@ export default function PosSystem() {
                 </button>
                 <button
                   onClick={() => handleTabChange("open-accounts")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "open-accounts"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <FileText className="h-4 w-4 mb-1" />
@@ -1829,10 +1919,10 @@ export default function PosSystem() {
                 </button>
                 <button
                   onClick={() => handleTabChange("reports")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "reports"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <BarChart3 className="h-4 w-4 mb-1" />
@@ -1840,10 +1930,10 @@ export default function PosSystem() {
                 </button>
                 <button
                   onClick={() => handleTabChange("usage")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "usage"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <CreditCard className="h-4 w-4 mb-1" />
@@ -1853,10 +1943,10 @@ export default function PosSystem() {
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 tabs-navigation">
+            <TabsList className="hidden md:grid w-full grid-cols-6 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="sales" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-sales"
               >
                 <ShoppingCart className="h-4 w-4" />
@@ -1864,7 +1954,7 @@ export default function PosSystem() {
               </TabsTrigger>
               <TabsTrigger 
                 value="products" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-products"
               >
                 <Package className="h-4 w-4" />
@@ -1872,7 +1962,7 @@ export default function PosSystem() {
               </TabsTrigger>
               <TabsTrigger 
                 value="customers" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-customers"
               >
                 <Users className="h-4 w-4" />
@@ -1880,7 +1970,7 @@ export default function PosSystem() {
               </TabsTrigger>
               <TabsTrigger 
                 value="open-accounts" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-open-accounts"
               >
                 <FileText className="h-4 w-4" />
@@ -1888,7 +1978,7 @@ export default function PosSystem() {
               </TabsTrigger>
               <TabsTrigger 
                 value="reports" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-reports"
               >
                 <BarChart3 className="h-4 w-4" />
@@ -1896,7 +1986,7 @@ export default function PosSystem() {
               </TabsTrigger>
               <TabsTrigger 
                 value="usage" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-usage"
               >
                 <CreditCard className="h-4 w-4" />
@@ -1907,13 +1997,22 @@ export default function PosSystem() {
 
           {/* Sales Tab */}
           <TabsContent value="sales">
-            <div className="grid lg:grid-cols-2 gap-8">
+            <motion.div 
+              className="grid lg:grid-cols-2 gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               {/* Product Selection */}
-              <div>
-                <Card data-testid="product-selection-card">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Package className="h-5 w-5" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                       <span>Products</span>
                     </CardTitle>
                     <div className="relative">
@@ -1956,14 +2055,18 @@ export default function PosSystem() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* Current Sale */}
-              <div>
-                <Card data-testid="current-sale-card">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Card data-testid="current-sale-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <ShoppingCart className="h-5 w-5" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <ShoppingCart className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                       <span>Current Sale</span>
                     </CardTitle>
                   </CardHeader>
@@ -2253,16 +2356,21 @@ export default function PosSystem() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </TabsContent>
 
           {/* Products Tab */}
           <TabsContent value="products">
-            <Card>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Product Inventory</CardTitle>
+                  <CardTitle className="text-white">Product Inventory</CardTitle>
                   <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                     <DialogTrigger asChild>
                       <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
