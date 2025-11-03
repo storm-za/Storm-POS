@@ -1687,12 +1687,12 @@ export default function PosSystem() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
-            <div className="flex-shrink-0 company-banner">
+            <div className="flex-shrink-0">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
-                className="h-40 sm:h-60 w-auto mix-blend-multiply"
-                style={{ filter: 'drop-shadow(0 0 0 transparent)', marginLeft: '-25px' }}
+                className="h-16 sm:h-40 md:h-48 w-auto mix-blend-multiply"
+                style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
               />
             </div>
             
