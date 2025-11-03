@@ -37,6 +37,16 @@ export function ReceiptCustomizerDialog({
   const [settings, setSettings] = useState<ReceiptSettings>(defaultReceiptSettings());
   const [isSaving, setIsSaving] = useState(false);
 
+  // Deep merge helper
+  const deepMergeSettings = (defaults: ReceiptSettings, stored: any): ReceiptSettings => {
+    return {
+      sections: stored?.sections || defaults.sections,
+      toggles: { ...defaults.toggles, ...stored?.toggles },
+      businessInfo: { ...defaults.businessInfo, ...stored?.businessInfo },
+      customMessages: { ...defaults.customMessages, ...stored?.customMessages },
+    };
+  };
+
   // Initialize settings from currentUser
   useEffect(() => {
     if (currentUser?.receiptSettings) {
@@ -44,7 +54,7 @@ export function ReceiptCustomizerDialog({
         const parsedSettings = typeof currentUser.receiptSettings === 'string' 
           ? JSON.parse(currentUser.receiptSettings) 
           : currentUser.receiptSettings;
-        setSettings({ ...defaultReceiptSettings(), ...parsedSettings });
+        setSettings(deepMergeSettings(defaultReceiptSettings(), parsedSettings));
       } catch (error) {
         console.error("Error parsing receipt settings:", error);
         setSettings(defaultReceiptSettings());

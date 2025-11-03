@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
 import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
@@ -1141,127 +1141,232 @@ export default function PosSystem() {
     }
   };
 
+  // Merge receipt settings with defaults
+  const mergeReceiptSettings = (settings: any) => {
+    const defaults = defaultReceiptSettings();
+    if (!settings) return defaults;
+    
+    try {
+      const parsed = typeof settings === 'string' ? JSON.parse(settings) : settings;
+      return {
+        sections: parsed.sections || defaults.sections,
+        toggles: { ...defaults.toggles, ...parsed.toggles },
+        businessInfo: { ...defaults.businessInfo, ...parsed.businessInfo },
+        customMessages: { ...defaults.customMessages, ...parsed.customMessages },
+      };
+    } catch {
+      return defaults;
+    }
+  };
+
   // PDF Receipt Generation
-  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false) => {
+  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false, customSettings?: any) => {
     const doc = new jsPDF();
     let yPosition = 20;
-
-    // Add company logo if available
-    if (currentUser?.companyLogo) {
-      try {
-        doc.addImage(currentUser.companyLogo, 'JPEG', 20, yPosition, 30, 30);
-        yPosition += 35;
-      } catch (error) {
-        console.error('Error adding logo to PDF:', error);
+    
+    // Merge settings with defaults
+    const settings = mergeReceiptSettings(customSettings || currentUser?.receiptSettings);
+    
+    // Section renderers
+    const renderLogo = () => {
+      if (settings.toggles.showLogo && currentUser?.companyLogo) {
+        try {
+          doc.addImage(currentUser.companyLogo, 'JPEG', 20, yPosition, 30, 30);
+          yPosition += 35;
+        } catch (error) {
+          console.error('Error adding logo to PDF:', error);
+        }
       }
-    }
-
-    // Receipt title only
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', 20, yPosition);
-    yPosition += 15;
-
-    // Date and time
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
-    doc.text(`Time: ${new Date().toLocaleTimeString()}`, 120, yPosition);
-    yPosition += 10;
-
-    // Staff member info
-    if (staffName) {
-      doc.text(`Served by: ${staffName}`, 20, yPosition);
-      yPosition += 8;
-    }
-
-    // Customer or account info
-    if (customerName) {
-      doc.text(`Customer: ${customerName}`, 20, yPosition);
-      yPosition += 8;
-    }
-    if (accountName) {
-      doc.text(`Account: ${accountName}`, 20, yPosition);
-      yPosition += 8;
-    }
-
-    yPosition += 5;
-
-    // Items header
-    doc.setFont('helvetica', 'bold');
-    doc.text('Item', 20, yPosition);
-    doc.text('Qty', 120, yPosition);
-    doc.text('Price', 150, yPosition);
-    doc.text('Total', 175, yPosition);
-    yPosition += 5;
-
-    // Draw line
-    doc.line(20, yPosition, 190, yPosition);
-    yPosition += 8;
-
-    // Items
-    doc.setFont('helvetica', 'normal');
-    items.forEach(item => {
-      const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
-      
-      // Item name (truncate if too long)
-      let itemName = item.name;
-      if (itemName.length > 25) {
-        itemName = itemName.substring(0, 22) + '...';
-      }
-      
-      doc.text(itemName, 20, yPosition);
-      doc.text(item.quantity.toString(), 120, yPosition);
-      doc.text(`R${item.price}`, 150, yPosition);
-      doc.text(`R${itemTotal}`, 175, yPosition);
-      yPosition += 6;
-    });
-
-    yPosition += 5;
-    // Draw line
-    doc.line(20, yPosition, 190, yPosition);
-    yPosition += 8;
-
-    // Total
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text(`TOTAL: R${total}`, 150, yPosition);
-    yPosition += 15;
-
-    // Tip lines if enabled
-    if (includeTipLines) {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      yPosition += 5;
-      
-      // Draw tip line
-      doc.text('Tip: ', 20, yPosition);
-      doc.line(35, yPosition, 100, yPosition);
+    };
+    
+    const renderBusinessInfo = () => {
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', 20, yPosition);
       yPosition += 10;
       
-      // Draw new total line
-      doc.text('New Total: ', 20, yPosition);
-      doc.line(50, yPosition, 100, yPosition);
-      yPosition += 15;
-    }
-
-    // Payment method and notes
-    if (paymentType) {
-      doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.text(`Payment: ${paymentType.toUpperCase()}`, 20, yPosition);
+      doc.setFont('helvetica', 'normal');
+      
+      if (settings.toggles.showBusinessName && settings.businessInfo.name) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(settings.businessInfo.name, 20, yPosition);
+        doc.setFont('helvetica', 'normal');
+        yPosition += 6;
+      }
+      
+      if (settings.toggles.showBusinessAddress) {
+        if (settings.businessInfo.addressLine1) {
+          doc.text(settings.businessInfo.addressLine1, 20, yPosition);
+          yPosition += 5;
+        }
+        if (settings.businessInfo.addressLine2) {
+          doc.text(settings.businessInfo.addressLine2, 20, yPosition);
+          yPosition += 5;
+        }
+      }
+      
+      if (settings.toggles.showBusinessPhone && settings.businessInfo.phone) {
+        doc.text(`Tel: ${settings.businessInfo.phone}`, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showBusinessEmail && settings.businessInfo.email) {
+        doc.text(`Email: ${settings.businessInfo.email}`, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showBusinessWebsite && settings.businessInfo.website) {
+        doc.text(`Web: ${settings.businessInfo.website}`, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showRegistrationNumber && settings.businessInfo.registrationNumber) {
+        doc.text(`Reg: ${settings.businessInfo.registrationNumber}`, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showVATNumber && settings.businessInfo.vatNumber) {
+        doc.text(`VAT: ${settings.businessInfo.vatNumber}`, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      yPosition += 5;
+    };
+    
+    const renderDateTime = () => {
+      if (settings.toggles.showDateTime) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
+        doc.text(`Time: ${new Date().toLocaleTimeString()}`, 120, yPosition);
+        yPosition += 10;
+      }
+    };
+    
+    const renderStaffInfo = () => {
+      if (settings.toggles.showStaffInfo && staffName) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Served by: ${staffName}`, 20, yPosition);
+        yPosition += 8;
+      }
+    };
+    
+    const renderCustomerInfo = () => {
+      if (settings.toggles.showCustomerInfo) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        if (customerName) {
+          doc.text(`Customer: ${customerName}`, 20, yPosition);
+          yPosition += 8;
+        }
+        if (accountName) {
+          doc.text(`Account: ${accountName}`, 20, yPosition);
+          yPosition += 8;
+        }
+      }
+    };
+    
+    const renderItems = () => {
+      yPosition += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Item', 20, yPosition);
+      doc.text('Qty', 120, yPosition);
+      doc.text('Price', 150, yPosition);
+      doc.text('Total', 175, yPosition);
+      yPosition += 5;
+      doc.line(20, yPosition, 190, yPosition);
       yPosition += 8;
-    }
-
-    if (notes) {
-      doc.text(`Notes: ${notes}`, 20, yPosition);
+      
+      doc.setFont('helvetica', 'normal');
+      items.forEach(item => {
+        const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+        let itemName = item.name.length > 25 ? item.name.substring(0, 22) + '...' : item.name;
+        doc.text(itemName, 20, yPosition);
+        doc.text(item.quantity.toString(), 120, yPosition);
+        doc.text(`R${item.price}`, 150, yPosition);
+        doc.text(`R${itemTotal}`, 175, yPosition);
+        yPosition += 6;
+      });
+    };
+    
+    const renderTotals = () => {
+      yPosition += 5;
+      doc.line(20, yPosition, 190, yPosition);
       yPosition += 8;
-    }
-
-    yPosition += 10;
-    doc.setFontSize(8);
-    doc.text('Thank you for your business!', 20, yPosition);
-    doc.text('Powered by Storm POS - stormsoftware.co.za', 20, yPosition + 5);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(`TOTAL: R${total}`, 150, yPosition);
+      yPosition += 15;
+      
+      if (includeTipLines) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        yPosition += 5;
+        doc.text('Tip: ', 20, yPosition);
+        doc.line(35, yPosition, 100, yPosition);
+        yPosition += 10;
+        doc.text('New Total: ', 20, yPosition);
+        doc.line(50, yPosition, 100, yPosition);
+        yPosition += 15;
+      }
+    };
+    
+    const renderPaymentInfo = () => {
+      if (settings.toggles.showPaymentMethod && paymentType) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(`Payment: ${paymentType.toUpperCase()}`, 20, yPosition);
+        yPosition += 8;
+      }
+      if (notes) {
+        doc.setFontSize(10);
+        doc.text(`Notes: ${notes}`, 20, yPosition);
+        yPosition += 8;
+      }
+    };
+    
+    const renderMessages = () => {
+      yPosition += 10;
+      doc.setFontSize(8);
+      
+      if (settings.toggles.showCustomHeader && settings.customMessages.header) {
+        doc.text(settings.customMessages.header, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showThankYouMessage) {
+        doc.text(settings.customMessages.thankYou || 'Thank you for your business!', 20, yPosition);
+        yPosition += 5;
+      }
+      
+      if (settings.toggles.showCustomFooter && settings.customMessages.footer) {
+        doc.text(settings.customMessages.footer, 20, yPosition);
+        yPosition += 5;
+      }
+      
+      doc.text('Powered by Storm POS - stormsoftware.co.za', 20, yPosition);
+    };
+    
+    // Render sections in order
+    const sectionRenderers: Record<string, () => void> = {
+      logo: renderLogo,
+      businessInfo: renderBusinessInfo,
+      dateTime: renderDateTime,
+      staffInfo: renderStaffInfo,
+      customerInfo: renderCustomerInfo,
+      items: renderItems,
+      totals: renderTotals,
+      paymentInfo: renderPaymentInfo,
+      messages: renderMessages,
+    };
+    
+    settings.sections.forEach((section: string) => {
+      const renderer = sectionRenderers[section];
+      if (renderer) renderer();
+    });
 
     // Download the PDF
     const fileName = isOpenAccount 
