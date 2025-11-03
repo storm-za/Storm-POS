@@ -25,8 +25,6 @@ import {
 } from "lucide-react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { TutorialGuide } from "@/components/TutorialGuide";
-import { afrikaansTutorialSteps } from "@/data/tutorialSteps";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
@@ -115,8 +113,6 @@ export default function PosSystemAfrikaans() {
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("verkope");
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
   const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
@@ -568,65 +564,6 @@ export default function PosSystemAfrikaans() {
     },
   });
 
-  // Tutorial completion mutation  
-  const completeTutorialMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentUser) throw new Error("Geen gebruiker gevind nie");
-      const response = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/tutorial`, {
-        completed: true,
-        userEmail: currentUser.email,
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Kon nie tutoriaal voltooi nie");
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      // Update current user state with tutorial completion
-      if (currentUser && data.user) {
-        setCurrentUser({ ...currentUser, tutorialCompleted: true });
-        // Also update localStorage if it exists
-        const userData = localStorage.getItem('posUser');
-        if (userData) {
-          try {
-            const parsedUser = JSON.parse(userData);
-            parsedUser.tutorialCompleted = true;
-            localStorage.setItem('posUser', JSON.stringify(parsedUser));
-          } catch (error) {
-            console.error('Fout met opdatering van localStorage:', error);
-          }
-        }
-      }
-      
-      setShouldShowTutorial(false);
-      setIsTutorialOpen(false);
-      toast({ 
-        title: "Tutoriaal Voltooi!", 
-        description: "Jy kan hierdie tutoriaal enige tyd herspeel vanaf die Tutoriaal knoppie." 
-      });
-    },
-    onError: (error: Error) => {
-      console.error("Fout met tutoriaal voltooiing:", error);
-      toast({ 
-        title: "Fout", 
-        description: error.message || "Kon nie tutoriaal voltooiing stoor nie. Probeer asseblief weer.", 
-        variant: "destructive" 
-      });
-    },
-  });
-
-  // Check if user should see tutorial on first load
-  useEffect(() => {
-    if (currentUser && !currentUser.tutorialCompleted) {
-      setShouldShowTutorial(true);
-      setIsTutorialOpen(true);
-    }
-  }, [currentUser]);
-
-  const handleTutorialComplete = () => {
-    completeTutorialMutation.mutate();
-  };
 
   // Sale functions
   const addToSale = (product: Product) => {
@@ -1268,16 +1205,16 @@ ${dateFilteredSales.map(sale =>
             
             {/* Right side controls */}
             <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* Tutorial Button */}
+              {/* Help Button */}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsTutorialOpen(true)}
+                onClick={() => window.location.href = '/pos/help/afrikaans'}
                 className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,35%)] hover:bg-blue-50"
-                data-testid="tutorial-button"
+                data-testid="help-button"
               >
-                <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Tutoriaal</span>
+                <HelpCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Hulp</span>
               </Button>
 
               {/* Staff Account Dropdown */}
@@ -3491,15 +3428,6 @@ ${dateFilteredSales.map(sale =>
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Tutorial Guide */}
-        <TutorialGuide
-          isOpen={isTutorialOpen}
-          onClose={() => setIsTutorialOpen(false)}
-          steps={afrikaansTutorialSteps}
-          onComplete={handleTutorialComplete}
-          language="af"
-        />
       </div>
     </div>
   );
