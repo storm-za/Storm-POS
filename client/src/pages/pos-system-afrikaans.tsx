@@ -1533,7 +1533,7 @@ ${dateFilteredSales.map(sale =>
                       {/* Sale Details */}
                       <div className="space-y-3 pt-4 border-t">
                         <div>
-                          <Label htmlFor="customer">Klient (Opsioneel)</Label>
+                          <Label htmlFor="customer" className="text-white">Klient (Opsioneel)</Label>
                           <Select 
                             value={selectedCustomerId?.toString() || "none"} 
                             onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}
@@ -1566,7 +1566,7 @@ ${dateFilteredSales.map(sale =>
                         </div>
 
                         <div>
-                          <Label htmlFor="payment">Betaalmetode</Label>
+                          <Label htmlFor="payment" className="text-white">Betaalmetode</Label>
                           <Select value={paymentType} onValueChange={setPaymentType}>
                             <SelectTrigger>
                               <SelectValue />
@@ -1580,7 +1580,7 @@ ${dateFilteredSales.map(sale =>
                         </div>
 
                         <div>
-                          <Label htmlFor="notes">Notas (Opsioneel)</Label>
+                          <Label htmlFor="notes" className="text-white">Notas (Opsioneel)</Label>
                           <Textarea
                             id="notes"
                             value={saleNotes}
@@ -1592,7 +1592,7 @@ ${dateFilteredSales.map(sale =>
 
                         {/* Discount Section */}
                         <div>
-                          <Label>Afslag</Label>
+                          <Label className="text-white">Afslag</Label>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {[0, 5, 10, 20, 50].map((percentage) => (
                               <Button
@@ -1611,7 +1611,7 @@ ${dateFilteredSales.map(sale =>
 
                         {/* Tip Option Section */}
                         <div>
-                          <Label>Fooiopsie</Label>
+                          <Label className="text-white">Fooiopsie</Label>
                           <div className="flex items-center gap-2 mt-2">
                             <button
                               type="button"
@@ -1628,7 +1628,7 @@ ${dateFilteredSales.map(sale =>
                                 }`}
                               />
                             </button>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-[#ffffff]">
                               {tipOptionEnabled ? 'Fooilyne geaktiveer op kwitansie' : 'Voeg fooiopsie by kwitansie'}
                             </span>
                           </div>
@@ -1636,19 +1636,19 @@ ${dateFilteredSales.map(sale =>
 
                         {/* Total Section */}
                         <div className="pt-4 border-t space-y-2">
-                          <div className="flex justify-between items-center text-lg">
+                          <div className="flex justify-between items-center text-lg text-white">
                             <span>Subtotaal:</span>
                             <span>R{calculateSubtotal().toFixed(2)}</span>
                           </div>
                           {discountPercentage > 0 && (
-                            <div className="flex justify-between items-center text-lg text-green-600">
+                            <div className="flex justify-between items-center text-lg text-green-400">
                               <span>Afslag ({discountPercentage}%):</span>
                               <span>-R{calculateDiscount().toFixed(2)}</span>
                             </div>
                           )}
-                          <div className="flex justify-between items-center text-xl font-bold border-t pt-2">
+                          <div className="flex justify-between items-center text-xl font-bold border-t pt-2 text-white">
                             <span>Totaal:</span>
-                            <span className="text-[hsl(217,90%,40%)]">R{calculateTotal()}</span>
+                            <span className="text-blue-400">R{calculateTotal()}</span>
                           </div>
                         </div>
 
@@ -1675,10 +1675,10 @@ ${dateFilteredSales.map(sale =>
 
           {/* Products Tab */}
           <TabsContent value="produkte">
-            <Card>
+            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Produkvoorraad</CardTitle>
+                  <CardTitle className="text-white">Produkvoorraad</CardTitle>
                   <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
                     <PlusCircle className="h-4 w-4 mr-2" />
                     Voeg Produk By
@@ -1706,21 +1706,21 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     ) : (
                       filteredProducts.map((product) => (
-                        <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                        <div key={product.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-gray-700/30 hover:bg-gray-700/50 transition-all">
                           <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">{product.name}</h3>
-                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
+                            <h3 className="font-medium text-white">{product.name}</h3>
+                            <p className="text-sm text-gray-400">SKU: {product.sku}</p>
                           </div>
                           <div className="text-right mr-4">
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-600">Kosprys: R{product.costPrice}</p>
-                              <p className="font-bold text-gray-900">Kleinhandel: R{product.retailPrice}</p>
+                              <p className="text-sm text-gray-400">Kosprys: R{product.costPrice}</p>
+                              <p className="font-bold text-white">Kleinhandel: R{product.retailPrice}</p>
                               {product.tradePrice && (
-                                <p className="text-sm text-blue-600">Groothandel: R{product.tradePrice}</p>
+                                <p className="text-sm text-blue-400">Groothandel: R{product.tradePrice}</p>
                               )}
                             </div>
                             <p className={`text-sm ${
-                              product.quantity <= 5 ? 'text-red-500' : 'text-gray-500'
+                              product.quantity <= 5 ? 'text-red-400' : 'text-gray-400'
                             }`}>
                               Voorraad: {product.quantity}
                               {product.quantity <= 5 && (
@@ -1758,11 +1758,11 @@ ${dateFilteredSales.map(sale =>
 
           {/* Customers Tab */}
           <TabsContent value="kliente">
-            <Card>
+            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center space-x-2">
-                    <Users className="h-5 w-5" />
+                  <CardTitle className="flex items-center space-x-2 text-white">
+                    <Users className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                     <span>Klientelys</span>
                   </CardTitle>
                   <Button onClick={() => openCustomerDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
@@ -1774,15 +1774,15 @@ ${dateFilteredSales.map(sale =>
               <CardContent>
                 <div className="space-y-4">
                   {customers.map((customer) => (
-                    <div key={customer.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={customer.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-gray-700/30">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{customer.name}</h3>
+                          <h3 className="font-semibold text-white">{customer.name}</h3>
                           <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs">
                             {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
                           </Badge>
                         </div>
-                        {customer.phone && <p className="text-sm text-gray-500">Telefoon: {customer.phone}</p>}
+                        {customer.phone && <p className="text-sm text-gray-400">Telefoon: {customer.phone}</p>}
                         {customer.notes && <p className="text-sm text-gray-400 italic">{customer.notes}</p>}
                       </div>
                       <div className="flex items-center space-x-2">
@@ -1810,25 +1810,25 @@ ${dateFilteredSales.map(sale =>
 
           {/* Open Accounts Tab */}
           <TabsContent value="oop-rekeninge">
-            <Card>
+            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2 text-white">
+                  <FileText className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                   <span>Oop Rekeninge</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {openAccounts.map((account) => (
-                    <div key={account.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={account.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-gray-700/30">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{account.accountName}</h3>
+                          <h3 className="font-semibold text-white">{account.accountName}</h3>
                           <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="text-xs">
                             {account.accountType === 'table' ? 'Tafel' : 'Klient'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-400">
                           Totaal: R{account.total} • Items: {Array.isArray(account.items) ? account.items.length : 0}
                         </p>
                         {account.notes && <p className="text-sm text-gray-400 italic">{account.notes}</p>}
@@ -1846,7 +1846,7 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   ))}
                   {openAccounts.length === 0 && (
-                    <p className="text-center text-gray-500 py-8">Geen oop rekeninge nie</p>
+                    <p className="text-center text-gray-400 py-8">Geen oop rekeninge nie</p>
                   )}
                 </div>
               </CardContent>
@@ -1857,10 +1857,10 @@ ${dateFilteredSales.map(sale =>
           <TabsContent value="verslae">
             <div className="space-y-6">
               {/* Date Filter */}
-              <Card>
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <Calendar className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Verkope Analise
                   </CardTitle>
                 </CardHeader>
@@ -1975,43 +1975,43 @@ ${dateFilteredSales.map(sale =>
                   <>
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium text-gray-600">Totale Omset</span>
+                            <DollarSign className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                            <span className="text-sm font-medium text-gray-300">Totale Omset</span>
                           </div>
-                          <div className="text-2xl font-bold text-green-600">R{totalRevenue.toFixed(2)}</div>
+                          <div className="text-2xl font-bold text-blue-400">R{totalRevenue.toFixed(2)}</div>
                         </CardContent>
                       </Card>
                       
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-emerald-600" />
-                            <span className="text-sm font-medium text-gray-600">Totale Wins</span>
+                            <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                            <span className="text-sm font-medium text-gray-300">Totale Wins</span>
                           </div>
-                          <div className="text-2xl font-bold text-emerald-600">R{totalProfit.toFixed(2)}</div>
+                          <div className="text-2xl font-bold text-blue-400">R{totalProfit.toFixed(2)}</div>
                         </CardContent>
                       </Card>
                       
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
-                            <Receipt className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-600">Transaksies</span>
+                            <Receipt className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                            <span className="text-sm font-medium text-gray-300">Transaksies</span>
                           </div>
-                          <div className="text-2xl font-bold text-blue-600">{totalTransactions}</div>
+                          <div className="text-2xl font-bold text-blue-400">{totalTransactions}</div>
                         </CardContent>
                       </Card>
                       
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm font-medium text-gray-600">Gem. Transaksie</span>
+                            <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                            <span className="text-sm font-medium text-gray-300">Gem. Transaksie</span>
                           </div>
-                          <div className="text-2xl font-bold text-purple-600">R{avgTransactionValue.toFixed(2)}</div>
+                          <div className="text-2xl font-bold text-blue-400">R{avgTransactionValue.toFixed(2)}</div>
                         </CardContent>
                       </Card>
                     </div>
@@ -2019,9 +2019,9 @@ ${dateFilteredSales.map(sale =>
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Payment Methods Pie Chart */}
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardHeader>
-                          <CardTitle>Betaalmetodes Verdeling</CardTitle>
+                          <CardTitle className="text-white">Betaalmetodes Verdeling</CardTitle>
                         </CardHeader>
                         <CardContent>
                           {paymentChartData.length > 0 ? (
@@ -2045,7 +2045,7 @@ ${dateFilteredSales.map(sale =>
                               </PieChart>
                             </ResponsiveContainer>
                           ) : (
-                            <div className="h-[300px] flex items-center justify-center text-gray-500">
+                            <div className="h-[300px] flex items-center justify-center text-gray-400">
                               Geen verkope data vir geselekteerde datum nie
                             </div>
                           )}
@@ -2053,9 +2053,9 @@ ${dateFilteredSales.map(sale =>
                       </Card>
 
                       {/* 7-Day Trend Line Chart */}
-                      <Card>
+                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                         <CardHeader>
-                          <CardTitle>7-Dag Verkope Tendens</CardTitle>
+                          <CardTitle className="text-white">7-Dag Verkope Tendens</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <ResponsiveContainer width="100%" height={300}>
@@ -2077,14 +2077,14 @@ ${dateFilteredSales.map(sale =>
                     </div>
 
                     {/* Detailed Sales List */}
-                    <Card>
+                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader>
-                        <CardTitle>Gedetailleerde Verkope Lys</CardTitle>
+                        <CardTitle className="text-white">Gedetailleerde Verkope Lys</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
                           {dateFilteredSales.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-gray-400">
                               Geen verkope vir geselekteerde datum en filter nie
                             </div>
                           ) : (
@@ -2292,51 +2292,51 @@ ${dateFilteredSales.map(sale =>
                   </div>
                   {/* Key Metrics */}
                   <div className="grid md:grid-cols-3 gap-6">
-                    <Card className="border-l-4 border-l-green-500">
+                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4" />
+                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
                           Huidige Maand Omset
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold text-green-600">R{currentMonthRevenue.toFixed(2)}</div>
-                        <div className="text-sm text-gray-500 mt-1">
+                        <div className="text-2xl font-bold text-blue-400">R{currentMonthRevenue.toFixed(2)}</div>
+                        <div className="text-sm text-gray-400 mt-1">
                           {currentMonthSales.length} transaksies
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="border-l-4 border-l-blue-500">
+                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <CreditCard className="w-4 h-4" />
+                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-[hsl(217,90%,40%)]" />
                           Storm Diensfooi
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
-                        <div className="text-sm text-gray-500 mt-1">
+                        <div className="text-2xl font-bold text-blue-400">R{stormFee.toFixed(2)}</div>
+                        <div className="text-sm text-gray-400 mt-1">
                           0.5% van maandelikse omset
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="border-l-4 border-l-orange-500">
+                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
+                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-[hsl(217,90%,40%)]" />
                           Faktuurperiode
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">{Math.round(progressPercentage)}%</div>
-                        <div className="text-sm text-gray-500 mt-1">
+                        <div className="text-2xl font-bold text-blue-400">{Math.round(progressPercentage)}%</div>
+                        <div className="text-sm text-gray-400 mt-1">
                           Dag {daysCompleted} van {daysInMonth}
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
                           <div 
-                            className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
                             style={{ width: `${progressPercentage}%` }}
                           ></div>
                         </div>
@@ -2346,10 +2346,10 @@ ${dateFilteredSales.map(sale =>
                   {/* Billing Breakdown */}
                   <div className="grid lg:grid-cols-2 gap-6">
                     {/* Fee Calculation */}
-                    <Card>
+                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <DollarSign className="w-5 h-5" />
+                        <CardTitle className="flex items-center gap-2 text-white">
+                          <DollarSign className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                           Fooi Uiteensetting
                         </CardTitle>
                       </CardHeader>
@@ -2387,10 +2387,10 @@ ${dateFilteredSales.map(sale =>
                     </Card>
 
                     {/* Revenue Trend */}
-                    <Card>
+                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <BarChart3 className="w-5 h-5" />
+                        <CardTitle className="flex items-center gap-2 text-white">
+                          <BarChart3 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                           Onlangse Prestasie
                         </CardTitle>
                       </CardHeader>
@@ -2399,21 +2399,21 @@ ${dateFilteredSales.map(sale =>
                           <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                <div className="text-gray-600">Gem. Daaglikse Omset</div>
-                                <div className="font-semibold">
+                                <div className="text-gray-400">Gem. Daaglikse Omset</div>
+                                <div className="font-semibold text-white">
                                   R{(currentMonthRevenue / Math.max(daysCompleted, 1)).toFixed(2)}
                                 </div>
                               </div>
                               <div>
-                                <div className="text-gray-600">Beste Dag</div>
-                                <div className="font-semibold">
+                                <div className="text-gray-400">Beste Dag</div>
+                                <div className="font-semibold text-white">
                                   R{Math.max(...Object.values(dailyBreakdown)).toFixed(2)}
                                 </div>
                               </div>
                             </div>
                             
                             <div className="space-y-2">
-                              <div className="text-sm font-medium text-gray-700">Daaglikse Omset Tendens</div>
+                              <div className="text-sm font-medium text-gray-300">Daaglikse Omset Tendens</div>
                               <div className="space-y-1">
                                 {Object.entries(dailyBreakdown)
                                   .sort(([a], [b]) => b.localeCompare(a))
@@ -2422,16 +2422,16 @@ ${dateFilteredSales.map(sale =>
                                     const percentage = (revenue / Math.max(...Object.values(dailyBreakdown))) * 100;
                                     return (
                                       <div key={date} className="flex items-center gap-3">
-                                        <div className="w-16 text-xs text-gray-500">
+                                        <div className="w-16 text-xs text-gray-400">
                                           {new Date(date).toLocaleDateString('af-ZA', { day: 'numeric', month: 'short' })}
                                         </div>
-                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="flex-1 bg-gray-700 rounded-full h-2">
                                           <div 
-                                            className="bg-[hsl(217,90%,40%)] h-2 rounded-full transition-all duration-300"
+                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                             style={{ width: `${percentage}%` }}
                                           ></div>
                                         </div>
-                                        <div className="w-20 text-xs text-right font-medium">
+                                        <div className="w-20 text-xs text-right font-medium text-white">
                                           R{revenue.toFixed(2)}
                                         </div>
                                       </div>
@@ -2441,7 +2441,7 @@ ${dateFilteredSales.map(sale =>
                             </div>
                           </div>
                         ) : (
-                          <div className="text-center py-8 text-gray-500">
+                          <div className="text-center py-8 text-gray-400">
                             <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                             <p>Nog geen verkoopdata vir hierdie maand nie.</p>
                             <p className="text-sm">Begin verkoop om jou omset tendense te sien!</p>
@@ -2451,7 +2451,7 @@ ${dateFilteredSales.map(sale =>
                     </Card>
                   </div>
                   {/* Payment Information */}
-                  <Card>
+                  <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Receipt className="w-5 h-5" />
