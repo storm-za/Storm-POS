@@ -1875,7 +1875,7 @@ ${dateFilteredSales.map(sale =>
                         onChange={(e) => setSelectedDate(e.target.value)}
                         className="w-auto"
                       />
-                      <Label htmlFor="staff-filter" className="text-white">Filter volgens Personeel:</Label>
+                      <Label htmlFor="staff-filter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#ffffff]">Filter volgens Personeel:</Label>
                       <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
                         <SelectTrigger className="w-48">
                           <SelectValue placeholder="Alle Personeel" />

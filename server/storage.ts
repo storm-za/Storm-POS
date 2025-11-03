@@ -58,6 +58,7 @@ export interface IStorage {
   createPosUser(user: InsertPosUser): Promise<PosUser>;
   updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined>;
   updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined>;
+  updatePosUserReceiptSettings(id: number, settings: any): Promise<PosUser | undefined>;
   
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
@@ -279,6 +280,15 @@ export class MemStorage implements IStorage {
     if (!user) return undefined;
     
     const updatedUser: PosUser = { ...user, tutorialCompleted: completed };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updatePosUserReceiptSettings(id: number, settings: any): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, receiptSettings: settings };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
   }
@@ -537,6 +547,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(posUsers)
       .set({ tutorialCompleted: completed })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updatePosUserReceiptSettings(id: number, settings: any): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ receiptSettings: settings })
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;

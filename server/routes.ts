@@ -272,6 +272,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user receipt settings
+  app.put("/api/pos/user/:id/receipt-settings", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { settings } = req.body;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      if (!settings) {
+        return res.status(400).json({ message: "Receipt settings are required" });
+      }
+      
+      const updatedUser = await storage.updatePosUserReceiptSettings(userId, settings);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating receipt settings:", error);
+      res.status(500).json({ message: "Failed to update receipt settings" });
+    }
+  });
+
   // POS Products
   app.get("/api/pos/products", async (req, res) => {
     try {
