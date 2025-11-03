@@ -2951,6 +2951,8 @@ ${dateFilteredSales.map(sale =>
           labels={{
             title: "Personaliseer Jou Kwitansie",
             description: "Personaliseer jou kwitansie met jou besigheidsinligting en pas die uitleg aan.",
+            
+            // Section labels
             sections: {
               logo: "Logo",
               businessInfo: "Besigheidsinligting",
@@ -2962,8 +2964,62 @@ ${dateFilteredSales.map(sale =>
               paymentInfo: "Betalingsinligting",
               messages: "Pasgemaakte Boodskappe",
             },
+            
+            // Card titles
+            sectionOrderTitle: "Kwitansie Afdeling Volgorde",
+            logoTitle: "Kwitansie Logo",
+            businessInfoTitle: "Besigheidsinligting",
+            displayOptionsTitle: "Vertoon Opsies",
+            customMessagesTitle: "Pasgemaakte Boodskappe",
+            
+            // Logo section
+            currentLogo: "Huidige Logo:",
+            uploadLogoLabel: "Laai Pasgemaakte Logo Op (Opsioneel)",
+            logoHelp: "Laai 'n pasgemaakte logo op vir kwitansies. Aanbeveel: Vierkant beelde werk beste (PNG, JPG, maks 2MB)",
+            newLogoPreview: "Nuwe Logo Voorskou:",
+            removeButton: "Verwyder",
+            
+            // Business info fields
+            businessName: "Besigheidsnaam",
+            phoneNumber: "Telefoonnommer",
+            addressLine1: "Adreslyn 1",
+            addressLine2: "Adreslyn 2",
+            email: "E-pos",
+            website: "Webwerf",
+            registrationNumber: "Registrasienommer",
+            vatNumber: "BTW Nommer",
+            
+            // Placeholders
+            businessNamePlaceholder: "Jou Besigheidsnaam",
+            phonePlaceholder: "+27 123 456 7890",
+            addressLine1Placeholder: "123 Hoofstraat",
+            addressLine2Placeholder: "Stad, Poskode",
+            emailPlaceholder: "info@besigheid.com",
+            websitePlaceholder: "www.besigheid.com",
+            regNumberPlaceholder: "REG123456",
+            vatNumberPlaceholder: "BTW123456",
+            
+            // Display options
+            showLogo: "Wys Logo",
+            showDateTime: "Wys Datum & Tyd",
+            showStaffInfo: "Wys Personeellid Inligting",
+            showCustomerInfo: "Wys Kliënt Inligting",
+            showPaymentMethod: "Wys Betaalmetode",
+            
+            // Custom messages
+            headerMessage: "Kopskrif Boodskap",
+            headerPlaceholder: "Welkom! Spesiale aanbiedinge vandag...",
+            thankYouMessage: "Dankie Boodskap",
+            thankYouPlaceholder: "Dankie vir jou besigheid!",
+            footerMessage: "Voetskrif Boodskap",
+            footerPlaceholder: "Besoek ons weer! Terugsendings aanvaar binne 30 dae...",
+            
+            // Buttons and messages
             save: "Stoor Instellings",
             cancel: "Kanselleer",
+            saving: "Stoor...",
+            saveSuccess: "Kwitansie instellings suksesvol gestoor!",
+            saveError: "Kon nie kwitansie instellings stoor nie",
           }}
         />
 

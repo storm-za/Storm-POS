@@ -219,7 +219,7 @@ export function ReceiptCustomizerDialog({
           {/* Section Ordering */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm">Receipt Section Order</CardTitle>
+              <CardTitle className="text-white text-sm">{labels.sectionOrderTitle || "Receipt Section Order"}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -260,12 +260,12 @@ export function ReceiptCustomizerDialog({
           {/* Logo Upload */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm">Receipt Logo</CardTitle>
+              <CardTitle className="text-white text-sm">{labels.logoTitle || "Receipt Logo"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {currentUser?.companyLogo && (
                 <div className="text-center">
-                  <p className="text-sm text-gray-300 mb-2">Current Logo:</p>
+                  <p className="text-sm text-gray-300 mb-2">{labels.currentLogo || "Current Logo:"}</p>
                   <img 
                     src={currentUser.companyLogo} 
                     alt="Current Logo" 
@@ -275,7 +275,7 @@ export function ReceiptCustomizerDialog({
               )}
               
               <div>
-                <Label htmlFor="receiptLogoUpload" className="text-white">Upload Custom Logo (Optional)</Label>
+                <Label htmlFor="receiptLogoUpload" className="text-white">{labels.uploadLogoLabel || "Upload Custom Logo (Optional)"}</Label>
                 <Input
                   id="receiptLogoUpload"
                   type="file"
@@ -284,13 +284,13 @@ export function ReceiptCustomizerDialog({
                   className="mt-2 bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded"
                 />
                 <p className="text-xs text-gray-400 mt-2">
-                  Upload a custom logo for receipts. Recommended: Square images work best (PNG, JPG, max 2MB)
+                  {labels.logoHelp || "Upload a custom logo for receipts. Recommended: Square images work best (PNG, JPG, max 2MB)"}
                 </p>
               </div>
               
               {logoPreview && (
                 <div className="text-center">
-                  <p className="text-sm text-gray-300 mb-2">New Logo Preview:</p>
+                  <p className="text-sm text-gray-300 mb-2">{labels.newLogoPreview || "New Logo Preview:"}</p>
                   <img 
                     src={logoPreview} 
                     alt="New Logo Preview" 
@@ -302,7 +302,7 @@ export function ReceiptCustomizerDialog({
                     onClick={() => setLogoPreview(null)}
                     className="mt-2 text-gray-300 border-gray-600 hover:bg-gray-700"
                   >
-                    Remove
+                    {labels.removeButton || "Remove"}
                   </Button>
                 </div>
               )}
@@ -312,13 +312,13 @@ export function ReceiptCustomizerDialog({
           {/* Business Information */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm">Business Information</CardTitle>
+              <CardTitle className="text-white text-sm">{labels.businessInfoTitle || "Business Information"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Business Name</Label>
+                    <Label className="text-white">{labels.businessName || "Business Name"}</Label>
                     <Switch
                       checked={settings.toggles.showBusinessName}
                       onCheckedChange={(v) => updateToggle('showBusinessName', v)}
@@ -327,13 +327,13 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.name || ''}
                     onChange={(e) => updateBusinessInfo('name', e.target.value)}
-                    placeholder={currentUser?.companyName || "Your Business Name"}
+                    placeholder={currentUser?.companyName || labels.businessNamePlaceholder || "Your Business Name"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Phone Number</Label>
+                    <Label className="text-white">{labels.phoneNumber || "Phone Number"}</Label>
                     <Switch
                       checked={settings.toggles.showBusinessPhone}
                       onCheckedChange={(v) => updateToggle('showBusinessPhone', v)}
@@ -342,7 +342,7 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.phone || ''}
                     onChange={(e) => updateBusinessInfo('phone', e.target.value)}
-                    placeholder="+27 123 456 7890"
+                    placeholder={labels.phonePlaceholder || "+27 123 456 7890"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -350,7 +350,7 @@ export function ReceiptCustomizerDialog({
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-white">Address Line 1</Label>
+                  <Label className="text-white">{labels.addressLine1 || "Address Line 1"}</Label>
                   <Switch
                     checked={settings.toggles.showBusinessAddress}
                     onCheckedChange={(v) => updateToggle('showBusinessAddress', v)}
@@ -359,17 +359,17 @@ export function ReceiptCustomizerDialog({
                 <Input
                   value={settings.businessInfo.addressLine1 || ''}
                   onChange={(e) => updateBusinessInfo('addressLine1', e.target.value)}
-                  placeholder="123 Main Street"
+                  placeholder={labels.addressLine1Placeholder || "123 Main Street"}
                   className="bg-gray-700 border-gray-600 text-white"
                 />
               </div>
 
               <div>
-                <Label className="text-white">Address Line 2</Label>
+                <Label className="text-white">{labels.addressLine2 || "Address Line 2"}</Label>
                 <Input
                   value={settings.businessInfo.addressLine2 || ''}
                   onChange={(e) => updateBusinessInfo('addressLine2', e.target.value)}
-                  placeholder="City, Postal Code"
+                  placeholder={labels.addressLine2Placeholder || "City, Postal Code"}
                   className="bg-gray-700 border-gray-600 text-white"
                 />
               </div>
@@ -377,7 +377,7 @@ export function ReceiptCustomizerDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Email</Label>
+                    <Label className="text-white">{labels.email || "Email"}</Label>
                     <Switch
                       checked={settings.toggles.showBusinessEmail}
                       onCheckedChange={(v) => updateToggle('showBusinessEmail', v)}
@@ -386,14 +386,14 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.email || ''}
                     onChange={(e) => updateBusinessInfo('email', e.target.value)}
-                    placeholder="info@business.com"
+                    placeholder={labels.emailPlaceholder || "info@business.com"}
                     type="email"
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Website</Label>
+                    <Label className="text-white">{labels.website || "Website"}</Label>
                     <Switch
                       checked={settings.toggles.showBusinessWebsite}
                       onCheckedChange={(v) => updateToggle('showBusinessWebsite', v)}
@@ -402,7 +402,7 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.website || ''}
                     onChange={(e) => updateBusinessInfo('website', e.target.value)}
-                    placeholder="www.business.com"
+                    placeholder={labels.websitePlaceholder || "www.business.com"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -411,7 +411,7 @@ export function ReceiptCustomizerDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">Registration Number</Label>
+                    <Label className="text-white">{labels.registrationNumber || "Registration Number"}</Label>
                     <Switch
                       checked={settings.toggles.showRegistrationNumber}
                       onCheckedChange={(v) => updateToggle('showRegistrationNumber', v)}
@@ -420,13 +420,13 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.registrationNumber || ''}
                     onChange={(e) => updateBusinessInfo('registrationNumber', e.target.value)}
-                    placeholder="REG123456"
+                    placeholder={labels.regNumberPlaceholder || "REG123456"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-white">VAT Number</Label>
+                    <Label className="text-white">{labels.vatNumber || "VAT Number"}</Label>
                     <Switch
                       checked={settings.toggles.showVATNumber}
                       onCheckedChange={(v) => updateToggle('showVATNumber', v)}
@@ -435,7 +435,7 @@ export function ReceiptCustomizerDialog({
                   <Input
                     value={settings.businessInfo.vatNumber || ''}
                     onChange={(e) => updateBusinessInfo('vatNumber', e.target.value)}
-                    placeholder="VAT123456"
+                    placeholder={labels.vatNumberPlaceholder || "VAT123456"}
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -446,39 +446,39 @@ export function ReceiptCustomizerDialog({
           {/* Display Options */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm">Display Options</CardTitle>
+              <CardTitle className="text-white text-sm">{labels.displayOptionsTitle || "Display Options"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-white">Show Logo</Label>
+                <Label className="text-white">{labels.showLogo || "Show Logo"}</Label>
                 <Switch
                   checked={settings.toggles.showLogo}
                   onCheckedChange={(v) => updateToggle('showLogo', v)}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label className="text-white">Show Date & Time</Label>
+                <Label className="text-white">{labels.showDateTime || "Show Date & Time"}</Label>
                 <Switch
                   checked={settings.toggles.showDateTime}
                   onCheckedChange={(v) => updateToggle('showDateTime', v)}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label className="text-white">Show Staff Information</Label>
+                <Label className="text-white">{labels.showStaffInfo || "Show Staff Information"}</Label>
                 <Switch
                   checked={settings.toggles.showStaffInfo}
                   onCheckedChange={(v) => updateToggle('showStaffInfo', v)}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label className="text-white">Show Customer Information</Label>
+                <Label className="text-white">{labels.showCustomerInfo || "Show Customer Information"}</Label>
                 <Switch
                   checked={settings.toggles.showCustomerInfo}
                   onCheckedChange={(v) => updateToggle('showCustomerInfo', v)}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label className="text-white">Show Payment Method</Label>
+                <Label className="text-white">{labels.showPaymentMethod || "Show Payment Method"}</Label>
                 <Switch
                   checked={settings.toggles.showPaymentMethod}
                   onCheckedChange={(v) => updateToggle('showPaymentMethod', v)}
@@ -490,12 +490,12 @@ export function ReceiptCustomizerDialog({
           {/* Custom Messages */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white text-sm">Custom Messages</CardTitle>
+              <CardTitle className="text-white text-sm">{labels.customMessagesTitle || "Custom Messages"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-white">Header Message</Label>
+                  <Label className="text-white">{labels.headerMessage || "Header Message"}</Label>
                   <Switch
                     checked={settings.toggles.showCustomHeader}
                     onCheckedChange={(v) => updateToggle('showCustomHeader', v)}
@@ -504,14 +504,14 @@ export function ReceiptCustomizerDialog({
                 <Textarea
                   value={settings.customMessages.header || ''}
                   onChange={(e) => updateCustomMessage('header', e.target.value)}
-                  placeholder="Welcome! Special offers today..."
+                  placeholder={labels.headerPlaceholder || "Welcome! Special offers today..."}
                   className="bg-gray-700 border-gray-600 text-white"
                   rows={2}
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-white">Thank You Message</Label>
+                  <Label className="text-white">{labels.thankYouMessage || "Thank You Message"}</Label>
                   <Switch
                     checked={settings.toggles.showThankYouMessage}
                     onCheckedChange={(v) => updateToggle('showThankYouMessage', v)}
@@ -520,13 +520,13 @@ export function ReceiptCustomizerDialog({
                 <Input
                   value={settings.customMessages.thankYou || 'Thank you for your business!'}
                   onChange={(e) => updateCustomMessage('thankYou', e.target.value)}
-                  placeholder="Thank you for your business!"
+                  placeholder={labels.thankYouPlaceholder || "Thank you for your business!"}
                   className="bg-gray-700 border-gray-600 text-white"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-white">Footer Message</Label>
+                  <Label className="text-white">{labels.footerMessage || "Footer Message"}</Label>
                   <Switch
                     checked={settings.toggles.showCustomFooter}
                     onCheckedChange={(v) => updateToggle('showCustomFooter', v)}
@@ -535,7 +535,7 @@ export function ReceiptCustomizerDialog({
                 <Textarea
                   value={settings.customMessages.footer || ''}
                   onChange={(e) => updateCustomMessage('footer', e.target.value)}
-                  placeholder="Visit us again! Returns accepted within 30 days..."
+                  placeholder={labels.footerPlaceholder || "Visit us again! Returns accepted within 30 days..."}
                   className="bg-gray-700 border-gray-600 text-white"
                   rows={2}
                 />
@@ -545,7 +545,11 @@ export function ReceiptCustomizerDialog({
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
-          <Button variant="outline" onClick={onClose} className="border-gray-600 text-white hover:bg-gray-800">
+          <Button 
+            variant="outline" 
+            onClick={onClose} 
+            className="border-[hsl(217,90%,40%)] text-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,40%)] hover:text-white"
+          >
             {labels.cancel || "Cancel"}
           </Button>
           <Button
@@ -553,7 +557,7 @@ export function ReceiptCustomizerDialog({
             disabled={isSaving}
             className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"
           >
-            {isSaving ? "Saving..." : (labels.save || "Save Settings")}
+            {isSaving ? (labels.saving || "Saving...") : (labels.save || "Save Settings")}
           </Button>
         </div>
       </DialogContent>
