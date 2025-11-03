@@ -27,6 +27,7 @@ import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_17621973881
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TutorialGuide } from "@/components/TutorialGuide";
 import { afrikaansTutorialSteps } from "@/data/tutorialSteps";
+import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 
@@ -108,6 +109,7 @@ export default function PosSystemAfrikaans() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
+  const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
@@ -1242,6 +1244,10 @@ ${dateFilteredSales.map(sale =>
                   <DropdownMenuItem onClick={() => setIsLogoDialogOpen(true)}>
                     <User className="mr-2 h-4 w-4" />
                     Verander Profielfoto
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsReceiptCustomizerOpen(true)}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Personaliseer Jou Kwitansie
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => window.location.href = '/pos/system'}>
@@ -2787,6 +2793,32 @@ ${dateFilteredSales.map(sale =>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Receipt Customizer Dialog */}
+        <ReceiptCustomizerDialog 
+          isOpen={isReceiptCustomizerOpen}
+          onClose={() => setIsReceiptCustomizerOpen(false)}
+          currentUser={currentUser}
+          setCurrentUser={setCurrentUser}
+          toast={toast}
+          labels={{
+            title: "Personaliseer Jou Kwitansie",
+            description: "Personaliseer jou kwitansie met jou besigheidsinligting en pas die uitleg aan.",
+            sections: {
+              logo: "Logo",
+              businessInfo: "Besigheidsinligting",
+              dateTime: "Datum & Tyd",
+              staffInfo: "Personeellid Inligting",
+              customerInfo: "Kliënt Inligting",
+              items: "Items Lys",
+              totals: "Totale",
+              paymentInfo: "Betalingsinligting",
+              messages: "Pasgemaakte Boodskappe",
+            },
+            save: "Stoor Instellings",
+            cancel: "Kanselleer",
+          }}
+        />
 
         {/* Void Sale Dialog */}
         <Dialog open={voidSaleDialog.open} onOpenChange={(open) => {
