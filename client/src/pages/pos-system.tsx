@@ -1175,8 +1175,12 @@ export default function PosSystem() {
         const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
         if (logoToUse) {
           try {
-            doc.addImage(logoToUse, 'JPEG', 20, yPosition, 30, 30);
-            yPosition += 35;
+            // Logo is 2x bigger (60x60) and centered on the page
+            const logoWidth = 60;
+            const pageWidth = 210; // A4 width in mm
+            const xPosition = (pageWidth - logoWidth) / 2;
+            doc.addImage(logoToUse, 'JPEG', xPosition, yPosition, 60, 60);
+            yPosition += 65;
           } catch (error) {
             console.error('Error adding logo to PDF:', error);
           }
