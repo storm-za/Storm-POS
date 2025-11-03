@@ -1867,7 +1867,7 @@ ${dateFilteredSales.map(sale =>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <Label htmlFor="date-filter">Kies Datum:</Label>
+                      <Label htmlFor="date-filter" className="text-white">Kies Datum:</Label>
                       <Input
                         id="date-filter"
                         type="date"
@@ -1875,7 +1875,7 @@ ${dateFilteredSales.map(sale =>
                         onChange={(e) => setSelectedDate(e.target.value)}
                         className="w-auto"
                       />
-                      <Label htmlFor="staff-filter">Filter volgens Personeel:</Label>
+                      <Label htmlFor="staff-filter" className="text-white">Filter volgens Personeel:</Label>
                       <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
                         <SelectTrigger className="w-48">
                           <SelectValue placeholder="Alle Personeel" />
@@ -2453,7 +2453,7 @@ ${dateFilteredSales.map(sale =>
                   {/* Payment Information */}
                   <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-white">
                         <Receipt className="w-5 h-5" />
                         Betaalinligting
                       </CardTitle>
