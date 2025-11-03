@@ -23,7 +23,7 @@ import {
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, Globe, BookOpen, HelpCircle
 } from "lucide-react";
-import stormLogo from "@assets/STORM (1)_1757446684640.png";
+import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TutorialGuide } from "@/components/TutorialGuide";
 import { afrikaansTutorialSteps } from "@/data/tutorialSteps";
@@ -1056,17 +1056,63 @@ ${dateFilteredSales.map(sale =>
   const stormFee = monthlyRevenue * 0.005;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Grid Pattern */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(90deg, hsl(217,90%,40%) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px'
+          }}
+        />
+        
+        {/* Floating Particles */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+        
+        {/* Scanning Lines */}
+        <motion.div
+          className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
+          animate={{
+            top: ['0%', '100%'],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-blue-900/10 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
-            <div className="flex-shrink-0 company-banner">
+            <div className="flex-shrink-0">
               <img 
                 src={stormLogo} 
                 alt="Storm POS" 
-                className="h-40 sm:h-60 w-auto mix-blend-multiply"
+                className="h-16 sm:h-40 md:h-48 w-auto mix-blend-multiply"
                 style={{ filter: 'drop-shadow(0 0 0 transparent)' }}
               />
             </div>
@@ -1213,11 +1259,28 @@ ${dateFilteredSales.map(sale =>
           </div>
         </div>
       </header>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Company Banner */}
-        <div className="mb-6">
-          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-lg px-6 py-4 shadow-lg">
-            <div className="flex items-center justify-center">
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl px-6 py-4 shadow-2xl shadow-blue-900/50 border border-blue-400/20 backdrop-blur-sm relative overflow-hidden">
+            {/* Shine effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              animate={{
+                x: ['-100%', '200%'],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatDelay: 2,
+              }}
+            />
+            <div className="flex items-center justify-center relative z-10">
               <div className="text-center">
                 <h2 className="text-white text-lg font-semibold">
                   {currentUser?.companyName || "Demo Rekening"}
@@ -1225,81 +1288,75 @@ ${dateFilteredSales.map(sale =>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
-            {/* Mobile Tab Navigation */}
-            <div className="block md:hidden tabs-navigation">
-              <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-x-auto scrollbar-hide">
+            {/* Mobile Tab Navigation - Horizontal Scroll */}
+            <div className="block md:hidden">
+              <div className="flex space-x-1 p-1 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl overflow-x-auto scrollbar-hide shadow-lg shadow-blue-900/30">
                 <button
                   onClick={() => handleTabChange("verkope")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "verkope"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-sales"
                 >
                   <ShoppingCart className="h-4 w-4 mb-1" />
                   <span>Verkope</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("produkte")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "produkte"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-products"
                 >
                   <Package className="h-4 w-4 mb-1" />
                   <span>Produkte</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("kliente")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "kliente"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-customers"
                 >
                   <Users className="h-4 w-4 mb-1" />
                   <span>Kliente</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("oop-rekeninge")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "oop-rekeninge"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-open-accounts"
                 >
                   <FileText className="h-4 w-4 mb-1" />
                   <span>Rekeninge</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("verslae")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "verslae"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-reports"
                 >
                   <BarChart3 className="h-4 w-4 mb-1" />
                   <span>Verslae</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("gebruik")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "gebruik"
-                      ? "bg-white dark:bg-gray-700 text-[hsl(217,90%,40%)] shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
-                  data-testid="tab-usage"
                 >
                   <CreditCard className="h-4 w-4 mb-1" />
                   <span>Gebruik</span>
@@ -1308,10 +1365,10 @@ ${dateFilteredSales.map(sale =>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 tabs-navigation">
+            <TabsList className="hidden md:grid w-full grid-cols-6 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="verkope" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-sales"
               >
                 <ShoppingCart className="h-4 w-4" />
@@ -1319,7 +1376,7 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="produkte" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-products"
               >
                 <Package className="h-4 w-4" />
@@ -1327,7 +1384,7 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="kliente" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-customers"
               >
                 <Users className="h-4 w-4" />
@@ -1335,7 +1392,7 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="oop-rekeninge" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-open-accounts"
               >
                 <FileText className="h-4 w-4" />
@@ -1343,7 +1400,7 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="verslae" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-reports"
               >
                 <BarChart3 className="h-4 w-4" />
@@ -1351,7 +1408,7 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="gebruik" 
-                className="flex items-center space-x-2 h-10 rounded-md data-[state=active]:bg-white data-[state=active]:text-[hsl(217,90%,40%)] data-[state=active]:shadow-sm transition-all"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-usage"
               >
                 <CreditCard className="h-4 w-4" />
@@ -1362,13 +1419,22 @@ ${dateFilteredSales.map(sale =>
 
           {/* Sales Tab */}
           <TabsContent value="verkope">
-            <div className="grid lg:grid-cols-2 gap-8">
+            <motion.div 
+              className="grid lg:grid-cols-2 gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               {/* Product Selection */}
-              <div>
-                <Card data-testid="product-selection-card">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Package className="h-5 w-5" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                       <span>Produkte</span>
                     </CardTitle>
                     <div className="relative">
@@ -1386,20 +1452,20 @@ ${dateFilteredSales.map(sale =>
                       {filteredSalesProducts.map((product) => (
                         <div
                           key={product.id}
-                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                          className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
                           onClick={() => addToSale(product)}
                         >
                           <div>
-                            <p className="font-medium">{product.name}</p>
-                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-                            <p className="text-sm text-gray-500">Voorraad: {product.quantity}</p>
+                            <p className="font-medium text-white">{product.name}</p>
+                            <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                            <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-[hsl(217,90%,40%)]">
+                            <p className="font-bold text-blue-400">
                               R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
                             </p>
                             {product.tradePrice && (
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-400">
                                 {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
                                   ? `Kleinhandel: R${product.retailPrice}` 
                                   : `Groothandel: R${product.tradePrice}`}
@@ -1411,14 +1477,18 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* Current Sale */}
-              <div>
-                <Card data-testid="current-sale-card">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Card data-testid="current-sale-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <ShoppingCart className="h-5 w-5" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <ShoppingCart className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                       <span>Huidige Verkoop</span>
                     </CardTitle>
                   </CardHeader>
@@ -1599,8 +1669,8 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </TabsContent>
 
           {/* Products Tab */}
