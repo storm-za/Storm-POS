@@ -12,8 +12,8 @@ import PosSignup from "@/pages/pos-signup";
 import PosSystem from "@/pages/pos-system";
 import PosSystemAfrikaans from "@/pages/pos-system-afrikaans";
 import PosInactive from "@/pages/pos-inactive";
-import HelpCenter from "@/pages/HelpCenter";
-import HelpCenterAfrikaans from "@/pages/HelpCenterAfrikaans";
+import { HelpCenter } from "@/pages/HelpCenter";
+import { HelpCenterAfrikaans } from "@/pages/HelpCenterAfrikaans";
 import Navigation from "@/components/navigation";
 import { useEffect } from "react";
 
