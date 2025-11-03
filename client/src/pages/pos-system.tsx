@@ -2250,7 +2250,7 @@ export default function PosSystem() {
                             </div>
                           )}
                           <div className="flex justify-between items-center text-xl font-bold border-t pt-2">
-                            <span>Total:</span>
+                            <span className="text-[#ffffff]">Total:</span>
                             <span className="text-[hsl(217,90%,40%)]">R{calculateTotal()}</span>
                           </div>
                         </div>
