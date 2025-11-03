@@ -27,6 +27,7 @@ import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_17621973881
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TutorialGuide } from "@/components/TutorialGuide";
 import { englishTutorialSteps } from "@/data/tutorialSteps";
+import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 
@@ -121,6 +122,7 @@ export default function PosSystem() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [shouldShowTutorial, setShouldShowTutorial] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
+  const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -1820,6 +1822,11 @@ export default function PosSystem() {
                   <DropdownMenuItem onClick={() => setIsLogoDialogOpen(true)}>
                     <User className="mr-2 h-4 w-4" />
                     Change Profile Picture
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsReceiptCustomizerOpen(true)}>
+                    <Receipt className="mr-2 h-4 w-4" />
+                    Customize Your Receipt
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => window.location.href = '/pos/system/afrikaans'}>
@@ -3826,6 +3833,16 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Receipt Customizer Dialog */}
+      <ReceiptCustomizerDialog 
+        isOpen={isReceiptCustomizerOpen}
+        onClose={() => setIsReceiptCustomizerOpen(false)}
+        currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
+        toast={toast}
+      />
+
       {/* Staff Password Verification Dialog */}
       <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {
         setIsStaffPasswordDialogOpen(open);

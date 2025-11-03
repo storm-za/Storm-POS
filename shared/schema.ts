@@ -159,6 +159,68 @@ export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit
   lastUpdated: true,
 });
 
+// Receipt Settings Schema
+export const receiptSettingsSchema = z.object({
+  sections: z.array(z.enum(['logo', 'businessInfo', 'dateTime', 'staffInfo', 'customerInfo', 'items', 'totals', 'paymentInfo', 'messages'])).default(['logo', 'businessInfo', 'dateTime', 'staffInfo', 'customerInfo', 'items', 'totals', 'paymentInfo', 'messages']),
+  toggles: z.object({
+    showLogo: z.boolean().default(true),
+    showBusinessName: z.boolean().default(true),
+    showBusinessAddress: z.boolean().default(true),
+    showBusinessPhone: z.boolean().default(true),
+    showBusinessEmail: z.boolean().default(true),
+    showBusinessWebsite: z.boolean().default(false),
+    showRegistrationNumber: z.boolean().default(false),
+    showVATNumber: z.boolean().default(false),
+    showDateTime: z.boolean().default(true),
+    showStaffInfo: z.boolean().default(true),
+    showCustomerInfo: z.boolean().default(true),
+    showPaymentMethod: z.boolean().default(true),
+    showCustomHeader: z.boolean().default(false),
+    showCustomFooter: z.boolean().default(true),
+    showThankYouMessage: z.boolean().default(true),
+  }).default({}),
+  businessInfo: z.object({
+    name: z.string().optional(),
+    addressLine1: z.string().optional(),
+    addressLine2: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().optional(),
+    website: z.string().optional(),
+    registrationNumber: z.string().optional(),
+    vatNumber: z.string().optional(),
+  }).default({}),
+  customMessages: z.object({
+    header: z.string().optional(),
+    footer: z.string().optional(),
+    thankYou: z.string().default('Thank you for your business!'),
+  }).default({}),
+});
+
+export const defaultReceiptSettings = (): z.infer<typeof receiptSettingsSchema> => ({
+  sections: ['logo', 'businessInfo', 'dateTime', 'staffInfo', 'customerInfo', 'items', 'totals', 'paymentInfo', 'messages'],
+  toggles: {
+    showLogo: true,
+    showBusinessName: true,
+    showBusinessAddress: true,
+    showBusinessPhone: true,
+    showBusinessEmail: true,
+    showBusinessWebsite: false,
+    showRegistrationNumber: false,
+    showVATNumber: false,
+    showDateTime: true,
+    showStaffInfo: true,
+    showCustomerInfo: true,
+    showPaymentMethod: true,
+    showCustomHeader: false,
+    showCustomFooter: true,
+    showThankYouMessage: true,
+  },
+  businessInfo: {},
+  customMessages: {
+    thankYou: 'Thank you for your business!',
+  },
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -181,3 +243,4 @@ export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
 export type SystemSetting = typeof systemSettings.$inferSelect;
+export type ReceiptSettings = z.infer<typeof receiptSettingsSchema>;
