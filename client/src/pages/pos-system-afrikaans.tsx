@@ -1663,7 +1663,7 @@ ${dateFilteredSales.map(sale =>
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="w-8 text-center">{item.quantity}</span>
+                              <span className="w-8 text-center text-[#ffffff]">{item.quantity}</span>
                               <Button
                                 size="sm"
                                 variant="outline"
