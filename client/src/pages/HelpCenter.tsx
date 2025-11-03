@@ -741,7 +741,7 @@ export function HelpCenter() {
                   <HelpCircle className="h-12 w-12 text-[hsl(217,90%,40%)] mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Need More Help?</h3>
                   <p className="text-gray-700 mb-4">
-                    If you have questions not covered in this guide, please contact Storm support for assistance.
+                    If you have questions not covered in this guide, please <a href="mailto:softwarebystorm@gmail.com" className="text-[hsl(217,90%,40%)] underline hover:text-[hsl(217,90%,35%)]">contact Storm support</a> for assistance.
                   </p>
                   <p className="text-gray-600 text-sm">
                     This help center covers all features available in Storm POS. Explore each section to become a POS expert!

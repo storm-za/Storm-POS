@@ -741,7 +741,7 @@ export function HelpCenterAfrikaans() {
                   <HelpCircle className="h-12 w-12 text-[hsl(217,90%,40%)] mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Benodig Meer Hulp?</h3>
                   <p className="text-gray-700 mb-4">
-                    As jy vrae het wat nie in hierdie gids gedek word nie, kontak asseblief Storm ondersteuning vir bystand.
+                    As jy vrae het wat nie in hierdie gids gedek word nie, <a href="mailto:softwarebystorm@gmail.com" className="text-[hsl(217,90%,40%)] underline hover:text-[hsl(217,90%,35%)]">kontak asseblief Storm ondersteuning</a> vir bystand.
                   </p>
                   <p className="text-gray-600 text-sm">
                     Hierdie hulpsentrum dek alle funksies beskikbaar in Storm POS. Verken elke afdeling om 'n POS kenner te word!
