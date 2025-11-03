@@ -3114,7 +3114,12 @@ export default function PosSystem() {
               };
 
               return (
-                <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                >
                   {/* 7-Day Trial Banner */}
                   {isInTrial && (
                     <div className="bg-gradient-to-br from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,50%)] rounded-xl p-8 text-white shadow-xl border border-blue-400/30 relative overflow-hidden" data-testid="trial-banner">
@@ -3212,91 +3217,97 @@ export default function PosSystem() {
                   </div>
                   {/* Key Metrics */}
                   <div className="grid md:grid-cols-3 gap-6">
-                    <Card className="border-l-4 border-l-green-500">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4" />
-                          Current Month Revenue
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-green-600">R{currentMonthRevenue.toFixed(2)}</div>
-                        <div className="text-sm text-gray-500 mt-1">
-                          {currentMonthSales.length} transactions
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl border-l-4 border-l-blue-500">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4" />
+                            Current Month Revenue
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-blue-400">R{currentMonthRevenue.toFixed(2)}</div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            {currentMonthSales.length} transactions
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
 
-                    <Card className="border-l-4 border-l-blue-500">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <CreditCard className="w-4 h-4" />
-                          Storm Service Fee
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</div>
-                        <div className="text-sm text-gray-500 mt-1">
-                          0.5% of monthly revenue
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl border-l-4 border-l-blue-600">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                            <CreditCard className="w-4 h-4" />
+                            Storm Service Fee
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-blue-300">R{stormFee.toFixed(2)}</div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            0.5% of monthly revenue
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
 
-                    <Card className="border-l-4 border-l-orange-500">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          Billing Period
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">{Math.round(progressPercentage)}%</div>
-                        <div className="text-sm text-gray-500 mt-1">
-                          Day {daysCompleted} of {daysInMonth}
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-orange-500 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${progressPercentage}%` }}
-                          ></div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}>
+                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-xl border-l-4 border-l-blue-400">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            Billing Period
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-blue-300">{Math.round(progressPercentage)}%</div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            Day {daysCompleted} of {daysInMonth}
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2 mt-2">
+                            <div 
+                              className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                              style={{ width: `${progressPercentage}%` }}
+                            ></div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
                   </div>
                   {/* Billing Breakdown */}
                   <div className="grid lg:grid-cols-2 gap-6">
                     {/* Fee Calculation */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                    <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                      <CardHeader className="border-b border-white/10 pb-4">
+                        <CardTitle className="flex items-center gap-2 text-white">
                           <DollarSign className="w-5 h-5" />
                           Fee Breakdown
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                      <CardContent className="space-y-4 pt-6">
+                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Gross Revenue</span>
-                            <span className="font-semibold">R{currentMonthRevenue.toFixed(2)}</span>
+                            <span className="text-gray-300">Gross Revenue</span>
+                            <span className="font-semibold text-white">R{currentMonthRevenue.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Storm Service Rate</span>
-                            <span className="font-semibold">0.5%</span>
+                            <span className="text-gray-300">Storm Service Rate</span>
+                            <span className="font-semibold text-white">0.5%</span>
                           </div>
-                          <div className="border-t pt-3">
+                          <div className="border-t border-white/10 pt-3">
                             <div className="flex justify-between items-center">
-                              <span className="font-medium">Amount Due to Storm</span>
-                              <span className="text-xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</span>
+                              <span className="font-medium text-white">Amount Due to Storm</span>
+                              <span className="text-xl font-bold text-blue-400">R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                           <div className="flex items-start gap-3">
-                            <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
+                            <CreditCard className="w-5 h-5 text-blue-400 mt-0.5" />
                             <div>
-                              <h4 className="font-medium text-blue-900">Monthly Billing</h4>
-                              <p className="text-sm text-blue-700 mt-1">
+                              <h4 className="font-medium text-blue-300">Monthly Billing</h4>
+                              <p className="text-sm text-gray-300 mt-1">
                                 Storm POS charges 0.5% of your monthly revenue for using our platform. 
                                 Payment is automatically calculated and due at the end of each month.
                               </p>
@@ -3307,33 +3318,33 @@ export default function PosSystem() {
                     </Card>
 
                     {/* Revenue Trend */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                    <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                      <CardHeader className="border-b border-white/10 pb-4">
+                        <CardTitle className="flex items-center gap-2 text-white">
                           <BarChart3 className="w-5 h-5" />
                           Recent Performance
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-6">
                         {Object.keys(dailyBreakdown).length > 0 ? (
                           <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                <div className="text-gray-600">Avg. Daily Revenue</div>
-                                <div className="font-semibold">
+                                <div className="text-gray-300">Avg. Daily Revenue</div>
+                                <div className="font-semibold text-white">
                                   R{(currentMonthRevenue / Math.max(daysCompleted, 1)).toFixed(2)}
                                 </div>
                               </div>
                               <div>
-                                <div className="text-gray-600">Best Day</div>
-                                <div className="font-semibold">
+                                <div className="text-gray-300">Best Day</div>
+                                <div className="font-semibold text-white">
                                   R{Math.max(...Object.values(dailyBreakdown)).toFixed(2)}
                                 </div>
                               </div>
                             </div>
                             
                             <div className="space-y-2">
-                              <div className="text-sm font-medium text-gray-700">Daily Revenue Trend</div>
+                              <div className="text-sm font-medium text-gray-300">Daily Revenue Trend</div>
                               <div className="space-y-1">
                                 {Object.entries(dailyBreakdown)
                                   .sort(([a], [b]) => b.localeCompare(a))
@@ -3342,16 +3353,16 @@ export default function PosSystem() {
                                     const percentage = (revenue / Math.max(...Object.values(dailyBreakdown))) * 100;
                                     return (
                                       <div key={date} className="flex items-center gap-3">
-                                        <div className="w-16 text-xs text-gray-500">
+                                        <div className="w-16 text-xs text-gray-400">
                                           {new Date(date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
                                         </div>
-                                        <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="flex-1 bg-white/10 rounded-full h-2">
                                           <div 
-                                            className="bg-[hsl(217,90%,40%)] h-2 rounded-full transition-all duration-300"
+                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                             style={{ width: `${percentage}%` }}
                                           ></div>
                                         </div>
-                                        <div className="w-20 text-xs text-right font-medium">
+                                        <div className="w-20 text-xs text-right font-medium text-white">
                                           R{revenue.toFixed(2)}
                                         </div>
                                       </div>
@@ -3361,7 +3372,7 @@ export default function PosSystem() {
                             </div>
                           </div>
                         ) : (
-                          <div className="text-center py-8 text-gray-500">
+                          <div className="text-center py-8 text-gray-400">
                             <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                             <p>No sales data for this month yet.</p>
                             <p className="text-sm">Start making sales to see your revenue trends!</p>
@@ -3371,42 +3382,42 @@ export default function PosSystem() {
                     </Card>
                   </div>
                   {/* Payment Information */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                  <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                    <CardHeader className="border-b border-white/10 pb-4">
+                      <CardTitle className="flex items-center gap-2 text-white">
                         <Receipt className="w-5 h-5" />
                         Payment Information
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-6">
+                    <CardContent className="pt-6">
+                      <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <h4 className="font-semibold mb-3">How Billing Works</h4>
-                            <ul className="space-y-2 text-sm text-gray-600">
+                            <h4 className="font-semibold mb-3 text-white">How Billing Works</h4>
+                            <ul className="space-y-2 text-sm text-gray-300">
                               <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
                                 Monthly billing cycle: 1st to last day of month
                               </li>
                               <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
                                 Service fee: 0.5% of gross monthly revenue
                               </li>
                               <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
                                 Payment due: End of each month
                               </li>
                               <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rounded-full mt-2"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
                                 No setup fees or hidden charges
                               </li>
                             </ul>
                           </div>
                           <div>
-                            <h4 className="font-semibold mb-3">Contact & Support</h4>
-                            <div className="space-y-2 text-sm text-gray-600">
+                            <h4 className="font-semibold mb-3 text-white">Contact & Support</h4>
+                            <div className="space-y-2 text-sm text-gray-300">
                               <p>Questions about your billing?</p>
-                              <p className="font-medium text-[hsl(217,90%,40%)]">
+                              <p className="font-medium text-blue-400">
                                 Email: softwarebystorm@gmail.com
                               </p>
                             </div>
@@ -3415,7 +3426,7 @@ export default function PosSystem() {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               );
             })()}
           </TabsContent>
