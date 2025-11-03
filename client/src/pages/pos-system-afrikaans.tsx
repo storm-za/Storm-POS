@@ -1252,7 +1252,6 @@ ${dateFilteredSales.map(sale =>
           }}
         />
       </div>
-
       {/* Header */}
       <header className="bg-white backdrop-blur-xl border-b border-gray-200 shadow-lg shadow-blue-900/10 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1653,7 +1652,7 @@ ${dateFilteredSales.map(sale =>
                         {currentSale.map((item) => (
                           <div key={item.productId} className="flex items-center justify-between p-2 border rounded">
                             <div className="flex-1">
-                              <p className="font-medium">{item.name}</p>
+                              <p className="font-medium text-[#ffffff]">{item.name}</p>
                               <p className="text-sm text-gray-500">R{item.price} elk</p>
                             </div>
                             <div className="flex items-center space-x-2">
