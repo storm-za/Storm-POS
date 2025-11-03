@@ -2030,20 +2030,20 @@ export default function PosSystem() {
                       {filteredSalesProducts.map((product) => (
                         <div
                           key={product.id}
-                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                          className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
                           onClick={() => addToSale(product)}
                         >
                           <div>
-                            <p className="font-medium">{product.name}</p>
-                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-                            <p className="text-sm text-gray-500">Stock: {product.quantity}</p>
+                            <p className="font-medium text-white">{product.name}</p>
+                            <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                            <p className="text-sm text-gray-400">Stock: {product.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-[hsl(217,90%,40%)]">
+                            <p className="font-bold text-blue-400">
                               R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
                             </p>
                             {product.tradePrice && (
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-400">
                                 {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
                                   ? `Retail: R${product.retailPrice}` 
                                   : `Trade: R${product.tradePrice}`}
