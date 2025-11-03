@@ -23,7 +23,7 @@ import {
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, Globe, BookOpen, HelpCircle
 } from "lucide-react";
-import stormLogo from "@assets/STORM (1)_1757446684640.png";
+import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { TutorialGuide } from "@/components/TutorialGuide";
 import { englishTutorialSteps } from "@/data/tutorialSteps";
