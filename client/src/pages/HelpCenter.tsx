@@ -735,15 +735,15 @@ export function HelpCenter() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0 }}
           >
-            <Card className="bg-gradient-to-br from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 border-[hsl(217,90%,40%)]/30">
+            <Card className="bg-white border-[hsl(217,90%,40%)]">
               <CardContent className="p-6">
                 <div className="text-center">
                   <HelpCircle className="h-12 w-12 text-[hsl(217,90%,40%)] mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Need More Help?</h3>
-                  <p className="text-gray-300 mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Need More Help?</h3>
+                  <p className="text-gray-700 mb-4">
                     If you have questions not covered in this guide, please contact Storm support for assistance.
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-600 text-sm">
                     This help center covers all features available in Storm POS. Explore each section to become a POS expert!
                   </p>
                 </div>
