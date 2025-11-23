@@ -123,6 +123,7 @@ export default function PosSystem() {
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<any | null>(null);
   const [isDeleteInvoiceDialogOpen, setIsDeleteInvoiceDialogOpen] = useState(false);
   const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
@@ -492,6 +493,7 @@ export default function PosSystem() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
       setIsInvoiceDialogOpen(false);
+      setEditingInvoice(null);
       setInvoiceItems([]);
       setInvoiceClientId(null);
       setInvoiceDueDate("");
@@ -511,6 +513,44 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: error.message || "Failed to create invoice",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateInvoiceMutation = useMutation({
+    mutationFn: async ({ invoiceId, invoiceData }: { invoiceId: number; invoiceData: any }) => {
+      const response = await apiRequest("PUT", `/api/pos/invoices/${invoiceId}`, {
+        ...invoiceData,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: (updatedInvoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsInvoiceDialogOpen(false);
+      setEditingInvoice(null);
+      setIsInvoiceViewOpen(false);
+      setSelectedInvoice(updatedInvoice);
+      setInvoiceItems([]);
+      setInvoiceClientId(null);
+      setInvoiceDueDate("");
+      setInvoiceNotes("");
+      setInvoicePoNumber("");
+      setInvoiceDueTerms("7 days");
+      setInvoiceDiscountPercent("0");
+      setInvoiceShippingAmount("0");
+      setInvoicePaymentMethod("");
+      setInvoiceTerms("");
+      toast({
+        title: "Success",
+        description: `${updatedInvoice.documentType === 'invoice' ? 'Invoice' : 'Quote'} updated successfully`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update invoice",
         variant: "destructive",
       });
     },
@@ -4774,17 +4814,43 @@ export default function PosSystem() {
         </DialogContent>
       </Dialog>
       {/* Invoice Creation Dialog */}
-      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
+      <Dialog 
+        open={isInvoiceDialogOpen} 
+        onOpenChange={(open) => {
+          setIsInvoiceDialogOpen(open);
+          if (!open) {
+            // Reset all form state when dialog closes
+            setEditingInvoice(null);
+            setInvoiceItems([]);
+            setInvoiceClientId(null);
+            setInvoiceDueDate("");
+            setInvoiceNotes("");
+            setInvoicePoNumber("");
+            setInvoiceDueTerms("7 days");
+            setInvoiceDiscountPercent("0");
+            setInvoiceShippingAmount("0");
+            setInvoicePaymentMethod("");
+            setInvoiceTerms("");
+            setInvoiceType('invoice');
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}</DialogTitle>
+            <DialogTitle>
+              {editingInvoice ? 'Edit' : 'Create'} {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {/* Document Type Selection */}
             <div>
               <Label>Document Type</Label>
-              <Select value={invoiceType} onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}>
-                <SelectTrigger>
+              <Select 
+                value={invoiceType} 
+                onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
+                disabled={!!editingInvoice}
+              >
+                <SelectTrigger disabled={!!editingInvoice}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -4792,6 +4858,9 @@ export default function PosSystem() {
                   <SelectItem value="quote">Quote</SelectItem>
                 </SelectContent>
               </Select>
+              {editingInvoice && (
+                <p className="text-xs text-gray-500 mt-1">Document type cannot be changed when editing</p>
+              )}
             </div>
 
             {/* Client Selection */}
@@ -5051,9 +5120,9 @@ export default function PosSystem() {
                   const shipping = parseFloat(invoiceShippingAmount) || 0;
                   const total = afterDiscount + taxAmount + shipping;
                   
-                  createInvoiceMutation.mutate({
+                  const invoiceData = {
                     documentType: invoiceType,
-                    status: 'draft',
+                    status: editingInvoice ? editingInvoice.status : 'draft',
                     clientId: invoiceClientId,
                     title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoiceClientId)?.name}`,
                     poNumber: invoicePoNumber || undefined,
@@ -5063,24 +5132,38 @@ export default function PosSystem() {
                       productId: item.productId,
                       name: products.find(p => p.id === item.productId)?.name || '',
                       quantity: item.quantity,
-                      price: item.price.toFixed(2),
-                      lineTotal: (item.price * item.quantity).toFixed(2)
+                      price: parseFloat(item.price.toFixed(2)),
+                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
                     })),
-                    subtotal: subtotal.toFixed(2),
-                    discountPercent: discountPercent.toFixed(2),
-                    taxPercent: "15.00",
-                    tax: taxAmount.toFixed(2),
-                    shippingAmount: shipping.toFixed(2),
-                    total: total.toFixed(2),
+                    subtotal: parseFloat(subtotal.toFixed(2)),
+                    discountPercent: parseFloat(discountPercent.toFixed(2)),
+                    taxPercent: 15.00,
+                    tax: parseFloat(taxAmount.toFixed(2)),
+                    shippingAmount: parseFloat(shipping.toFixed(2)),
+                    total: parseFloat(total.toFixed(2)),
                     paymentMethod: invoicePaymentMethod || undefined,
                     notes: invoiceNotes || undefined,
                     terms: invoiceTerms || undefined
-                  });
+                  };
+                  
+                  if (editingInvoice) {
+                    updateInvoiceMutation.mutate({
+                      invoiceId: editingInvoice.id,
+                      invoiceData
+                    });
+                  } else {
+                    createInvoiceMutation.mutate(invoiceData);
+                  }
                 }}
                 className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                disabled={createInvoiceMutation.isPending}
+                disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
               >
-                {createInvoiceMutation.isPending ? 'Creating...' : `Create ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}`}
+                {createInvoiceMutation.isPending || updateInvoiceMutation.isPending 
+                  ? (editingInvoice ? 'Updating...' : 'Creating...') 
+                  : editingInvoice 
+                    ? `Update ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}` 
+                    : `Create ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}`
+                }
               </Button>
             </div>
           </div>
@@ -5236,7 +5319,40 @@ export default function PosSystem() {
               {/* Action Buttons */}
               <div className="flex justify-between items-center border-t border-gray-200 pt-4">
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" data-testid="button-edit-invoice">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    data-testid="button-edit-invoice"
+                    onClick={() => {
+                      if (selectedInvoice) {
+                        // Populate form with existing invoice data
+                        setEditingInvoice(selectedInvoice);
+                        setInvoiceType(selectedInvoice.documentType);
+                        setInvoiceClientId(selectedInvoice.clientId);
+                        setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
+                        setInvoiceNotes(selectedInvoice.notes || '');
+                        setInvoicePoNumber(selectedInvoice.poNumber || '');
+                        setInvoiceDueTerms(selectedInvoice.dueTerms || '7 days');
+                        // Parse numeric fields to ensure they're numbers, not strings
+                        setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
+                        setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
+                        setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                        setInvoiceTerms(selectedInvoice.terms || '');
+                        
+                        // Populate line items with properly parsed prices
+                        const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
+                        setInvoiceItems(items.map((item: any) => ({
+                          productId: item.productId,
+                          quantity: parseFloat(item.quantity) || item.quantity,
+                          price: parseFloat(item.price)
+                        })));
+                        
+                        // Open the dialog
+                        setIsInvoiceViewOpen(false);
+                        setIsInvoiceDialogOpen(true);
+                      }
+                    }}
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
