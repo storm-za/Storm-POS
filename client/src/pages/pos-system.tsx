@@ -302,6 +302,18 @@ export default function PosSystem() {
     enabled: !!currentUser,
   });
 
+  // Fetch invoices
+  const { data: invoices = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/invoices", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch invoices');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
   // Product mutations
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {
@@ -2718,10 +2730,72 @@ export default function PosSystem() {
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
               <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
                 <CardTitle className="text-white text-xl font-bold">Invoices & Quotes</CardTitle>
-                <div className="text-center py-8 text-gray-400">
-                  Invoice & Quote generator coming soon - Full feature implementation in progress
-                </div>
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                  data-testid="button-create-invoice"
+                >
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Create Invoice/Quote
+                </Button>
               </CardHeader>
+              <CardContent className="pt-6">
+                {invoices.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Receipt className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-400 text-lg mb-2">No invoices or quotes yet</p>
+                    <p className="text-gray-500 text-sm">Create your first invoice or quote to get started</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {invoices.map((invoice) => (
+                      <motion.div
+                        key={invoice.id}
+                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Badge 
+                                variant={invoice.documentType === 'invoice' ? 'default' : 'outline'}
+                                className={invoice.documentType === 'invoice' 
+                                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/30' 
+                                  : 'bg-purple-600/20 text-purple-300 border-purple-500/30'
+                                }
+                              >
+                                {invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'}
+                              </Badge>
+                              <span className="text-white font-semibold">{invoice.documentNumber}</span>
+                              <Badge 
+                                variant="outline"
+                                className={
+                                  invoice.status === 'paid' ? 'bg-green-600/20 text-green-300 border-green-500/30' :
+                                  invoice.status === 'sent' ? 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30' :
+                                  'bg-gray-600/20 text-gray-300 border-gray-500/30'
+                                }
+                              >
+                                {invoice.status}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-300 text-sm">
+                              Client: {customers.find(c => c.id === invoice.clientId)?.name || 'N/A'}
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                              Due: {new Date(invoice.dueDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-white font-bold text-lg">
+                              R{typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
             </Card>
             </motion.div>
           </TabsContent>
