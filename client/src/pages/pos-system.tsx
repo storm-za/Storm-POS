@@ -120,11 +120,19 @@ export default function PosSystem() {
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+  const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
   const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
+  const [invoicePoNumber, setInvoicePoNumber] = useState("");
+  const [invoiceDueTerms, setInvoiceDueTerms] = useState("7 days");
+  const [invoiceDiscountPercent, setInvoiceDiscountPercent] = useState("0");
+  const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
+  const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
+  const [invoiceTerms, setInvoiceTerms] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -484,6 +492,12 @@ export default function PosSystem() {
       setInvoiceClientId(null);
       setInvoiceDueDate("");
       setInvoiceNotes("");
+      setInvoicePoNumber("");
+      setInvoiceDueTerms("7 days");
+      setInvoiceDiscountPercent("0");
+      setInvoiceShippingAmount("0");
+      setInvoicePaymentMethod("");
+      setInvoiceTerms("");
       toast({
         title: "Success",
         description: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} created successfully`,
@@ -2787,9 +2801,14 @@ export default function PosSystem() {
                     {invoices.map((invoice) => (
                       <motion.div
                         key={invoice.id}
-                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
                         whileHover={{ scale: 1.01, y: -2 }}
                         transition={{ duration: 0.2 }}
+                        onClick={() => {
+                          setSelectedInvoice(invoice);
+                          setIsInvoiceViewOpen(true);
+                        }}
+                        data-testid={`invoice-card-${invoice.id}`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
@@ -4570,6 +4589,35 @@ export default function PosSystem() {
               </Select>
             </div>
 
+            {/* PO Number */}
+            <div>
+              <Label>PO Number (Optional)</Label>
+              <input
+                type="text"
+                value={invoicePoNumber}
+                onChange={(e) => setInvoicePoNumber(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="Purchase order number"
+              />
+            </div>
+
+            {/* Payment Terms */}
+            <div>
+              <Label>Payment Terms</Label>
+              <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7 days">7 Days</SelectItem>
+                  <SelectItem value="14 days">14 Days</SelectItem>
+                  <SelectItem value="30 days">30 Days</SelectItem>
+                  <SelectItem value="60 days">60 Days</SelectItem>
+                  <SelectItem value="90 days">90 Days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Due Date */}
             <div>
               <Label>Due Date</Label>
@@ -4619,7 +4667,7 @@ export default function PosSystem() {
                         setInvoiceItems([...invoiceItems, {
                           productId: product.id,
                           quantity: 1,
-                          price: parseFloat(product.price)
+                          price: parseFloat(product.retailPrice)
                         }]);
                       }
                     }}
@@ -4630,7 +4678,7 @@ export default function PosSystem() {
                     <SelectContent>
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id.toString()}>
-                          {product.name} - R{product.price}
+                          {product.name} - R{product.retailPrice}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -4642,33 +4690,106 @@ export default function PosSystem() {
                 
                 {/* Totals */}
                 {invoiceItems.length > 0 && (
-                  <div className="border-t pt-2 space-y-1 text-sm">
-                    <div className="flex justify-between">
+                  <div className="border-t pt-2 space-y-2">
+                    <div className="flex justify-between text-sm">
                       <span>Subtotal:</span>
                       <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>VAT (15%):</span>
-                      <span>R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15).toFixed(2)}</span>
+                    
+                    {/* Discount Input */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Discount (%):</span>
+                      <input
+                        type="number"
+                        value={invoiceDiscountPercent}
+                        onChange={(e) => setInvoiceDiscountPercent(e.target.value)}
+                        className="w-20 px-2 py-1 border rounded text-right"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                      />
                     </div>
-                    <div className="flex justify-between font-bold text-base">
+                    {parseFloat(invoiceDiscountPercent) > 0 && (
+                      <div className="flex justify-between text-sm text-red-600">
+                        <span>Discount Amount:</span>
+                        <span>-R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between text-sm">
+                      <span>VAT (15%):</span>
+                      <span>R{((invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 - parseFloat(invoiceDiscountPercent) / 100)) * 0.15).toFixed(2)}</span>
+                    </div>
+                    
+                    {/* Shipping Input */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Shipping:</span>
+                      <div className="flex items-center gap-1">
+                        <span>R</span>
+                        <input
+                          type="number"
+                          value={invoiceShippingAmount}
+                          onChange={(e) => setInvoiceShippingAmount(e.target.value)}
+                          className="w-20 px-2 py-1 border rounded text-right"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between font-bold text-base border-t pt-2">
                       <span>Total:</span>
-                      <span>R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15).toFixed(2)}</span>
+                      <span>R{(() => {
+                        const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const discount = subtotal * (parseFloat(invoiceDiscountPercent) / 100);
+                        const afterDiscount = subtotal - discount;
+                        const tax = afterDiscount * 0.15;
+                        const shipping = parseFloat(invoiceShippingAmount) || 0;
+                        return (afterDiscount + tax + shipping).toFixed(2);
+                      })()}</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
+            {/* Payment Method */}
+            <div>
+              <Label>Payment Method (Optional)</Label>
+              <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="Card">Card</SelectItem>
+                  <SelectItem value="EFT">EFT</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Notes */}
             <div>
-              <Label>Notes</Label>
+              <Label>Notes (Optional)</Label>
               <textarea
                 value={invoiceNotes}
                 onChange={(e) => setInvoiceNotes(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg"
-                rows={3}
+                rows={2}
                 placeholder="Additional notes..."
+              />
+            </div>
+
+            {/* Terms & Conditions */}
+            <div>
+              <Label>Terms & Conditions (Optional)</Label>
+              <textarea
+                value={invoiceTerms}
+                onChange={(e) => setInvoiceTerms(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                rows={3}
+                placeholder="Enter payment terms and conditions..."
               />
             </div>
 
@@ -4698,14 +4819,20 @@ export default function PosSystem() {
                   }
                   
                   const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                  const taxAmount = subtotal * 0.15;
-                  const total = subtotal + taxAmount;
+                  const discountPercent = parseFloat(invoiceDiscountPercent) || 0;
+                  const discountAmount = subtotal * (discountPercent / 100);
+                  const afterDiscount = subtotal - discountAmount;
+                  const taxAmount = afterDiscount * 0.15;
+                  const shipping = parseFloat(invoiceShippingAmount) || 0;
+                  const total = afterDiscount + taxAmount + shipping;
                   
                   createInvoiceMutation.mutate({
                     documentType: invoiceType,
                     status: 'draft',
                     clientId: invoiceClientId,
                     title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoiceClientId)?.name}`,
+                    poNumber: invoicePoNumber || undefined,
+                    dueTerms: invoiceDueTerms,
                     dueDate: invoiceDueDate,
                     items: invoiceItems.map(item => ({
                       productId: item.productId,
@@ -4715,11 +4842,14 @@ export default function PosSystem() {
                       lineTotal: (item.price * item.quantity).toFixed(2)
                     })),
                     subtotal: subtotal.toFixed(2),
+                    discountPercent: discountPercent.toFixed(2),
                     taxPercent: "15.00",
                     tax: taxAmount.toFixed(2),
-                    shippingAmount: "0.00",
+                    shippingAmount: shipping.toFixed(2),
                     total: total.toFixed(2),
-                    notes: invoiceNotes
+                    paymentMethod: invoicePaymentMethod || undefined,
+                    notes: invoiceNotes || undefined,
+                    terms: invoiceTerms || undefined
                   });
                 }}
                 className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
@@ -4729,6 +4859,187 @@ export default function PosSystem() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Detail/View Modal */}
+      <Dialog open={isInvoiceViewOpen} onOpenChange={setIsInvoiceViewOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedInvoice && (
+            <>
+              <DialogHeader className="border-b border-gray-200 pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="text-2xl text-[hsl(217,90%,40%)]">
+                      {selectedInvoice.documentNumber}
+                    </DialogTitle>
+                    <p className="text-sm text-gray-500 mt-1">{selectedInvoice.title}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant={selectedInvoice.documentType === 'invoice' ? 'default' : 'outline'}
+                      className={selectedInvoice.documentType === 'invoice' 
+                        ? 'bg-[hsl(217,90%,40%)] text-white' 
+                        : 'text-purple-600 border-purple-300'
+                      }
+                    >
+                      {selectedInvoice.documentType === 'invoice' ? 'INVOICE' : 'QUOTE'}
+                    </Badge>
+                    <Badge 
+                      variant="outline"
+                      className={
+                        selectedInvoice.status === 'paid' ? 'bg-green-100 text-green-700 border-green-300' :
+                        selectedInvoice.status === 'sent' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
+                        selectedInvoice.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-300' :
+                        'bg-gray-100 text-gray-700 border-gray-300'
+                      }
+                    >
+                      {selectedInvoice.status.toUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                {/* Document Info Grid */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <Label className="text-xs text-gray-500">Client</Label>
+                    <p className="font-medium">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
+                  </div>
+                  {selectedInvoice.poNumber && (
+                    <div>
+                      <Label className="text-xs text-gray-500">PO Number</Label>
+                      <p className="font-medium">{selectedInvoice.poNumber}</p>
+                    </div>
+                  )}
+                  <div>
+                    <Label className="text-xs text-gray-500">Created Date</Label>
+                    <p className="font-medium">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Due Date</Label>
+                    <p className="font-medium">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Payment Terms</Label>
+                    <p className="font-medium">{selectedInvoice.dueTerms || '7 days'}</p>
+                  </div>
+                  {selectedInvoice.paymentMethod && (
+                    <div>
+                      <Label className="text-xs text-gray-500">Payment Method</Label>
+                      <p className="font-medium">{selectedInvoice.paymentMethod}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Line Items Table */}
+                <div>
+                  <Label className="text-sm font-semibold mb-2 block">Line Items</Label>
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="text-left p-3 text-xs font-semibold text-gray-600">Product</th>
+                          <th className="text-center p-3 text-xs font-semibold text-gray-600">Qty</th>
+                          <th className="text-right p-3 text-xs font-semibold text-gray-600">Unit Price</th>
+                          <th className="text-right p-3 text-xs font-semibold text-gray-600">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="p-3">{item.name}</td>
+                            <td className="p-3 text-center">{item.quantity}</td>
+                            <td className="p-3 text-right">R{parseFloat(item.price).toFixed(2)}</td>
+                            <td className="p-3 text-right font-medium">R{parseFloat(item.lineTotal).toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Financial Summary */}
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="max-w-xs ml-auto space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal:</span>
+                      <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
+                    </div>
+                    {parseFloat(selectedInvoice.discountPercent || '0') > 0 && (
+                      <div className="flex justify-between text-sm text-red-600">
+                        <span>Discount ({selectedInvoice.discountPercent}%):</span>
+                        <span>-R{(parseFloat(selectedInvoice.subtotal) * (parseFloat(selectedInvoice.discountPercent) / 100)).toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">VAT (15%):</span>
+                      <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
+                    </div>
+                    {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Shipping:</span>
+                        <span className="font-medium">R{typeof selectedInvoice.shippingAmount === 'number' ? selectedInvoice.shippingAmount.toFixed(2) : selectedInvoice.shippingAmount}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
+                      <span>Total:</span>
+                      <span className="text-[hsl(217,90%,40%)]">R{typeof selectedInvoice.total === 'number' ? selectedInvoice.total.toFixed(2) : selectedInvoice.total}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes & Terms */}
+                {(selectedInvoice.notes || selectedInvoice.terms) && (
+                  <div className="space-y-4 border-t border-gray-200 pt-4">
+                    {selectedInvoice.notes && (
+                      <div>
+                        <Label className="text-sm font-semibold mb-2 block">Notes</Label>
+                        <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedInvoice.notes}</p>
+                      </div>
+                    )}
+                    {selectedInvoice.terms && (
+                      <div>
+                        <Label className="text-sm font-semibold mb-2 block">Terms & Conditions</Label>
+                        <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">{selectedInvoice.terms}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center border-t border-gray-200 pt-4">
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" data-testid="button-edit-invoice">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" data-testid="button-delete-invoice">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" data-testid="button-change-status">
+                    Change Status
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                    data-testid="button-export-pdf"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export PDF
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>

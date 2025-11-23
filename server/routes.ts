@@ -631,10 +631,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId, ...invoiceData } = req.body;
       const userIdToUse = userId || 1;
       
+      // Auto-generate document number
+      const documentNumber = await storage.getNextDocumentNumber(userIdToUse, invoiceData.documentType);
+      
       // Convert date strings to Date objects and ensure proper types
       const processedData = {
         ...invoiceData,
         userId: userIdToUse,
+        documentNumber,
         createdDate: invoiceData.createdDate ? new Date(invoiceData.createdDate) : new Date(),
         dueDate: new Date(invoiceData.dueDate),
       };
