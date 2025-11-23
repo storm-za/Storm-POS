@@ -4707,13 +4707,13 @@ export default function PosSystem() {
                     clientId: invoiceClientId,
                     title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoiceClientId)?.name}`,
                     dueDate: invoiceDueDate,
-                    items: JSON.stringify(invoiceItems.map(item => ({
+                    items: invoiceItems.map(item => ({
                       productId: item.productId,
-                      productName: products.find(p => p.id === item.productId)?.name || '',
+                      name: products.find(p => p.id === item.productId)?.name || '',
                       quantity: item.quantity,
                       price: item.price.toFixed(2),
-                      total: (item.price * item.quantity).toFixed(2)
-                    }))),
+                      lineTotal: (item.price * item.quantity).toFixed(2)
+                    })),
                     subtotal: subtotal.toFixed(2),
                     taxPercent: "15.00",
                     tax: taxAmount.toFixed(2),
