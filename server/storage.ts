@@ -1,9 +1,10 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posStaffAccounts, systemSettings,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, systemSettings,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
-  type PosOpenAccount, type InsertPosOpenAccount, type PosStaffAccount, type InsertPosStaffAccount,
+  type PosOpenAccount, type InsertPosOpenAccount, type PosInvoice, type InsertPosInvoice,
+  type PosStaffAccount, type InsertPosStaffAccount,
   type SystemSetting, type InsertSystemSetting
 } from "@shared/schema";
 import { db } from "./db";
@@ -81,6 +82,13 @@ export interface IStorage {
   deletePosOpenAccount(id: number): Promise<boolean>;
   addItemToPosOpenAccount(accountId: number, item: any): Promise<PosOpenAccount | undefined>;
   removeItemFromPosOpenAccount(accountId: number, itemIndex: number): Promise<PosOpenAccount | undefined>;
+  
+  // Invoice Operations
+  getPosInvoices(userId: number): Promise<PosInvoice[]>;
+  createPosInvoice(invoice: InsertPosInvoice): Promise<PosInvoice>;
+  updatePosInvoice(id: number, invoice: Partial<PosInvoice>): Promise<PosInvoice | undefined>;
+  deletePosInvoice(id: number): Promise<boolean>;
+  getNextDocumentNumber(userId: number, documentType: string): Promise<string>;
   
   // Staff Account Operations
   getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]>;
@@ -480,6 +488,78 @@ export class MemStorage implements IStorage {
     this.posOpenAccounts.set(accountId, updated);
     return updated;
   }
+
+  // Invoice Operations (stub implementations for MemStorage)
+  async getPosInvoices(userId: number): Promise<PosInvoice[]> {
+    return [];
+  }
+
+  async createPosInvoice(insertInvoice: InsertPosInvoice): Promise<PosInvoice> {
+    throw new Error("Invoice operations not supported in MemStorage");
+  }
+
+  async updatePosInvoice(id: number, updates: Partial<PosInvoice>): Promise<PosInvoice | undefined> {
+    return undefined;
+  }
+
+  async deletePosInvoice(id: number): Promise<boolean> {
+    return false;
+  }
+
+  async getNextDocumentNumber(userId: number, documentType: string): Promise<string> {
+    return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
+  }
+
+  // Staff Account Operations (stub implementations for MemStorage)
+  async getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]> {
+    return [];
+  }
+
+  async createPosStaffAccount(staffAccount: InsertPosStaffAccount): Promise<PosStaffAccount> {
+    throw new Error("Staff operations not supported in MemStorage");
+  }
+
+  async updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined> {
+    return undefined;
+  }
+
+  async deletePosStaffAccount(id: number): Promise<boolean> {
+    return false;
+  }
+
+  async authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined> {
+    return undefined;
+  }
+
+  // Usage tracking (stub implementations for MemStorage)
+  async incrementUserUsage(userId: number, amount: string): Promise<void> {
+    // No-op in MemStorage
+  }
+
+  async resetAllUsersUsage(): Promise<void> {
+    // No-op in MemStorage
+  }
+
+  async getUserUsage(userId: number): Promise<string> {
+    return "0.00";
+  }
+
+  // System settings (stub implementations for MemStorage)
+  async getSystemSetting(key: string): Promise<string | null> {
+    return null;
+  }
+
+  async setSystemSetting(key: string, value: string): Promise<void> {
+    // No-op in MemStorage
+  }
+
+  async getLastMonthlyResetDate(): Promise<string | null> {
+    return null;
+  }
+
+  async setLastMonthlyResetDate(date: string): Promise<void> {
+    // No-op in MemStorage
+  }
 }
 
 // DatabaseStorage implementation
@@ -696,6 +776,61 @@ export class DatabaseStorage implements IStorage {
       .where(eq(posOpenAccounts.id, accountId))
       .returning();
     return updated || undefined;
+  }
+
+  // Invoice Operations
+  async getPosInvoices(userId: number): Promise<PosInvoice[]> {
+    return db.select().from(posInvoices).where(eq(posInvoices.userId, userId));
+  }
+
+  async createPosInvoice(insertInvoice: InsertPosInvoice): Promise<PosInvoice> {
+    const [invoice] = await db
+      .insert(posInvoices)
+      .values(insertInvoice)
+      .returning();
+    return invoice;
+  }
+
+  async updatePosInvoice(id: number, updates: Partial<PosInvoice>): Promise<PosInvoice | undefined> {
+    const [invoice] = await db
+      .update(posInvoices)
+      .set(updates)
+      .where(eq(posInvoices.id, id))
+      .returning();
+    return invoice || undefined;
+  }
+
+  async deletePosInvoice(id: number): Promise<boolean> {
+    const result = await db.delete(posInvoices).where(eq(posInvoices.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getNextDocumentNumber(userId: number, documentType: string): Promise<string> {
+    // Get the highest document number for this user and document type
+    const [latest] = await db
+      .select({ documentNumber: posInvoices.documentNumber })
+      .from(posInvoices)
+      .where(and(
+        eq(posInvoices.userId, userId),
+        eq(posInvoices.documentType, documentType)
+      ))
+      .orderBy(sql`id DESC`)
+      .limit(1);
+
+    if (!latest || !latest.documentNumber) {
+      // First document for this user and type
+      return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
+    }
+
+    // Extract number from document number (e.g., "INV-0005" -> 5)
+    const match = latest.documentNumber.match(/(\d+)$/);
+    if (!match) {
+      return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
+    }
+
+    const nextNum = parseInt(match[1]) + 1;
+    const prefix = documentType === 'invoice' ? 'INV' : 'QUO';
+    return `${prefix}-${String(nextNum).padStart(4, '0')}`;
   }
 
   // Staff Account Operations

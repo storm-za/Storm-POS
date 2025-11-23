@@ -1966,6 +1966,17 @@ export default function PosSystem() {
                   <span>Customers</span>
                 </button>
                 <button
+                  onClick={() => handleTabChange("invoices")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "invoices"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                  }`}
+                >
+                  <Receipt className="h-4 w-4 mb-1" />
+                  <span>Invoices</span>
+                </button>
+                <button
                   onClick={() => handleTabChange("open-accounts")}
                   className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "open-accounts"
@@ -2002,7 +2013,7 @@ export default function PosSystem() {
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
+            <TabsList className="hidden md:grid w-full grid-cols-7 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="sales" 
                 className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
@@ -2026,6 +2037,14 @@ export default function PosSystem() {
               >
                 <Users className="h-4 w-4" />
                 <span>Customers</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="invoices" 
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
+                data-testid="tab-invoices"
+              >
+                <Receipt className="h-4 w-4" />
+                <span>Invoices & Quotes</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="open-accounts" 
@@ -2685,6 +2704,24 @@ export default function PosSystem() {
                   )}
                 </div>
               </CardContent>
+            </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* Invoices & Quotes Tab */}
+          <TabsContent value="invoices">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+            <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
+                <CardTitle className="text-white text-xl font-bold">Invoices & Quotes</CardTitle>
+                <div className="text-center py-8 text-gray-400">
+                  Invoice & Quote generator coming soon - Full feature implementation in progress
+                </div>
+              </CardHeader>
             </Card>
             </motion.div>
           </TabsContent>

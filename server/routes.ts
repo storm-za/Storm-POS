@@ -7,6 +7,7 @@ import {
   insertPosCustomerSchema, 
   insertPosSaleSchema,
   insertPosOpenAccountSchema,
+  insertPosInvoiceSchema,
   signupPosUserSchema
 } from "@shared/schema";
 import { sendContactSubmissionEmail, sendWelcomeEmail } from "./email";
@@ -598,6 +599,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error removing item from open account:", error);
       res.status(500).json({ message: "Failed to remove item from open account" });
+    }
+  });
+
+  // Invoice Routes
+  app.get("/api/pos/invoices", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const invoices = await storage.getPosInvoices(userId);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  app.get("/api/pos/invoices/next-number", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const documentType = (req.query.documentType as string) || 'invoice';
+      const nextNumber = await storage.getNextDocumentNumber(userId, documentType);
+      res.json({ documentNumber: nextNumber });
+    } catch (error) {
+      console.error("Error getting next document number:", error);
+      res.status(500).json({ message: "Failed to get next document number" });
+    }
+  });
+
+  app.post("/api/pos/invoices", async (req, res) => {
+    try {
+      const { userId, ...invoiceData } = req.body;
+      const userIdToUse = userId || 1;
+      
+      // Convert date strings to Date objects and ensure proper types
+      const processedData = {
+        ...invoiceData,
+        userId: userIdToUse,
+        createdDate: invoiceData.createdDate ? new Date(invoiceData.createdDate) : new Date(),
+        dueDate: new Date(invoiceData.dueDate),
+      };
+      
+      const validatedData = insertPosInvoiceSchema.parse(processedData);
+      
+      const invoice = await storage.createPosInvoice(validatedData);
+      res.json(invoice);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: error.errors 
+        });
+      }
+      console.error("Error creating invoice:", error);
+      res.status(500).json({ message: "Failed to create invoice" });
+    }
+  });
+
+  app.put("/api/pos/invoices/:id", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const invoice = await storage.updatePosInvoice(invoiceId, req.body);
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      res.status(500).json({ message: "Failed to update invoice" });
+    }
+  });
+
+  app.delete("/api/pos/invoices/:id", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const success = await storage.deletePosInvoice(invoiceId);
+      if (!success) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
     }
   });
 
