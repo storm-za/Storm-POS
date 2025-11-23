@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,6 +138,14 @@ export default function PosSystem() {
   const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
   const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
+  
+  // Invoice search and filter state
+  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'cancelled'>('all');
+  const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<'all' | 'invoice' | 'quote'>('all');
+  const [invoiceDateFrom, setInvoiceDateFrom] = useState("");
+  const [invoiceDateTo, setInvoiceDateTo] = useState("");
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -332,6 +340,52 @@ export default function PosSystem() {
     },
     enabled: !!currentUser,
   });
+
+  // Filter invoices based on search and filter criteria
+  const filteredInvoices = useMemo(() => {
+    return invoices.filter((invoice) => {
+      // Search filter (document number or client name)
+      if (invoiceSearchQuery) {
+        const query = invoiceSearchQuery.toLowerCase();
+        const documentNumber = invoice.documentNumber?.toLowerCase() || '';
+        const clientName = (customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || '').toLowerCase();
+        if (!documentNumber.includes(query) && !clientName.includes(query)) {
+          return false;
+        }
+      }
+      
+      // Status filter
+      if (invoiceStatusFilter !== 'all' && invoice.status !== invoiceStatusFilter) {
+        return false;
+      }
+      
+      // Document type filter
+      if (invoiceTypeFilter !== 'all' && invoice.documentType !== invoiceTypeFilter) {
+        return false;
+      }
+      
+      // Date from filter
+      if (invoiceDateFrom) {
+        const invoiceDate = new Date(invoice.createdDate);
+        const fromDate = new Date(invoiceDateFrom);
+        if (invoiceDate < fromDate) {
+          return false;
+        }
+      }
+      
+      // Date to filter
+      if (invoiceDateTo) {
+        const invoiceDate = new Date(invoice.createdDate);
+        const toDate = new Date(invoiceDateTo);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (invoiceDate > toDate) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers]);
 
   // Product mutations
   const createProductMutation = useMutation({
@@ -3058,15 +3112,106 @@ export default function PosSystem() {
                 </Button>
               </CardHeader>
               <CardContent className="pt-6">
-                {invoices.length === 0 ? (
+                {/* Search and Filter Controls */}
+                <div className="mb-6 space-y-4">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Input
+                          placeholder="Search by document number or client name..."
+                          value={invoiceSearchQuery}
+                          onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+                          data-testid="input-invoice-search"
+                        />
+                      </div>
+                    </div>
+                    <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
+                        <SelectValue placeholder="All Types" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="invoice">Invoices Only</SelectItem>
+                        <SelectItem value="quote">Quotes Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
+                        <SelectValue placeholder="All Statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="paid">Paid</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-3 items-end">
+                    <div className="flex-1 flex gap-3">
+                      <div className="flex-1">
+                        <Label className="text-gray-300 text-sm mb-1 block">From Date</Label>
+                        <Input
+                          type="date"
+                          value={invoiceDateFrom}
+                          onChange={(e) => setInvoiceDateFrom(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white"
+                          data-testid="input-invoice-date-from"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Label className="text-gray-300 text-sm mb-1 block">To Date</Label>
+                        <Input
+                          type="date"
+                          value={invoiceDateTo}
+                          onChange={(e) => setInvoiceDateTo(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white"
+                          data-testid="input-invoice-date-to"
+                        />
+                      </div>
+                    </div>
+                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setInvoiceSearchQuery("");
+                          setInvoiceStatusFilter('all');
+                          setInvoiceTypeFilter('all');
+                          setInvoiceDateFrom("");
+                          setInvoiceDateTo("");
+                        }}
+                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 whitespace-nowrap"
+                        data-testid="button-clear-filters"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {filteredInvoices.length === 0 ? (
                   <div className="text-center py-12">
                     <Receipt className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-400 text-lg mb-2">No invoices or quotes yet</p>
-                    <p className="text-gray-500 text-sm">Create your first invoice or quote to get started</p>
+                    {invoices.length === 0 ? (
+                      <>
+                        <p className="text-gray-400 text-lg mb-2">No invoices or quotes yet</p>
+                        <p className="text-gray-500 text-sm">Create your first invoice or quote to get started</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-gray-400 text-lg mb-2">No results found</p>
+                        <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {invoices.map((invoice) => (
+                    {filteredInvoices.map((invoice) => (
                       <motion.div
                         key={invoice.id}
                         className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
