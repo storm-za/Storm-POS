@@ -130,6 +130,8 @@ export default function PosSystem() {
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
   const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
+  const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
+  const [isCustomClient, setIsCustomClient] = useState(false);
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
   const [invoicePoNumber, setInvoicePoNumber] = useState("");
@@ -550,6 +552,8 @@ export default function PosSystem() {
       setEditingInvoice(null);
       setInvoiceItems([]);
       setInvoiceClientId(null);
+      setInvoiceCustomClient("");
+      setIsCustomClient(false);
       setInvoiceDueDate("");
       setInvoiceNotes("");
       setInvoicePoNumber("");
@@ -588,6 +592,8 @@ export default function PosSystem() {
       setSelectedInvoice(updatedInvoice);
       setInvoiceItems([]);
       setInvoiceClientId(null);
+      setInvoiceCustomClient("");
+      setIsCustomClient(false);
       setInvoiceDueDate("");
       setInvoiceNotes("");
       setInvoicePoNumber("");
@@ -4968,6 +4974,8 @@ export default function PosSystem() {
             setEditingInvoice(null);
             setInvoiceItems([]);
             setInvoiceClientId(null);
+            setInvoiceCustomClient("");
+            setIsCustomClient(false);
             setInvoiceDueDate("");
             setInvoiceNotes("");
             setInvoicePoNumber("");
@@ -5010,22 +5018,51 @@ export default function PosSystem() {
 
             {/* Client Selection */}
             <div>
-              <Label>Client</Label>
-              <Select 
-                value={invoiceClientId?.toString() || ""} 
-                onValueChange={(value) => setInvoiceClientId(parseInt(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Client</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCustomClient(!isCustomClient);
+                    if (!isCustomClient) {
+                      setInvoiceClientId(null);
+                    } else {
+                      setInvoiceCustomClient("");
+                    }
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-700 underline"
+                  data-testid="button-toggle-custom-client"
+                >
+                  {isCustomClient ? "Select from list" : "Enter custom client"}
+                </button>
+              </div>
+              {isCustomClient ? (
+                <Input
+                  type="text"
+                  value={invoiceCustomClient}
+                  onChange={(e) => setInvoiceCustomClient(e.target.value)}
+                  placeholder="Enter client name"
+                  className="w-full"
+                  data-testid="input-custom-client"
+                />
+              ) : (
+                <Select 
+                  value={invoiceClientId?.toString() || ""} 
+                  onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+                  data-testid="select-client"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {/* PO Number */}
@@ -5239,13 +5276,30 @@ export default function PosSystem() {
               </Button>
               <Button 
                 onClick={() => {
-                  if (!invoiceClientId || !invoiceDueDate) {
-                    toast({
-                      title: "Missing Information",
-                      description: "Please select a client and due date",
-                      variant: "destructive"
-                    });
-                    return;
+                  // Trim custom client name
+                  const trimmedCustomClient = invoiceCustomClient.trim();
+                  
+                  // Mode-specific validation to prevent stale state leaks
+                  if (isCustomClient) {
+                    // In custom mode: require custom client name
+                    if (!trimmedCustomClient || !invoiceDueDate) {
+                      toast({
+                        title: "Missing Information",
+                        description: "Please enter a client name and due date",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                  } else {
+                    // In list mode: require client selection from dropdown
+                    if (!invoiceClientId || !invoiceDueDate) {
+                      toast({
+                        title: "Missing Information",
+                        description: "Please select a client and due date",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
                   }
                   
                   if (invoiceItems.length === 0) {
@@ -5265,11 +5319,31 @@ export default function PosSystem() {
                   const shipping = parseFloat(invoiceShippingAmount) || 0;
                   const total = afterDiscount + taxAmount + shipping;
                   
+                  // Determine client name based ONLY on current mode (prevents stale state leaks)
+                  let clientName: string;
+                  if (isCustomClient) {
+                    // Custom mode: use trimmed custom name
+                    clientName = trimmedCustomClient;
+                  } else {
+                    // List mode: resolve customer name from dropdown selection
+                    const selectedCustomer = customers.find(c => c.id === invoiceClientId);
+                    if (!selectedCustomer) {
+                      toast({
+                        title: "Error",
+                        description: "Selected customer not found. Please select a valid customer.",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                    clientName = selectedCustomer.name;
+                  }
+                  
                   const invoiceData = {
                     documentType: invoiceType,
                     status: editingInvoice ? editingInvoice.status : 'draft',
-                    clientId: invoiceClientId,
-                    title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoiceClientId)?.name}`,
+                    clientId: isCustomClient ? undefined : invoiceClientId,
+                    clientName: isCustomClient ? trimmedCustomClient : undefined,
+                    title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${clientName}`,
                     poNumber: invoicePoNumber || undefined,
                     dueTerms: invoiceDueTerms,
                     dueDate: invoiceDueDate,
@@ -5473,7 +5547,18 @@ export default function PosSystem() {
                         // Populate form with existing invoice data
                         setEditingInvoice(selectedInvoice);
                         setInvoiceType(selectedInvoice.documentType);
-                        setInvoiceClientId(selectedInvoice.clientId);
+                        
+                        // Handle custom client vs client from list
+                        if (selectedInvoice.clientId) {
+                          setIsCustomClient(false);
+                          setInvoiceClientId(selectedInvoice.clientId);
+                          setInvoiceCustomClient("");
+                        } else if (selectedInvoice.clientName) {
+                          setIsCustomClient(true);
+                          setInvoiceCustomClient(selectedInvoice.clientName);
+                          setInvoiceClientId(null);
+                        }
+                        
                         setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                         setInvoiceNotes(selectedInvoice.notes || '');
                         setInvoicePoNumber(selectedInvoice.poNumber || '');
