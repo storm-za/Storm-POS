@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -122,6 +123,7 @@ export default function PosSystem() {
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [isDeleteInvoiceDialogOpen, setIsDeleteInvoiceDialogOpen] = useState(false);
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
   const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
@@ -507,6 +509,30 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: error.message || "Failed to create invoice",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/invoices/${invoiceId}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsDeleteInvoiceDialogOpen(false);
+      setIsInvoiceViewOpen(false);
+      setSelectedInvoice(null);
+      toast({
+        title: "Deleted",
+        description: "Invoice deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete invoice",
         variant: "destructive",
       });
     },
@@ -1721,6 +1747,184 @@ export default function PosSystem() {
   const logout = () => {
     // In a real app, you'd clear session/tokens here
     window.location.href = "/pos/login";
+  };
+
+  // PDF Export Function
+  const generateInvoicePDF = (invoice: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const blueColor: [number, number, number] = [43, 108, 176]; // hsl(217,90%,40%) converted to RGB
+    
+    // Helper to safely format dates
+    const formatDate = (date: any) => {
+      if (!date) return 'N/A';
+      const dateObj = date instanceof Date ? date : new Date(date);
+      return isNaN(dateObj.getTime()) ? 'N/A' : dateObj.toLocaleDateString();
+    };
+    
+    // Storm Header
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('STORM', 20, 25);
+    
+    // Document Title
+    doc.setFontSize(16);
+    doc.text(invoice.documentType === 'invoice' ? 'INVOICE' : 'QUOTE', pageWidth - 20, 25, { align: 'right' });
+    
+    // Reset text color
+    doc.setTextColor(0, 0, 0);
+    
+    // Document Number and Status
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Document #: ${invoice.documentNumber || 'N/A'}`, 20, 55);
+    doc.setFont('helvetica', 'normal');
+    if (invoice.status) {
+      doc.text(`Status: ${invoice.status.toUpperCase()}`, pageWidth - 20, 55, { align: 'right' });
+    }
+    
+    // Document Info
+    let y = 70;
+    doc.setFontSize(10);
+    doc.text(`Created: ${formatDate(invoice.createdDate)}`, 20, y);
+    doc.text(`Due: ${formatDate(invoice.dueDate)}`, 20, y + 6);
+    if (invoice.poNumber) {
+      doc.text(`PO #: ${invoice.poNumber}`, 20, y + 12);
+      y += 6;
+    }
+    doc.text(`Payment Terms: ${invoice.dueTerms || '7 days'}`, 20, y + 12);
+    
+    // Client Information
+    y += 25;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('BILL TO:', 20, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const client = customers.find(c => c.id === invoice.clientId);
+    doc.text(client?.name || invoice.clientName || 'N/A', 20, y + 7);
+    if (client?.phone) {
+      doc.text(client.phone, 20, y + 13);
+    }
+    
+    // Line Items Table
+    y += 30;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('ITEMS', 20, y);
+    
+    y += 7;
+    // Table headers
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(20, y, pageWidth - 40, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.text('Product', 25, y + 5.5);
+    doc.text('Qty', pageWidth - 90, y + 5.5, { align: 'center' });
+    doc.text('Price', pageWidth - 60, y + 5.5, { align: 'right' });
+    doc.text('Total', pageWidth - 25, y + 5.5, { align: 'right' });
+    
+    // Table rows
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    y += 10;
+    
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    items.forEach((item: any) => {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(item.name, 25, y);
+      doc.text(item.quantity.toString(), pageWidth - 90, y, { align: 'center' });
+      doc.text(`R${parseFloat(item.price).toFixed(2)}`, pageWidth - 60, y, { align: 'right' });
+      doc.text(`R${parseFloat(item.lineTotal).toFixed(2)}`, pageWidth - 25, y, { align: 'right' });
+      y += 6;
+    });
+    
+    // Financial Summary
+    y += 10;
+    const summaryX = pageWidth - 80;
+    doc.setFont('helvetica', 'normal');
+    doc.text('Subtotal:', summaryX, y);
+    doc.text(`R${typeof invoice.subtotal === 'number' ? invoice.subtotal.toFixed(2) : invoice.subtotal}`, pageWidth - 25, y, { align: 'right' });
+    
+    if (parseFloat(invoice.discountPercent || '0') > 0) {
+      y += 6;
+      doc.setTextColor(255, 0, 0);
+      doc.text(`Discount (${invoice.discountPercent}%):`, summaryX, y);
+      const discountAmount = parseFloat(invoice.subtotal) * (parseFloat(invoice.discountPercent) / 100);
+      doc.text(`-R${discountAmount.toFixed(2)}`, pageWidth - 25, y, { align: 'right' });
+      doc.setTextColor(0, 0, 0);
+    }
+    
+    y += 6;
+    doc.text('VAT (15%):', summaryX, y);
+    doc.text(`R${typeof invoice.tax === 'number' ? invoice.tax.toFixed(2) : invoice.tax}`, pageWidth - 25, y, { align: 'right' });
+    
+    if (parseFloat(invoice.shippingAmount || '0') > 0) {
+      y += 6;
+      doc.text('Shipping:', summaryX, y);
+      doc.text(`R${typeof invoice.shippingAmount === 'number' ? invoice.shippingAmount.toFixed(2) : invoice.shippingAmount}`, pageWidth - 25, y, { align: 'right' });
+    }
+    
+    // Total
+    y += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('TOTAL:', summaryX, y);
+    doc.text(`R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`, pageWidth - 25, y, { align: 'right' });
+    
+    // Notes and Terms
+    if (invoice.notes || invoice.terms) {
+      y += 15;
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      
+      if (invoice.notes) {
+        doc.text('Notes:', 20, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const notesLines = doc.splitTextToSize(invoice.notes, pageWidth - 40);
+        doc.text(notesLines, 20, y + 5);
+        y += (notesLines.length * 4) + 10;
+      }
+      
+      if (invoice.terms) {
+        if (y > 250) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('Terms & Conditions:', 20, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const termsLines = doc.splitTextToSize(invoice.terms, pageWidth - 40);
+        doc.text(termsLines, 20, y + 5);
+      }
+    }
+    
+    // Footer
+    const footerY = doc.internal.pageSize.getHeight() - 15;
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Thank you for your business!', pageWidth / 2, footerY, { align: 'center' });
+    doc.text('softwarebystorm@gmail.com', pageWidth / 2, footerY + 5, { align: 'center' });
+    
+    // Download PDF
+    const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
+    doc.save(fileName);
+    
+    toast({
+      title: "PDF Generated",
+      description: `${invoice.documentNumber} has been downloaded`,
+    });
   };
 
   return (
@@ -5016,7 +5220,13 @@ export default function PosSystem() {
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" data-testid="button-delete-invoice">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700" 
+                    data-testid="button-delete-invoice"
+                    onClick={() => setIsDeleteInvoiceDialogOpen(true)}
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Delete
                   </Button>
@@ -5029,6 +5239,7 @@ export default function PosSystem() {
                     size="sm" 
                     className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                     data-testid="button-export-pdf"
+                    onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export PDF
@@ -5042,6 +5253,36 @@ export default function PosSystem() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Invoice Confirmation Dialog */}
+      <AlertDialog open={isDeleteInvoiceDialogOpen} onOpenChange={setIsDeleteInvoiceDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Invoice?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{' '}
+              <span className="font-semibold text-[hsl(217,90%,40%)]">
+                {selectedInvoice?.documentNumber}
+              </span>
+              ? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (selectedInvoice) {
+                  deleteInvoiceMutation.mutate(selectedInvoice.id);
+                }
+              }}
+              disabled={deleteInvoiceMutation.isPending}
+            >
+              {deleteInvoiceMutation.isPending ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
