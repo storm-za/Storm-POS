@@ -120,8 +120,49 @@ export default function PosSystemAfrikaans() {
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
+  
+  // Invoice-related state
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+  const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<any | null>(null);
+  const [isDeleteInvoiceDialogOpen, setIsDeleteInvoiceDialogOpen] = useState(false);
+  const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
+  const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
+  const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
+  const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
+  const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
+  const [isCustomClient, setIsCustomClient] = useState(false);
+  const [invoiceDueDate, setInvoiceDueDate] = useState("");
+  const [invoiceNotes, setInvoiceNotes] = useState("");
+  const [invoicePoNumber, setInvoicePoNumber] = useState("");
+  const [invoiceDueTerms, setInvoiceDueTerms] = useState("7 dae");
+  const [invoiceDiscountPercent, setInvoiceDiscountPercent] = useState("0");
+  const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
+  const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
+  const [invoiceTerms, setInvoiceTerms] = useState("");
+  
+  // Invoice search and filter state
+  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'cancelled'>('all');
+  const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<'all' | 'invoice' | 'quote'>('all');
+  const [invoiceDateFrom, setInvoiceDateFrom] = useState("");
+  const [invoiceDateTo, setInvoiceDateTo] = useState("");
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Status translation helper function
+  const translateStatus = (status: string): string => {
+    const statusMap: Record<string, string> = {
+      'draft': 'Konsep',
+      'sent': 'Gestuur',
+      'paid': 'Betaal',
+      'cancelled': 'Gekanselleer'
+    };
+    return statusMap[status] || status;
+  };
 
   // Form schemas - Afrikaans validation messages
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
@@ -285,6 +326,63 @@ export default function PosSystemAfrikaans() {
     enabled: !!currentUser,
   });
 
+  const { data: invoices = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/invoices", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Kon nie fakturen laai nie');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Filter invoices based on search and filter criteria
+  const filteredInvoices = useMemo(() => {
+    return invoices.filter((invoice) => {
+      // Search filter (document number or client name)
+      if (invoiceSearchQuery) {
+        const query = invoiceSearchQuery.toLowerCase();
+        const documentNumber = invoice.documentNumber?.toLowerCase() || '';
+        const clientName = (customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || '').toLowerCase();
+        if (!documentNumber.includes(query) && !clientName.includes(query)) {
+          return false;
+        }
+      }
+      
+      // Status filter
+      if (invoiceStatusFilter !== 'all' && invoice.status !== invoiceStatusFilter) {
+        return false;
+      }
+      
+      // Document type filter
+      if (invoiceTypeFilter !== 'all' && invoice.documentType !== invoiceTypeFilter) {
+        return false;
+      }
+      
+      // Date from filter
+      if (invoiceDateFrom) {
+        const invoiceDate = new Date(invoice.createdDate);
+        const fromDate = new Date(invoiceDateFrom);
+        if (invoiceDate < fromDate) {
+          return false;
+        }
+      }
+      
+      // Date to filter
+      if (invoiceDateTo) {
+        const invoiceDate = new Date(invoice.createdDate);
+        const toDate = new Date(invoiceDateTo);
+        toDate.setHours(23, 59, 59, 999); // End of day
+        if (invoiceDate > toDate) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers]);
+
   // Logout function
   const logout = async () => {
     try {
@@ -442,6 +540,132 @@ export default function PosSystemAfrikaans() {
       toast({
         title: "Fout",
         description: "Kon nie klient verwyder nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Invoice mutations
+  const createInvoiceMutation = useMutation({
+    mutationFn: async (invoiceData: any) => {
+      const response = await apiRequest("POST", "/api/pos/invoices", {
+        ...invoiceData,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsInvoiceDialogOpen(false);
+      setEditingInvoice(null);
+      setInvoiceItems([]);
+      setInvoiceClientId(null);
+      setInvoiceCustomClient("");
+      setIsCustomClient(false);
+      setInvoiceDueDate("");
+      setInvoiceNotes("");
+      setInvoicePoNumber("");
+      setInvoiceDueTerms("7 dae");
+      setInvoiceDiscountPercent("0");
+      setInvoiceShippingAmount("0");
+      setInvoicePaymentMethod("");
+      setInvoiceTerms("");
+      toast({
+        title: "Sukses",
+        description: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} geskep`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Kon nie faktuur skep nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateInvoiceMutation = useMutation({
+    mutationFn: async ({ invoiceId, invoiceData }: { invoiceId: number; invoiceData: any }) => {
+      const response = await apiRequest("PUT", `/api/pos/invoices/${invoiceId}`, {
+        ...invoiceData,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: (updatedInvoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsInvoiceDialogOpen(false);
+      setEditingInvoice(null);
+      setIsInvoiceViewOpen(false);
+      setSelectedInvoice(updatedInvoice);
+      setInvoiceItems([]);
+      setInvoiceClientId(null);
+      setInvoiceCustomClient("");
+      setIsCustomClient(false);
+      setInvoiceDueDate("");
+      setInvoiceNotes("");
+      setInvoicePoNumber("");
+      setInvoiceDueTerms("7 dae");
+      setInvoiceDiscountPercent("0");
+      setInvoiceShippingAmount("0");
+      setInvoicePaymentMethod("");
+      setInvoiceTerms("");
+      toast({
+        title: "Sukses",
+        description: `${updatedInvoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} bygewerk`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Kon nie faktuur bywerk nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/invoices/${invoiceId}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsDeleteInvoiceDialogOpen(false);
+      setIsInvoiceViewOpen(false);
+      setSelectedInvoice(null);
+      toast({
+        title: "Verwyder",
+        description: "Faktuur verwyder",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: "Kon nie faktuur verwyder nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateInvoiceStatusMutation = useMutation({
+    mutationFn: async ({ invoiceId, status }: { invoiceId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/pos/invoices/${invoiceId}`, { status });
+      return response.json();
+    },
+    onSuccess: (updatedInvoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setSelectedInvoice(updatedInvoice);
+      setIsStatusChangeDialogOpen(false);
+      toast({
+        title: "Status Bygewerk",
+        description: `Faktuur status verander na ${translateStatus(updatedInvoice.status)}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: "Kon nie status bywerk nie",
         variant: "destructive",
       });
     },
@@ -1455,7 +1679,7 @@ ${dateFilteredSales.map(sale =>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-6 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
+            <TabsList className="hidden md:grid w-full grid-cols-7 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="verkope" 
                 className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
@@ -1479,6 +1703,14 @@ ${dateFilteredSales.map(sale =>
               >
                 <Users className="h-4 w-4" />
                 <span>Kliente</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="fakturen" 
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
+                data-testid="tab-invoices"
+              >
+                <Receipt className="h-4 w-4" />
+                <span>Fakturen</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="oop-rekeninge" 
@@ -1896,6 +2128,186 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Invoices & Quotes Tab */}
+          <TabsContent value="fakturen">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+            <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
+                <CardTitle className="text-white text-xl font-bold">Fakturen & Kwotasies</CardTitle>
+                <Button 
+                  onClick={() => setIsInvoiceDialogOpen(true)}
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                  data-testid="button-create-invoice"
+                >
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Skep Faktuur/Kwotasie
+                </Button>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {/* Search and Filter Controls */}
+                <div className="mb-6 space-y-4">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Input
+                          placeholder="Soek op dokumentnommer of kliëntnaam..."
+                          value={invoiceSearchQuery}
+                          onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+                          data-testid="input-invoice-search"
+                        />
+                      </div>
+                    </div>
+                    <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
+                        <SelectValue placeholder="Almal" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Tipes</SelectItem>
+                        <SelectItem value="invoice">Slegs Fakturen</SelectItem>
+                        <SelectItem value="quote">Slegs Kwotasies</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
+                        <SelectValue placeholder="Alle Statusse" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Statusse</SelectItem>
+                        <SelectItem value="draft">Konsep</SelectItem>
+                        <SelectItem value="sent">Gestuur</SelectItem>
+                        <SelectItem value="paid">Betaal</SelectItem>
+                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-3 items-end">
+                    <div className="flex-1 flex gap-3">
+                      <div className="flex-1">
+                        <Label className="text-gray-300 text-sm mb-1 block">Van Datum</Label>
+                        <Input
+                          type="date"
+                          value={invoiceDateFrom}
+                          onChange={(e) => setInvoiceDateFrom(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white"
+                          data-testid="input-invoice-date-from"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Label className="text-gray-300 text-sm mb-1 block">Tot Datum</Label>
+                        <Input
+                          type="date"
+                          value={invoiceDateTo}
+                          onChange={(e) => setInvoiceDateTo(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white"
+                          data-testid="input-invoice-date-to"
+                        />
+                      </div>
+                    </div>
+                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setInvoiceSearchQuery("");
+                          setInvoiceStatusFilter('all');
+                          setInvoiceTypeFilter('all');
+                          setInvoiceDateFrom("");
+                          setInvoiceDateTo("");
+                        }}
+                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 whitespace-nowrap"
+                        data-testid="button-clear-filters"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        Maak Filters Skoon
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {filteredInvoices.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Receipt className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                    {invoices.length === 0 ? (
+                      <>
+                        <p className="text-gray-400 text-lg mb-2">Geen fakturen of kwotasies nog nie</p>
+                        <p className="text-gray-500 text-sm">Skep jou eerste faktuur of kwotasie om te begin</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-gray-400 text-lg mb-2">Geen resultate gevind nie</p>
+                        <p className="text-gray-500 text-sm">Probeer jou soek- of filterinstellings aanpas</p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredInvoices.map((invoice) => (
+                      <motion.div
+                        key={invoice.id}
+                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
+                        whileHover={{ scale: 1.01, y: -2 }}
+                        transition={{ duration: 0.2 }}
+                        onClick={() => {
+                          setSelectedInvoice(invoice);
+                          setIsInvoiceViewOpen(true);
+                        }}
+                        data-testid={`invoice-card-${invoice.id}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Badge 
+                                variant={invoice.documentType === 'invoice' ? 'default' : 'outline'}
+                                className={invoice.documentType === 'invoice' 
+                                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/30' 
+                                  : 'bg-purple-600/20 text-purple-300 border-purple-500/30'
+                                }
+                              >
+                                {invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+                              </Badge>
+                              <span className="text-white font-semibold">{invoice.documentNumber}</span>
+                              <Badge 
+                                variant="outline"
+                                className={
+                                  invoice.status === 'paid' ? 'bg-green-600/20 text-green-300 border-green-500/30' :
+                                  invoice.status === 'sent' ? 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30' :
+                                  'bg-gray-600/20 text-gray-300 border-gray-500/30'
+                                }
+                              >
+                                {invoice.status === 'draft' ? 'Konsep' : 
+                                 invoice.status === 'sent' ? 'Gestuur' : 
+                                 invoice.status === 'paid' ? 'Betaal' : 
+                                 invoice.status === 'cancelled' ? 'Gekanselleer' : invoice.status}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-300 text-sm">
+                              Kliënt: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                              Vervaldatum: {new Date(invoice.dueDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-white font-bold text-lg">
+                              R{typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            </motion.div>
           </TabsContent>
 
           {/* Open Accounts Tab */}
@@ -3424,6 +3836,729 @@ ${dateFilteredSales.map(sale =>
             <div className="flex justify-end pt-4">
               <Button onClick={() => setIsBankDetailsOpen(false)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
                 Sluit
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Invoice Creation/Edit Dialog */}
+        <Dialog 
+          open={isInvoiceDialogOpen} 
+          onOpenChange={(open) => {
+            setIsInvoiceDialogOpen(open);
+            if (!open) {
+              setEditingInvoice(null);
+              setInvoiceItems([]);
+              setInvoiceClientId(null);
+              setInvoiceCustomClient("");
+              setIsCustomClient(false);
+              setInvoiceDueDate("");
+              setInvoiceNotes("");
+              setInvoicePoNumber("");
+              setInvoiceDueTerms("7 dae");
+              setInvoiceDiscountPercent("0");
+              setInvoiceShippingAmount("0");
+              setInvoicePaymentMethod("");
+              setInvoiceTerms("");
+              setInvoiceType('invoice');
+            }
+          }}
+        >
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {/* Document Type Selection */}
+              <div>
+                <Label>Dokumenttipe</Label>
+                <Select 
+                  value={invoiceType} 
+                  onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
+                  disabled={!!editingInvoice}
+                >
+                  <SelectTrigger disabled={!!editingInvoice}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="invoice">Faktuur</SelectItem>
+                    <SelectItem value="quote">Kwotasie</SelectItem>
+                  </SelectContent>
+                </Select>
+                {editingInvoice && (
+                  <p className="text-xs text-gray-500 mt-1">Dokumenttipe kan nie verander word wanneer jy wysig nie</p>
+                )}
+              </div>
+
+              {/* Client Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Kliënt</Label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomClient(!isCustomClient);
+                      if (!isCustomClient) {
+                        setInvoiceClientId(null);
+                      } else {
+                        setInvoiceCustomClient("");
+                      }
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-700 underline"
+                    data-testid="button-toggle-custom-client"
+                  >
+                    {isCustomClient ? "Kies uit lys" : "Voer pasgemaakte kliënt in"}
+                  </button>
+                </div>
+                {isCustomClient ? (
+                  <Input
+                    type="text"
+                    value={invoiceCustomClient}
+                    onChange={(e) => setInvoiceCustomClient(e.target.value)}
+                    placeholder="Voer kliëntnaam in"
+                    className="w-full"
+                    data-testid="input-custom-client"
+                  />
+                ) : (
+                  <Select 
+                    value={invoiceClientId?.toString() || ""} 
+                    onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+                    data-testid="select-client"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kies kliënt" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                          {customer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {/* PO Number */}
+              <div>
+                <Label>PO Nommer (Opsioneel)</Label>
+                <input
+                  type="text"
+                  value={invoicePoNumber}
+                  onChange={(e) => setInvoicePoNumber(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Aankooporder nommer"
+                />
+              </div>
+
+              {/* Payment Terms */}
+              <div>
+                <Label>Betalingsvoorwaardes</Label>
+                <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7 dae">7 Dae</SelectItem>
+                    <SelectItem value="14 dae">14 Dae</SelectItem>
+                    <SelectItem value="30 dae">30 Dae</SelectItem>
+                    <SelectItem value="60 dae">60 Dae</SelectItem>
+                    <SelectItem value="90 dae">90 Dae</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <Label>Vervaldatum</Label>
+                <input
+                  type="date"
+                  value={invoiceDueDate}
+                  onChange={(e) => setInvoiceDueDate(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Line Items */}
+              <div>
+                <Label>Lynitemme</Label>
+                <div className="space-y-2 mt-2">
+                  {invoiceItems.map((item, index) => {
+                    const product = products.find(p => p.id === item.productId);
+                    return (
+                      <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                        <div className="flex-1">
+                          <span className="font-medium">{product?.name}</span>
+                          <span className="text-sm text-gray-500 ml-2">x{item.quantity}</span>
+                        </div>
+                        <div className="text-right font-medium">
+                          R{(item.price * item.quantity).toFixed(2)}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Add Line Item */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <Select
+                      value=""
+                      onValueChange={(value) => {
+                        const product = products.find(p => p.id === parseInt(value));
+                        if (product) {
+                          setInvoiceItems([...invoiceItems, {
+                            productId: product.id,
+                            quantity: 1,
+                            price: parseFloat(product.retailPrice)
+                          }]);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kies produk" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map((product) => (
+                          <SelectItem key={product.id} value={product.id.toString()}>
+                            {product.name} - R{product.retailPrice}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button variant="outline" size="sm" className="col-span-2">
+                      + Voeg Produk By
+                    </Button>
+                  </div>
+                  
+                  {/* Totals */}
+                  {invoiceItems.length > 0 && (
+                    <div className="border-t pt-2 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Subtotaal:</span>
+                        <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
+                      </div>
+                      
+                      {/* Discount Input */}
+                      <div className="flex justify-between items-center text-sm">
+                        <span>Afslag (%):</span>
+                        <input
+                          type="number"
+                          value={invoiceDiscountPercent}
+                          onChange={(e) => setInvoiceDiscountPercent(e.target.value)}
+                          className="w-20 px-2 py-1 border rounded text-right"
+                          min="0"
+                          max="100"
+                          step="0.01"
+                        />
+                      </div>
+                      {parseFloat(invoiceDiscountPercent) > 0 && (
+                        <div className="flex justify-between text-sm text-red-600">
+                          <span>Afslag Bedrag:</span>
+                          <span>-R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between text-sm">
+                        <span>BTW (15%):</span>
+                        <span>R{((invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 - parseFloat(invoiceDiscountPercent) / 100)) * 0.15).toFixed(2)}</span>
+                      </div>
+                      
+                      {/* Shipping Input */}
+                      <div className="flex justify-between items-center text-sm">
+                        <span>Versending:</span>
+                        <div className="flex items-center gap-1">
+                          <span>R</span>
+                          <input
+                            type="number"
+                            value={invoiceShippingAmount}
+                            onChange={(e) => setInvoiceShippingAmount(e.target.value)}
+                            className="w-20 px-2 py-1 border rounded text-right"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between font-bold text-base border-t pt-2">
+                        <span>Totaal:</span>
+                        <span>R{(() => {
+                          const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                          const discount = subtotal * (parseFloat(invoiceDiscountPercent) / 100);
+                          const afterDiscount = subtotal - discount;
+                          const tax = afterDiscount * 0.15;
+                          const shipping = parseFloat(invoiceShippingAmount) || 0;
+                          return (afterDiscount + tax + shipping).toFixed(2);
+                        })()}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div>
+                <Label>Betaalmetode (Opsioneel)</Label>
+                <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies betaalmetode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Kontant">Kontant</SelectItem>
+                    <SelectItem value="Kaart">Kaart</SelectItem>
+                    <SelectItem value="EFT">EFT</SelectItem>
+                    <SelectItem value="Ander">Ander</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label>Notas (Opsioneel)</Label>
+                <textarea
+                  value={invoiceNotes}
+                  onChange={(e) => setInvoiceNotes(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={2}
+                  placeholder="Addisionele notas..."
+                />
+              </div>
+
+              {/* Terms & Conditions */}
+              <div>
+                <Label>Terme & Voorwaardes (Opsioneel)</Label>
+                <textarea
+                  value={invoiceTerms}
+                  onChange={(e) => setInvoiceTerms(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Voer betalingsvoorwaardes en -terme in..."
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
+                  Kanselleer
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const trimmedCustomClient = invoiceCustomClient.trim();
+                    
+                    if (isCustomClient) {
+                      if (!trimmedCustomClient || !invoiceDueDate) {
+                        toast({
+                          title: "Ontbrekende Inligting",
+                          description: "Voer asseblief 'n kliëntnaam en vervaldatum in",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                    } else {
+                      if (!invoiceClientId || !invoiceDueDate) {
+                        toast({
+                          title: "Ontbrekende Inligting",
+                          description: "Kies asseblief 'n kliënt en vervaldatum",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                    }
+                    
+                    if (invoiceItems.length === 0) {
+                      toast({
+                        title: "Geen Lynitemme",
+                        description: "Voeg asseblief ten minste een produk by die faktuur",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                    
+                    const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const discountPercent = parseFloat(invoiceDiscountPercent) || 0;
+                    const discountAmount = subtotal * (discountPercent / 100);
+                    const afterDiscount = subtotal - discountAmount;
+                    const taxAmount = afterDiscount * 0.15;
+                    const shipping = parseFloat(invoiceShippingAmount) || 0;
+                    const total = afterDiscount + taxAmount + shipping;
+                    
+                    let clientName: string;
+                    if (isCustomClient) {
+                      clientName = trimmedCustomClient;
+                    } else {
+                      const selectedCustomer = customers.find(c => c.id === invoiceClientId);
+                      if (!selectedCustomer) {
+                        toast({
+                          title: "Fout",
+                          description: "Geselekteerde kliënt nie gevind nie. Kies asseblief 'n geldige kliënt.",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      clientName = selectedCustomer.name;
+                    }
+                    
+                    const invoiceData = {
+                      documentType: invoiceType,
+                      status: editingInvoice ? editingInvoice.status : 'draft',
+                      clientId: isCustomClient ? undefined : invoiceClientId,
+                      clientName: isCustomClient ? trimmedCustomClient : undefined,
+                      title: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${clientName}`,
+                      poNumber: invoicePoNumber || undefined,
+                      dueTerms: invoiceDueTerms,
+                      dueDate: invoiceDueDate,
+                      items: invoiceItems.map(item => ({
+                        productId: item.productId,
+                        name: products.find(p => p.id === item.productId)?.name || '',
+                        quantity: item.quantity,
+                        price: parseFloat(item.price.toFixed(2)),
+                        lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
+                      })),
+                      subtotal: parseFloat(subtotal.toFixed(2)),
+                      discountPercent: parseFloat(discountPercent.toFixed(2)),
+                      taxPercent: 15.00,
+                      tax: parseFloat(taxAmount.toFixed(2)),
+                      shippingAmount: parseFloat(shipping.toFixed(2)),
+                      total: parseFloat(total.toFixed(2)),
+                      paymentMethod: invoicePaymentMethod || undefined,
+                      notes: invoiceNotes || undefined,
+                      terms: invoiceTerms || undefined
+                    };
+                    
+                    if (editingInvoice) {
+                      updateInvoiceMutation.mutate({
+                        invoiceId: editingInvoice.id,
+                        invoiceData
+                      });
+                    } else {
+                      createInvoiceMutation.mutate(invoiceData);
+                    }
+                  }}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
+                >
+                  {createInvoiceMutation.isPending || updateInvoiceMutation.isPending 
+                    ? (editingInvoice ? 'Werk By...' : 'Skep...') 
+                    : editingInvoice 
+                      ? `Werk ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} By` 
+                      : `Skep ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}`
+                  }
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Invoice Detail/View Modal */}
+        <Dialog open={isInvoiceViewOpen} onOpenChange={setIsInvoiceViewOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            {selectedInvoice && (
+              <>
+                <DialogHeader className="border-b border-gray-200 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <DialogTitle className="text-2xl text-[hsl(217,90%,40%)]">
+                        {selectedInvoice.documentNumber}
+                      </DialogTitle>
+                      <p className="text-sm text-gray-500 mt-1">{selectedInvoice.title}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={selectedInvoice.documentType === 'invoice' ? 'default' : 'outline'}
+                        className={selectedInvoice.documentType === 'invoice' 
+                          ? 'bg-[hsl(217,90%,40%)] text-white' 
+                          : 'text-purple-600 border-purple-300'
+                        }
+                      >
+                        {selectedInvoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE'}
+                      </Badge>
+                      <Badge 
+                        variant="outline"
+                        className={
+                          selectedInvoice.status === 'paid' ? 'bg-green-100 text-green-700 border-green-300' :
+                          selectedInvoice.status === 'sent' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
+                          selectedInvoice.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-300' :
+                          'bg-gray-100 text-gray-700 border-gray-300'
+                        }
+                      >
+                        {selectedInvoice.status === 'draft' ? 'KONSEP' : 
+                         selectedInvoice.status === 'sent' ? 'GESTUUR' : 
+                         selectedInvoice.status === 'paid' ? 'BETAAL' : 
+                         selectedInvoice.status === 'cancelled' ? 'GEKANSELLEER' : selectedInvoice.status.toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+                </DialogHeader>
+                
+                <div className="space-y-6 py-4">
+                  {/* Document Info Grid */}
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <Label className="text-xs text-gray-500">Kliënt</Label>
+                      <p className="font-medium">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
+                    </div>
+                    {selectedInvoice.poNumber && (
+                      <div>
+                        <Label className="text-xs text-gray-500">PO Nommer</Label>
+                        <p className="font-medium">{selectedInvoice.poNumber}</p>
+                      </div>
+                    )}
+                    <div>
+                      <Label className="text-xs text-gray-500">Datum Geskep</Label>
+                      <p className="font-medium">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">Vervaldatum</Label>
+                      <p className="font-medium">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-gray-500">Betalingsvoorwaardes</Label>
+                      <p className="font-medium">{selectedInvoice.dueTerms || '7 dae'}</p>
+                    </div>
+                    {selectedInvoice.paymentMethod && (
+                      <div>
+                        <Label className="text-xs text-gray-500">Betaalmetode</Label>
+                        <p className="font-medium">{selectedInvoice.paymentMethod}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Line Items Table */}
+                  <div>
+                    <Label className="text-sm font-semibold mb-2 block">Lynitemme</Label>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="text-left p-3 text-xs font-semibold text-gray-600">Produk</th>
+                            <th className="text-center p-3 text-xs font-semibold text-gray-600">Hoev</th>
+                            <th className="text-right p-3 text-xs font-semibold text-gray-600">Eenheidsprys</th>
+                            <th className="text-right p-3 text-xs font-semibold text-gray-600">Totaal</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="p-3">{item.name}</td>
+                              <td className="p-3 text-center">{item.quantity}</td>
+                              <td className="p-3 text-right">R{parseFloat(item.price).toFixed(2)}</td>
+                              <td className="p-3 text-right font-medium">R{parseFloat(item.lineTotal).toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Financial Summary */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="max-w-xs ml-auto space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Subtotaal:</span>
+                        <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
+                      </div>
+                      {parseFloat(selectedInvoice.discountPercent || '0') > 0 && (
+                        <div className="flex justify-between text-sm text-red-600">
+                          <span>Afslag ({selectedInvoice.discountPercent}%):</span>
+                          <span>-R{(parseFloat(selectedInvoice.subtotal) * (parseFloat(selectedInvoice.discountPercent) / 100)).toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">BTW (15%):</span>
+                        <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
+                      </div>
+                      {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Versending:</span>
+                          <span className="font-medium">R{typeof selectedInvoice.shippingAmount === 'number' ? selectedInvoice.shippingAmount.toFixed(2) : selectedInvoice.shippingAmount}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
+                        <span>Totaal:</span>
+                        <span className="text-[hsl(217,90%,40%)]">R{typeof selectedInvoice.total === 'number' ? selectedInvoice.total.toFixed(2) : selectedInvoice.total}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes & Terms */}
+                  {(selectedInvoice.notes || selectedInvoice.terms) && (
+                    <div className="space-y-4 border-t border-gray-200 pt-4">
+                      {selectedInvoice.notes && (
+                        <div>
+                          <Label className="text-sm font-semibold mb-2 block">Notas</Label>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedInvoice.notes}</p>
+                        </div>
+                      )}
+                      {selectedInvoice.terms && (
+                        <div>
+                          <Label className="text-sm font-semibold mb-2 block">Terme & Voorwaardes</Label>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">{selectedInvoice.terms}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-between items-center border-t border-gray-200 pt-4">
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      data-testid="button-edit-invoice"
+                      onClick={() => {
+                        if (selectedInvoice) {
+                          setEditingInvoice(selectedInvoice);
+                          setInvoiceType(selectedInvoice.documentType);
+                          
+                          if (selectedInvoice.clientId) {
+                            setIsCustomClient(false);
+                            setInvoiceClientId(selectedInvoice.clientId);
+                            setInvoiceCustomClient("");
+                          } else if (selectedInvoice.clientName) {
+                            setIsCustomClient(true);
+                            setInvoiceCustomClient(selectedInvoice.clientName);
+                            setInvoiceClientId(null);
+                          }
+                          
+                          setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
+                          setInvoiceNotes(selectedInvoice.notes || '');
+                          setInvoicePoNumber(selectedInvoice.poNumber || '');
+                          setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
+                          setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
+                          setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
+                          setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                          setInvoiceTerms(selectedInvoice.terms || '');
+                          
+                          const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
+                          setInvoiceItems(items.map((item: any) => ({
+                            productId: item.productId,
+                            quantity: parseFloat(item.quantity) || item.quantity,
+                            price: parseFloat(item.price)
+                          })));
+                          
+                          setIsInvoiceViewOpen(false);
+                          setIsInvoiceDialogOpen(true);
+                        }
+                      }}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Wysig
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600 hover:text-red-700" 
+                      data-testid="button-delete-invoice"
+                      onClick={() => setIsDeleteInvoiceDialogOpen(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Verwyder
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      data-testid="button-change-status"
+                      onClick={() => {
+                        setNewStatus(selectedInvoice?.status || 'draft');
+                        setIsStatusChangeDialogOpen(true);
+                      }}
+                    >
+                      Verander Status
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
+                      Sluit
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Invoice Confirmation Dialog */}
+        <AlertDialog open={isDeleteInvoiceDialogOpen} onOpenChange={setIsDeleteInvoiceDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Verwyder Faktuur?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Is jy seker jy wil{' '}
+                <span className="font-semibold text-[hsl(217,90%,40%)]">
+                  {selectedInvoice?.documentNumber}
+                </span>
+                {' '}verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Kanselleer</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 hover:bg-red-700"
+                onClick={() => {
+                  if (selectedInvoice) {
+                    deleteInvoiceMutation.mutate(selectedInvoice.id);
+                  }
+                }}
+                disabled={deleteInvoiceMutation.isPending}
+              >
+                {deleteInvoiceMutation.isPending ? 'Verwyder...' : 'Verwyder'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Change Status Dialog */}
+        <Dialog open={isStatusChangeDialogOpen} onOpenChange={setIsStatusChangeDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Verander Faktuur Status</DialogTitle>
+              <DialogDescription>
+                Werk die status van {selectedInvoice?.documentNumber} by
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Kies Nuwe Status</Label>
+                <Select value={newStatus} onValueChange={(value: any) => setNewStatus(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Konsep</SelectItem>
+                    <SelectItem value="sent">Gestuur</SelectItem>
+                    <SelectItem value="paid">Betaal</SelectItem>
+                    <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsStatusChangeDialogOpen(false)}>
+                Kanselleer
+              </Button>
+              <Button
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                onClick={() => {
+                  if (selectedInvoice) {
+                    updateInvoiceStatusMutation.mutate({
+                      invoiceId: selectedInvoice.id,
+                      status: newStatus
+                    });
+                  }
+                }}
+                disabled={updateInvoiceStatusMutation.isPending}
+              >
+                {updateInvoiceStatusMutation.isPending ? 'Werk By...' : 'Werk Status By'}
               </Button>
             </div>
           </DialogContent>
