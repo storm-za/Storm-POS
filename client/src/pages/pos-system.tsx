@@ -119,6 +119,12 @@ export default function PosSystem() {
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+  const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
+  const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
+  const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
+  const [invoiceDueDate, setInvoiceDueDate] = useState("");
+  const [invoiceNotes, setInvoiceNotes] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -457,6 +463,36 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: "Failed to delete customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Invoice mutations
+  const createInvoiceMutation = useMutation({
+    mutationFn: async (invoiceData: any) => {
+      const response = await apiRequest("POST", "/api/pos/invoices", {
+        ...invoiceData,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsInvoiceDialogOpen(false);
+      setInvoiceItems([]);
+      setInvoiceClientId(null);
+      setInvoiceDueDate("");
+      setInvoiceNotes("");
+      toast({
+        title: "Success",
+        description: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} created successfully`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create invoice",
         variant: "destructive",
       });
     },
@@ -2731,6 +2767,7 @@ export default function PosSystem() {
               <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
                 <CardTitle className="text-white text-xl font-bold">Invoices & Quotes</CardTitle>
                 <Button 
+                  onClick={() => setIsInvoiceDialogOpen(true)}
                   className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
                   data-testid="button-create-invoice"
                 >
@@ -4488,6 +4525,209 @@ export default function PosSystem() {
             <Button onClick={() => setIsBankDetailsOpen(false)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
               Close
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Creation Dialog */}
+      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Document Type Selection */}
+            <div>
+              <Label>Document Type</Label>
+              <Select value={invoiceType} onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="invoice">Invoice</SelectItem>
+                  <SelectItem value="quote">Quote</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Client Selection */}
+            <div>
+              <Label>Client</Label>
+              <Select 
+                value={invoiceClientId?.toString() || ""} 
+                onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id.toString()}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <Label>Due Date</Label>
+              <input
+                type="date"
+                value={invoiceDueDate}
+                onChange={(e) => setInvoiceDueDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+
+            {/* Line Items */}
+            <div>
+              <Label>Line Items</Label>
+              <div className="space-y-2 mt-2">
+                {invoiceItems.map((item, index) => {
+                  const product = products.find(p => p.id === item.productId);
+                  return (
+                    <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                      <div className="flex-1">
+                        <span className="font-medium">{product?.name}</span>
+                        <span className="text-sm text-gray-500 ml-2">x{item.quantity}</span>
+                      </div>
+                      <div className="text-right font-medium">
+                        R{(item.price * item.quantity).toFixed(2)}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
+                
+                {/* Add Line Item */}
+                <div className="grid grid-cols-3 gap-2">
+                  <Select
+                    value=""
+                    onValueChange={(value) => {
+                      const product = products.find(p => p.id === parseInt(value));
+                      if (product) {
+                        setInvoiceItems([...invoiceItems, {
+                          productId: product.id,
+                          quantity: 1,
+                          price: parseFloat(product.price)
+                        }]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id.toString()}>
+                          {product.name} - R{product.price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" size="sm" className="col-span-2">
+                    + Add Product
+                  </Button>
+                </div>
+                
+                {/* Totals */}
+                {invoiceItems.length > 0 && (
+                  <div className="border-t pt-2 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>VAT (15%):</span>
+                      <span>R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.15).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-base">
+                      <span>Total:</span>
+                      <span>R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.15).toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <Label>Notes</Label>
+              <textarea
+                value={invoiceNotes}
+                onChange={(e) => setInvoiceNotes(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                rows={3}
+                placeholder="Additional notes..."
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (!invoiceClientId || !invoiceDueDate) {
+                    toast({
+                      title: "Missing Information",
+                      description: "Please select a client and due date",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  if (invoiceItems.length === 0) {
+                    toast({
+                      title: "No Line Items",
+                      description: "Please add at least one product to the invoice",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                  const taxAmount = subtotal * 0.15;
+                  const total = subtotal + taxAmount;
+                  
+                  createInvoiceMutation.mutate({
+                    documentType: invoiceType,
+                    status: 'draft',
+                    clientId: invoiceClientId,
+                    title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoiceClientId)?.name}`,
+                    dueDate: invoiceDueDate,
+                    items: JSON.stringify(invoiceItems.map(item => ({
+                      productId: item.productId,
+                      productName: products.find(p => p.id === item.productId)?.name || '',
+                      quantity: item.quantity,
+                      price: item.price.toFixed(2),
+                      total: (item.price * item.quantity).toFixed(2)
+                    }))),
+                    subtotal: subtotal.toFixed(2),
+                    taxPercent: "15.00",
+                    tax: taxAmount.toFixed(2),
+                    shippingAmount: "0.00",
+                    total: total.toFixed(2),
+                    notes: invoiceNotes
+                  });
+                }}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                disabled={createInvoiceMutation.isPending}
+              >
+                {createInvoiceMutation.isPending ? 'Creating...' : `Create ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}`}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
