@@ -673,6 +673,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/pos/invoices/:id", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (!status || !['draft', 'sent', 'paid', 'cancelled'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status value" });
+      }
+      
+      const invoice = await storage.updatePosInvoice(invoiceId, { status });
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+      res.status(500).json({ message: "Failed to update invoice status" });
+    }
+  });
+
   app.delete("/api/pos/invoices/:id", async (req, res) => {
     try {
       const invoiceId = parseInt(req.params.id);

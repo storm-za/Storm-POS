@@ -124,6 +124,8 @@ export default function PosSystem() {
   const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
   const [isDeleteInvoiceDialogOpen, setIsDeleteInvoiceDialogOpen] = useState(false);
+  const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
   const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
@@ -533,6 +535,29 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: "Failed to delete invoice",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateInvoiceStatusMutation = useMutation({
+    mutationFn: async ({ invoiceId, status }: { invoiceId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/pos/invoices/${invoiceId}`, { status });
+      return response.json();
+    },
+    onSuccess: (updatedInvoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setSelectedInvoice(updatedInvoice);
+      setIsStatusChangeDialogOpen(false);
+      toast({
+        title: "Status Updated",
+        description: `Invoice status changed to ${updatedInvoice.status}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
         variant: "destructive",
       });
     },
@@ -5227,7 +5252,15 @@ export default function PosSystem() {
                   </Button>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" data-testid="button-change-status">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    data-testid="button-change-status"
+                    onClick={() => {
+                      setNewStatus(selectedInvoice?.status || 'draft');
+                      setIsStatusChangeDialogOpen(true);
+                    }}
+                  >
                     Change Status
                   </Button>
                   <Button 
@@ -5277,6 +5310,53 @@ export default function PosSystem() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Change Status Dialog */}
+      <Dialog open={isStatusChangeDialogOpen} onOpenChange={setIsStatusChangeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change Invoice Status</DialogTitle>
+            <DialogDescription>
+              Update the status of {selectedInvoice?.documentNumber}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Select New Status</Label>
+              <Select value={newStatus} onValueChange={(value: any) => setNewStatus(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="sent">Sent</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsStatusChangeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (selectedInvoice) {
+                  updateInvoiceStatusMutation.mutate({
+                    invoiceId: selectedInvoice.id,
+                    status: newStatus
+                  });
+                }
+              }}
+              disabled={updateInvoiceStatusMutation.isPending}
+            >
+              {updateInvoiceStatusMutation.isPending ? 'Updating...' : 'Update Status'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
