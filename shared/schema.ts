@@ -96,6 +96,31 @@ export const posOpenAccounts = pgTable("pos_open_accounts", {
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
 
+export const posInvoices = pgTable("pos_invoices", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  documentNumber: text("document_number").notNull(), // Auto-generated document number
+  documentType: text("document_type").notNull(), // 'invoice' or 'quote'
+  status: text("status").notNull().default('draft'), // 'draft', 'sent', 'paid', 'cancelled'
+  clientId: integer("client_id").references(() => posCustomers.id),
+  clientName: text("client_name"), // Fallback if client is not in customers
+  title: text("title").default('INVOICE'),
+  poNumber: text("po_number"), // Purchase order number (optional)
+  createdDate: timestamp("created_date").defaultNow().notNull(),
+  dueTerms: text("due_terms").default('7 days'), // '7 days', '14 days', '30 days', '60 days', '90 days'
+  dueDate: timestamp("due_date").notNull(),
+  items: jsonb("items").notNull(), // Array of {productId, name, price, quantity, lineTotal}
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  discountPercent: decimal("discount_percent", { precision: 5, scale: 2 }).notNull().default("0.00"),
+  taxPercent: decimal("tax_percent", { precision: 5, scale: 2 }).notNull().default("0.00"),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).notNull().default("0.00"),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text("payment_method"), // Optional payment method
+  notes: text("notes"), // Additional notes
+  terms: text("terms"), // Terms & conditions
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // System settings for tracking admin operations like monthly resets
 export const systemSettings = pgTable("system_settings", {
   id: serial("id").primaryKey(),
@@ -147,6 +172,11 @@ export const insertPosOpenAccountSchema = createInsertSchema(posOpenAccounts).om
   id: true,
   createdAt: true,
   lastUpdated: true,
+});
+
+export const insertPosInvoiceSchema = createInsertSchema(posInvoices).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
@@ -240,6 +270,8 @@ export type InsertPosSale = z.infer<typeof insertPosSaleSchema>;
 export type PosSale = typeof posSales.$inferSelect;
 export type InsertPosOpenAccount = z.infer<typeof insertPosOpenAccountSchema>;
 export type PosOpenAccount = typeof posOpenAccounts.$inferSelect;
+export type InsertPosInvoice = z.infer<typeof insertPosInvoiceSchema>;
+export type PosInvoice = typeof posInvoices.$inferSelect;
 export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
