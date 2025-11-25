@@ -147,6 +147,9 @@ export default function PosSystem() {
   const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<'all' | 'invoice' | 'quote'>('all');
   const [invoiceDateFrom, setInvoiceDateFrom] = useState("");
   const [invoiceDateTo, setInvoiceDateTo] = useState("");
+  const [isEditTitleDialogOpen, setIsEditTitleDialogOpen] = useState(false);
+  const [editingTitleInvoice, setEditingTitleInvoice] = useState<any | null>(null);
+  const [newInvoiceTitle, setNewInvoiceTitle] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -658,6 +661,30 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: "Failed to update status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateInvoiceTitleMutation = useMutation({
+    mutationFn: async ({ invoiceId, title }: { invoiceId: number; title: string }) => {
+      const response = await apiRequest("PUT", `/api/pos/invoices/${invoiceId}`, { title });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setIsEditTitleDialogOpen(false);
+      setEditingTitleInvoice(null);
+      setNewInvoiceTitle("");
+      toast({
+        title: "Title Updated",
+        description: "Invoice title has been updated",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update title",
         variant: "destructive",
       });
     },
@@ -3403,6 +3430,18 @@ export default function PosSystem() {
                                 {invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'}
                               </Badge>
                               <span className="text-white font-semibold">{invoice.documentNumber}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingTitleInvoice(invoice);
+                                  setNewInvoiceTitle(invoice.title || `${invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'} for ${customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'Client'}`);
+                                  setIsEditTitleDialogOpen(true);
+                                }}
+                                className="p-1 hover:bg-white/10 rounded transition-colors"
+                                title="Edit invoice title"
+                              >
+                                <Edit className="w-3 h-3 text-gray-400 hover:text-white" />
+                              </button>
                               <Badge 
                                 variant="outline"
                                 className={
@@ -3414,8 +3453,8 @@ export default function PosSystem() {
                                 {invoice.status}
                               </Badge>
                             </div>
-                            <p className="text-gray-300 text-sm">
-                              Client: {customers.find(c => c.id === invoice.clientId)?.name || 'N/A'}
+                            <p className="text-gray-300 text-sm truncate" title={invoice.title}>
+                              {invoice.title || `Client: ${customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}`}
                             </p>
                             <p className="text-gray-400 text-sm">
                               Due: {new Date(invoice.dueDate).toLocaleDateString()}
@@ -5856,6 +5895,51 @@ export default function PosSystem() {
               disabled={updateInvoiceStatusMutation.isPending}
             >
               {updateInvoiceStatusMutation.isPending ? 'Updating...' : 'Update Status'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Invoice Title Dialog */}
+      <Dialog open={isEditTitleDialogOpen} onOpenChange={setIsEditTitleDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Invoice Title</DialogTitle>
+            <DialogDescription>
+              Change the title for {editingTitleInvoice?.documentNumber}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={newInvoiceTitle}
+                onChange={(e) => setNewInvoiceTitle(e.target.value)}
+                placeholder="Enter invoice title..."
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => {
+              setIsEditTitleDialogOpen(false);
+              setEditingTitleInvoice(null);
+              setNewInvoiceTitle("");
+            }}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (editingTitleInvoice && newInvoiceTitle.trim()) {
+                  updateInvoiceTitleMutation.mutate({
+                    invoiceId: editingTitleInvoice.id,
+                    title: newInvoiceTitle.trim()
+                  });
+                }
+              }}
+              disabled={updateInvoiceTitleMutation.isPending || !newInvoiceTitle.trim()}
+            >
+              {updateInvoiceTitleMutation.isPending ? 'Saving...' : 'Save Title'}
             </Button>
           </div>
         </DialogContent>
