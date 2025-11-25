@@ -177,6 +177,7 @@ export const insertPosOpenAccountSchema = createInsertSchema(posOpenAccounts).om
 export const insertPosInvoiceSchema = createInsertSchema(posInvoices).omit({
   id: true,
   createdAt: true,
+  createdDate: true,
 });
 
 export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
