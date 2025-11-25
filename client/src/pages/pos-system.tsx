@@ -2198,6 +2198,11 @@ export default function PosSystem() {
     doc.setFontSize(8);
     doc.text(`${companyName} | Generated on ${new Date().toLocaleDateString('en-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
     
+    // Powered by STORM Software footer
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Powered by STORM Software', pageWidth / 2, footerY + 10, { align: 'center' });
+    
     // Download PDF
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     doc.save(fileName);

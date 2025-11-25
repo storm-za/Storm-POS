@@ -706,6 +706,11 @@ export default function PosSystemAfrikaans() {
     doc.setFontSize(8);
     doc.text(`${companyName} | Gegenereer op ${new Date().toLocaleDateString('af-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
     
+    // Powered by STORM Software footer
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Powered by STORM Software', pageWidth / 2, footerY + 10, { align: 'center' });
+    
     // Laai PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     doc.save(fileName);
