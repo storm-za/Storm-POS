@@ -890,47 +890,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sitemap.xml endpoint for Google crawling
-  app.get("/sitemap.xml", (req, res) => {
-    const baseUrl = req.protocol + '://' + req.get('host');
+  // ===== ENTERPRISE-GRADE SITEMAP STRUCTURE FOR SEO =====
+  // Production domain - hardcoded for consistent SEO indexing
+  const PRODUCTION_DOMAIN = 'https://stormsoftware.co.za';
+  
+  // robots.txt endpoint - references sitemap index
+  app.get("/robots.txt", (req, res) => {
+    const robotsTxt = `# Storm Software - robots.txt
+# https://stormsoftware.co.za
+
+User-agent: *
+Allow: /
+
+# Disallow private/authenticated areas
+Disallow: /pos/system
+Disallow: /pos/system/*
+Disallow: /api/
+
+# Sitemap Index Location
+Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
+`;
+    res.set('Content-Type', 'text/plain');
+    res.send(robotsTxt);
+  });
+
+  // Sitemap Index - Enterprise structure following Google's best practices
+  app.get("/sitemap_index.xml", (req, res) => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${PRODUCTION_DOMAIN}/sitemap-main.xml</loc>
+    <lastmod>${currentDate}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${PRODUCTION_DOMAIN}/sitemap-services.xml</loc>
+    <lastmod>${currentDate}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${PRODUCTION_DOMAIN}/sitemap-pos.xml</loc>
+    <lastmod>${currentDate}</lastmod>
+  </sitemap>
+</sitemapindex>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.set('X-Robots-Tag', 'noindex');
+    res.send(sitemapIndex);
+  });
+
+  // Main pages sitemap (homepage, about, contact)
+  app.get("/sitemap-main.xml", (req, res) => {
     const currentDate = new Date().toISOString().split('T')[0];
     
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>${PRODUCTION_DOMAIN}/</loc>
     <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/web-development</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/pos</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/pos/signup</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/pos/login</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
   </url>
 </urlset>`;
 
     res.set('Content-Type', 'application/xml');
     res.send(sitemap);
+  });
+
+  // Services pages sitemap (web development, etc.)
+  app.get("/sitemap-services.xml", (req, res) => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/web-development</loc>
+    <lastmod>${currentDate}</lastmod>
+  </url>
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
+
+  // POS product pages sitemap
+  app.get("/sitemap-pos.xml", (req, res) => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/pos</loc>
+    <lastmod>${currentDate}</lastmod>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/pos/signup</loc>
+    <lastmod>${currentDate}</lastmod>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/pos/login</loc>
+    <lastmod>${currentDate}</lastmod>
+  </url>
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
+
+  // Legacy sitemap.xml redirect to sitemap index (for backwards compatibility)
+  app.get("/sitemap.xml", (req, res) => {
+    res.redirect(301, '/sitemap_index.xml');
   });
 
   // Initialize monthly reset scheduler (but don't run immediately)

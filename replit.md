@@ -227,6 +227,22 @@ POS System tables:
     - pos_invoices table with all invoice fields
     - Support for both stored customers and custom client names
     - Auto-incrementing document numbers per user per document type
+- November 25, 2025. Enhanced invoice PDF export with business details:
+  - PDF now includes user's company logo from profile
+  - Company name, address, phone, email, website, VAT and registration numbers
+  - Professional layout with blue branding (hsl(217,90%,40%))
+  - Available in both English and Afrikaans versions
+- November 25, 2025. Implemented enterprise-grade sitemap structure for SEO:
+  - Sitemap index structure at /sitemap_index.xml (like big companies use)
+  - Child sitemaps organized by content type:
+    - /sitemap-main.xml (homepage)
+    - /sitemap-services.xml (web development)
+    - /sitemap-pos.xml (POS product pages)
+  - Hardcoded production domain: https://stormsoftware.co.za
+  - robots.txt with sitemap reference and crawler directives
+  - Removed priority/changefreq (Google ignores them)
+  - Legacy /sitemap.xml redirects to sitemap index (301)
+  - Private areas (/pos/system, /api/) blocked from crawling
 
 ## User Preferences
 
