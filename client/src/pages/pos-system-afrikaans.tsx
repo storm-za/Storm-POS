@@ -150,9 +150,9 @@ export default function PosSystemAfrikaans() {
   const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<'all' | 'invoice' | 'quote'>('all');
   const [invoiceDateFrom, setInvoiceDateFrom] = useState("");
   const [invoiceDateTo, setInvoiceDateTo] = useState("");
-  const [isEditTitleDialogOpen, setIsEditTitleDialogOpen] = useState(false);
-  const [editingTitleInvoice, setEditingTitleInvoice] = useState<any | null>(null);
-  const [newInvoiceTitle, setNewInvoiceTitle] = useState("");
+  const [isEditDocNumberDialogOpen, setIsEditDocNumberDialogOpen] = useState(false);
+  const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
+  const [newDocumentNumber, setNewDocumentNumber] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1012,25 +1012,25 @@ export default function PosSystemAfrikaans() {
     },
   });
 
-  const updateInvoiceTitleMutation = useMutation({
-    mutationFn: async ({ invoiceId, title }: { invoiceId: number; title: string }) => {
-      const response = await apiRequest("PUT", `/api/pos/invoices/${invoiceId}`, { title });
+  const updateDocumentNumberMutation = useMutation({
+    mutationFn: async ({ invoiceId, documentNumber }: { invoiceId: number; documentNumber: string }) => {
+      const response = await apiRequest("PUT", `/api/pos/invoices/${invoiceId}`, { documentNumber });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
-      setIsEditTitleDialogOpen(false);
-      setEditingTitleInvoice(null);
-      setNewInvoiceTitle("");
+      setIsEditDocNumberDialogOpen(false);
+      setEditingDocNumberInvoice(null);
+      setNewDocumentNumber("");
       toast({
-        title: "Titel Bygewerk",
-        description: "Faktuur titel is bygewerk",
+        title: "Dokumentnommer Bygewerk",
+        description: "Faktuur nommer is bygewerk",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Fout",
-        description: "Kon nie titel bywerk nie",
+        description: "Kon nie dokumentnommer bywerk nie",
         variant: "destructive",
       });
     },
@@ -2642,12 +2642,12 @@ ${dateFilteredSales.map(sale =>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setEditingTitleInvoice(invoice);
-                                  setNewInvoiceTitle(invoice.title || `${invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'Kliënt'}`);
-                                  setIsEditTitleDialogOpen(true);
+                                  setEditingDocNumberInvoice(invoice);
+                                  setNewDocumentNumber(invoice.documentNumber || '');
+                                  setIsEditDocNumberDialogOpen(true);
                                 }}
                                 className="p-1 hover:bg-white/10 rounded transition-colors"
-                                title="Wysig faktuur titel"
+                                title="Wysig dokumentnommer"
                               >
                                 <Edit className="w-3 h-3 text-gray-400 hover:text-white" />
                               </button>
@@ -2665,8 +2665,8 @@ ${dateFilteredSales.map(sale =>
                                  invoice.status === 'cancelled' ? 'Gekanselleer' : invoice.status}
                               </Badge>
                             </div>
-                            <p className="text-gray-300 text-sm truncate" title={invoice.title}>
-                              {invoice.title || `Kliënt: ${customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}`}
+                            <p className="text-gray-300 text-sm">
+                              Kliënt: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
                             </p>
                             <p className="text-gray-400 text-sm">
                               Vervaldatum: {new Date(invoice.dueDate).toLocaleDateString()}
@@ -4946,46 +4946,46 @@ ${dateFilteredSales.map(sale =>
           </DialogContent>
         </Dialog>
 
-        {/* Edit Invoice Title Dialog */}
-        <Dialog open={isEditTitleDialogOpen} onOpenChange={setIsEditTitleDialogOpen}>
+        {/* Edit Document Number Dialog */}
+        <Dialog open={isEditDocNumberDialogOpen} onOpenChange={setIsEditDocNumberDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Wysig Faktuur Titel</DialogTitle>
+              <DialogTitle>Wysig Dokumentnommer</DialogTitle>
               <DialogDescription>
-                Verander die titel vir {editingTitleInvoice?.documentNumber}
+                Verander die dokumentnommer vir hierdie {editingDocNumberInvoice?.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Titel</Label>
+                <Label>Dokumentnommer</Label>
                 <Input
-                  value={newInvoiceTitle}
-                  onChange={(e) => setNewInvoiceTitle(e.target.value)}
-                  placeholder="Voer faktuur titel in..."
+                  value={newDocumentNumber}
+                  onChange={(e) => setNewDocumentNumber(e.target.value)}
+                  placeholder="bv. INV-0001"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => {
-                setIsEditTitleDialogOpen(false);
-                setEditingTitleInvoice(null);
-                setNewInvoiceTitle("");
+                setIsEditDocNumberDialogOpen(false);
+                setEditingDocNumberInvoice(null);
+                setNewDocumentNumber("");
               }}>
                 Kanselleer
               </Button>
               <Button
                 className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                 onClick={() => {
-                  if (editingTitleInvoice && newInvoiceTitle.trim()) {
-                    updateInvoiceTitleMutation.mutate({
-                      invoiceId: editingTitleInvoice.id,
-                      title: newInvoiceTitle.trim()
+                  if (editingDocNumberInvoice && newDocumentNumber.trim()) {
+                    updateDocumentNumberMutation.mutate({
+                      invoiceId: editingDocNumberInvoice.id,
+                      documentNumber: newDocumentNumber.trim()
                     });
                   }
                 }}
-                disabled={updateInvoiceTitleMutation.isPending || !newInvoiceTitle.trim()}
+                disabled={updateDocumentNumberMutation.isPending || !newDocumentNumber.trim()}
               >
-                {updateInvoiceTitleMutation.isPending ? 'Stoor...' : 'Stoor Titel'}
+                {updateDocumentNumberMutation.isPending ? 'Stoor...' : 'Stoor'}
               </Button>
             </div>
           </DialogContent>
