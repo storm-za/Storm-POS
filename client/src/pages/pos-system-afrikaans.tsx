@@ -384,6 +384,338 @@ export default function PosSystemAfrikaans() {
     });
   }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers]);
 
+  // PDF Export Funksie - Professionele Faktuur/Kwotasie met Besigheidsbesonderhede
+  const generateInvoicePDF = (invoice: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const blueColor: [number, number, number] = [43, 108, 176]; // hsl(217,90%,40%) converted to RGB
+    const margin = 20;
+    
+    // Hulpfunksie om datums veilig te formateer
+    const formatDate = (date: any) => {
+      if (!date) return 'N/B';
+      const dateObj = date instanceof Date ? date : new Date(date);
+      return isNaN(dateObj.getTime()) ? 'N/B' : dateObj.toLocaleDateString('af-ZA', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    };
+    
+    // Kry besigheidsbesonderhede uit kwitansie-instellings en gebruikersprofiel
+    const settings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
+    const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Besigheid';
+    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const businessAddress1 = settings.businessInfo?.addressLine1 || '';
+    const businessAddress2 = settings.businessInfo?.addressLine2 || '';
+    const businessPhone = settings.businessInfo?.phone || '';
+    const businessEmail = settings.businessInfo?.email || '';
+    const businessWebsite = settings.businessInfo?.website || '';
+    const vatNumber = settings.businessInfo?.vatNumber || '';
+    const regNumber = settings.businessInfo?.registrationNumber || '';
+    
+    let y = 15;
+    
+    // ===== KOPTEKST AFDELING =====
+    // Voeg maatskappy logo by indien beskikbaar (linker kant)
+    if (companyLogo) {
+      try {
+        doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
+      } catch (error) {
+        console.error('Fout met byvoeging van logo na PDF:', error);
+      }
+    }
+    
+    // Maatskappy Naam en Besigheidsbesonderhede - Regter kant
+    const headerRightX = pageWidth - margin;
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text(companyName.toUpperCase(), headerRightX, y + 5, { align: 'right' });
+    
+    // Besigheid kontakinligting onder maatskappy naam
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    let headerY = y + 10;
+    
+    if (businessAddress1) {
+      doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (businessAddress2) {
+      doc.text(businessAddress2, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (businessPhone) {
+      doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (businessEmail) {
+      doc.text(businessEmail, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (businessWebsite) {
+      doc.text(businessWebsite, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (vatNumber) {
+      doc.text(`BTW: ${vatNumber}`, headerRightX, headerY, { align: 'right' });
+      headerY += 4;
+    }
+    if (regNumber) {
+      doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' });
+    }
+    
+    // Dokument Tipe Etiket (geposisioneer onder maatskappy besonderhede)
+    y = Math.max(companyLogo ? 55 : 45, headerY + 5);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text(invoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE', margin, y);
+    
+    // Dokument Nommer
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y + 7);
+    
+    // Dekoratiewe lyn onder koptekst
+    y += 12;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    
+    y += 15;
+    
+    // ===== DOKUMENT BESONDERHEDE AFDELING =====
+    const leftColX = margin;
+    const rightColX = pageWidth / 2 + 10;
+    
+    // Linker kolom - Faktuur Aan
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('FAKTUUR AAN', leftColX, y);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    const client = customers.find(c => c.id === invoice.clientId);
+    const clientName = client?.name || invoice.clientName || 'N/B';
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(clientName, leftColX, y + 8);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    let clientY = y + 15;
+    if (client?.phone) {
+      doc.text(`Tel: ${client.phone}`, leftColX, clientY);
+      clientY += 5;
+    }
+    if (client?.notes) {
+      doc.text(client.notes, leftColX, clientY);
+    }
+    
+    // Regter kolom - Faktuur Besonderhede
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('BESONDERHEDE', rightColX, y);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    const detailsData = [
+      { label: 'Datum:', value: formatDate(invoice.createdDate) },
+      { label: 'Vervaldatum:', value: formatDate(invoice.dueDate) },
+      { label: 'Terme:', value: invoice.dueTerms || '7 dae' },
+      ...(invoice.poNumber ? [{ label: 'BO #:', value: invoice.poNumber }] : []),
+      { label: 'Status:', value: (invoice.status || 'konsep').toUpperCase() }
+    ];
+    
+    let detailY = y + 8;
+    detailsData.forEach(detail => {
+      doc.setFont('helvetica', 'normal');
+      doc.text(detail.label, rightColX, detailY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(detail.value, rightColX + 35, detailY);
+      detailY += 6;
+    });
+    
+    y = Math.max(clientY, detailY) + 15;
+    
+    // ===== LYNITEMS TABEL =====
+    // Tabel koptekst
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(margin, y, pageWidth - (margin * 2), 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('BESKRYWING', margin + 5, y + 7);
+    doc.text('AANTAL', pageWidth - 95, y + 7, { align: 'center' });
+    doc.text('EENHEIDSPRYS', pageWidth - 60, y + 7, { align: 'right' });
+    doc.text('BEDRAG', pageWidth - margin - 5, y + 7, { align: 'right' });
+    
+    y += 12;
+    
+    // Tabel rye
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    items.forEach((item: any, index: number) => {
+      if (y > pageHeight - 80) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      // Afwisselende ry agtergrond
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 249, 250);
+        doc.rect(margin, y - 4, pageWidth - (margin * 2), 8, 'F');
+      }
+      
+      doc.setTextColor(0, 0, 0);
+      doc.text(item.name || 'Item', margin + 5, y);
+      doc.text(item.quantity?.toString() || '1', pageWidth - 95, y, { align: 'center' });
+      doc.text(`R ${parseFloat(item.price || 0).toFixed(2)}`, pageWidth - 60, y, { align: 'right' });
+      doc.text(`R ${parseFloat(item.lineTotal || 0).toFixed(2)}`, pageWidth - margin - 5, y, { align: 'right' });
+      y += 8;
+    });
+    
+    // Onderste lyn van tabel
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    
+    y += 15;
+    
+    // ===== FINANSIELE OPSOMMING =====
+    const summaryX = pageWidth - 100;
+    const valueX = pageWidth - margin - 5;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    
+    // Subtotaal
+    doc.text('Subtotaal:', summaryX, y);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`R ${parseFloat(invoice.subtotal || 0).toFixed(2)}`, valueX, y, { align: 'right' });
+    y += 7;
+    
+    // Afslag
+    if (parseFloat(invoice.discountPercent || '0') > 0) {
+      doc.setTextColor(220, 53, 69);
+      doc.text(`Afslag (${invoice.discountPercent}%):`, summaryX, y);
+      const discountAmount = parseFloat(invoice.subtotal || 0) * (parseFloat(invoice.discountPercent) / 100);
+      doc.text(`-R ${discountAmount.toFixed(2)}`, valueX, y, { align: 'right' });
+      doc.setTextColor(80, 80, 80);
+      y += 7;
+    }
+    
+    // BTW
+    doc.setTextColor(80, 80, 80);
+    doc.text('BTW (15%):', summaryX, y);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`R ${parseFloat(invoice.tax || 0).toFixed(2)}`, valueX, y, { align: 'right' });
+    y += 7;
+    
+    // Versending
+    if (parseFloat(invoice.shippingAmount || '0') > 0) {
+      doc.setTextColor(80, 80, 80);
+      doc.text('Versending:', summaryX, y);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`R ${parseFloat(invoice.shippingAmount || 0).toFixed(2)}`, valueX, y, { align: 'right' });
+      y += 7;
+    }
+    
+    // Totaal boks
+    y += 3;
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(summaryX - 5, y - 5, pageWidth - summaryX - margin + 10, 14, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('TOTAAL VERSKULDIG:', summaryX, y + 4);
+    doc.text(`R ${parseFloat(invoice.total || 0).toFixed(2)}`, valueX, y + 4, { align: 'right' });
+    
+    y += 25;
+    
+    // ===== BETAALMETODE =====
+    if (invoice.paymentMethod) {
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Betaalmetode:', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(invoice.paymentMethod, margin + 40, y);
+      y += 12;
+    }
+    
+    // ===== NOTAS AFDELING =====
+    if (invoice.notes) {
+      if (y > pageHeight - 60) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('NOTAS', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const notesLines = doc.splitTextToSize(invoice.notes, pageWidth - (margin * 2));
+      doc.text(notesLines, margin, y + 6);
+      y += (notesLines.length * 4) + 15;
+    }
+    
+    // ===== TERME & VOORWAARDES =====
+    if (invoice.terms) {
+      if (y > pageHeight - 60) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('TERME & VOORWAARDES', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const termsLines = doc.splitTextToSize(invoice.terms, pageWidth - (margin * 2));
+      doc.text(termsLines, margin, y + 6);
+    }
+    
+    // ===== VOETTEKST =====
+    const footerY = pageHeight - 20;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dankie vir u besigheid!', pageWidth / 2, footerY, { align: 'center' });
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(8);
+    doc.text(`${companyName} | Gegenereer op ${new Date().toLocaleDateString('af-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
+    
+    // Laai PDF af
+    const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
+    doc.save(fileName);
+    
+    toast({
+      title: "PDF Gegenereer",
+      description: `${invoice.documentNumber} is afgelaai`,
+    });
+  };
+
   // Logout function
   const logout = async () => {
     try {
@@ -4477,6 +4809,15 @@ ${dateFilteredSales.map(sale =>
                       }}
                     >
                       Verander Status
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      data-testid="button-export-pdf"
+                      onClick={() => generateInvoicePDF(selectedInvoice)}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Eksporteer PDF
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
