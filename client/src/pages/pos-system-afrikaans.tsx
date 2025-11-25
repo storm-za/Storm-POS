@@ -4299,6 +4299,7 @@ ${dateFilteredSales.map(sale =>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">Geen</SelectItem>
                     <SelectItem value="7 dae">7 Dae</SelectItem>
                     <SelectItem value="14 dae">14 Dae</SelectItem>
                     <SelectItem value="30 dae">30 Dae</SelectItem>
@@ -4310,7 +4311,7 @@ ${dateFilteredSales.map(sale =>
 
               {/* Due Date */}
               <div>
-                <Label>Vervaldatum</Label>
+                <Label>Vervaldatum (Opsioneel)</Label>
                 <input
                   type="date"
                   value={invoiceDueDate}
@@ -4319,9 +4320,9 @@ ${dateFilteredSales.map(sale =>
                 />
               </div>
 
-              {/* Line Items */}
+              {/* Add Products */}
               <div>
-                <Label>Lynitemme</Label>
+                <Label>Voeg Produkte By</Label>
                 <div className="space-y-2 mt-2">
                   {invoiceItems.map((item, index) => {
                     const product = products.find(p => p.id === item.productId);
@@ -4348,35 +4349,30 @@ ${dateFilteredSales.map(sale =>
                   })}
                   
                   {/* Add Line Item */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <Select
-                      value=""
-                      onValueChange={(value) => {
-                        const product = products.find(p => p.id === parseInt(value));
-                        if (product) {
-                          setInvoiceItems([...invoiceItems, {
-                            productId: product.id,
-                            quantity: 1,
-                            price: parseFloat(product.retailPrice)
-                          }]);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Kies produk" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products.map((product) => (
-                          <SelectItem key={product.id} value={product.id.toString()}>
-                            {product.name} - R{product.retailPrice}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button variant="outline" size="sm" className="col-span-2">
-                      + Voeg Produk By
-                    </Button>
-                  </div>
+                  <Select
+                    value=""
+                    onValueChange={(value) => {
+                      const product = products.find(p => p.id === parseInt(value));
+                      if (product) {
+                        setInvoiceItems([...invoiceItems, {
+                          productId: product.id,
+                          quantity: 1,
+                          price: parseFloat(product.retailPrice)
+                        }]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kies produk" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id.toString()}>
+                          {product.name} - R{product.retailPrice}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   
                   {/* Totals */}
                   {invoiceItems.length > 0 && (
@@ -4493,19 +4489,19 @@ ${dateFilteredSales.map(sale =>
                     const trimmedCustomClient = invoiceCustomClient.trim();
                     
                     if (isCustomClient) {
-                      if (!trimmedCustomClient || !invoiceDueDate) {
+                      if (!trimmedCustomClient) {
                         toast({
                           title: "Ontbrekende Inligting",
-                          description: "Voer asseblief 'n kliëntnaam en vervaldatum in",
+                          description: "Voer asseblief 'n kliëntnaam in",
                           variant: "destructive"
                         });
                         return;
                       }
                     } else {
-                      if (!invoiceClientId || !invoiceDueDate) {
+                      if (!invoiceClientId) {
                         toast({
                           title: "Ontbrekende Inligting",
-                          description: "Kies asseblief 'n kliënt en vervaldatum",
+                          description: "Kies asseblief 'n kliënt",
                           variant: "destructive"
                         });
                         return;
@@ -4552,8 +4548,8 @@ ${dateFilteredSales.map(sale =>
                       clientName: isCustomClient ? trimmedCustomClient : undefined,
                       title: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${clientName}`,
                       poNumber: invoicePoNumber || undefined,
-                      dueTerms: invoiceDueTerms,
-                      dueDate: invoiceDueDate,
+                      dueTerms: invoiceDueTerms === 'none' ? undefined : invoiceDueTerms,
+                      dueDate: invoiceDueDate || undefined,
                       items: invoiceItems.map(item => ({
                         productId: item.productId,
                         name: products.find(p => p.id === item.productId)?.name || '',

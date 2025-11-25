@@ -107,8 +107,8 @@ export const posInvoices = pgTable("pos_invoices", {
   title: text("title").default('INVOICE'),
   poNumber: text("po_number"), // Purchase order number (optional)
   createdDate: timestamp("created_date").defaultNow().notNull(),
-  dueTerms: text("due_terms").default('7 days'), // '7 days', '14 days', '30 days', '60 days', '90 days'
-  dueDate: timestamp("due_date").notNull(),
+  dueTerms: text("due_terms"), // 'none', '7 days', '14 days', '30 days', '60 days', '90 days'
+  dueDate: timestamp("due_date"), // Optional due date
   items: jsonb("items").notNull(), // Array of {productId, name, price, quantity, lineTotal}
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   discountPercent: decimal("discount_percent", { precision: 5, scale: 2 }).notNull().default("0.00"),

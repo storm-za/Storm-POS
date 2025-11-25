@@ -5246,6 +5246,7 @@ export default function PosSystem() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="7 days">7 Days</SelectItem>
                   <SelectItem value="14 days">14 Days</SelectItem>
                   <SelectItem value="30 days">30 Days</SelectItem>
@@ -5257,7 +5258,7 @@ export default function PosSystem() {
 
             {/* Due Date */}
             <div>
-              <Label>Due Date</Label>
+              <Label>Due Date (Optional)</Label>
               <input
                 type="date"
                 value={invoiceDueDate}
@@ -5266,9 +5267,9 @@ export default function PosSystem() {
               />
             </div>
 
-            {/* Line Items */}
+            {/* Add Products */}
             <div>
-              <Label>Line Items</Label>
+              <Label>Add Products</Label>
               <div className="space-y-2 mt-2">
                 {invoiceItems.map((item, index) => {
                   const product = products.find(p => p.id === item.productId);
@@ -5295,35 +5296,30 @@ export default function PosSystem() {
                 })}
                 
                 {/* Add Line Item */}
-                <div className="grid grid-cols-3 gap-2">
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      const product = products.find(p => p.id === parseInt(value));
-                      if (product) {
-                        setInvoiceItems([...invoiceItems, {
-                          productId: product.id,
-                          quantity: 1,
-                          price: parseFloat(product.retailPrice)
-                        }]);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id.toString()}>
-                          {product.name} - R{product.retailPrice}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="sm" className="col-span-2">
-                    + Add Product
-                  </Button>
-                </div>
+                <Select
+                  value=""
+                  onValueChange={(value) => {
+                    const product = products.find(p => p.id === parseInt(value));
+                    if (product) {
+                      setInvoiceItems([...invoiceItems, {
+                        productId: product.id,
+                        quantity: 1,
+                        price: parseFloat(product.retailPrice)
+                      }]);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select product" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id.toString()}>
+                        {product.name} - R{product.retailPrice}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 
                 {/* Totals */}
                 {invoiceItems.length > 0 && (
@@ -5443,20 +5439,20 @@ export default function PosSystem() {
                   // Mode-specific validation to prevent stale state leaks
                   if (isCustomClient) {
                     // In custom mode: require custom client name
-                    if (!trimmedCustomClient || !invoiceDueDate) {
+                    if (!trimmedCustomClient) {
                       toast({
                         title: "Missing Information",
-                        description: "Please enter a client name and due date",
+                        description: "Please enter a client name",
                         variant: "destructive"
                       });
                       return;
                     }
                   } else {
                     // In list mode: require client selection from dropdown
-                    if (!invoiceClientId || !invoiceDueDate) {
+                    if (!invoiceClientId) {
                       toast({
                         title: "Missing Information",
-                        description: "Please select a client and due date",
+                        description: "Please select a client",
                         variant: "destructive"
                       });
                       return;
@@ -5506,8 +5502,8 @@ export default function PosSystem() {
                     clientName: isCustomClient ? trimmedCustomClient : undefined,
                     title: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} for ${clientName}`,
                     poNumber: invoicePoNumber || undefined,
-                    dueTerms: invoiceDueTerms,
-                    dueDate: invoiceDueDate,
+                    dueTerms: invoiceDueTerms === 'none' ? undefined : invoiceDueTerms,
+                    dueDate: invoiceDueDate || undefined,
                     items: invoiceItems.map(item => ({
                       productId: item.productId,
                       name: products.find(p => p.id === item.productId)?.name || '',

@@ -640,7 +640,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...invoiceData,
         userId: userIdToUse,
         documentNumber,
-        dueDate: new Date(invoiceData.dueDate),
+        dueDate: invoiceData.dueDate ? new Date(invoiceData.dueDate) : null,
+        dueTerms: invoiceData.dueTerms || null,
         // Ensure numeric fields are properly typed as strings for decimal columns
         subtotal: String(invoiceData.subtotal || 0),
         discountPercent: String(invoiceData.discountPercent || 0),
