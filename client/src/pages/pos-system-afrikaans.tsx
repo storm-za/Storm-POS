@@ -2009,14 +2009,14 @@ ${dateFilteredSales.map(sale =>
                 </button>
                 <button
                   onClick={() => handleTabChange("fakturen")}
-                  className={`flex flex-col items-center justify-center min-w-[90px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     currentTab === "fakturen"
                       ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
                       : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <Receipt className="h-4 w-4 mb-1" />
-                  <span>Fakture & Kwotasies</span>
+                  <span className="text-center leading-tight">Fakture &<br/>Kwotasies</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("oop-rekeninge")}
@@ -2055,7 +2055,7 @@ ${dateFilteredSales.map(sale =>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-7 h-16 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
+            <TabsList className="hidden md:grid w-full grid-cols-7 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="verkope" 
                 className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
@@ -2082,11 +2082,11 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="fakturen" 
-                className="flex flex-col items-center justify-center h-full rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all text-xs leading-tight"
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
                 data-testid="tab-invoices"
               >
-                <Receipt className="h-4 w-4 mb-0.5 flex-shrink-0" />
-                <span className="text-center">Fakture &<br/>Kwotasies</span>
+                <Receipt className="h-4 w-4 flex-shrink-0" />
+                <span>Fakture & Kwotasies</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="oop-rekeninge" 
