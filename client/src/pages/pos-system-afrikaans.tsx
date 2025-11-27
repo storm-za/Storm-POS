@@ -2515,7 +2515,7 @@ ${dateFilteredSales.map(sale =>
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
               <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4 gap-3">
-                <CardTitle className="text-white text-xl font-bold">Fakturen & Kwotasies</CardTitle>
+                <CardTitle className="text-white text-xl font-bold">Fakture & Kwotasies</CardTitle>
                 <Button 
                   onClick={() => setIsInvoiceDialogOpen(true)}
                   className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 w-full sm:w-auto"
