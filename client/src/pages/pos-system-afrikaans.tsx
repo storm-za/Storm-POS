@@ -2075,7 +2075,7 @@ ${dateFilteredSales.map(sale =>
                 data-testid="tab-invoices"
               >
                 <Receipt className="h-4 w-4" />
-                <span>Fakturen</span>
+                <span>Fakture en kwotasies</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="oop-rekeninge" 
