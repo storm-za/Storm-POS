@@ -998,21 +998,28 @@ export default function PosSystemAfrikaans() {
       const response = await apiRequest("PATCH", `/api/pos/invoices/${invoiceId}`, { status });
       return response.json();
     },
+    onMutate: async ({ invoiceId, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      const previousInvoices = queryClient.getQueryData(["/api/pos/invoices", currentUser?.id]);
+      queryClient.setQueryData(["/api/pos/invoices", currentUser?.id], (old: any) => 
+        old?.map((inv: any) => inv.id === invoiceId ? { ...inv, status } : inv)
+      );
+      return { previousInvoices };
+    },
     onSuccess: (updatedInvoice) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
       setSelectedInvoice(updatedInvoice);
       setIsStatusChangeDialogOpen(false);
-      toast({
-        title: "Status Bygewerk",
-        description: `Faktuur status verander na ${translateStatus(updatedInvoice.status)}`,
-      });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, variables, context) => {
+      queryClient.setQueryData(["/api/pos/invoices", currentUser?.id], context?.previousInvoices);
       toast({
         title: "Fout",
         description: "Kon nie status bywerk nie",
         variant: "destructive",
       });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
     },
   });
 
