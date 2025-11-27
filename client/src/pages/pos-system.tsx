@@ -360,8 +360,11 @@ export default function PosSystem() {
         }
       }
       
-      // Status filter
-      if (invoiceStatusFilter !== 'all' && invoice.status !== invoiceStatusFilter) {
+      // Status filter (simplified: all, paid, not_paid)
+      if (invoiceStatusFilter === 'paid' && invoice.status !== 'paid') {
+        return false;
+      }
+      if (invoiceStatusFilter === 'not_paid' && invoice.status === 'paid') {
         return false;
       }
       
@@ -3338,10 +3341,8 @@ export default function PosSystem() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="sent">Sent</SelectItem>
                         <SelectItem value="paid">Paid</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="not_paid">Not Paid</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

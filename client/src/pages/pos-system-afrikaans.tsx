@@ -355,8 +355,11 @@ export default function PosSystemAfrikaans() {
         }
       }
       
-      // Status filter
-      if (invoiceStatusFilter !== 'all' && invoice.status !== invoiceStatusFilter) {
+      // Status filter (simplified: all, paid, not_paid)
+      if (invoiceStatusFilter === 'paid' && invoice.status !== 'paid') {
+        return false;
+      }
+      if (invoiceStatusFilter === 'not_paid' && invoice.status === 'paid') {
         return false;
       }
       
@@ -2559,10 +2562,8 @@ ${dateFilteredSales.map(sale =>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Alle Statusse</SelectItem>
-                          <SelectItem value="draft">Konsep</SelectItem>
-                          <SelectItem value="sent">Gestuur</SelectItem>
                           <SelectItem value="paid">Betaal</SelectItem>
-                          <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                          <SelectItem value="not_paid">Nie Betaal</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
