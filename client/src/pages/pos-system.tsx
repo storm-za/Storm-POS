@@ -3449,7 +3449,7 @@ export default function PosSystem() {
                                   checked={invoice.status === 'paid'}
                                   onCheckedChange={(checked) => {
                                     updateInvoiceStatusMutation.mutate({
-                                      id: invoice.id,
+                                      invoiceId: invoice.id,
                                       status: checked ? 'paid' : 'draft'
                                     });
                                   }}
