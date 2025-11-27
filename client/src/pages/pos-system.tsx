@@ -162,8 +162,8 @@ export default function PosSystem() {
       return;
     }
 
-    // For staff users or no user logged in, only allow sales, customers, and open-accounts
-    const allowedTabs = ['sales', 'customers', 'open-accounts'];
+    // For staff users or no user logged in, only allow sales, customers, invoices, and open-accounts
+    const allowedTabs = ['sales', 'customers', 'invoices', 'open-accounts'];
     
     if (allowedTabs.includes(tabValue)) {
       setCurrentTab(tabValue);
