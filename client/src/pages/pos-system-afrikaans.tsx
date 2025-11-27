@@ -2009,14 +2009,14 @@ ${dateFilteredSales.map(sale =>
                 </button>
                 <button
                   onClick={() => handleTabChange("fakturen")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`flex flex-col items-center justify-center min-w-[90px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     currentTab === "fakturen"
                       ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
                       : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                   }`}
                 >
                   <Receipt className="h-4 w-4 mb-1" />
-                  <span>Fakturen</span>
+                  <span>Fakture & Kwotasies</span>
                 </button>
                 <button
                   onClick={() => handleTabChange("oop-rekeninge")}
