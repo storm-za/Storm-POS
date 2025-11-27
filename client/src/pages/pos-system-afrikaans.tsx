@@ -2055,7 +2055,7 @@ ${dateFilteredSales.map(sale =>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-7 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
+            <TabsList className="hidden md:grid w-full grid-cols-7 h-16 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="verkope" 
                 className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
@@ -2082,11 +2082,11 @@ ${dateFilteredSales.map(sale =>
               </TabsTrigger>
               <TabsTrigger 
                 value="fakturen" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
+                className="flex flex-col items-center justify-center h-full rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all text-xs leading-tight"
                 data-testid="tab-invoices"
               >
-                <Receipt className="h-4 w-4" />
-                <span>Fakture en kwotasies</span>
+                <Receipt className="h-4 w-4 mb-0.5 flex-shrink-0" />
+                <span className="text-center">Fakture &<br/>Kwotasies</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="oop-rekeninge" 
@@ -2514,22 +2514,22 @@ ${dateFilteredSales.map(sale =>
               transition={{ duration: 0.5 }}
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4 gap-3">
                 <CardTitle className="text-white text-xl font-bold">Fakturen & Kwotasies</CardTitle>
                 <Button 
                   onClick={() => setIsInvoiceDialogOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 w-full sm:w-auto"
                   data-testid="button-create-invoice"
                 >
                   <PlusCircle className="w-4 h-4 mr-2" />
                   Skep Faktuur/Kwotasie
                 </Button>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 px-3 sm:px-6">
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
-                  <div className="flex flex-col md:flex-row gap-3">
-                    <div className="flex-1">
+                  <div className="flex flex-col gap-3">
+                    <div className="w-full">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -2541,48 +2541,50 @@ ${dateFilteredSales.map(sale =>
                         />
                       </div>
                     </div>
-                    <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
-                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
-                        <SelectValue placeholder="Almal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle Tipes</SelectItem>
-                        <SelectItem value="invoice">Slegs Fakturen</SelectItem>
-                        <SelectItem value="quote">Slegs Kwotasies</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
-                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
-                        <SelectValue placeholder="Alle Statusse" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle Statusse</SelectItem>
-                        <SelectItem value="draft">Konsep</SelectItem>
-                        <SelectItem value="sent">Gestuur</SelectItem>
-                        <SelectItem value="paid">Betaal</SelectItem>
-                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
+                          <SelectValue placeholder="Almal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Alle Tipes</SelectItem>
+                          <SelectItem value="invoice">Slegs Fakturen</SelectItem>
+                          <SelectItem value="quote">Slegs Kwotasies</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
+                          <SelectValue placeholder="Alle Statusse" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Alle Statusse</SelectItem>
+                          <SelectItem value="draft">Konsep</SelectItem>
+                          <SelectItem value="sent">Gestuur</SelectItem>
+                          <SelectItem value="paid">Betaal</SelectItem>
+                          <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-3 items-end">
-                    <div className="flex-1 flex gap-3">
-                      <div className="flex-1">
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
                         <Label className="text-gray-300 text-sm mb-1 block">Van Datum</Label>
                         <Input
                           type="date"
                           value={invoiceDateFrom}
                           onChange={(e) => setInvoiceDateFrom(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white"
+                          className="bg-white/5 border-white/10 text-white w-full"
                           data-testid="input-invoice-date-from"
                         />
                       </div>
-                      <div className="flex-1">
+                      <div>
                         <Label className="text-gray-300 text-sm mb-1 block">Tot Datum</Label>
                         <Input
                           type="date"
                           value={invoiceDateTo}
                           onChange={(e) => setInvoiceDateTo(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white"
+                          className="bg-white/5 border-white/10 text-white w-full"
                           data-testid="input-invoice-date-to"
                         />
                       </div>
@@ -2598,7 +2600,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceDateFrom("");
                           setInvoiceDateTo("");
                         }}
-                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 whitespace-nowrap"
+                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 w-full"
                         data-testid="button-clear-filters"
                       >
                         <X className="w-4 h-4 mr-1" />
