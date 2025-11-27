@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
@@ -3442,16 +3443,19 @@ export default function PosSystem() {
                               >
                                 <Edit className="w-3 h-3 text-gray-400 hover:text-white" />
                               </button>
-                              <Badge 
-                                variant="outline"
-                                className={
-                                  invoice.status === 'paid' ? 'bg-green-600/20 text-green-300 border-green-500/30' :
-                                  invoice.status === 'sent' ? 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30' :
-                                  'bg-gray-600/20 text-gray-300 border-gray-500/30'
-                                }
-                              >
-                                {invoice.status}
-                              </Badge>
+                              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                <span className="text-gray-300 text-sm">Paid</span>
+                                <Switch
+                                  checked={invoice.status === 'paid'}
+                                  onCheckedChange={(checked) => {
+                                    updateInvoiceStatusMutation.mutate({
+                                      id: invoice.id,
+                                      status: checked ? 'paid' : 'draft'
+                                    });
+                                  }}
+                                  className="data-[state=checked]:bg-[hsl(217,90%,40%)] data-[state=unchecked]:bg-gray-600"
+                                />
+                              </div>
                             </div>
                             <p className="text-gray-300 text-sm">
                               Client: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
