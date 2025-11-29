@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update user company logo
+  // Update user company logo (PUT method with user ID)
   app.put("/api/pos/user/:id/logo", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
@@ -229,6 +229,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user logo:", error);
       res.status(500).json({ message: "Failed to update logo" });
+    }
+  });
+
+  // Upload company logo (POST method - used by frontend)
+  app.post("/api/pos/upload-logo", async (req, res) => {
+    try {
+      const { logo, userId } = req.body;
+      
+      if (!logo) {
+        return res.status(400).json({ message: "Logo data is required" });
+      }
+      
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      
+      const updatedUser = await storage.updatePosUserLogo(userId, logo);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, logoUrl: logo });
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      res.status(500).json({ message: "Failed to upload logo" });
     }
   });
 

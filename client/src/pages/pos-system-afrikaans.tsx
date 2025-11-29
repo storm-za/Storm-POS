@@ -1123,20 +1123,24 @@ export default function PosSystemAfrikaans() {
 
   // Logo upload mutation
   const logoUploadMutation = useMutation({
-    mutationFn: async (logoData: string) => {
-      const response = await apiRequest("POST", "/api/pos/upload-logo", { logo: logoData });
+    mutationFn: async (logo: string) => {
+      const userId = currentUser?.id || 1;
+      console.log('Uploading logo for user ID:', userId);
+      const response = await apiRequest("PUT", `/api/pos/user/${userId}/logo`, { logo });
       return response.json();
     },
     onSuccess: (data) => {
-      setCurrentUser(prev => prev ? { ...prev, companyLogo: data.logoUrl } : null);
-      setIsLogoDialogOpen(false);
-      setLogoFile(null);
       toast({
         title: "Logo opgelaai",
         description: "Maatskappy logo is suksesvol bygewerk.",
       });
+      setCurrentUser(prev => prev ? { ...prev, companyLogo: data.user.companyLogo } : null);
+      localStorage.setItem('posUser', JSON.stringify(data.user));
+      setIsLogoDialogOpen(false);
+      setLogoFile(null);
     },
     onError: (error: Error) => {
+      console.error('Logo upload error:', error);
       toast({
         title: "Fout",
         description: error.message || "Kon nie logo oplaai nie",
