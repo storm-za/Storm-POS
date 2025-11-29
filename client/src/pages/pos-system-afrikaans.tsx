@@ -144,6 +144,7 @@ export default function PosSystemAfrikaans() {
   const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
   const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
+  const [invoiceTaxEnabled, setInvoiceTaxEnabled] = useState(true);
   
   // Invoice search and filter state
   const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
@@ -623,12 +624,14 @@ export default function PosSystemAfrikaans() {
       y += 7;
     }
     
-    // BTW
-    doc.setTextColor(80, 80, 80);
-    doc.text('BTW (15%):', summaryX, y);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`R ${parseFloat(invoice.tax || 0).toFixed(2)}`, valueX, y, { align: 'right' });
-    y += 7;
+    // BTW (slegs wys as belasting toegepas word)
+    if (parseFloat(invoice.taxPercent || '0') > 0) {
+      doc.setTextColor(80, 80, 80);
+      doc.text('BTW (15%):', summaryX, y);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`R ${parseFloat(invoice.tax || 0).toFixed(2)}`, valueX, y, { align: 'right' });
+      y += 7;
+    }
     
     // Versending
     if (parseFloat(invoice.shippingAmount || '0') > 0) {
@@ -915,6 +918,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
       setInvoiceTerms("");
+      setInvoiceTaxEnabled(true);
       toast({
         title: "Sukses",
         description: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} geskep`,
@@ -955,6 +959,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
       setInvoiceTerms("");
+      setInvoiceTaxEnabled(true);
       toast({
         title: "Sukses",
         description: `${updatedInvoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} bygewerk`,
@@ -4259,6 +4264,7 @@ ${dateFilteredSales.map(sale =>
               setInvoiceShippingAmount("0");
               setInvoicePaymentMethod("");
               setInvoiceTerms("");
+              setInvoiceTaxEnabled(true);
               setInvoiceType('invoice');
             }
           }}
@@ -4463,10 +4469,21 @@ ${dateFilteredSales.map(sale =>
                         </div>
                       )}
                       
-                      <div className="flex justify-between text-sm">
-                        <span>BTW (15%):</span>
-                        <span>R{((invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 - parseFloat(invoiceDiscountPercent) / 100)) * 0.15).toFixed(2)}</span>
+                      {/* Tax Toggle */}
+                      <div className="flex justify-between items-center text-sm">
+                        <span>Voeg BTW by (15%):</span>
+                        <Switch
+                          checked={invoiceTaxEnabled}
+                          onCheckedChange={setInvoiceTaxEnabled}
+                        />
                       </div>
+                      
+                      {invoiceTaxEnabled && (
+                        <div className="flex justify-between text-sm">
+                          <span>BTW (15%):</span>
+                          <span>R{((invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 - parseFloat(invoiceDiscountPercent) / 100)) * 0.15).toFixed(2)}</span>
+                        </div>
+                      )}
                       
                       {/* Shipping Input */}
                       <div className="flex justify-between items-center text-sm">
@@ -4490,7 +4507,7 @@ ${dateFilteredSales.map(sale =>
                           const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                           const discount = subtotal * (parseFloat(invoiceDiscountPercent) / 100);
                           const afterDiscount = subtotal - discount;
-                          const tax = afterDiscount * 0.15;
+                          const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
                           const shipping = parseFloat(invoiceShippingAmount) || 0;
                           return (afterDiscount + tax + shipping).toFixed(2);
                         })()}</span>
@@ -4582,7 +4599,7 @@ ${dateFilteredSales.map(sale =>
                     const discountPercent = parseFloat(invoiceDiscountPercent) || 0;
                     const discountAmount = subtotal * (discountPercent / 100);
                     const afterDiscount = subtotal - discountAmount;
-                    const taxAmount = afterDiscount * 0.15;
+                    const taxAmount = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
                     const shipping = parseFloat(invoiceShippingAmount) || 0;
                     const total = afterDiscount + taxAmount + shipping;
                     
@@ -4620,7 +4637,7 @@ ${dateFilteredSales.map(sale =>
                       })),
                       subtotal: parseFloat(subtotal.toFixed(2)),
                       discountPercent: parseFloat(discountPercent.toFixed(2)),
-                      taxPercent: 15.00,
+                      taxPercent: invoiceTaxEnabled ? 15.00 : 0,
                       tax: parseFloat(taxAmount.toFixed(2)),
                       shippingAmount: parseFloat(shipping.toFixed(2)),
                       total: parseFloat(total.toFixed(2)),
@@ -4767,10 +4784,12 @@ ${dateFilteredSales.map(sale =>
                           <span>-R{(parseFloat(selectedInvoice.subtotal) * (parseFloat(selectedInvoice.discountPercent) / 100)).toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">BTW (15%):</span>
-                        <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
-                      </div>
+                      {parseFloat(selectedInvoice.taxPercent || '0') > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">BTW (15%):</span>
+                          <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
+                        </div>
+                      )}
                       {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Versending:</span>
@@ -4833,6 +4852,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
+                          setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                           
                           const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
                           setInvoiceItems(items.map((item: any) => ({
