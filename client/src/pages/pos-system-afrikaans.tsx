@@ -575,8 +575,11 @@ export default function PosSystemAfrikaans() {
     doc.setFontSize(10);
     
     const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const needsSecondPage = items.length >= 10;
+    
     items.forEach((item: any, index: number) => {
-      if (y > pageHeight - 80) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 80) {
         doc.addPage();
         y = 20;
       }
@@ -669,7 +672,8 @@ export default function PosSystemAfrikaans() {
     
     // ===== NOTAS AFDELING =====
     if (invoice.notes) {
-      if (y > pageHeight - 60) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -687,7 +691,8 @@ export default function PosSystemAfrikaans() {
     
     // ===== TERME & VOORWAARDES =====
     if (invoice.terms) {
-      if (y > pageHeight - 60) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }

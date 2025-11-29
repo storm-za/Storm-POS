@@ -2098,9 +2098,11 @@ export default function PosSystem() {
     doc.setFontSize(10);
     
     const items = Array.isArray(invoice.items) ? invoice.items : [];
+    const needsSecondPage = items.length >= 10;
     let rowCount = 0;
     items.forEach((item: any, index: number) => {
-      if (y > pageHeight - 80) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 80) {
         doc.addPage();
         y = 20;
       }
@@ -2194,7 +2196,8 @@ export default function PosSystem() {
     
     // ===== NOTES SECTION =====
     if (invoice.notes) {
-      if (y > pageHeight - 60) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -2212,7 +2215,8 @@ export default function PosSystem() {
     
     // ===== TERMS & CONDITIONS =====
     if (invoice.terms) {
-      if (y > pageHeight - 60) {
+      // Only add page break for 10+ items when running out of space
+      if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
