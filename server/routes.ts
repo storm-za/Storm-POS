@@ -313,10 +313,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pos/products", async (req, res) => {
     try {
       const { userId, ...productData } = req.body;
-      const validatedData = insertPosProductSchema.parse({
+      const cleanedData = {
         ...productData,
-        userId: userId || 1
-      });
+        userId: userId || 1,
+        costPrice: productData.costPrice === "" ? null : productData.costPrice,
+        tradePrice: productData.tradePrice === "" ? null : productData.tradePrice,
+        retailPrice: productData.retailPrice === "" ? "0" : productData.retailPrice,
+      };
+      const validatedData = insertPosProductSchema.parse(cleanedData);
       const product = await storage.createPosProduct(validatedData);
       res.json(product);
     } catch (error) {
@@ -329,10 +333,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const productId = parseInt(req.params.id);
       const { userId, ...productData } = req.body;
-      const validatedData = insertPosProductSchema.parse({
+      const cleanedData = {
         ...productData,
-        userId: userId || 1
-      });
+        userId: userId || 1,
+        costPrice: productData.costPrice === "" ? null : productData.costPrice,
+        tradePrice: productData.tradePrice === "" ? null : productData.tradePrice,
+        retailPrice: productData.retailPrice === "" ? "0" : productData.retailPrice,
+      };
+      const validatedData = insertPosProductSchema.parse(cleanedData);
       const product = await storage.updatePosProduct(productId, validatedData);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
