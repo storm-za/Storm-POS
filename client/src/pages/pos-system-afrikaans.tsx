@@ -141,6 +141,8 @@ export default function PosSystemAfrikaans() {
   const [invoicePoNumber, setInvoicePoNumber] = useState("");
   const [invoiceDueTerms, setInvoiceDueTerms] = useState("7 dae");
   const [invoiceDiscountPercent, setInvoiceDiscountPercent] = useState("0");
+  const [invoiceDiscountAmount, setInvoiceDiscountAmount] = useState("0");
+  const [invoiceDiscountType, setInvoiceDiscountType] = useState<'percent' | 'amount'>('percent');
   const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
   const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
@@ -615,11 +617,11 @@ export default function PosSystemAfrikaans() {
     y += 7;
     
     // Afslag
-    if (parseFloat(invoice.discountPercent || '0') > 0) {
+    if (parseFloat(invoice.discountPercent || '0') > 0 || parseFloat(invoice.discountAmount || '0') > 0) {
       doc.setTextColor(220, 53, 69);
-      doc.text(`Afslag (${invoice.discountPercent}%):`, summaryX, y);
-      const discountAmount = parseFloat(invoice.subtotal || 0) * (parseFloat(invoice.discountPercent) / 100);
-      doc.text(`-R ${discountAmount.toFixed(2)}`, valueX, y, { align: 'right' });
+      const hasPercent = parseFloat(invoice.discountPercent || '0') > 0;
+      doc.text(`Afslag${hasPercent ? ` (${invoice.discountPercent}%)` : ''}:`, summaryX, y);
+      doc.text(`-R ${parseFloat(invoice.discountAmount || 0).toFixed(2)}`, valueX, y, { align: 'right' });
       doc.setTextColor(80, 80, 80);
       y += 7;
     }
@@ -4455,21 +4457,45 @@ ${dateFilteredSales.map(sale =>
                       
                       {/* Discount Input */}
                       <div className="flex justify-between items-center text-sm">
-                        <span>Afslag (%):</span>
-                        <input
-                          type="number"
-                          value={invoiceDiscountPercent}
-                          onChange={(e) => setInvoiceDiscountPercent(e.target.value)}
-                          className="w-20 px-2 py-1 border rounded text-right"
-                          min="0"
-                          max="100"
-                          step="0.01"
-                        />
+                        <div className="flex items-center gap-2">
+                          <span>Afslag:</span>
+                          <select
+                            value={invoiceDiscountType}
+                            onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')}
+                            className="px-2 py-1 border rounded text-xs"
+                          >
+                            <option value="percent">%</option>
+                            <option value="amount">R</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {invoiceDiscountType === 'amount' && <span>R</span>}
+                          <input
+                            type="number"
+                            value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount}
+                            onChange={(e) => {
+                              if (invoiceDiscountType === 'percent') {
+                                setInvoiceDiscountPercent(e.target.value);
+                              } else {
+                                setInvoiceDiscountAmount(e.target.value);
+                              }
+                            }}
+                            className="w-20 px-2 py-1 border rounded text-right"
+                            min="0"
+                            max={invoiceDiscountType === 'percent' ? "100" : undefined}
+                            step="0.01"
+                          />
+                          {invoiceDiscountType === 'percent' && <span>%</span>}
+                        </div>
                       </div>
-                      {parseFloat(invoiceDiscountPercent) > 0 && (
+                      {((invoiceDiscountType === 'percent' && parseFloat(invoiceDiscountPercent) > 0) || 
+                        (invoiceDiscountType === 'amount' && parseFloat(invoiceDiscountAmount) > 0)) && (
                         <div className="flex justify-between text-sm text-red-600">
                           <span>Afslag Bedrag:</span>
-                          <span>-R{(invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)}</span>
+                          <span>-R{invoiceDiscountType === 'percent' 
+                            ? (invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)
+                            : parseFloat(invoiceDiscountAmount).toFixed(2)
+                          }</span>
                         </div>
                       )}
                       
@@ -4485,7 +4511,13 @@ ${dateFilteredSales.map(sale =>
                       {invoiceTaxEnabled && (
                         <div className="flex justify-between text-sm">
                           <span>BTW (15%):</span>
-                          <span>R{((invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (1 - parseFloat(invoiceDiscountPercent) / 100)) * 0.15).toFixed(2)}</span>
+                          <span>R{(() => {
+                            const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                            const discount = invoiceDiscountType === 'percent' 
+                              ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
+                              : parseFloat(invoiceDiscountAmount) || 0;
+                            return ((subtotal - discount) * 0.15).toFixed(2);
+                          })()}</span>
                         </div>
                       )}
                       
@@ -4509,7 +4541,9 @@ ${dateFilteredSales.map(sale =>
                         <span>Totaal:</span>
                         <span>R{(() => {
                           const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                          const discount = subtotal * (parseFloat(invoiceDiscountPercent) / 100);
+                          const discount = invoiceDiscountType === 'percent' 
+                            ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
+                            : parseFloat(invoiceDiscountAmount) || 0;
                           const afterDiscount = subtotal - discount;
                           const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
                           const shipping = parseFloat(invoiceShippingAmount) || 0;
@@ -4600,9 +4634,11 @@ ${dateFilteredSales.map(sale =>
                     }
                     
                     const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                    const discountPercent = parseFloat(invoiceDiscountPercent) || 0;
-                    const discountAmount = subtotal * (discountPercent / 100);
-                    const afterDiscount = subtotal - discountAmount;
+                    const discountPercent = invoiceDiscountType === 'percent' ? (parseFloat(invoiceDiscountPercent) || 0) : 0;
+                    const discountAmountValue = invoiceDiscountType === 'amount' 
+                      ? (parseFloat(invoiceDiscountAmount) || 0)
+                      : subtotal * (discountPercent / 100);
+                    const afterDiscount = subtotal - discountAmountValue;
                     const taxAmount = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
                     const shipping = parseFloat(invoiceShippingAmount) || 0;
                     const total = afterDiscount + taxAmount + shipping;
@@ -4641,6 +4677,7 @@ ${dateFilteredSales.map(sale =>
                       })),
                       subtotal: parseFloat(subtotal.toFixed(2)),
                       discountPercent: parseFloat(discountPercent.toFixed(2)),
+                      discountAmount: parseFloat(discountAmountValue.toFixed(2)),
                       taxPercent: invoiceTaxEnabled ? 15.00 : 0,
                       tax: parseFloat(taxAmount.toFixed(2)),
                       shippingAmount: parseFloat(shipping.toFixed(2)),
@@ -4782,10 +4819,10 @@ ${dateFilteredSales.map(sale =>
                         <span className="text-gray-600">Subtotaal:</span>
                         <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
                       </div>
-                      {parseFloat(selectedInvoice.discountPercent || '0') > 0 && (
+                      {(parseFloat(selectedInvoice.discountPercent || '0') > 0 || parseFloat(selectedInvoice.discountAmount || '0') > 0) && (
                         <div className="flex justify-between text-sm text-red-600">
-                          <span>Afslag ({selectedInvoice.discountPercent}%):</span>
-                          <span>-R{(parseFloat(selectedInvoice.subtotal) * (parseFloat(selectedInvoice.discountPercent) / 100)).toFixed(2)}</span>
+                          <span>Afslag{parseFloat(selectedInvoice.discountPercent || '0') > 0 ? ` (${selectedInvoice.discountPercent}%)` : ''}:</span>
+                          <span>-R{parseFloat(selectedInvoice.discountAmount || '0').toFixed(2)}</span>
                         </div>
                       )}
                       {parseFloat(selectedInvoice.taxPercent || '0') > 0 && (
@@ -4852,7 +4889,11 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceNotes(selectedInvoice.notes || '');
                           setInvoicePoNumber(selectedInvoice.poNumber || '');
                           setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
+                          const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
+                          const hasAmountDiscount = parseFloat(selectedInvoice.discountAmount || '0') > 0 && !hasPercentDiscount;
+                          setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                           setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
+                          setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
                           setInvoiceTerms(selectedInvoice.terms || '');

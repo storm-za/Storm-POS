@@ -112,6 +112,7 @@ export const posInvoices = pgTable("pos_invoices", {
   items: jsonb("items").notNull(), // Array of {productId, name, price, quantity, lineTotal}
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   discountPercent: decimal("discount_percent", { precision: 5, scale: 2 }).notNull().default("0.00"),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull().default("0.00"),
   taxPercent: decimal("tax_percent", { precision: 5, scale: 2 }).notNull().default("0.00"),
   shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).notNull().default("0.00"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
