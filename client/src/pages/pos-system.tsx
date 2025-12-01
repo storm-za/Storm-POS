@@ -825,8 +825,8 @@ export default function PosSystem() {
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
     console.log("Form submitted:", { data, editingProduct: editingProduct?.id, errors: productForm.formState.errors });
     
-    // Add userId to the data
-    const dataWithUserId = { ...data, userId: 1 }; // Demo user ID
+    // Add userId to the data - use current user's ID
+    const dataWithUserId = { ...data, userId: currentUser?.id || 1 };
     
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.id, data: dataWithUserId });
@@ -836,8 +836,8 @@ export default function PosSystem() {
   };
 
   const handleCustomerSubmit = (data: z.infer<typeof customerFormSchema>) => {
-    // Add userId to the data
-    const dataWithUserId = { ...data, userId: 1 }; // Demo user ID
+    // Add userId to the data - use current user's ID
+    const dataWithUserId = { ...data, userId: currentUser?.id || 1 };
     
     if (editingCustomer) {
       updateCustomerMutation.mutate({ id: editingCustomer.id, data: dataWithUserId });
