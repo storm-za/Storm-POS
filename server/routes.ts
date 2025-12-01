@@ -10,7 +10,7 @@ import {
   insertPosInvoiceSchema,
   signupPosUserSchema
 } from "@shared/schema";
-import { sendContactSubmissionEmail, sendWelcomeEmail } from "./email";
+import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -1045,6 +1045,56 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   // Legacy sitemap.xml redirect to sitemap index (for backwards compatibility)
   app.get("/sitemap.xml", (req, res) => {
     res.redirect(301, '/sitemap_index.xml');
+  });
+
+  // Send "What's New" email to all POS users (admin endpoint)
+  app.post("/api/admin/send-whats-new-email", async (req, res) => {
+    try {
+      console.log("📧 Starting What's New email campaign...");
+      
+      // Get all POS users
+      const allUsers = await storage.getAllPosUsers();
+      console.log(`📋 Found ${allUsers.length} POS users`);
+      
+      let successCount = 0;
+      let failCount = 0;
+      const results: { email: string; success: boolean }[] = [];
+      
+      // Send email to each user
+      for (const user of allUsers) {
+        const userName = user.firstName || user.companyName || 'there';
+        const success = await sendWhatsNewEmail(user.email, userName);
+        
+        results.push({ email: user.email, success });
+        
+        if (success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+        
+        // Small delay between emails to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      console.log(`✅ Email campaign complete: ${successCount} sent, ${failCount} failed`);
+      
+      res.json({
+        success: true,
+        message: `Email campaign complete`,
+        totalUsers: allUsers.length,
+        successCount,
+        failCount,
+        results
+      });
+    } catch (error) {
+      console.error("❌ Error sending What's New emails:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to send emails",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
   });
 
   // Initialize monthly reset scheduler (but don't run immediately)

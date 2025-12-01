@@ -54,6 +54,7 @@ export interface IStorage {
   getContactSubmissions(): Promise<ContactSubmission[]>;
   
   // POS Operations
+  getAllPosUsers(): Promise<PosUser[]>;
   getPosUser(id: number): Promise<PosUser | undefined>;
   getPosUserByEmail(email: string): Promise<PosUser | undefined>;
   createPosUser(user: InsertPosUser): Promise<PosUser>;
@@ -248,6 +249,10 @@ export class MemStorage implements IStorage {
   }
 
   // POS User Methods
+  async getAllPosUsers(): Promise<PosUser[]> {
+    return Array.from(this.posUsers.values());
+  }
+
   async getPosUser(id: number): Promise<PosUser | undefined> {
     return this.posUsers.get(id);
   }
@@ -595,6 +600,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // POS Operations
+  async getAllPosUsers(): Promise<PosUser[]> {
+    return db.select().from(posUsers);
+  }
+
   async getPosUser(id: number): Promise<PosUser | undefined> {
     const [user] = await db.select().from(posUsers).where(eq(posUsers.id, id));
     return user || undefined;

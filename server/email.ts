@@ -131,6 +131,144 @@ The Storm Team
   }
 }
 
+export async function sendWhatsNewEmail(userEmail: string, userName: string): Promise<boolean> {
+  const transporter = createTransporter();
+  
+  if (!transporter) {
+    console.log('📧 What\'s New email skipped (no email configured) for:', userEmail);
+    return false;
+  }
+
+  try {
+    const emailContent = `
+Hi ${userName || 'there'},
+
+We hope Storm POS is helping your business run smoother every day! We've been hard at work adding new features and fixing issues based on your feedback. Here's what's new:
+
+📄 NEW: Invoices & Quotes Generator
+
+You can now create professional invoices and quotes directly from Storm POS! Features include:
+• Automatic document numbering (INV-001, QUO-001)
+• Add your company logo and business details
+• Line items with products from your inventory
+• Flexible discounts (percentage or fixed amount)
+• Optional 15% VAT toggle
+• Professional PDF export with your branding
+• Status tracking (Draft → Sent → Paid)
+• Available in both English and Afrikaans
+
+Find it right next to the Customers tab in your dashboard.
+
+🔧 Bug Fixes & Improvements
+
+• Product Editing Fixed: We resolved an issue where editing a product could cause it to disappear. Your products now save correctly every time.
+• Improved PDF Layouts: Invoice PDFs are now more compact - only creating multiple pages when truly needed.
+
+💡 Coming Soon
+
+We're always working on making Storm better for you. Stay tuned for more updates!
+
+Thank you for choosing Storm POS. If you have any questions or feedback, just reply to this email - we'd love to hear from you.
+
+Keep thriving,
+The Storm Team
+🌐 stormsoftware.co.za
+    `.trim();
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
+    .section { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2563eb; }
+    .section-title { color: #2563eb; margin: 0 0 10px 0; font-size: 18px; }
+    .feature { margin: 8px 0; padding-left: 5px; }
+    .bugfix { background: #f0fdf4; border-left-color: #22c55e; }
+    .bugfix .section-title { color: #22c55e; }
+    .coming-soon { background: #fefce8; border-left-color: #eab308; }
+    .coming-soon .section-title { color: #b45309; }
+    .cta-button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+    .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; border-radius: 0 0 10px 10px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0;">Still enjoying Storm? 🚀</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.9;">Here's what's new!</p>
+    </div>
+    <div class="content">
+      <p>Hi ${userName || 'there'},</p>
+      
+      <p>We hope Storm POS is helping your business run smoother every day! We've been hard at work adding new features and fixing issues based on your feedback. Here's what's new:</p>
+      
+      <div class="section">
+        <h3 class="section-title">📄 NEW: Invoices & Quotes Generator</h3>
+        <p>You can now create professional invoices and quotes directly from Storm POS!</p>
+        <div class="feature">✅ Automatic document numbering (INV-001, QUO-001)</div>
+        <div class="feature">✅ Add your company logo and business details</div>
+        <div class="feature">✅ Line items with products from your inventory</div>
+        <div class="feature">✅ Flexible discounts (percentage or fixed amount)</div>
+        <div class="feature">✅ Optional 15% VAT toggle</div>
+        <div class="feature">✅ Professional PDF export with your branding</div>
+        <div class="feature">✅ Status tracking (Draft → Sent → Paid)</div>
+        <div class="feature">✅ Available in both English and Afrikaans</div>
+        <p style="margin-top: 15px;"><strong>Find it right next to the Customers tab in your dashboard.</strong></p>
+      </div>
+      
+      <div class="section bugfix">
+        <h3 class="section-title">🔧 Bug Fixes & Improvements</h3>
+        <div class="feature"><strong>Product Editing Fixed:</strong> We resolved an issue where editing a product could cause it to disappear. Your products now save correctly every time.</div>
+        <div class="feature"><strong>Improved PDF Layouts:</strong> Invoice PDFs are now more compact - only creating multiple pages when truly needed.</div>
+      </div>
+      
+      <div class="section coming-soon">
+        <h3 class="section-title">💡 Coming Soon</h3>
+        <p style="margin: 0;">We're always working on making Storm better for you. Stay tuned for more updates!</p>
+      </div>
+      
+      <center>
+        <a href="https://stormsoftware.co.za/pos/login" class="cta-button">Log In to Storm POS →</a>
+      </center>
+      
+      <p>Thank you for choosing Storm POS. If you have any questions or feedback, just reply to this email - we'd love to hear from you.</p>
+      
+      <p style="margin-top: 30px;">
+        Keep thriving,<br>
+        <strong>The Storm Team</strong><br>
+        🌐 <a href="https://stormsoftware.co.za" style="color: #2563eb;">stormsoftware.co.za</a>
+      </p>
+    </div>
+    <div class="footer">
+      <p style="margin: 0;">Powered by STORM Software</p>
+      <p style="margin: 5px 0 0 0;">This email was sent to ${userEmail} because you're a Storm POS customer.</p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+
+    await transporter.sendMail({
+      from: '"Storm POS" <softwarebystorm@gmail.com>',
+      to: userEmail,
+      subject: "🚀 Still enjoying Storm? Here's what's new!",
+      text: emailContent,
+      html: htmlContent,
+    });
+
+    console.log(`✅ What's New email sent successfully to ${userEmail}`);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Failed to send What\'s New email:', error.message);
+    console.log(`📧 What's New email failed for: ${userEmail}`);
+    return false;
+  }
+}
+
 export async function sendContactSubmissionEmail(submission: ContactSubmission): Promise<boolean> {
   const transporter = createTransporter();
   
