@@ -293,9 +293,6 @@ export default function Home() {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-amber-600 transition-colors duration-300">Pricing Intelligence</h3>
                   <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Advanced market analysis and competitor tracking to optimize your pricing strategy in real-time</p>
-                  <Button disabled className="bg-gray-400 text-white cursor-not-allowed shadow-lg">
-                    Notify Me When Ready
-                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
