@@ -3327,62 +3327,64 @@ export default function PosSystem() {
                   Create Invoice/Quote
                 </Button>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
-                  <div className="flex flex-col md:flex-row gap-3">
-                    <div className="flex-1">
+                  <div className="space-y-3">
+                    <div className="w-full">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
-                          placeholder="Search by document number or client name..."
+                          placeholder="Search by document number or client..."
                           value={invoiceSearchQuery}
                           onChange={(e) => setInvoiceSearchQuery(e.target.value)}
-                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400 text-sm"
                           data-testid="input-invoice-search"
                         />
                       </div>
                     </div>
-                    <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
-                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
-                        <SelectValue placeholder="All Types" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Types</SelectItem>
-                        <SelectItem value="invoice">Invoices Only</SelectItem>
-                        <SelectItem value="quote">Quotes Only</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
-                      <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
-                        <SelectValue placeholder="All Statuses" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="paid">Paid</SelectItem>
-                        <SelectItem value="not_paid">Not Paid</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm" data-testid="select-invoice-type-filter">
+                          <SelectValue placeholder="All Types" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="invoice">Invoices</SelectItem>
+                          <SelectItem value="quote">Quotes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm" data-testid="select-invoice-status-filter">
+                          <SelectValue placeholder="All Statuses" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="not_paid">Not Paid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-3 items-end">
-                    <div className="flex-1 flex gap-3">
-                      <div className="flex-1">
-                        <Label className="text-gray-300 text-sm mb-1 block">From Date</Label>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-gray-300 text-xs sm:text-sm mb-1 block">From Date</Label>
                         <Input
                           type="date"
                           value={invoiceDateFrom}
                           onChange={(e) => setInvoiceDateFrom(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white"
+                          className="bg-white/5 border-white/10 text-white w-full text-sm"
                           data-testid="input-invoice-date-from"
                         />
                       </div>
-                      <div className="flex-1">
-                        <Label className="text-gray-300 text-sm mb-1 block">To Date</Label>
+                      <div>
+                        <Label className="text-gray-300 text-xs sm:text-sm mb-1 block">To Date</Label>
                         <Input
                           type="date"
                           value={invoiceDateTo}
                           onChange={(e) => setInvoiceDateTo(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white"
+                          className="bg-white/5 border-white/10 text-white w-full text-sm"
                           data-testid="input-invoice-date-to"
                         />
                       </div>
@@ -3398,7 +3400,7 @@ export default function PosSystem() {
                           setInvoiceDateFrom("");
                           setInvoiceDateTo("");
                         }}
-                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 whitespace-nowrap"
+                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 w-full"
                         data-testid="button-clear-filters"
                       >
                         <X className="w-4 h-4 mr-1" />
