@@ -2541,11 +2541,11 @@ ${dateFilteredSales.map(sale =>
               transition={{ duration: 0.5 }}
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-4 gap-3">
-                <CardTitle className="text-white text-xl font-bold">Fakture & Kwotasies</CardTitle>
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <CardTitle className="text-white text-lg sm:text-xl font-bold">Fakture & Kwotasies</CardTitle>
                 <Button 
                   onClick={() => setIsInvoiceDialogOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 w-full sm:w-auto"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 w-full sm:w-auto text-sm"
                   data-testid="button-create-invoice"
                 >
                   <PlusCircle className="w-4 h-4 mr-2" />
@@ -2655,7 +2655,7 @@ ${dateFilteredSales.map(sale =>
                     {filteredInvoices.map((invoice) => (
                       <motion.div
                         key={invoice.id}
-                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
+                        className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
                         whileHover={{ scale: 1.01, y: -2 }}
                         transition={{ duration: 0.2 }}
                         onClick={() => {
@@ -2664,19 +2664,19 @@ ${dateFilteredSales.map(sale =>
                         }}
                         data-testid={`invoice-card-${invoice.id}`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                               <Badge 
                                 variant={invoice.documentType === 'invoice' ? 'default' : 'outline'}
-                                className={invoice.documentType === 'invoice' 
+                                className={`text-xs sm:text-sm ${invoice.documentType === 'invoice' 
                                   ? 'bg-blue-600/20 text-blue-300 border-blue-500/30' 
                                   : 'bg-purple-600/20 text-purple-300 border-purple-500/30'
-                                }
+                                }`}
                               >
                                 {invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
                               </Badge>
-                              <span className="text-white font-semibold">{invoice.documentNumber}</span>
+                              <span className="text-white font-semibold text-sm sm:text-base truncate">{invoice.documentNumber}</span>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -2684,34 +2684,34 @@ ${dateFilteredSales.map(sale =>
                                   setNewDocumentNumber(invoice.documentNumber || '');
                                   setIsEditDocNumberDialogOpen(true);
                                 }}
-                                className="p-1 hover:bg-white/10 rounded transition-colors"
+                                className="p-1 hover:bg-white/10 rounded transition-colors flex-shrink-0"
                                 title="Wysig dokumentnommer"
                               >
                                 <Edit className="w-3 h-3 text-gray-400 hover:text-white" />
                               </button>
-                              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                <span className="text-gray-300 text-sm">Betaal</span>
-                                <Switch
-                                  checked={invoice.status === 'paid'}
-                                  onCheckedChange={(checked) => {
-                                    updateInvoiceStatusMutation.mutate({
-                                      invoiceId: invoice.id,
-                                      status: checked ? 'paid' : 'draft'
-                                    });
-                                  }}
-                                  className="data-[state=checked]:bg-[hsl(217,90%,40%)] data-[state=unchecked]:bg-gray-600"
-                                />
-                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">
+                            <div className="flex items-center gap-2 mb-2" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-gray-300 text-xs sm:text-sm">Betaal</span>
+                              <Switch
+                                checked={invoice.status === 'paid'}
+                                onCheckedChange={(checked) => {
+                                  updateInvoiceStatusMutation.mutate({
+                                    invoiceId: invoice.id,
+                                    status: checked ? 'paid' : 'draft'
+                                  });
+                                }}
+                                className="data-[state=checked]:bg-[hsl(217,90%,40%)] data-[state=unchecked]:bg-gray-600"
+                              />
+                            </div>
+                            <p className="text-gray-300 text-xs sm:text-sm truncate">
                               Kliënt: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
                             </p>
-                            <p className="text-gray-400 text-sm">
+                            <p className="text-gray-400 text-xs sm:text-sm">
                               Vervaldatum: {new Date(invoice.dueDate).toLocaleDateString()}
                             </p>
                           </div>
-                          <div className="text-right">
-                            <p className="text-white font-bold text-lg">
+                          <div className="text-left sm:text-right flex-shrink-0">
+                            <p className="text-white font-bold text-base sm:text-lg">
                               R{typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}
                             </p>
                           </div>
