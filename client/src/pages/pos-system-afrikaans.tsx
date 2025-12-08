@@ -158,6 +158,7 @@ export default function PosSystemAfrikaans() {
   const [isEditDocNumberDialogOpen, setIsEditDocNumberDialogOpen] = useState(false);
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -278,6 +279,72 @@ export default function PosSystemAfrikaans() {
       window.location.href = '/pos/inactive';
     }
   }, [currentUser]);
+
+  // Mobile back button handling
+  useEffect(() => {
+    // Push initial state to history
+    window.history.pushState({ pos: true, tab: 'verkope' }, '');
+    
+    const handlePopState = (event: PopStateEvent) => {
+      // Prevent default navigation
+      event.preventDefault();
+      
+      // Check all dialog states and close the first open one
+      const dialogStates = [
+        { isOpen: isInvoiceViewOpen, close: () => setIsInvoiceViewOpen(false) },
+        { isOpen: isInvoiceDialogOpen, close: () => setIsInvoiceDialogOpen(false) },
+        { isOpen: isDeleteInvoiceDialogOpen, close: () => setIsDeleteInvoiceDialogOpen(false) },
+        { isOpen: isStatusChangeDialogOpen, close: () => setIsStatusChangeDialogOpen(false) },
+        { isOpen: isEditDocNumberDialogOpen, close: () => setIsEditDocNumberDialogOpen(false) },
+        { isOpen: isProductDialogOpen, close: () => setIsProductDialogOpen(false) },
+        { isOpen: isCustomerDialogOpen, close: () => setIsCustomerDialogOpen(false) },
+        { isOpen: isStaffDialogOpen, close: () => setIsStaffDialogOpen(false) },
+        { isOpen: isStaffPasswordDialogOpen, close: () => setIsStaffPasswordDialogOpen(false) },
+        { isOpen: isUserManagementOpen, close: () => setIsUserManagementOpen(false) },
+        { isOpen: isOpenAccountDialogOpen, close: () => setIsOpenAccountDialogOpen(false) },
+        { isOpen: isBankDetailsOpen, close: () => setIsBankDetailsOpen(false) },
+        { isOpen: isLogoDialogOpen, close: () => setIsLogoDialogOpen(false) },
+        { isOpen: isReceiptCustomizerOpen, close: () => setIsReceiptCustomizerOpen(false) },
+        { isOpen: managementPasswordDialog, close: () => setManagementPasswordDialog(false) },
+        { isOpen: voidSaleDialog.open, close: () => setVoidSaleDialog({ open: false, sale: null }) },
+        { isOpen: viewVoidDialog.open, close: () => setViewVoidDialog({ open: false, sale: null }) },
+        { isOpen: isLogoutDialogOpen, close: () => setIsLogoutDialogOpen(false) },
+      ];
+      
+      // Find and close the first open dialog
+      const openDialog = dialogStates.find(d => d.isOpen);
+      if (openDialog) {
+        openDialog.close();
+        // Push state back to maintain history
+        window.history.pushState({ pos: true, tab: currentTab }, '');
+        return;
+      }
+      
+      // No dialogs open - handle tab navigation
+      if (currentTab !== 'verkope') {
+        // Navigate to verkope (sales) tab
+        setCurrentTab('verkope');
+        window.history.pushState({ pos: true, tab: 'verkope' }, '');
+      } else {
+        // On verkope tab - show logout confirmation
+        setIsLogoutDialogOpen(true);
+        window.history.pushState({ pos: true, tab: 'verkope' }, '');
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [
+    currentTab, isInvoiceViewOpen, isInvoiceDialogOpen, isDeleteInvoiceDialogOpen,
+    isStatusChangeDialogOpen, isEditDocNumberDialogOpen, isProductDialogOpen, 
+    isCustomerDialogOpen, isStaffDialogOpen, isStaffPasswordDialogOpen,
+    isUserManagementOpen, isOpenAccountDialogOpen, isBankDetailsOpen, 
+    isLogoDialogOpen, isReceiptCustomizerOpen, managementPasswordDialog,
+    voidSaleDialog.open, viewVoidDialog.open, isLogoutDialogOpen
+  ]);
 
   // Data fetching queries
   const { data: products = [] } = useQuery<Product[]>({
@@ -5238,6 +5305,32 @@ ${dateFilteredSales.map(sale =>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Logout Confirmation Dialog */}
+        <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Teken Uit?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Is jy seker jy wil uitteken uit Storm POS?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setIsLogoutDialogOpen(false)}>
+                Nee, Bly Aangeteken
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                onClick={() => {
+                  localStorage.removeItem('posUser');
+                  window.location.href = '/pos/login';
+                }}
+              >
+                Ja, Teken Uit
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

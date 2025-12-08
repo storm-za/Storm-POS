@@ -155,6 +155,7 @@ export default function PosSystem() {
   const [isEditDocNumberDialogOpen, setIsEditDocNumberDialogOpen] = useState(false);
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -225,6 +226,71 @@ export default function PosSystem() {
     }
   }, []);
 
+  // Mobile back button handling
+  useEffect(() => {
+    // Push initial state to history
+    window.history.pushState({ pos: true, tab: 'sales' }, '');
+    
+    const handlePopState = (event: PopStateEvent) => {
+      // Prevent default navigation
+      event.preventDefault();
+      
+      // Check all dialog states and close the first open one
+      const dialogStates = [
+        { isOpen: isInvoiceViewOpen, close: () => setIsInvoiceViewOpen(false) },
+        { isOpen: isInvoiceDialogOpen, close: () => setIsInvoiceDialogOpen(false) },
+        { isOpen: isDeleteInvoiceDialogOpen, close: () => setIsDeleteInvoiceDialogOpen(false) },
+        { isOpen: isStatusChangeDialogOpen, close: () => setIsStatusChangeDialogOpen(false) },
+        { isOpen: isEditDocNumberDialogOpen, close: () => setIsEditDocNumberDialogOpen(false) },
+        { isOpen: isProductDialogOpen, close: () => setIsProductDialogOpen(false) },
+        { isOpen: isCustomerDialogOpen, close: () => setIsCustomerDialogOpen(false) },
+        { isOpen: isStaffDialogOpen, close: () => setIsStaffDialogOpen(false) },
+        { isOpen: isStaffPasswordDialogOpen, close: () => setIsStaffPasswordDialogOpen(false) },
+        { isOpen: isUserManagementOpen, close: () => setIsUserManagementOpen(false) },
+        { isOpen: isOpenAccountDialogOpen, close: () => setIsOpenAccountDialogOpen(false) },
+        { isOpen: isBankDetailsOpen, close: () => setIsBankDetailsOpen(false) },
+        { isOpen: isLogoDialogOpen, close: () => setIsLogoDialogOpen(false) },
+        { isOpen: isReceiptCustomizerOpen, close: () => setIsReceiptCustomizerOpen(false) },
+        { isOpen: managementPasswordDialog, close: () => setManagementPasswordDialog(false) },
+        { isOpen: voidSaleDialog.open, close: () => setVoidSaleDialog({ open: false, sale: null }) },
+        { isOpen: viewVoidDialog.open, close: () => setViewVoidDialog({ open: false, sale: null }) },
+        { isOpen: isLogoutDialogOpen, close: () => setIsLogoutDialogOpen(false) },
+      ];
+      
+      // Find and close the first open dialog
+      const openDialog = dialogStates.find(d => d.isOpen);
+      if (openDialog) {
+        openDialog.close();
+        // Push state back to maintain history
+        window.history.pushState({ pos: true, tab: currentTab }, '');
+        return;
+      }
+      
+      // No dialogs open - handle tab navigation
+      if (currentTab !== 'sales') {
+        // Navigate to sales tab
+        setCurrentTab('sales');
+        window.history.pushState({ pos: true, tab: 'sales' }, '');
+      } else {
+        // On sales tab - show logout confirmation
+        setIsLogoutDialogOpen(true);
+        window.history.pushState({ pos: true, tab: 'sales' }, '');
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [
+    currentTab, isInvoiceViewOpen, isInvoiceDialogOpen, isDeleteInvoiceDialogOpen,
+    isStatusChangeDialogOpen, isEditDocNumberDialogOpen, isProductDialogOpen, 
+    isCustomerDialogOpen, isStaffDialogOpen, isStaffPasswordDialogOpen,
+    isUserManagementOpen, isOpenAccountDialogOpen, isBankDetailsOpen, 
+    isLogoDialogOpen, isReceiptCustomizerOpen, managementPasswordDialog,
+    voidSaleDialog.open, viewVoidDialog.open, isLogoutDialogOpen
+  ]);
 
   // Product form schema - exclude userId since we'll add it in the mutation
   const productFormSchema = insertPosProductSchema.omit({ userId: true }).extend({
@@ -6163,6 +6229,32 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Log Out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to log out of Storm POS?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsLogoutDialogOpen(false)}>
+              No, Stay Logged In
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                localStorage.removeItem('posUser');
+                window.location.href = '/pos/login';
+              }}
+            >
+              Yes, Log Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
