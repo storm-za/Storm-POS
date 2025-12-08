@@ -117,6 +117,7 @@ export const posInvoices = pgTable("pos_invoices", {
   shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).notNull().default("0.00"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   paymentMethod: text("payment_method"), // Optional payment method
+  paymentDetails: text("payment_details"), // Bank details, payment instructions, etc.
   notes: text("notes"), // Additional notes
   terms: text("terms"), // Terms & conditions
   createdAt: timestamp("created_at").defaultNow().notNull(),

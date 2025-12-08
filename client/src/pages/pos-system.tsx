@@ -142,6 +142,7 @@ export default function PosSystem() {
   const [invoiceDiscountType, setInvoiceDiscountType] = useState<'percent' | 'amount'>('percent');
   const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
   const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
+  const [invoicePaymentDetails, setInvoicePaymentDetails] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
   const [invoiceTaxEnabled, setInvoiceTaxEnabled] = useState(true);
   
@@ -571,6 +572,7 @@ export default function PosSystem() {
       setInvoiceDiscountPercent("0");
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
+      setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
       toast({
@@ -612,6 +614,7 @@ export default function PosSystem() {
       setInvoiceDiscountPercent("0");
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
+      setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
       toast({
@@ -2192,6 +2195,20 @@ export default function PosSystem() {
       doc.setFont('helvetica', 'normal');
       doc.text(invoice.paymentMethod, margin + 40, y);
       y += 12;
+    }
+    
+    // ===== PAYMENT DETAILS =====
+    if (invoice.paymentDetails) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('PAYMENT DETAILS', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const paymentDetailsLines = doc.splitTextToSize(invoice.paymentDetails, pageWidth - (margin * 2));
+      doc.text(paymentDetailsLines, margin, y + 6);
+      y += (paymentDetailsLines.length * 4) + 15;
     }
     
     // ===== NOTES SECTION =====
@@ -5208,6 +5225,7 @@ export default function PosSystem() {
             setInvoiceDiscountPercent("0");
             setInvoiceShippingAmount("0");
             setInvoicePaymentMethod("");
+            setInvoicePaymentDetails("");
             setInvoiceTerms("");
             setInvoiceTaxEnabled(true);
             setInvoiceType('invoice');
@@ -5510,6 +5528,18 @@ export default function PosSystem() {
               </Select>
             </div>
 
+            {/* Payment Details */}
+            <div>
+              <Label>Payment Details (Optional)</Label>
+              <textarea
+                value={invoicePaymentDetails}
+                onChange={(e) => setInvoicePaymentDetails(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                rows={2}
+                placeholder="Bank details, payment instructions, etc..."
+              />
+            </div>
+
             {/* Notes */}
             <div>
               <Label>Notes (Optional)</Label>
@@ -5629,6 +5659,7 @@ export default function PosSystem() {
                     shippingAmount: shipping.toFixed(2),
                     total: total.toFixed(2),
                     paymentMethod: invoicePaymentMethod || undefined,
+                    paymentDetails: invoicePaymentDetails || undefined,
                     notes: invoiceNotes || undefined,
                     terms: invoiceTerms || undefined
                   };
@@ -5725,6 +5756,12 @@ export default function PosSystem() {
                     <div>
                       <Label className="text-xs text-gray-500">Payment</Label>
                       <p className="font-medium text-sm">{selectedInvoice.paymentMethod}</p>
+                    </div>
+                  )}
+                  {selectedInvoice.paymentDetails && (
+                    <div className="col-span-2">
+                      <Label className="text-xs text-gray-500">Payment Details</Label>
+                      <p className="font-medium text-sm whitespace-pre-wrap">{selectedInvoice.paymentDetails}</p>
                     </div>
                   )}
                 </div>
@@ -5856,6 +5893,7 @@ export default function PosSystem() {
                         setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                         setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                         setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                        setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                         setInvoiceTerms(selectedInvoice.terms || '');
                         setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                         

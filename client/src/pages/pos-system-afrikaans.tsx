@@ -145,6 +145,7 @@ export default function PosSystemAfrikaans() {
   const [invoiceDiscountType, setInvoiceDiscountType] = useState<'percent' | 'amount'>('percent');
   const [invoiceShippingAmount, setInvoiceShippingAmount] = useState("0");
   const [invoicePaymentMethod, setInvoicePaymentMethod] = useState("");
+  const [invoicePaymentDetails, setInvoicePaymentDetails] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
   const [invoiceTaxEnabled, setInvoiceTaxEnabled] = useState(true);
   
@@ -681,6 +682,20 @@ export default function PosSystemAfrikaans() {
       y += 12;
     }
     
+    // ===== BETALINGSBESONDERHEDE =====
+    if (invoice.paymentDetails) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('BETALINGSBESONDERHEDE', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const paymentDetailsLines = doc.splitTextToSize(invoice.paymentDetails, pageWidth - (margin * 2));
+      doc.text(paymentDetailsLines, margin, y + 6);
+      y += (paymentDetailsLines.length * 4) + 15;
+    }
+    
     // ===== NOTAS AFDELING =====
     if (invoice.notes) {
       // Only add page break for 10+ items when running out of space
@@ -935,6 +950,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceDiscountPercent("0");
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
+      setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
       toast({
@@ -976,6 +992,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceDiscountPercent("0");
       setInvoiceShippingAmount("0");
       setInvoicePaymentMethod("");
+      setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
       toast({
@@ -4285,6 +4302,7 @@ ${dateFilteredSales.map(sale =>
               setInvoiceDiscountPercent("0");
               setInvoiceShippingAmount("0");
               setInvoicePaymentMethod("");
+              setInvoicePaymentDetails("");
               setInvoiceTerms("");
               setInvoiceTaxEnabled(true);
               setInvoiceType('invoice');
@@ -4587,6 +4605,18 @@ ${dateFilteredSales.map(sale =>
                 </Select>
               </div>
 
+              {/* Payment Details */}
+              <div>
+                <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                <textarea
+                  value={invoicePaymentDetails}
+                  onChange={(e) => setInvoicePaymentDetails(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={2}
+                  placeholder="Bankbesonderhede, betalingsinstruksies, ens..."
+                />
+              </div>
+
               {/* Notes */}
               <div>
                 <Label>Notas (Opsioneel)</Label>
@@ -4699,6 +4729,7 @@ ${dateFilteredSales.map(sale =>
                       shippingAmount: shipping.toFixed(2),
                       total: total.toFixed(2),
                       paymentMethod: invoicePaymentMethod || undefined,
+                      paymentDetails: invoicePaymentDetails || undefined,
                       notes: invoiceNotes || undefined,
                       terms: invoiceTerms || undefined
                     };
@@ -4799,6 +4830,12 @@ ${dateFilteredSales.map(sale =>
                       <div>
                         <Label className="text-xs text-gray-500">Betaalmetode</Label>
                         <p className="font-medium text-sm">{selectedInvoice.paymentMethod}</p>
+                      </div>
+                    )}
+                    {selectedInvoice.paymentDetails && (
+                      <div className="col-span-2">
+                        <Label className="text-xs text-gray-500">Betalingsbesonderhede</Label>
+                        <p className="font-medium text-sm whitespace-pre-wrap">{selectedInvoice.paymentDetails}</p>
                       </div>
                     )}
                   </div>
@@ -4930,6 +4967,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                          setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
                           setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                           
