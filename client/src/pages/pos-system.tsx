@@ -2324,10 +2324,13 @@ export default function PosSystem() {
     doc.setFontSize(8);
     doc.text(`${companyName} | Generated on ${new Date().toLocaleDateString('en-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
     
-    // Powered by STORM Software footer
+    // Powered by STORM Software footer with clickable link
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text('Powered by STORM Software', pageWidth / 2, footerY + 10, { align: 'center' });
+    const stormText = 'Powered by STORM Software';
+    const stormTextWidth = doc.getTextWidth(stormText);
+    const stormTextX = (pageWidth - stormTextWidth) / 2;
+    doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
     // Download PDF
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;

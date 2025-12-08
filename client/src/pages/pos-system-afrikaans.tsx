@@ -810,10 +810,13 @@ export default function PosSystemAfrikaans() {
     doc.setFontSize(8);
     doc.text(`${companyName} | Gegenereer op ${new Date().toLocaleDateString('af-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
     
-    // Aangedryf deur STORM Sagteware footer
+    // Aangedryf deur STORM Sagteware footer with clickable link
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text('Aangedryf deur STORM Sagteware', pageWidth / 2, footerY + 10, { align: 'center' });
+    const stormText = 'Aangedryf deur STORM Sagteware';
+    const stormTextWidth = doc.getTextWidth(stormText);
+    const stormTextX = (pageWidth - stormTextWidth) / 2;
+    doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
     // Laai PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
