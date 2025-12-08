@@ -4729,35 +4729,35 @@ ${dateFilteredSales.map(sale =>
 
         {/* Invoice Detail/View Modal */}
         <Dialog open={isInvoiceViewOpen} onOpenChange={setIsInvoiceViewOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
             {selectedInvoice && (
               <>
-                <DialogHeader className="border-b border-gray-200 pb-4">
-                  <div className="flex items-center justify-between">
+                <DialogHeader className="border-b border-gray-200 pb-3 sm:pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
-                      <DialogTitle className="text-2xl text-[hsl(217,90%,40%)]">
+                      <DialogTitle className="text-lg sm:text-2xl text-[hsl(217,90%,40%)]">
                         {selectedInvoice.documentNumber}
                       </DialogTitle>
-                      <p className="text-sm text-gray-500 mt-1">{selectedInvoice.title}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{selectedInvoice.title}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Badge 
                         variant={selectedInvoice.documentType === 'invoice' ? 'default' : 'outline'}
-                        className={selectedInvoice.documentType === 'invoice' 
+                        className={`text-xs ${selectedInvoice.documentType === 'invoice' 
                           ? 'bg-[hsl(217,90%,40%)] text-white' 
                           : 'text-purple-600 border-purple-300'
-                        }
+                        }`}
                       >
                         {selectedInvoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE'}
                       </Badge>
                       <Badge 
                         variant="outline"
-                        className={
+                        className={`text-xs ${
                           selectedInvoice.status === 'paid' ? 'bg-green-100 text-green-700 border-green-300' :
                           selectedInvoice.status === 'sent' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
                           selectedInvoice.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-300' :
                           'bg-gray-100 text-gray-700 border-gray-300'
-                        }
+                        }`}
                       >
                         {selectedInvoice.status === 'draft' ? 'KONSEP' : 
                          selectedInvoice.status === 'sent' ? 'GESTUUR' : 
@@ -4768,43 +4768,58 @@ ${dateFilteredSales.map(sale =>
                   </div>
                 </DialogHeader>
                 
-                <div className="space-y-6 py-4">
+                <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
                   {/* Document Info Grid */}
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg text-sm">
                     <div>
                       <Label className="text-xs text-gray-500">Kliënt</Label>
-                      <p className="font-medium">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
+                      <p className="font-medium text-sm truncate">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
                     </div>
                     {selectedInvoice.poNumber && (
                       <div>
                         <Label className="text-xs text-gray-500">PO Nommer</Label>
-                        <p className="font-medium">{selectedInvoice.poNumber}</p>
+                        <p className="font-medium text-sm">{selectedInvoice.poNumber}</p>
                       </div>
                     )}
                     <div>
-                      <Label className="text-xs text-gray-500">Datum Geskep</Label>
-                      <p className="font-medium">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
+                      <Label className="text-xs text-gray-500">Datum</Label>
+                      <p className="font-medium text-sm">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
                     </div>
                     <div>
                       <Label className="text-xs text-gray-500">Vervaldatum</Label>
-                      <p className="font-medium">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
+                      <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-500">Betalingsvoorwaardes</Label>
-                      <p className="font-medium">{selectedInvoice.dueTerms || '7 dae'}</p>
+                      <Label className="text-xs text-gray-500">Terme</Label>
+                      <p className="font-medium text-sm">{selectedInvoice.dueTerms || '7 dae'}</p>
                     </div>
                     {selectedInvoice.paymentMethod && (
                       <div>
                         <Label className="text-xs text-gray-500">Betaalmetode</Label>
-                        <p className="font-medium">{selectedInvoice.paymentMethod}</p>
+                        <p className="font-medium text-sm">{selectedInvoice.paymentMethod}</p>
                       </div>
                     )}
                   </div>
 
-                  {/* Line Items Table */}
+                  {/* Line Items - Mobile Cards / Desktop Table */}
                   <div>
                     <Label className="text-sm font-semibold mb-2 block">Lynitemme</Label>
-                    <div className="border rounded-lg overflow-hidden">
+                    {/* Mobile: Card layout */}
+                    <div className="sm:hidden space-y-2">
+                      {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
+                        <div key={index} className="bg-gray-50 rounded-lg p-3 border">
+                          <div className="flex justify-between items-start mb-1">
+                            <span className="font-medium text-sm">{item.name}</span>
+                            <span className="font-bold text-sm">R{parseFloat(item.lineTotal).toFixed(2)}</span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {item.quantity} x R{parseFloat(item.price).toFixed(2)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Desktop: Table layout */}
+                    <div className="hidden sm:block border rounded-lg overflow-hidden">
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
@@ -4829,31 +4844,31 @@ ${dateFilteredSales.map(sale =>
                   </div>
 
                   {/* Financial Summary */}
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="max-w-xs ml-auto space-y-2">
-                      <div className="flex justify-between text-sm">
+                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                    <div className="sm:max-w-xs sm:ml-auto space-y-1 sm:space-y-2 text-sm">
+                      <div className="flex justify-between">
                         <span className="text-gray-600">Subtotaal:</span>
                         <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
                       </div>
                       {(parseFloat(selectedInvoice.discountPercent || '0') > 0 || parseFloat(selectedInvoice.discountAmount || '0') > 0) && (
-                        <div className="flex justify-between text-sm text-red-600">
+                        <div className="flex justify-between text-red-600">
                           <span>Afslag{parseFloat(selectedInvoice.discountPercent || '0') > 0 ? ` (${selectedInvoice.discountPercent}%)` : ''}:</span>
                           <span>-R{parseFloat(selectedInvoice.discountAmount || '0').toFixed(2)}</span>
                         </div>
                       )}
                       {parseFloat(selectedInvoice.taxPercent || '0') > 0 && (
-                        <div className="flex justify-between text-sm">
+                        <div className="flex justify-between">
                           <span className="text-gray-600">BTW (15%):</span>
                           <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
                         </div>
                       )}
                       {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
-                        <div className="flex justify-between text-sm">
+                        <div className="flex justify-between">
                           <span className="text-gray-600">Versending:</span>
                           <span className="font-medium">R{typeof selectedInvoice.shippingAmount === 'number' ? selectedInvoice.shippingAmount.toFixed(2) : selectedInvoice.shippingAmount}</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
+                      <div className="flex justify-between text-base sm:text-lg font-bold border-t pt-2 mt-2">
                         <span>Totaal:</span>
                         <span className="text-[hsl(217,90%,40%)]">R{typeof selectedInvoice.total === 'number' ? selectedInvoice.total.toFixed(2) : selectedInvoice.total}</span>
                       </div>
@@ -4862,29 +4877,31 @@ ${dateFilteredSales.map(sale =>
 
                   {/* Notes & Terms */}
                   {(selectedInvoice.notes || selectedInvoice.terms) && (
-                    <div className="space-y-4 border-t border-gray-200 pt-4">
+                    <div className="space-y-3 sm:space-y-4 border-t border-gray-200 pt-3 sm:pt-4">
                       {selectedInvoice.notes && (
                         <div>
                           <Label className="text-sm font-semibold mb-2 block">Notas</Label>
-                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedInvoice.notes}</p>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded">{selectedInvoice.notes}</p>
                         </div>
                       )}
                       {selectedInvoice.terms && (
                         <div>
                           <Label className="text-sm font-semibold mb-2 block">Terme & Voorwaardes</Label>
-                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">{selectedInvoice.terms}</p>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded whitespace-pre-wrap">{selectedInvoice.terms}</p>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-between items-center border-t border-gray-200 pt-4">
-                  <div className="flex gap-2">
+                {/* Action Buttons - Mobile Stacked */}
+                <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2 sm:space-y-0">
+                  {/* Mobile: Stack all buttons */}
+                  <div className="grid grid-cols-2 gap-2 sm:hidden">
                     <Button 
                       variant="outline" 
                       size="sm" 
+                      className="text-xs"
                       data-testid="button-edit-invoice"
                       onClick={() => {
                         if (selectedInvoice) {
@@ -4906,7 +4923,6 @@ ${dateFilteredSales.map(sale =>
                           setInvoicePoNumber(selectedInvoice.poNumber || '');
                           setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
                           const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
-                          const hasAmountDiscount = parseFloat(selectedInvoice.discountAmount || '0') > 0 && !hasPercentDiscount;
                           setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                           setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
                           setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
@@ -4927,44 +4943,133 @@ ${dateFilteredSales.map(sale =>
                         }
                       }}
                     >
-                      <Edit className="w-4 h-4 mr-2" />
+                      <Edit className="w-3 h-3 mr-1" />
                       Wysig
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-red-600 hover:text-red-700" 
+                      className="text-red-600 hover:text-red-700 text-xs" 
                       data-testid="button-delete-invoice"
                       onClick={() => setIsDeleteInvoiceDialogOpen(true)}
                     >
-                      <Trash2 className="w-4 h-4 mr-2" />
+                      <Trash2 className="w-3 h-3 mr-1" />
                       Verwyder
                     </Button>
-                  </div>
-                  <div className="flex gap-2">
                     <Button 
                       variant="outline" 
-                      size="sm" 
+                      size="sm"
+                      className="text-xs"
                       data-testid="button-change-status"
                       onClick={() => {
                         setNewStatus(selectedInvoice?.status || 'draft');
                         setIsStatusChangeDialogOpen(true);
                       }}
                     >
-                      Verander Status
+                      Status
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs"
                       data-testid="button-export-pdf"
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      <Download className="w-4 h-4 mr-2" />
-                      Eksporteer PDF
+                      <Download className="w-3 h-3 mr-1" />
+                      PDF
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
+                  </div>
+                  <div className="sm:hidden">
+                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
                     </Button>
+                  </div>
+                  
+                  {/* Desktop: Original layout */}
+                  <div className="hidden sm:flex sm:justify-between sm:items-center">
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        data-testid="button-edit-invoice-desktop"
+                        onClick={() => {
+                          if (selectedInvoice) {
+                            setEditingInvoice(selectedInvoice);
+                            setInvoiceType(selectedInvoice.documentType);
+                            
+                            if (selectedInvoice.clientId) {
+                              setIsCustomClient(false);
+                              setInvoiceClientId(selectedInvoice.clientId);
+                              setInvoiceCustomClient("");
+                            } else if (selectedInvoice.clientName) {
+                              setIsCustomClient(true);
+                              setInvoiceCustomClient(selectedInvoice.clientName);
+                              setInvoiceClientId(null);
+                            }
+                            
+                            setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
+                            setInvoiceNotes(selectedInvoice.notes || '');
+                            setInvoicePoNumber(selectedInvoice.poNumber || '');
+                            setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
+                            const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
+                            setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
+                            setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
+                            setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
+                            setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
+                            setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                            setInvoiceTerms(selectedInvoice.terms || '');
+                            setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
+                            
+                            const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
+                            setInvoiceItems(items.map((item: any) => ({
+                              productId: item.productId,
+                              quantity: parseFloat(item.quantity) || item.quantity,
+                              price: parseFloat(item.price)
+                            })));
+                            
+                            setIsInvoiceViewOpen(false);
+                            setIsInvoiceDialogOpen(true);
+                          }
+                        }}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Wysig
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600 hover:text-red-700" 
+                        data-testid="button-delete-invoice-desktop"
+                        onClick={() => setIsDeleteInvoiceDialogOpen(true)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Verwyder
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        data-testid="button-change-status-desktop"
+                        onClick={() => {
+                          setNewStatus(selectedInvoice?.status || 'draft');
+                          setIsStatusChangeDialogOpen(true);
+                        }}
+                      >
+                        Verander Status
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                        data-testid="button-export-pdf-desktop"
+                        onClick={() => generateInvoicePDF(selectedInvoice)}
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Eksporteer PDF
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
+                        Sluit
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </>
