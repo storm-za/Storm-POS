@@ -550,7 +550,7 @@ export default function PosSystemAfrikaans() {
     const detailsData = [
       { label: 'Datum:', value: formatDate(invoice.createdDate) },
       { label: 'Vervaldatum:', value: formatDate(invoice.dueDate) },
-      { label: 'Terme:', value: invoice.dueTerms || '7 dae' },
+      ...(invoice.dueTerms ? [{ label: 'Terme:', value: invoice.dueTerms }] : []),
       ...(invoice.poNumber ? [{ label: 'BO #:', value: invoice.poNumber }] : []),
       { label: 'Status:', value: getStatusAfrikaans(invoice.status) }
     ];
@@ -4789,10 +4789,12 @@ ${dateFilteredSales.map(sale =>
                       <Label className="text-xs text-gray-500">Vervaldatum</Label>
                       <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
                     </div>
-                    <div>
-                      <Label className="text-xs text-gray-500">Terme</Label>
-                      <p className="font-medium text-sm">{selectedInvoice.dueTerms || '7 dae'}</p>
-                    </div>
+                    {selectedInvoice.dueTerms && (
+                      <div>
+                        <Label className="text-xs text-gray-500">Terme</Label>
+                        <p className="font-medium text-sm">{selectedInvoice.dueTerms}</p>
+                      </div>
+                    )}
                     {selectedInvoice.paymentMethod && (
                       <div>
                         <Label className="text-xs text-gray-500">Betaalmetode</Label>
@@ -4921,7 +4923,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                           setInvoiceNotes(selectedInvoice.notes || '');
                           setInvoicePoNumber(selectedInvoice.poNumber || '');
-                          setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
+                          setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
                           const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
                           setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                           setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
@@ -5009,7 +5011,7 @@ ${dateFilteredSales.map(sale =>
                             setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                             setInvoiceNotes(selectedInvoice.notes || '');
                             setInvoicePoNumber(selectedInvoice.poNumber || '');
-                            setInvoiceDueTerms(selectedInvoice.dueTerms || '7 dae');
+                            setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
                             const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
                             setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                             setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());

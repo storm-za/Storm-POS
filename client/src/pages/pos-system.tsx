@@ -2062,7 +2062,7 @@ export default function PosSystem() {
     const detailsData = [
       { label: 'Date:', value: formatDate(invoice.createdDate) },
       { label: 'Due Date:', value: formatDate(invoice.dueDate) },
-      { label: 'Terms:', value: invoice.dueTerms || '7 days' },
+      ...(invoice.dueTerms ? [{ label: 'Terms:', value: invoice.dueTerms }] : []),
       ...(invoice.poNumber ? [{ label: 'PO #:', value: invoice.poNumber }] : []),
       { label: 'Status:', value: (invoice.status || 'draft').toUpperCase() }
     ];
@@ -5715,10 +5715,12 @@ export default function PosSystem() {
                     <Label className="text-xs text-gray-500">Due Date</Label>
                     <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
                   </div>
-                  <div>
-                    <Label className="text-xs text-gray-500">Terms</Label>
-                    <p className="font-medium text-sm">{selectedInvoice.dueTerms || '7 days'}</p>
-                  </div>
+                  {selectedInvoice.dueTerms && (
+                    <div>
+                      <Label className="text-xs text-gray-500">Terms</Label>
+                      <p className="font-medium text-sm">{selectedInvoice.dueTerms}</p>
+                    </div>
+                  )}
                   {selectedInvoice.paymentMethod && (
                     <div>
                       <Label className="text-xs text-gray-500">Payment</Label>
@@ -5847,7 +5849,7 @@ export default function PosSystem() {
                         setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                         setInvoiceNotes(selectedInvoice.notes || '');
                         setInvoicePoNumber(selectedInvoice.poNumber || '');
-                        setInvoiceDueTerms(selectedInvoice.dueTerms || '7 days');
+                        setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
                         const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
                         setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                         setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
@@ -5935,7 +5937,7 @@ export default function PosSystem() {
                           setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                           setInvoiceNotes(selectedInvoice.notes || '');
                           setInvoicePoNumber(selectedInvoice.poNumber || '');
-                          setInvoiceDueTerms(selectedInvoice.dueTerms || '7 days');
+                          setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
                           const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
                           setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
                           setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
