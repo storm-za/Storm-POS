@@ -536,12 +536,23 @@ export default function PosSystemAfrikaans() {
     
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0, 0, 0);
+    // Status vertaling funksie
+    const getStatusAfrikaans = (status: string) => {
+      switch (status) {
+        case 'draft': return 'KONSEP';
+        case 'sent': return 'GESTUUR';
+        case 'paid': return 'BETAAL';
+        case 'cancelled': return 'GEKANSELLEER';
+        default: return (status || 'KONSEP').toUpperCase();
+      }
+    };
+    
     const detailsData = [
       { label: 'Datum:', value: formatDate(invoice.createdDate) },
       { label: 'Vervaldatum:', value: formatDate(invoice.dueDate) },
       { label: 'Terme:', value: invoice.dueTerms || '7 dae' },
       ...(invoice.poNumber ? [{ label: 'BO #:', value: invoice.poNumber }] : []),
-      { label: 'Status:', value: (invoice.status || 'konsep').toUpperCase() }
+      { label: 'Status:', value: getStatusAfrikaans(invoice.status) }
     ];
     
     let detailY = y + 8;
