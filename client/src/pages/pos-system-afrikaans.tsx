@@ -505,18 +505,12 @@ export default function PosSystemAfrikaans() {
       }
     }
     
-    // Maatskappy Naam en Besigheidsbesonderhede - Regter kant
+    // Besigheidsbesonderhede - Regter kant (geen maatskappy naam)
     const headerRightX = pageWidth - margin;
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-    doc.text(companyName.toUpperCase(), headerRightX, y + 5, { align: 'right' });
-    
-    // Besigheid kontakinligting onder maatskappy naam
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    let headerY = y + 10;
+    let headerY = y + 5;
     
     if (businessAddress1) {
       doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
@@ -816,10 +810,10 @@ export default function PosSystemAfrikaans() {
     doc.setFontSize(8);
     doc.text(`${companyName} | Gegenereer op ${new Date().toLocaleDateString('af-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
     
-    // Powered by STORM Software footer
+    // Aangedryf deur STORM Sagteware footer
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text('Powered by STORM Software', pageWidth / 2, footerY + 10, { align: 'center' });
+    doc.text('Aangedryf deur STORM Sagteware', pageWidth / 2, footerY + 10, { align: 'center' });
     
     // Laai PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;

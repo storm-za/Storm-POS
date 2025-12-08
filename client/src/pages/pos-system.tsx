@@ -2029,18 +2029,12 @@ export default function PosSystem() {
       }
     }
     
-    // Company Name and Business Details - Right side header
+    // Business Details - Right side header (no company name)
     const headerRightX = pageWidth - margin;
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-    doc.text(companyName.toUpperCase(), headerRightX, y + 5, { align: 'right' });
-    
-    // Business contact info under company name
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    let headerY = y + 10;
+    let headerY = y + 5;
     
     if (businessAddress1) {
       doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
