@@ -5718,10 +5718,10 @@ export default function PosSystem() {
                     tax: taxAmount.toFixed(2),
                     shippingAmount: shipping.toFixed(2),
                     total: total.toFixed(2),
-                    paymentMethod: invoicePaymentMethod || undefined,
-                    paymentDetails: invoicePaymentDetails || undefined,
-                    notes: invoiceNotes || undefined,
-                    terms: invoiceTerms || undefined
+                    paymentMethod: invoicePaymentMethod || null,
+                    paymentDetails: invoicePaymentDetails || null,
+                    notes: invoiceNotes || null,
+                    terms: invoiceTerms || null
                   };
                   
                   if (editingInvoice) {
