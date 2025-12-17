@@ -973,6 +973,10 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
     <loc>${PRODUCTION_DOMAIN}/sitemap-pos.xml</loc>
     <lastmod>${currentDate}</lastmod>
   </sitemap>
+  <sitemap>
+    <loc>${PRODUCTION_DOMAIN}/sitemap-blog.xml</loc>
+    <lastmod>${currentDate}</lastmod>
+  </sitemap>
 </sitemapindex>`;
 
     res.set('Content-Type', 'application/xml');
@@ -1035,6 +1039,36 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   <url>
     <loc>${PRODUCTION_DOMAIN}/pos/login</loc>
     <lastmod>${currentDate}</lastmod>
+  </url>
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
+
+  // Blog pages sitemap
+  app.get("/sitemap-blog.xml", (req, res) => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/blog</loc>
+    <lastmod>${currentDate}</lastmod>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/blog/why-south-african-retailers-switching-cloud-pos</loc>
+    <lastmod>2025-12-15</lastmod>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/blog/real-cost-not-having-website-2025</loc>
+    <lastmod>2025-12-12</lastmod>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/blog/how-choose-right-pos-system-business</loc>
+    <lastmod>2025-12-08</lastmod>
   </url>
 </urlset>`;
 

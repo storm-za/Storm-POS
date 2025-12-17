@@ -1,4 +1,5 @@
 import { Mail, MapPin } from "lucide-react";
+import { Link } from "wouter";
 
 import stormLogoPath from "@assets/wilgerrusorania.co.za (11)_1751022573240.png";
 import stormTextPath from "@assets/wilgerrusorania.co.za__13_-removebg-preview_1751022992745.png";
@@ -17,8 +18,8 @@ export default function Footer() {
   return (
     <footer className="glassmorphism mt-16 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
+        <div className="grid md:grid-cols-4 gap-8">
+          <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <StormLogo />
               <img 
@@ -30,6 +31,21 @@ export default function Footer() {
             <p className="text-gray-600 mb-4">
               Empowering South African businesses with smart software solutions and professional web development services.
             </p>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Resources</h4>
+            <div className="space-y-2">
+              <Link href="/blog" className="block text-gray-600 hover:text-[hsl(217,90%,40%)] transition-colors">
+                Blog
+              </Link>
+              <Link href="/web-development" className="block text-gray-600 hover:text-[hsl(217,90%,40%)] transition-colors">
+                Web Development
+              </Link>
+              <Link href="/pos" className="block text-gray-600 hover:text-[hsl(217,90%,40%)] transition-colors">
+                Storm POS
+              </Link>
+            </div>
           </div>
           
           <div>
@@ -45,12 +61,10 @@ export default function Footer() {
               </p>
             </div>
           </div>
-          
-          
         </div>
         
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-          <p className="text-gray-600">&copy; 2024 Storm. All rights reserved.</p>
+          <p className="text-gray-600">&copy; 2025 Storm. All rights reserved.</p>
         </div>
       </div>
     </footer>

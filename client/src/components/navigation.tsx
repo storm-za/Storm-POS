@@ -39,6 +39,14 @@ export default function Navigation() {
             >
               Web Development
             </Link>
+            <Link 
+              href="/blog" 
+              className={`text-gray-700 hover:text-[hsl(217,90%,40%)] transition-colors duration-200 font-medium ${
+                location.startsWith('/blog') ? 'text-[hsl(217,90%,40%)]' : ''
+              }`}
+            >
+              Blog
+            </Link>
             <Button 
               className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]"
               onClick={() => {
@@ -82,6 +90,13 @@ export default function Navigation() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Web Development
+            </Link>
+            <Link 
+              href="/blog" 
+              className="block px-3 py-2 text-gray-700 hover:text-[hsl(217,90%,40%)]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Blog
             </Link>
             <Button 
               className="w-full mt-2 bg-[hsl(217,90%,40%)] text-white"
