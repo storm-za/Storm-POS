@@ -22,8 +22,9 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, Globe, BookOpen, HelpCircle
+  ChevronDown, Globe, BookOpen, HelpCircle, Share2
 } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -2340,6 +2341,302 @@ export default function PosSystem() {
       title: "PDF Generated",
       description: `${invoice.documentNumber} has been downloaded`,
     });
+  };
+
+  // Share Invoice via WhatsApp
+  const shareInvoiceWhatsApp = async (invoice: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const blueColor: [number, number, number] = [43, 108, 176];
+    const margin = 20;
+    
+    const formatDate = (date: any) => {
+      if (!date) return 'N/A';
+      const dateObj = date instanceof Date ? date : new Date(date);
+      return isNaN(dateObj.getTime()) ? 'N/A' : dateObj.toLocaleDateString('en-ZA', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    };
+    
+    const settings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Business';
+    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const businessAddress1 = settings.businessInfo?.addressLine1 || '';
+    const businessAddress2 = settings.businessInfo?.addressLine2 || '';
+    const businessPhone = settings.businessInfo?.phone || '';
+    const businessEmail = settings.businessInfo?.email || '';
+    const businessWebsite = settings.businessInfo?.website || '';
+    const vatNumber = settings.businessInfo?.vatNumber || '';
+    const regNumber = settings.businessInfo?.registrationNumber || '';
+    
+    let y = 15;
+    
+    if (companyLogo) {
+      try {
+        doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
+      } catch (error) {
+        console.error('Error adding logo to PDF:', error);
+      }
+    }
+    
+    const headerRightX = pageWidth - margin;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    let headerY = y + 5;
+    
+    if (businessAddress1) { doc.text(businessAddress1, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessAddress2) { doc.text(businessAddress2, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessEmail) { doc.text(businessEmail, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessWebsite) { doc.text(businessWebsite, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (vatNumber) { doc.text(`VAT: ${vatNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); }
+    
+    y = Math.max(companyLogo ? 55 : 45, headerY + 5);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text(invoice.documentType === 'invoice' ? 'INVOICE' : 'QUOTE', margin, y);
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y + 7);
+    
+    y += 12;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    
+    y += 15;
+    
+    const leftColX = margin;
+    const rightColX = pageWidth / 2 + 10;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('BILL TO', leftColX, y);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    const client = customers.find(c => c.id === invoice.clientId);
+    const clientName = client?.name || invoice.clientName || 'N/A';
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(clientName, leftColX, y + 8);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    let clientY = y + 15;
+    if (client?.phone) { doc.text(`Tel: ${client.phone}`, leftColX, clientY); clientY += 5; }
+    if (client?.notes) { doc.text(client.notes, leftColX, clientY); }
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('DETAILS', rightColX, y);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(10);
+    let detailY = y + 8;
+    doc.text(`Date: ${formatDate(invoice.createdAt)}`, rightColX, detailY);
+    detailY += 6;
+    if (invoice.dueDate) { doc.text(`Due: ${formatDate(invoice.dueDate)}`, rightColX, detailY); detailY += 6; }
+    if (invoice.poNumber) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); }
+    
+    y = Math.max(clientY, detailY) + 15;
+    
+    const tableHeaderY = y;
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(margin, tableHeaderY - 5, pageWidth - (margin * 2), 8, 'F');
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Item', margin + 3, tableHeaderY);
+    doc.text('Qty', pageWidth - margin - 60, tableHeaderY, { align: 'right' });
+    doc.text('Price', pageWidth - margin - 30, tableHeaderY, { align: 'right' });
+    doc.text('Total', pageWidth - margin - 3, tableHeaderY, { align: 'right' });
+    
+    y = tableHeaderY + 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
+    
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+    items.forEach((item: any, index: number) => {
+      const product = products.find(p => p.id === item.productId);
+      const productName = product?.name || `Product #${item.productId}`;
+      const lineTotal = (parseFloat(item.price) * parseFloat(item.quantity));
+      
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(margin, y - 4, pageWidth - (margin * 2), 7, 'F');
+      }
+      
+      doc.setTextColor(0, 0, 0);
+      doc.text(productName.substring(0, 40), margin + 3, y);
+      doc.text(item.quantity.toString(), pageWidth - margin - 60, y, { align: 'right' });
+      doc.text(`R${parseFloat(item.price).toFixed(2)}`, pageWidth - margin - 30, y, { align: 'right' });
+      doc.text(`R${lineTotal.toFixed(2)}`, pageWidth - margin - 3, y, { align: 'right' });
+      
+      y += 7;
+    });
+    
+    y += 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(pageWidth / 2 + 10, y - 5, pageWidth - margin, y - 5);
+    
+    const totalsX = pageWidth - margin - 3;
+    const labelX = pageWidth / 2 + 20;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Subtotal:', labelX, y);
+    doc.text(`R${typeof invoice.subtotal === 'number' ? invoice.subtotal.toFixed(2) : invoice.subtotal}`, totalsX, y, { align: 'right' });
+    y += 7;
+    
+    if (parseFloat(invoice.discountAmount || '0') > 0) {
+      doc.setTextColor(200, 80, 80);
+      const discountLabel = parseFloat(invoice.discountPercent || '0') > 0 
+        ? `Discount (${invoice.discountPercent}%):` 
+        : 'Discount:';
+      doc.text(discountLabel, labelX, y);
+      doc.text(`-R${parseFloat(invoice.discountAmount).toFixed(2)}`, totalsX, y, { align: 'right' });
+      y += 7;
+    }
+    
+    if (parseFloat(invoice.taxPercent || '0') > 0) {
+      doc.setTextColor(80, 80, 80);
+      doc.text('VAT (15%):', labelX, y);
+      doc.text(`R${typeof invoice.tax === 'number' ? invoice.tax.toFixed(2) : invoice.tax}`, totalsX, y, { align: 'right' });
+      y += 7;
+    }
+    
+    if (parseFloat(invoice.shippingAmount || '0') > 0) {
+      doc.text('Shipping:', labelX, y);
+      doc.text(`R${parseFloat(invoice.shippingAmount).toFixed(2)}`, totalsX, y, { align: 'right' });
+      y += 7;
+    }
+    
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(1);
+    doc.line(pageWidth / 2 + 10, y, pageWidth - margin, y);
+    y += 8;
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('TOTAL:', labelX, y);
+    doc.text(`R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`, totalsX, y, { align: 'right' });
+    
+    y += 20;
+    
+    if (invoice.paymentMethod) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('PAYMENT METHOD', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(10);
+      doc.text(invoice.paymentMethod, margin, y + 6);
+      y += 15;
+    }
+    
+    if (invoice.notes) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('NOTES', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const notesLines = doc.splitTextToSize(invoice.notes, pageWidth - (margin * 2));
+      doc.text(notesLines, margin, y + 6);
+      y += 6 + (notesLines.length * 5);
+    }
+    
+    if (invoice.terms) {
+      y += 10;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text('TERMS & CONDITIONS', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      const termsLines = doc.splitTextToSize(invoice.terms, pageWidth - (margin * 2));
+      doc.text(termsLines, margin, y + 6);
+    }
+    
+    const footerY = pageHeight - 20;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(0.5);
+    doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Thank you for your business!', pageWidth / 2, footerY, { align: 'center' });
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(8);
+    doc.text(`${companyName} | Generated on ${new Date().toLocaleDateString('en-ZA')}`, pageWidth / 2, footerY + 5, { align: 'center' });
+    
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    const stormText = 'Powered by STORM Software';
+    const stormTextWidth = doc.getTextWidth(stormText);
+    const stormTextX = (pageWidth - stormTextWidth) / 2;
+    doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
+    
+    // Generate PDF blob for sharing
+    const pdfBlob = doc.output('blob');
+    const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    
+    // Try Web Share API first (works on mobile)
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `${invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'} ${invoice.documentNumber}`,
+          text: `Please find attached ${invoice.documentType} ${invoice.documentNumber} from ${companyName}.`
+        });
+        toast({
+          title: "Shared Successfully",
+          description: `${invoice.documentNumber} has been shared`,
+        });
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          // Fallback: Download PDF and open WhatsApp with message
+          doc.save(fileName);
+          const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+          window.open(`https://wa.me/?text=${message}`, '_blank');
+          toast({
+            title: "PDF Downloaded",
+            description: "Attach the downloaded PDF to your WhatsApp message",
+          });
+        }
+      }
+    } else {
+      // Fallback for desktop: Download PDF and open WhatsApp Web
+      doc.save(fileName);
+      const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+      window.open(`https://wa.me/?text=${message}`, '_blank');
+      toast({
+        title: "PDF Downloaded",
+        description: "Attach the downloaded PDF to your WhatsApp message",
+      });
+    }
   };
 
   return (
@@ -6010,6 +6307,15 @@ export default function PosSystem() {
                     <Download className="w-3 h-3 mr-1" />
                     PDF
                   </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700 text-xs col-span-2"
+                    data-testid="button-share-whatsapp"
+                    onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
+                  >
+                    <SiWhatsapp className="w-3 h-3 mr-1" />
+                    Share via WhatsApp
+                  </Button>
                 </div>
                 <div className="sm:hidden">
                   <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setIsInvoiceViewOpen(false)}>
@@ -6098,6 +6404,15 @@ export default function PosSystem() {
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Export PDF
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="bg-green-600 hover:bg-green-700"
+                      data-testid="button-share-whatsapp-desktop"
+                      onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
+                    >
+                      <SiWhatsapp className="w-4 h-4 mr-2" />
+                      WhatsApp
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Close
