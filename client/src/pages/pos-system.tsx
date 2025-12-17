@@ -5603,28 +5603,30 @@ export default function PosSystem() {
               />
             </div>
 
-            {/* Notes */}
-            <div>
-              <Label>Notes (Optional)</Label>
-              <textarea
-                value={invoiceNotes}
-                onChange={(e) => setInvoiceNotes(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows={2}
-                placeholder="Additional notes..."
-              />
-            </div>
-
-            {/* Terms & Conditions */}
-            <div>
-              <Label>Terms & Conditions (Optional)</Label>
-              <textarea
-                value={invoiceTerms}
-                onChange={(e) => setInvoiceTerms(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows={3}
-                placeholder="Enter payment terms and conditions..."
-              />
+            {/* Notes & Terms - Side by Side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Notes (Optional) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
+                <textarea
+                  value={invoiceNotes}
+                  onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
+                  maxLength={300}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Additional notes..."
+                />
+              </div>
+              <div>
+                <Label>Terms & Conditions (Optional) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
+                <textarea
+                  value={invoiceTerms}
+                  onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
+                  maxLength={500}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Enter payment terms and conditions..."
+                />
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -5903,21 +5905,23 @@ export default function PosSystem() {
                   </div>
                 </div>
 
-                {/* Notes & Terms */}
+                {/* Notes & Terms - Side by Side on Desktop */}
                 {(selectedInvoice.notes || selectedInvoice.terms) && (
-                  <div className="space-y-3 sm:space-y-4 border-t border-gray-200 pt-3 sm:pt-4">
-                    {selectedInvoice.notes && (
-                      <div>
-                        <Label className="text-sm font-semibold mb-2 block">Notes</Label>
-                        <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded">{selectedInvoice.notes}</p>
-                      </div>
-                    )}
-                    {selectedInvoice.terms && (
-                      <div>
-                        <Label className="text-sm font-semibold mb-2 block">Terms & Conditions</Label>
-                        <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded whitespace-pre-wrap">{selectedInvoice.terms}</p>
-                      </div>
-                    )}
+                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      {selectedInvoice.notes && (
+                        <div className="sm:order-1">
+                          <Label className="text-sm font-semibold mb-2 block">Notes</Label>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.notes}</p>
+                        </div>
+                      )}
+                      {selectedInvoice.terms && (
+                        <div className="sm:order-2">
+                          <Label className="text-sm font-semibold mb-2 block">Terms & Conditions</Label>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.terms}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
