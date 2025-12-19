@@ -3753,8 +3753,16 @@ ${dateFilteredSales.map(sale =>
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (0.5% of revenue) - but show R0.00 during trial
-              const stormFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
+              // Filter invoices for current month
+              const currentMonthInvoices = invoices.filter(invoice => {
+                const invoiceDate = new Date(invoice.createdAt);
+                return invoiceDate >= currentMonthStart && invoiceDate <= currentMonthEnd;
+              });
+
+              // Calculate Storm fees - sales fee (0.5%) + invoice fee (R0.50 each)
+              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
+              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50;
+              const stormFee = salesFee + invoiceFee;
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -3893,8 +3901,9 @@ ${dateFilteredSales.map(sale =>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold text-blue-400">R{stormFee.toFixed(2)}</div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          0.5% van maandelikse omset
+                        <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+                          <div>Verkope: R{salesFee.toFixed(2)} (0.5%)</div>
+                          <div>Fakture: R{invoiceFee.toFixed(2)} ({currentMonthInvoices.length} × R0.50)</div>
                         </div>
                       </CardContent>
                     </Card>
@@ -3931,32 +3940,47 @@ ${dateFilteredSales.map(sale =>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
+                          <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Verkoopsfooi (0.5%)</div>
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Bruto Omset</span>
-                            <span className="font-semibold">R{currentMonthRevenue.toFixed(2)}</span>
+                            <span className="text-gray-300">Bruto Omset</span>
+                            <span className="font-semibold text-white">R{currentMonthRevenue.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600">Storm Dienskoers</span>
-                            <span className="font-semibold">0.5%</span>
+                            <span className="text-gray-300">Verkoopsfooi (0.5%)</span>
+                            <span className="font-semibold text-blue-400">R{salesFee.toFixed(2)}</span>
                           </div>
-                          <div className="border-t pt-3">
+                          
+                          <div className="border-t border-white/10 pt-3 mt-3">
+                            <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Faktuurfooi (R0.50 elk)</div>
                             <div className="flex justify-between items-center">
-                              <span className="font-medium">Bedrag Verskuldig aan Storm</span>
-                              <span className="text-xl font-bold text-[hsl(217,90%,40%)]">R{stormFee.toFixed(2)}</span>
+                              <span className="text-gray-300">Fakture Geskep</span>
+                              <span className="font-semibold text-white">{currentMonthInvoices.length}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-300">Faktuurfooi</span>
+                              <span className="font-semibold text-blue-400">R{invoiceFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t-2 border-blue-500/30 pt-3 mt-3">
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold text-white">Totaal Verskuldig aan Storm</span>
+                              <span className="text-xl font-bold text-blue-400">R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                           <div className="flex items-start gap-3">
-                            <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
+                            <CreditCard className="w-5 h-5 text-blue-400 mt-0.5" />
                             <div>
-                              <h4 className="font-medium text-blue-900">Maandelikse Fakturering</h4>
-                              <p className="text-sm text-blue-700 mt-1">
-                                Storm POS hef 0.5% van jou maandelikse omset vir die gebruik van ons platform. 
-                                Betaling word outomaties bereken en is verskuldig aan die einde van elke maand.
-                              </p>
+                              <h4 className="font-medium text-blue-300">Hoe Pryse Werk</h4>
+                              <ul className="text-sm text-gray-300 mt-2 space-y-1">
+                                <li>• <strong>Verkope:</strong> 0.5% van jou maandelikse omset</li>
+                                <li>• <strong>Fakture:</strong> R0.50 per faktuur geskep</li>
+                                <li className="text-gray-400 text-xs mt-2">Voorbeeld: 100 fakture/maand = R50 in faktuurfooie</li>
+                              </ul>
                             </div>
                           </div>
                         </div>
