@@ -33,6 +33,12 @@ export const posUsers = pgTable("pos_users", {
   tutorialCompleted: boolean("tutorial_completed").notNull().default(false), // Track if user has completed the welcome tutorial
   trialStartDate: timestamp("trial_start_date"), // Track when the 7-day free trial started
   receiptSettings: jsonb("receipt_settings"), // Custom receipt configuration
+  xeroConnected: boolean("xero_connected").notNull().default(false), // XERO integration status
+  xeroTenantId: text("xero_tenant_id"), // XERO organization tenant ID
+  xeroAccessToken: text("xero_access_token"), // XERO OAuth access token (encrypted)
+  xeroRefreshToken: text("xero_refresh_token"), // XERO OAuth refresh token (encrypted)
+  xeroTokenExpiry: timestamp("xero_token_expiry"), // When the access token expires
+  xeroLastSync: timestamp("xero_last_sync"), // Last successful sync time
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

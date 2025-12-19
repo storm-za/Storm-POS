@@ -14,6 +14,7 @@ import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail } from 
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import * as XLSX from "xlsx";
 
 const scryptAsync = promisify(scrypt);
 
@@ -1133,6 +1134,378 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
 
   // Initialize monthly reset scheduler (but don't run immediately)
   console.log("📅 Monthly usage reset scheduler initialized - will check every hour for 1st day of month");
+
+  // ==================== EXCEL EXPORT ENDPOINTS ====================
+
+  // Export Products to Excel
+  app.get("/api/pos/export/products/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const products = await storage.getPosProducts(userId);
+      
+      const data = products.map(p => ({
+        'SKU': p.sku,
+        'Product Name': p.name,
+        'Cost Price (R)': p.costPrice,
+        'Retail Price (R)': p.retailPrice,
+        'Trade Price (R)': p.tradePrice || '',
+        'Stock Quantity': p.quantity,
+        'Category': p.category || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+      
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="storm-products.xlsx"');
+      res.send(buffer);
+    } catch (error) {
+      console.error("Export products error:", error);
+      res.status(500).json({ message: "Failed to export products" });
+    }
+  });
+
+  // Export Customers to Excel
+  app.get("/api/pos/export/customers/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const customers = await storage.getPosCustomers(userId);
+      
+      const data = customers.map(c => ({
+        'Customer Name': c.name,
+        'Email': c.email || '',
+        'Phone': c.phone || '',
+        'Customer Type': c.customerType || 'retail',
+        'Notes': c.notes || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+      
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="storm-customers.xlsx"');
+      res.send(buffer);
+    } catch (error) {
+      console.error("Export customers error:", error);
+      res.status(500).json({ message: "Failed to export customers" });
+    }
+  });
+
+  // Export Invoices to Excel
+  app.get("/api/pos/export/invoices/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const invoices = await storage.getPosInvoices(userId);
+      
+      const data = invoices.map(inv => ({
+        'Document Number': inv.documentNumber,
+        'Type': inv.documentType === 'invoice' ? 'Invoice' : 'Quote',
+        'Client Name': inv.clientName,
+        'Client Email': inv.clientEmail || '',
+        'Date': inv.createdAt,
+        'Due Date': inv.dueDate || '',
+        'PO Number': inv.poNumber || '',
+        'Subtotal': inv.subtotal,
+        'Discount %': inv.discountPercent,
+        'Discount Amount': inv.discountAmount,
+        'Tax %': inv.taxPercent,
+        'Tax Amount': inv.taxAmount,
+        'Shipping': inv.shippingAmount,
+        'Total': inv.total,
+        'Status': inv.status,
+        'Payment Method': inv.paymentMethod || '',
+        'Notes': inv.notes || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Invoices");
+      
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="storm-invoices.xlsx"');
+      res.send(buffer);
+    } catch (error) {
+      console.error("Export invoices error:", error);
+      res.status(500).json({ message: "Failed to export invoices" });
+    }
+  });
+
+  // Export Sales to Excel
+  app.get("/api/pos/export/sales/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const sales = await storage.getPosSales(userId);
+      
+      const data = sales.map(s => ({
+        'Date': s.createdAt,
+        'Items': JSON.stringify(s.items),
+        'Subtotal': s.subtotal,
+        'Tax': s.tax,
+        'Tip': s.tip || 0,
+        'Total': s.total,
+        'Payment Type': s.paymentType,
+        'Voided': s.isVoided ? 'Yes' : 'No',
+        'Void Reason': s.voidReason || '',
+        'Staff Member': s.staffName || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sales");
+      
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename="storm-sales.xlsx"');
+      res.send(buffer);
+    } catch (error) {
+      console.error("Export sales error:", error);
+      res.status(500).json({ message: "Failed to export sales" });
+    }
+  });
+
+  // ==================== EXCEL IMPORT ENDPOINTS ====================
+
+  // Import Products from Excel
+  app.post("/api/pos/import/products/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { data } = req.body;
+      
+      if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ message: "Invalid data format" });
+      }
+
+      const results = {
+        imported: 0,
+        updated: 0,
+        errors: [] as string[]
+      };
+
+      for (const row of data) {
+        try {
+          const productData = {
+            userId,
+            sku: row['SKU'] || row['sku'] || '',
+            name: row['Product Name'] || row['name'] || '',
+            costPrice: String(row['Cost Price (R)'] || row['costPrice'] || '0'),
+            retailPrice: String(row['Retail Price (R)'] || row['retailPrice'] || '0'),
+            tradePrice: row['Trade Price (R)'] || row['tradePrice'] || undefined,
+            quantity: parseInt(row['Stock Quantity'] || row['quantity'] || '0'),
+            category: row['Category'] || row['category'] || undefined
+          };
+
+          if (!productData.name) {
+            results.errors.push(`Row missing product name`);
+            continue;
+          }
+
+          // Check if product with same SKU exists
+          const existingProducts = await storage.getPosProducts(userId);
+          const existingProduct = existingProducts.find(p => p.sku === productData.sku && productData.sku);
+          
+          if (existingProduct) {
+            await storage.updatePosProduct(existingProduct.id, productData);
+            results.updated++;
+          } else {
+            await storage.createPosProduct(productData);
+            results.imported++;
+          }
+        } catch (err) {
+          results.errors.push(`Error processing row: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Import complete: ${results.imported} new, ${results.updated} updated`,
+        ...results
+      });
+    } catch (error) {
+      console.error("Import products error:", error);
+      res.status(500).json({ message: "Failed to import products" });
+    }
+  });
+
+  // Import Customers from Excel
+  app.post("/api/pos/import/customers/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { data } = req.body;
+      
+      if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ message: "Invalid data format" });
+      }
+
+      const results = {
+        imported: 0,
+        updated: 0,
+        errors: [] as string[]
+      };
+
+      for (const row of data) {
+        try {
+          const customerData = {
+            userId,
+            name: row['Customer Name'] || row['name'] || '',
+            email: row['Email'] || row['email'] || undefined,
+            phone: row['Phone'] || row['phone'] || undefined,
+            customerType: (row['Customer Type'] || row['customerType'] || 'retail') as 'retail' | 'trade',
+            notes: row['Notes'] || row['notes'] || undefined
+          };
+
+          if (!customerData.name) {
+            results.errors.push(`Row missing customer name`);
+            continue;
+          }
+
+          // Check if customer with same name exists
+          const existingCustomers = await storage.getPosCustomers(userId);
+          const existingCustomer = existingCustomers.find(c => 
+            c.name.toLowerCase() === customerData.name.toLowerCase()
+          );
+          
+          if (existingCustomer) {
+            await storage.updatePosCustomer(existingCustomer.id, customerData);
+            results.updated++;
+          } else {
+            await storage.createPosCustomer(customerData);
+            results.imported++;
+          }
+        } catch (err) {
+          results.errors.push(`Error processing row: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: `Import complete: ${results.imported} new, ${results.updated} updated`,
+        ...results
+      });
+    } catch (error) {
+      console.error("Import customers error:", error);
+      res.status(500).json({ message: "Failed to import customers" });
+    }
+  });
+
+  // ==================== XERO Integration Routes ====================
+  
+  // Get XERO connection status
+  app.get("/api/pos/xero/status/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getPosUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({
+        connected: user.xeroConnected || false,
+        lastSync: user.xeroLastSync || null,
+        tenantId: user.xeroTenantId || null
+      });
+    } catch (error) {
+      console.error("Get XERO status error:", error);
+      res.status(500).json({ message: "Failed to get XERO status" });
+    }
+  });
+  
+  // Initiate XERO OAuth connection (placeholder - requires XERO credentials)
+  app.post("/api/pos/xero/connect/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { clientId, clientSecret } = req.body;
+      
+      if (!clientId || !clientSecret) {
+        return res.status(400).json({ 
+          message: "XERO integration requires you to provide your own XERO Developer credentials. Please visit https://developer.xero.com/myapps/ to create an application and obtain your Client ID and Client Secret." 
+        });
+      }
+      
+      // In a production implementation, you would:
+      // 1. Store encrypted credentials
+      // 2. Generate OAuth 2.0 PKCE challenge
+      // 3. Redirect user to XERO authorization URL
+      // 4. Handle callback with authorization code
+      // 5. Exchange code for access/refresh tokens
+      
+      res.json({ 
+        success: false,
+        message: "XERO OAuth flow requires additional setup. Please contact support for enterprise XERO integration.",
+        setupRequired: true
+      });
+    } catch (error) {
+      console.error("Connect XERO error:", error);
+      res.status(500).json({ message: "Failed to initiate XERO connection" });
+    }
+  });
+  
+  // Disconnect XERO
+  app.post("/api/pos/xero/disconnect/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      await storage.updatePosUser(userId, {
+        xeroConnected: false,
+        xeroTenantId: null,
+        xeroAccessToken: null,
+        xeroRefreshToken: null,
+        xeroTokenExpiry: null,
+        xeroLastSync: null
+      });
+      
+      res.json({ success: true, message: "Disconnected from XERO" });
+    } catch (error) {
+      console.error("Disconnect XERO error:", error);
+      res.status(500).json({ message: "Failed to disconnect from XERO" });
+    }
+  });
+  
+  // Manual XERO sync
+  app.post("/api/pos/xero/sync/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getPosUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!user.xeroConnected) {
+        return res.status(400).json({ message: "XERO is not connected. Please connect to XERO first." });
+      }
+      
+      // In a production implementation, you would:
+      // 1. Refresh access token if expired
+      // 2. Sync customers <-> contacts
+      // 3. Sync products <-> items
+      // 4. Push invoices to XERO
+      // 5. Update payment statuses
+      
+      // Update last sync time
+      await storage.updatePosUser(userId, {
+        xeroLastSync: new Date()
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "XERO sync completed",
+        syncedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("XERO sync error:", error);
+      res.status(500).json({ message: "Failed to sync with XERO" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

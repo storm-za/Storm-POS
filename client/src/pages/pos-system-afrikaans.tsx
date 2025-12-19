@@ -22,7 +22,7 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, Globe, BookOpen, HelpCircle, Share2
+  ChevronDown, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -31,6 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
 
 interface Product {
   id: number;
@@ -163,6 +164,19 @@ export default function PosSystemAfrikaans() {
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  
+  // Excel import/export state
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importType, setImportType] = useState<'products' | 'customers'>('products');
+  const [importData, setImportData] = useState<any[]>([]);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  
+  // XERO integration state
+  const [xeroClientId, setXeroClientId] = useState('');
+  const [xeroClientSecret, setXeroClientSecret] = useState('');
+  const [isConnectingXero, setIsConnectingXero] = useState(false);
+  const [isSyncingXero, setIsSyncingXero] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -2094,7 +2108,109 @@ ${dateFilteredSales.map(sale =>
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Excel Export Handlers
+  const handleExportProducts = () => {
+    if (!currentUser?.id) return;
+    window.location.href = `/api/pos/export/products/${currentUser.id}`;
+    toast({
+      title: "Uitvoer Begin",
+      description: "Jou produkte word as 'n Excel-lêer afgelaai.",
+    });
+  };
+
+  const handleExportCustomers = () => {
+    if (!currentUser?.id) return;
+    window.location.href = `/api/pos/export/customers/${currentUser.id}`;
+    toast({
+      title: "Uitvoer Begin",
+      description: "Jou kliënte word as 'n Excel-lêer afgelaai.",
+    });
+  };
+
+  const handleExportInvoices = () => {
+    if (!currentUser?.id) return;
+    window.location.href = `/api/pos/export/invoices/${currentUser.id}`;
+    toast({
+      title: "Uitvoer Begin",
+      description: "Jou fakture word as 'n Excel-lêer afgelaai.",
+    });
+  };
+
+  const handleExportSales = () => {
+    if (!currentUser?.id) return;
+    window.location.href = `/api/pos/export/sales/${currentUser.id}`;
+    toast({
+      title: "Uitvoer Begin",
+      description: "Jou verkoopsdata word as 'n Excel-lêer afgelaai.",
+    });
+  };
+
+  // Excel Import Handlers
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'products' | 'customers') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(worksheet);
+      
+      setImportType(type);
+      setImportData(data);
+      setImportPreview(data.slice(0, 5)); // Preview first 5 rows
+      setIsImportDialogOpen(true);
+    } catch (error) {
+      toast({
+        title: "Invoerfout",
+        description: "Kon nie die Excel-lêer lees nie. Kontroleer asseblief die lêerformaat.",
+        variant: "destructive",
+      });
+    }
+    
+    // Reset the input
+    e.target.value = '';
+  };
+
+  const handleImportConfirm = async () => {
+    if (!currentUser?.id || importData.length === 0) return;
+    
+    setIsImporting(true);
+    try {
+      const response = await apiRequest("POST", `/api/pos/import/${importType}/${currentUser.id}`, {
+        data: importData
+      });
+      const result = await response.json();
+      
+      toast({
+        title: "Invoer Voltooid",
+        description: result.message,
+      });
+      
+      // Refresh the data
+      if (importType === 'products') {
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser.id] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/pos/customers", currentUser.id] });
+      }
+      
+      setIsImportDialogOpen(false);
+      setImportData([]);
+      setImportPreview([]);
+    } catch (error) {
+      toast({
+        title: "Invoerfout",
+        description: "Kon nie data invoer nie. Probeer asseblief weer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  // Logo file upload handler
+  const handleLogoFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
@@ -2121,6 +2237,64 @@ ${dateFilteredSales.map(sale =>
         saleId: voidSaleDialog.sale.id,
         reason: voidReason.trim()
       });
+    }
+  };
+
+  // XERO Integration Handlers
+  const handleConnectXero = async () => {
+    setIsConnectingXero(true);
+    try {
+      toast({
+        title: "XERO OAuth Opstelling Benodig",
+        description: "Die XERO-integrasie vereis dat OAuth-eiebewyse opgestel word. Kontak asseblief ondersteuning vir hulp met opstelling.",
+      });
+    } finally {
+      setIsConnectingXero(false);
+    }
+  };
+
+  const handleDisconnectXero = async () => {
+    if (!currentUser?.id) return;
+    setIsConnectingXero(true);
+    try {
+      await apiRequest("POST", `/api/pos/xero/disconnect/${currentUser.id}`, {});
+      toast({
+        title: "XERO Ontkoppel",
+        description: "Jou XERO-integrasie is ontkoppel.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/user", currentUser.id] });
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Kon nie XERO ontkoppel nie. Probeer asseblief weer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConnectingXero(false);
+    }
+  };
+
+  const handleSyncXero = async () => {
+    if (!currentUser?.id) return;
+    setIsSyncingXero(true);
+    try {
+      const response = await apiRequest("POST", `/api/pos/xero/sync/${currentUser.id}`, {});
+      const result = await response.json();
+      toast({
+        title: "Sinkronisasie Voltooi",
+        description: result.message || "Data is met XERO gesinkroniseer.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/customers", currentUser.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser.id] });
+    } catch (error) {
+      toast({
+        title: "Sinkronisasie Misluk",
+        description: "Kon nie met XERO sinkroniseer nie. Probeer asseblief weer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncingXero(false);
     }
   };
 
@@ -2474,11 +2648,22 @@ ${dateFilteredSales.map(sale =>
                   <CreditCard className="h-4 w-4 mb-1" />
                   <span>Gebruik</span>
                 </button>
+                <button
+                  onClick={() => handleTabChange("instellings")}
+                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    currentTab === "instellings"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                  }`}
+                >
+                  <Settings className="h-4 w-4 mb-1" />
+                  <span>Instellings</span>
+                </button>
               </div>
             </div>
 
             {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-7 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
+            <TabsList className="hidden md:grid w-full grid-cols-8 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
               <TabsTrigger 
                 value="verkope" 
                 className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
@@ -2534,6 +2719,14 @@ ${dateFilteredSales.map(sale =>
               >
                 <CreditCard className="h-4 w-4" />
                 <span>Gebruik</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="instellings" 
+                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
+                data-testid="tab-settings"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Instellings</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -2798,12 +2991,42 @@ ${dateFilteredSales.map(sale =>
           <TabsContent value="produkte">
             <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <CardTitle className="text-white">Produkvoorraad</CardTitle>
-                  <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Voeg Produk By
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20">
+                          <FileSpreadsheet className="h-4 w-4 mr-1" />
+                          Excel
+                          <ChevronDown className="h-3 w-3 ml-1" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={handleExportProducts}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Voer Produkte Uit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <label className="cursor-pointer flex items-center">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Voer Produkte In
+                            <input
+                              type="file"
+                              accept=".xlsx,.xls,.csv"
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, 'products')}
+                            />
+                          </label>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Voeg Produk By
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -2881,15 +3104,45 @@ ${dateFilteredSales.map(sale =>
           <TabsContent value="kliente">
             <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
               <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <CardTitle className="flex items-center space-x-2 text-white">
                     <Users className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                     <span>Klientelys</span>
                   </CardTitle>
-                  <Button onClick={() => openCustomerDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Voeg Klient By
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20">
+                          <FileSpreadsheet className="h-4 w-4 mr-1" />
+                          Excel
+                          <ChevronDown className="h-3 w-3 ml-1" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={handleExportCustomers}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Voer Kliënte Uit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <label className="cursor-pointer flex items-center">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Voer Kliënte In
+                            <input
+                              type="file"
+                              accept=".xlsx,.xls,.csv"
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, 'customers')}
+                            />
+                          </label>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button onClick={() => openCustomerDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      Voeg Klient By
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -2939,14 +3192,25 @@ ${dateFilteredSales.map(sale =>
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <CardTitle className="text-white text-lg sm:text-xl font-bold">Fakture & Kwotasies</CardTitle>
-                <Button 
-                  onClick={() => setIsInvoiceDialogOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 w-full sm:w-auto text-sm"
-                  data-testid="button-create-invoice"
-                >
-                  <PlusCircle className="w-4 h-4 mr-2" />
-                  Skep Faktuur/Kwotasie
-                </Button>
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportInvoices}
+                    className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-1" />
+                    Voer Excel Uit
+                  </Button>
+                  <Button 
+                    onClick={() => setIsInvoiceDialogOpen(true)}
+                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 text-sm"
+                    data-testid="button-create-invoice"
+                  >
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    Skep Faktuur/Kwotasie
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="pt-6 px-3 sm:px-6">
                 {/* Search and Filter Controls */}
@@ -3812,6 +4076,164 @@ ${dateFilteredSales.map(sale =>
               );
             })()}
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="instellings">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                <CardHeader className="border-b border-white/10 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                    Integrasies
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-8">
+                    {/* XERO Integration Section */}
+                    <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">X</span>
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">XERO Rekeningkunde</h3>
+                            <p className="text-sm text-gray-400">Koppel jou XERO-rekening vir naatlose rekeningkunde</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {(currentUser as any)?.xeroConnected ? (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              <Check className="w-3 h-3 mr-1" />
+                              Gekoppel
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                              Nie Gekoppel
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {(currentUser as any)?.xeroLastSync && (
+                        <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
+                          <p className="text-sm text-gray-400">
+                            <Clock className="w-4 h-4 inline mr-2" />
+                            Laaste gesinkroniseer: {new Date((currentUser as any).xeroLastSync).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="mb-6">
+                        <h4 className="text-sm font-medium text-gray-300 mb-2">Opstel Instruksies</h4>
+                        <ul className="space-y-2 text-sm text-gray-400">
+                          <li className="flex items-start gap-2">
+                            <span className="text-[hsl(217,90%,40%)] font-medium">Stap 1.</span>
+                            Gaan na die XERO Ontwikkelaarsportaal en skep 'n nuwe app
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-[hsl(217,90%,40%)] font-medium">Stap 2.</span>
+                            Stel die OAuth 2.0 herlei-URL na jou app se terugbel-URL
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-[hsl(217,90%,40%)] font-medium">Stap 3.</span>
+                            Kopieer jou Kliënt-ID en Kliëntgeheim
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-[hsl(217,90%,40%)] font-medium">Stap 4.</span>
+                            Klik Koppel aan XERO hieronder om te verifieer
+                          </li>
+                        </ul>
+                        <a 
+                          href="https://developer.xero.com/myapps/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,50%)] text-sm mt-3 transition-colors"
+                        >
+                          <Globe className="w-4 h-4" />
+                          XERO Ontwikkelaarsportaal →
+                        </a>
+                      </div>
+
+                      <div className="flex flex-wrap gap-3">
+                        {(currentUser as any)?.xeroConnected ? (
+                          <>
+                            <Button
+                              onClick={handleSyncXero}
+                              disabled={isSyncingXero}
+                              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                            >
+                              <RefreshCw className={`w-4 h-4 mr-2 ${isSyncingXero ? 'animate-spin' : ''}`} />
+                              {isSyncingXero ? 'Sinkroniseer...' : 'Sinkroniseer Nou'}
+                            </Button>
+                            <Button
+                              onClick={handleDisconnectXero}
+                              disabled={isConnectingXero}
+                              variant="outline"
+                              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                            >
+                              {isConnectingXero ? 'Ontkoppel...' : 'Ontkoppel'}
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            onClick={handleConnectXero}
+                            disabled={isConnectingXero}
+                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                          >
+                            <Link2 className="w-4 h-4 mr-2" />
+                            {isConnectingXero ? 'Koppel...' : 'Koppel aan XERO'}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Data Flow Section */}
+                    <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">Data Vloei</h4>
+                      <p className="text-sm text-gray-400 mb-4">
+                        Wanneer aan XERO gekoppel is, word die volgende data gesinkroniseer:
+                      </p>
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Users className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                            <span className="font-medium text-white">Kliënte</span>
+                          </div>
+                          <p className="text-sm text-gray-400">
+                            <span className="text-[hsl(217,90%,40%)]">↔</span> Kontakte (Twee-rigting sinkronisasie)
+                          </p>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Package className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                            <span className="font-medium text-white">Produkte</span>
+                          </div>
+                          <p className="text-sm text-gray-400">
+                            <span className="text-[hsl(217,90%,40%)]">↔</span> Items (Twee-rigting sinkronisasie)
+                          </p>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Receipt className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                            <span className="font-medium text-white">Fakture</span>
+                          </div>
+                          <p className="text-sm text-gray-400">
+                            <span className="text-[hsl(217,90%,40%)]">→</span> XERO (Een-rigting stoot)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
         </Tabs>
 
         {/* All dialogs and modals would go here - Product Dialog, Customer Dialog, etc. */}
@@ -4060,7 +4482,7 @@ ${dateFilteredSales.map(sale =>
                   id="logoUpload"
                   type="file"
                   accept="image/*"
-                  onChange={handleFileUpload}
+                  onChange={handleLogoFileUpload}
                   className="mt-1"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -5728,6 +6150,75 @@ ${dateFilteredSales.map(sale =>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Import Preview Dialog */}
+        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>
+                Voer {importType === 'products' ? 'Produkte' : 'Kliënte'} In vanaf Excel
+              </DialogTitle>
+              <DialogDescription>
+                Hersien die data voor invoer. Bestaande rekords sal opgedateer word.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-sm text-gray-600">
+                <strong>{importData.length}</strong> rekords gevind om in te voer
+              </div>
+              {importPreview.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs">
+                    <thead>
+                      <tr className="border-b">
+                        {Object.keys(importPreview[0]).slice(0, 4).map((key) => (
+                          <th key={key} className="px-2 py-1 text-left text-gray-600 font-medium">
+                            {key}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importPreview.map((row, idx) => (
+                        <tr key={idx} className="border-b">
+                          {Object.values(row).slice(0, 4).map((val: any, i) => (
+                            <td key={i} className="px-2 py-1 text-gray-800 truncate max-w-[120px]">
+                              {String(val || '')}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {importData.length > 5 && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      ...en {importData.length - 5} meer rye
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsImportDialogOpen(false);
+                  setImportData([]);
+                  setImportPreview([]);
+                }}
+              >
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={handleImportConfirm}
+                disabled={isImporting || importData.length === 0}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              >
+                {isImporting ? 'Voer in...' : `Voer ${importData.length} Rekords In`}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
