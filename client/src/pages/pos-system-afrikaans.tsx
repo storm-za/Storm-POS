@@ -133,8 +133,11 @@ export default function PosSystemAfrikaans() {
   const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
-  const [invoiceItems, setInvoiceItems] = useState<Array<{productId: number; quantity: number; price: number}>>([]);
+  const [invoiceItems, setInvoiceItems] = useState<Array<{productId?: number; customName?: string; quantity: number; price: number}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
+  const [showQuickAddProduct, setShowQuickAddProduct] = useState(false);
+  const [quickAddName, setQuickAddName] = useState("");
+  const [quickAddPrice, setQuickAddPrice] = useState("");
   const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
   const [isCustomClient, setIsCustomClient] = useState(false);
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
@@ -1312,6 +1315,9 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
+      setShowQuickAddProduct(false);
+      setQuickAddName("");
+      setQuickAddPrice("");
       toast({
         title: "Sukses",
         description: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} geskep`,
@@ -1354,6 +1360,9 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
+      setShowQuickAddProduct(false);
+      setQuickAddName("");
+      setQuickAddPrice("");
       toast({
         title: "Sukses",
         description: `${updatedInvoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} bygewerk`,
@@ -4791,11 +4800,13 @@ ${dateFilteredSales.map(sale =>
                 <Label>Voeg Produkte By</Label>
                 <div className="space-y-2 mt-2">
                   {invoiceItems.map((item, index) => {
-                    const product = products.find(p => p.id === item.productId);
+                    const product = item.productId ? products.find(p => p.id === item.productId) : null;
+                    const itemName = item.customName || product?.name || 'Onbekende Produk';
                     return (
                       <div key={index} className="flex items-center gap-2 p-2 border rounded">
                         <div className="flex-1">
-                          <span className="font-medium">{product?.name}</span>
+                          <span className="font-medium">{itemName}</span>
+                          {item.customName && <span className="text-xs text-purple-600 ml-1">(Aangepas)</span>}
                           <span className="text-sm text-gray-500 ml-2">x{item.quantity}</span>
                         </div>
                         <div className="text-right font-medium">
@@ -4814,7 +4825,7 @@ ${dateFilteredSales.map(sale =>
                     );
                   })}
                   
-                  {/* Add Line Item */}
+                  {/* Add Line Item from Product List */}
                   <Select
                     value=""
                     onValueChange={(value) => {
@@ -4829,7 +4840,7 @@ ${dateFilteredSales.map(sale =>
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Kies produk" />
+                      <SelectValue placeholder="Kies produk van lys" />
                     </SelectTrigger>
                     <SelectContent>
                       {products.map((product) => (
@@ -4839,6 +4850,78 @@ ${dateFilteredSales.map(sale =>
                       ))}
                     </SelectContent>
                   </Select>
+                  
+                  {/* Quick Add Custom Product */}
+                  <div className="border-t pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,95%)]"
+                      onClick={() => setShowQuickAddProduct(!showQuickAddProduct)}
+                      data-testid="button-toggle-quick-add-af"
+                    >
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      {showQuickAddProduct ? 'Versteek Vinnige Byvoeging' : 'Voeg Produk/Diens Vinnig By'}
+                    </Button>
+                    
+                    {showQuickAddProduct && (
+                      <div className="mt-2 p-3 border rounded-lg bg-gray-50 space-y-2">
+                        <p className="text-xs text-gray-500">Voeg 'n tydelike item by (word nie gestoor in produklys nie)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs">Produk/Diens Naam</Label>
+                            <input
+                              type="text"
+                              value={quickAddName}
+                              onChange={(e) => setQuickAddName(e.target.value)}
+                              placeholder="bv. Aangepaste Diens"
+                              className="w-full px-2 py-1.5 text-sm border rounded"
+                              data-testid="input-quick-add-name-af"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Prys (R)</Label>
+                            <input
+                              type="number"
+                              value={quickAddPrice}
+                              onChange={(e) => setQuickAddPrice(e.target.value)}
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              className="w-full px-2 py-1.5 text-sm border rounded"
+                              data-testid="input-quick-add-price-af"
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                          disabled={!quickAddName.trim() || !quickAddPrice || parseFloat(quickAddPrice) <= 0}
+                          onClick={() => {
+                            if (quickAddName.trim() && quickAddPrice && parseFloat(quickAddPrice) > 0) {
+                              setInvoiceItems([...invoiceItems, {
+                                customName: quickAddName.trim(),
+                                quantity: 1,
+                                price: parseFloat(quickAddPrice)
+                              }]);
+                              setQuickAddName("");
+                              setQuickAddPrice("");
+                              toast({
+                                title: "Item Bygevoeg",
+                                description: `"${quickAddName.trim()}" bygevoeg tot ${invoiceType === 'invoice' ? 'faktuur' : 'kwotasie'}`,
+                              });
+                            }
+                          }}
+                          data-testid="button-add-quick-product-af"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Voeg by {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   
                   {/* Totals */}
                   {invoiceItems.length > 0 && (
@@ -5077,7 +5160,7 @@ ${dateFilteredSales.map(sale =>
                       dueDate: invoiceDueDate || undefined,
                       items: invoiceItems.map(item => ({
                         productId: item.productId,
-                        name: products.find(p => p.id === item.productId)?.name || '',
+                        name: item.customName || products.find(p => p.id === item.productId)?.name || '',
                         quantity: item.quantity,
                         price: parseFloat(item.price.toFixed(2)),
                         lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
