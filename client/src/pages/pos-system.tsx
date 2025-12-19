@@ -4614,8 +4614,16 @@ export default function PosSystem() {
                 return total + parseFloat(sale.total);
               }, 0);
 
-              // Calculate Storm fee (0.5% of revenue) - but show R0.00 during trial
-              const stormFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
+              // Filter invoices for current month
+              const currentMonthInvoices = invoices.filter((invoice: any) => {
+                const invoiceDate = new Date(invoice.createdDate);
+                return invoiceDate >= currentMonthStart && invoiceDate <= currentMonthEnd;
+              });
+              
+              // Calculate fees
+              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005; // 0.5% of sales
+              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50; // R0.50 per invoice
+              const stormFee = salesFee + invoiceFee; // Total Storm fee
 
               // Calculate daily breakdown
               const dailyBreakdown: { [key: string]: number } = {};
@@ -4763,8 +4771,9 @@ export default function PosSystem() {
                         </CardHeader>
                         <CardContent>
                           <div className="text-2xl font-bold text-blue-300">R{stormFee.toFixed(2)}</div>
-                          <div className="text-sm text-gray-400 mt-1">
-                            0.5% of monthly revenue
+                          <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+                            <div>Sales: R{salesFee.toFixed(2)} (0.5%)</div>
+                            <div>Invoices: R{invoiceFee.toFixed(2)} ({currentMonthInvoices.length} × R0.50)</div>
                           </div>
                         </CardContent>
                       </Card>
@@ -4805,17 +4814,31 @@ export default function PosSystem() {
                       </CardHeader>
                       <CardContent className="space-y-4 pt-6">
                         <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
+                          <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Sales Fee (0.5%)</div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-300">Gross Revenue</span>
                             <span className="font-semibold text-white">R{currentMonthRevenue.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-300">Storm Service Rate</span>
-                            <span className="font-semibold text-white">0.5%</span>
+                            <span className="text-gray-300">Sales Fee (0.5%)</span>
+                            <span className="font-semibold text-blue-400">R{salesFee.toFixed(2)}</span>
                           </div>
-                          <div className="border-t border-white/10 pt-3">
+                          
+                          <div className="border-t border-white/10 pt-3 mt-3">
+                            <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Invoice Fee (R0.50 each)</div>
                             <div className="flex justify-between items-center">
-                              <span className="font-medium text-white">Amount Due to Storm</span>
+                              <span className="text-gray-300">Invoices Generated</span>
+                              <span className="font-semibold text-white">{currentMonthInvoices.length}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-300">Invoice Fee</span>
+                              <span className="font-semibold text-blue-400">R{invoiceFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t-2 border-blue-500/30 pt-3 mt-3">
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold text-white">Total Due to Storm</span>
                               <span className="text-xl font-bold text-blue-400">R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
@@ -4825,11 +4848,12 @@ export default function PosSystem() {
                           <div className="flex items-start gap-3">
                             <CreditCard className="w-5 h-5 text-blue-400 mt-0.5" />
                             <div>
-                              <h4 className="font-medium text-blue-300">Monthly Billing</h4>
-                              <p className="text-sm text-gray-300 mt-1">
-                                Storm POS charges 0.5% of your monthly revenue for using our platform. 
-                                Payment is automatically calculated and due at the end of each month.
-                              </p>
+                              <h4 className="font-medium text-blue-300">How Pricing Works</h4>
+                              <ul className="text-sm text-gray-300 mt-2 space-y-1">
+                                <li>• <strong>Sales:</strong> 0.5% of your monthly revenue</li>
+                                <li>• <strong>Invoices:</strong> R0.50 per invoice generated</li>
+                                <li className="text-gray-400 text-xs mt-2">Example: 100 invoices/month = R50 in invoice fees</li>
+                              </ul>
                             </div>
                           </div>
                         </div>

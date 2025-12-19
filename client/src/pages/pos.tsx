@@ -1788,7 +1788,7 @@ export default function POS() {
               <Link href="/pos/signup">Start Your Free Trial Now →</Link>
             </Button>
             <p className="mt-6 text-gray-600 text-sm">
-              After 7 days: 0.5% per sale. No sales? No charge. Ever. No contracts, no commitments.
+              After 7 days: 0.5% per sale + R0.50 per invoice. No sales? No charge. Ever.
             </p>
           </motion.div>
         </div>
@@ -1861,21 +1861,25 @@ export default function POS() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 mb-4">Only 0.5% Per Sale</h3>
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h3>
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  That's just 50 cents for every R100 you sell. No matter how small your business, 
-                  you'll never pay more than what's fair for your success.
+                  Just 0.5% on every sale, plus R0.50 per invoice you create. 
+                  No hidden costs, no surprises—you only pay when you succeed.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center p-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                  <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
-                  <div className="text-sm text-gray-600">Setup Fee</div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                  <div className="text-xl font-bold text-[hsl(217,90%,40%)] mb-1">0.5%</div>
+                  <div className="text-xs text-gray-600">Per Sale</div>
                 </div>
-                <div className="text-center p-6 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                  <div className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-2">R0</div>
-                  <div className="text-sm text-gray-600">Monthly Fee</div>
+                <div className="text-center p-4 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                  <div className="text-xl font-bold text-[hsl(217,90%,40%)] mb-1">R0.50</div>
+                  <div className="text-xs text-gray-600">Per Invoice</div>
+                </div>
+                <div className="text-center p-4 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                  <div className="text-xl font-bold text-[hsl(217,90%,40%)] mb-1">R0</div>
+                  <div className="text-xs text-gray-600">Monthly Fee</div>
                 </div>
               </div>
             </motion.div>
