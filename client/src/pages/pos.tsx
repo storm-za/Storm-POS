@@ -3,7 +3,12 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft } from "lucide-react";
+import { 
+  Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft,
+  FileSpreadsheet, FileText, Receipt, BarChart3, Package, CreditCard, 
+  Globe, RefreshCw, Calculator, PieChart, UserCheck, Lock, Languages,
+  Wallet, BookOpen, MessageSquare, Share2, ArrowRight
+} from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
 import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
@@ -692,6 +697,987 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
+
+      {/* Section 1: Complete Business Suite */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[hsl(217,90%,50%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.02)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Everything You Need
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Business Suite</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Every tool you need to run your business, all in one powerful platform. No add-ons, no extra costs.
+            </p>
+          </motion.div>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 - Real-Time Sales */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <CreditCard className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Real-Time Sales Processing</h3>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Accept Cash, Card, and EFT payments instantly. Every sale syncs across all your devices in real-time.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] text-sm rounded-full font-medium">Cash</span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] text-sm rounded-full font-medium">Card</span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] text-sm rounded-full font-medium">EFT</span>
+                    <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] text-sm rounded-full font-medium">Split Payments</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Feature 2 - Inventory */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <Package className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Smart Inventory</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Track stock levels automatically. Get low-stock alerts and never run out of bestsellers.
+              </p>
+            </motion.div>
+
+            {/* Feature 3 - Customer Directory */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <Users className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Customer Directory</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Retail & trade customers with notes, purchase history, and contact details.
+              </p>
+            </motion.div>
+
+            {/* Feature 4 - Invoices */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <FileText className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Invoices & Quotes</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Generate professional PDFs with your logo. Send via WhatsApp instantly.
+              </p>
+            </motion.div>
+
+            {/* Feature 5 - Open Accounts */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <BookOpen className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Open Accounts</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Tab system for restaurants, bars, and customer credit. Settle anytime.
+              </p>
+            </motion.div>
+
+            {/* Feature 6 - Analytics */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="lg:col-span-2 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl p-8 shadow-xl text-white group"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <BarChart3 className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">Detailed Analytics</h3>
+                  <p className="text-blue-100 leading-relaxed mb-4">
+                    Beautiful charts, comprehensive reports, and profit tracking. Know exactly how your business is performing at any moment.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-white/20 text-white text-sm rounded-full font-medium">Revenue Tracking</span>
+                    <span className="px-3 py-1 bg-white/20 text-white text-sm rounded-full font-medium">Profit Reports</span>
+                    <span className="px-3 py-1 bg-white/20 text-white text-sm rounded-full font-medium">Trend Charts</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Feature 7 - Staff Management */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <UserCheck className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Staff Management</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Role-based access control. Track who made each sale with accountability.
+              </p>
+            </motion.div>
+
+            {/* Feature 8 - Receipts */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all group"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                <Receipt className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Custom Receipts</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Add your logo, business info, and custom messages. Professional from day one.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: Excel & Accounting Power */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            className="absolute top-1/3 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-1/3 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.2, 0.4] }}
+            transition={{ duration: 12, repeat: Infinity }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Seamless Integrations
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Excel & Accounting <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Power</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Your data flows seamlessly between Storm POS and your existing tools. Import, export, and sync with ease.
+            </p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Excel Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <FileSpreadsheet className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Excel Import/Export</h3>
+                  <p className="text-gray-500">Spreadsheet Power</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">Import products from spreadsheets</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">Import customer lists in bulk</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">Export sales data for accounting</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <span className="text-gray-700">Backup your entire database</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* XERO Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl flex items-center justify-center shadow-lg">
+                  <Calculator className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">XERO Integration</h3>
+                  <p className="text-gray-500">Accounting Sync</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-[hsl(217,90%,40%)]/10 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <span className="text-gray-700">Sync customers automatically</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-[hsl(217,90%,40%)]/10 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <span className="text-gray-700">Push products to XERO</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-[hsl(217,90%,40%)]/10 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <span className="text-gray-700">Export invoices seamlessly</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-[hsl(217,90%,40%)]/10 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <span className="text-gray-700">Keep books always up to date</span>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* Data Flow Visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-16 text-center"
+          >
+            <div className="inline-flex items-center gap-6 bg-white/80 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-full px-8 py-4 shadow-lg">
+              <FileSpreadsheet className="w-8 h-8 text-green-500" />
+              <motion.div
+                animate={{ x: [0, 10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <ArrowRight className="w-6 h-6 text-[hsl(217,90%,40%)]" />
+              </motion.div>
+              <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center shadow-lg">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <motion.div
+                animate={{ x: [0, 10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+              >
+                <ArrowRight className="w-6 h-6 text-[hsl(217,90%,40%)]" />
+              </motion.div>
+              <Calculator className="w-8 h-8 text-[hsl(217,90%,40%)]" />
+            </div>
+            <p className="mt-4 text-gray-500 font-medium">Seamless data flow in both directions</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Section 3: Professional Document Generation */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 right-0 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[hsl(217,90%,50%)]/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="inline-block mb-6"
+              >
+                <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                  Professional Documents
+                </span>
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Stunning Invoices in <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Seconds</span>
+              </h2>
+              <p className="text-xl text-gray-600 leading-relaxed mb-8">
+                Create professional invoices and quotes that impress your customers. Your brand, your details, automatically formatted.
+              </p>
+
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">Auto-Generated Numbers</h4>
+                    <p className="text-gray-600">Sequential invoice and quote numbers, automatically assigned</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">PDF Export</h4>
+                    <p className="text-gray-600">Professional PDFs with your logo and business details</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">WhatsApp Sharing</h4>
+                    <p className="text-gray-600">Send invoices instantly via WhatsApp with one tap</p>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-start gap-4"
+                >
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <RefreshCw className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">Status Tracking</h4>
+                    <p className="text-gray-600">Draft → Sent → Paid → Cancelled. Always know where you stand.</p>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Right - Invoice Mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 blur-3xl rounded-full scale-110"></div>
+              <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+                {/* Invoice Header */}
+                <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] px-8 py-6 text-white">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="text-2xl font-bold mb-1">INVOICE</div>
+                      <div className="text-blue-100 text-sm">#INV-2024-0042</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-2">
+                        <Zap className="w-6 h-6" />
+                      </div>
+                      <div className="text-sm text-blue-100">Your Business</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Invoice Body */}
+                <div className="p-8">
+                  <div className="flex justify-between mb-8">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Bill To</div>
+                      <div className="font-semibold text-gray-900">Customer Name</div>
+                      <div className="text-sm text-gray-500">customer@email.com</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Date</div>
+                      <div className="text-gray-900">19 Dec 2024</div>
+                    </div>
+                  </div>
+
+                  {/* Items */}
+                  <div className="border-t border-b border-gray-100 py-4 mb-6">
+                    <div className="flex justify-between text-sm mb-3">
+                      <span className="text-gray-600">Product Item 1</span>
+                      <span className="font-medium text-gray-900">R 450.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm mb-3">
+                      <span className="text-gray-600">Product Item 2</span>
+                      <span className="font-medium text-gray-900">R 320.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Service Fee</span>
+                      <span className="font-medium text-gray-900">R 150.00</span>
+                    </div>
+                  </div>
+
+                  {/* Total */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-900">Total</span>
+                    <span className="text-2xl font-bold text-[hsl(217,90%,40%)]">R 920.00</span>
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                  className="absolute top-20 -right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform rotate-12"
+                >
+                  <span className="font-bold text-sm">PAID</span>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4: Insights That Drive Growth */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            className="absolute top-0 left-1/3 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-0 right-1/3 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2] }}
+            transition={{ duration: 12, repeat: Infinity }}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Data-Driven Decisions
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Insights That <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Drive Growth</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Know your business inside out. Real-time analytics and beautiful reports that help you make smarter decisions.
+            </p>
+          </motion.div>
+
+          {/* Dashboard Mockup */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 blur-3xl rounded-3xl"></div>
+            <div className="relative bg-white/80 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-3xl p-8 shadow-2xl">
+              <div className="grid md:grid-cols-4 gap-6 mb-8">
+                {/* Stat Cards */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl p-6 text-white"
+                >
+                  <TrendingUp className="w-8 h-8 mb-3 opacity-80" />
+                  <div className="text-3xl font-bold mb-1">R42,580</div>
+                  <div className="text-blue-100 text-sm">Today's Sales</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white border border-gray-200 rounded-2xl p-6"
+                >
+                  <Wallet className="w-8 h-8 mb-3 text-green-500" />
+                  <div className="text-3xl font-bold text-gray-900 mb-1">R8,750</div>
+                  <div className="text-gray-500 text-sm">Today's Profit</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white border border-gray-200 rounded-2xl p-6"
+                >
+                  <Receipt className="w-8 h-8 mb-3 text-[hsl(217,90%,40%)]" />
+                  <div className="text-3xl font-bold text-gray-900 mb-1">127</div>
+                  <div className="text-gray-500 text-sm">Transactions</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white border border-gray-200 rounded-2xl p-6"
+                >
+                  <Users className="w-8 h-8 mb-3 text-purple-500" />
+                  <div className="text-3xl font-bold text-gray-900 mb-1">48</div>
+                  <div className="text-gray-500 text-sm">New Customers</div>
+                </motion.div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Chart Area */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="md:col-span-2 bg-gray-50 rounded-2xl p-6"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-bold text-gray-900">Revenue Trend</h4>
+                    <div className="flex gap-2">
+                      <span className="px-3 py-1 bg-[hsl(217,90%,40%)]/10 text-[hsl(217,90%,40%)] text-xs rounded-full">Daily</span>
+                      <span className="px-3 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">Weekly</span>
+                      <span className="px-3 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">Monthly</span>
+                    </div>
+                  </div>
+                  {/* Fake Chart */}
+                  <div className="flex items-end gap-2 h-32">
+                    {[40, 65, 45, 80, 55, 90, 75].map((height, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ height: 0 }}
+                        whileInView={{ height: `${height}%` }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+                        className="flex-1 bg-gradient-to-t from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-t-lg"
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Pie Chart Area */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.7 }}
+                  className="bg-gray-50 rounded-2xl p-6"
+                >
+                  <h4 className="font-bold text-gray-900 mb-4">Payment Methods</h4>
+                  <div className="flex justify-center mb-4">
+                    <div className="relative w-24 h-24">
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="#e5e7eb" strokeWidth="16" />
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="hsl(217,90%,40%)" strokeWidth="16" strokeDasharray="126 251" />
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="hsl(217,90%,50%)" strokeWidth="16" strokeDasharray="75 251" strokeDashoffset="-126" />
+                        <circle cx="48" cy="48" r="40" fill="none" stroke="#22c55e" strokeWidth="16" strokeDasharray="50 251" strokeDashoffset="-201" />
+                      </svg>
+                      <PieChart className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-[hsl(217,90%,40%)] rounded-full"></div>
+                      <span className="text-gray-600">Cash (50%)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-[hsl(217,90%,50%)] rounded-full"></div>
+                      <span className="text-gray-600">Card (30%)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-gray-600">EFT (20%)</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Export Button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.8 }}
+                className="mt-6 text-center"
+              >
+                <span className="inline-flex items-center gap-2 text-[hsl(217,90%,40%)] font-medium">
+                  <FileText className="w-4 h-4" />
+                  Export all reports to PDF
+                </span>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Section 5: Built for Your Team */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/3 left-0 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-[hsl(217,90%,50%)]/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left - Team Illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative order-2 lg:order-1"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 blur-3xl rounded-full"></div>
+              <div className="relative grid grid-cols-2 gap-6">
+                {/* Manager Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="col-span-2 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl p-6 text-white shadow-xl"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                      <UserCheck className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-lg">Manager Access</div>
+                      <div className="text-blue-100 text-sm">Full control over all features</div>
+                    </div>
+                    <div className="ml-auto">
+                      <Lock className="w-5 h-5 text-white/60" />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Staff Cards */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white border border-gray-200 rounded-2xl p-5 shadow-lg"
+                >
+                  <div className="w-12 h-12 bg-[hsl(217,90%,40%)]/10 rounded-xl flex items-center justify-center mb-3">
+                    <Users className="w-6 h-6 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div className="font-bold text-gray-900">Staff</div>
+                  <div className="text-gray-500 text-sm">Sales & basic access</div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white border border-gray-200 rounded-2xl p-5 shadow-lg"
+                >
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-3">
+                    <Check className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="font-bold text-gray-900">Tracked</div>
+                  <div className="text-gray-500 text-sm">Every action logged</div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Right - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="order-1 lg:order-2"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="inline-block mb-6"
+              >
+                <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                  Team Management
+                </span>
+              </motion.div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Your Team</span>
+              </h2>
+              <p className="text-xl text-gray-600 leading-relaxed mb-8">
+                Empower your staff with the right tools while keeping sensitive areas secure. Full accountability for every transaction.
+              </p>
+
+              <div className="space-y-5">
+                <div className="flex items-center gap-4 p-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl">
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <Users className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">Individual Staff Logins</div>
+                    <div className="text-gray-500 text-sm">Each team member has their own account</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl">
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">Role-Based Access</div>
+                    <div className="text-gray-500 text-sm">Management vs Staff permission levels</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl">
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/10 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">Sale Attribution</div>
+                    <div className="text-gray-500 text-sm">Know who made each sale</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl">
+                  <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <RefreshCw className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">Void Tracking</div>
+                    <div className="text-gray-500 text-sm">Every void requires a reason</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 6: Speaks Your Language */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Background with SA Colors */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/3 left-0 w-48 h-48 bg-yellow-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-5xl mx-auto relative">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Local First
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Speaks <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Your Language</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-12">
+              Built by South Africans, for South Africans. Full Afrikaans translation available at the click of a button.
+            </p>
+          </motion.div>
+
+          {/* Language Toggle Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="max-w-xl mx-auto"
+          >
+            <div className="bg-white/80 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-3xl p-8 shadow-2xl">
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <Languages className="w-10 h-10 text-[hsl(217,90%,40%)]" />
+                <span className="text-2xl font-bold text-gray-900">Language Settings</span>
+              </div>
+
+              {/* Toggle Mockup */}
+              <div className="flex items-center justify-center gap-6 mb-8">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex-1 bg-gray-100 rounded-xl p-4 text-center cursor-pointer hover:bg-gray-200 transition-colors"
+                >
+                  <div className="text-lg font-bold text-gray-700">English</div>
+                  <div className="text-sm text-gray-500">Default language</div>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex-1 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-4 text-center cursor-pointer shadow-lg"
+                >
+                  <div className="text-lg font-bold text-white">Afrikaans</div>
+                  <div className="text-sm text-blue-100">Volledig vertaal</div>
+                </motion.div>
+              </div>
+
+              {/* SA Flag Colors Bar */}
+              <div className="flex rounded-full overflow-hidden h-2 mb-6">
+                <div className="flex-1 bg-green-600"></div>
+                <div className="flex-1 bg-yellow-400"></div>
+                <div className="flex-1 bg-black"></div>
+                <div className="flex-1 bg-white border-y border-gray-200"></div>
+                <div className="flex-1 bg-red-600"></div>
+                <div className="flex-1 bg-[hsl(217,90%,40%)]"></div>
+              </div>
+
+              <p className="text-center text-gray-600">
+                Switch between languages anytime—no restart needed
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Quote */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-center mt-12"
+          >
+            <p className="text-xl text-gray-500 italic">
+              "Gebou deur Suid-Afrikaners, vir Suid-Afrikaners"
+            </p>
+            <p className="text-gray-400 mt-2">Built by South Africans, for South Africans</p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 7-Day Free Trial Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
         {/* Animated Background Elements */}
