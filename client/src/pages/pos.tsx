@@ -61,7 +61,6 @@ export default function POS() {
           </Link>
         </Button>
       </motion.div>
-
       {/* Hero Section - High-Tech Design */}
       <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-white via-gray-50 to-blue-50">
         {/* Animated Background Effects */}
@@ -346,7 +345,6 @@ export default function POS() {
           </motion.div>
         </motion.div>
       </section>
-
       {/* What is Storm POS Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background Elements */}
@@ -557,7 +555,6 @@ export default function POS() {
           </div>
         </div>
       </section>
-        
       {/* Multi-Device Section - Unified Design */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
         {/* Subtle Background */}
@@ -697,7 +694,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Section 1: Complete Business Suite */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         {/* Background Effects */}
@@ -893,7 +889,6 @@ export default function POS() {
           </div>
         </div>
       </section>
-
       {/* Section 2: Excel & Accounting Power */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background Effects */}
@@ -1060,7 +1055,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Section 3: Professional Document Generation */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         {/* Background */}
@@ -1232,7 +1226,7 @@ export default function POS() {
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.5, type: "spring" }}
-                  className="absolute top-20 -right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform rotate-12"
+                  className="absolute top-20 -right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform rotate-12 mt-[33px] mb-[33px] ml-[25px] mr-[25px]"
                 >
                   <span className="font-bold text-sm">PAID</span>
                 </motion.div>
@@ -1241,7 +1235,6 @@ export default function POS() {
           </div>
         </div>
       </section>
-
       {/* Section 4: Insights That Drive Growth */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background */}
@@ -1432,7 +1425,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* Section 5: Built for Your Team */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         {/* Background */}
@@ -1577,7 +1569,6 @@ export default function POS() {
           </div>
         </div>
       </section>
-
       {/* Section 6: Speaks Your Language */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background with SA Colors */}
@@ -1677,7 +1668,6 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
-
       {/* 7-Day Free Trial Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
         {/* Animated Background Elements */}
