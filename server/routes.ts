@@ -689,12 +689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invoice = await storage.createPosInvoice(validatedData);
       
       // Add R0.50 to user's usage for each invoice created
-      const user = await storage.getPosUser(userIdToUse);
-      if (user) {
-        const currentUsage = parseFloat(user.currentUsage || '0');
-        const newUsage = currentUsage + 0.50;
-        await storage.updatePosUser(userIdToUse, { currentUsage: newUsage.toFixed(2) });
-      }
+      await storage.incrementUserUsage(userIdToUse, '0.50');
       
       res.json(invoice);
     } catch (error) {
