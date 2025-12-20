@@ -864,7 +864,7 @@ export default function PosSystemAfrikaans() {
       });
     };
     
-    const settings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const settings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
     const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Besigheid';
     const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
     const businessAddress1 = settings.businessInfo?.addressLine1 || '';
