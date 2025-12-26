@@ -2652,8 +2652,7 @@ export default function PosSystem() {
     
     const items = Array.isArray(invoice.items) ? invoice.items : [];
     items.forEach((item: any, index: number) => {
-      const product = products.find(p => p.id === item.productId);
-      const productName = product?.name || `Product #${item.productId}`;
+      const productName = item.name || item.customName || (item.productId ? products.find(p => p.id === item.productId)?.name : null) || 'Item';
       const lineTotal = (parseFloat(item.price) * parseFloat(item.quantity));
       
       if (index % 2 === 0) {
