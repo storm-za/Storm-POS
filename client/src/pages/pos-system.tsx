@@ -2309,8 +2309,7 @@ export default function PosSystem() {
       { label: 'Date:', value: formatDate(invoice.createdDate) },
       { label: 'Due Date:', value: formatDate(invoice.dueDate) },
       ...(invoice.dueTerms ? [{ label: 'Terms:', value: invoice.dueTerms }] : []),
-      ...(invoice.poNumber ? [{ label: 'PO #:', value: invoice.poNumber }] : []),
-      { label: 'Status:', value: (invoice.status || 'draft').toUpperCase() }
+      ...(invoice.poNumber ? [{ label: 'PO #:', value: invoice.poNumber }] : [])
     ];
     
     let detailY = y + 8;
