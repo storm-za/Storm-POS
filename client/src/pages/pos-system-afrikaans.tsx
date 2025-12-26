@@ -22,7 +22,7 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check
+  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -2570,95 +2570,110 @@ ${dateFilteredSales.map(sale =>
           <div className="mb-8">
             {/* Mobile Tab Navigation - Horizontal Scroll */}
             <div className="block md:hidden">
-              <div className="flex space-x-1 p-1 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl overflow-x-auto scrollbar-hide shadow-lg shadow-blue-900/30">
-                <button
-                  onClick={() => handleTabChange("verkope")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "verkope"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
+              {/* Swipe hint indicator */}
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-xs text-gray-400">Kieslys</span>
+                <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <span>Swiep vir meer</span>
+                  <ChevronRight className="h-3 w-3 animate-pulse" />
+                </div>
+              </div>
+              <div className="relative">
+                {/* Gradient fade on right edge to indicate more content */}
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900/80 to-transparent z-10 pointer-events-none rounded-r-xl"></div>
+                <div 
+                  className="flex gap-3 p-2 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl overflow-x-auto shadow-lg shadow-blue-900/30"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
                 >
-                  <ShoppingCart className="h-4 w-4 mb-1" />
-                  <span>Verkope</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("produkte")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "produkte"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <Package className="h-4 w-4 mb-1" />
-                  <span>Produkte</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("kliente")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "kliente"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <Users className="h-4 w-4 mb-1" />
-                  <span>Kliente</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("fakturen")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                    currentTab === "fakturen"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <Receipt className="h-4 w-4 mb-1" />
-                  <span className="text-center leading-tight">Fakture &<br/>Kwotasies</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("oop-rekeninge")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "oop-rekeninge"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <FileText className="h-4 w-4 mb-1" />
-                  <span>Rekeninge</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("verslae")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "verslae"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <BarChart3 className="h-4 w-4 mb-1" />
-                  <span>Verslae</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("gebruik")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "gebruik"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <CreditCard className="h-4 w-4 mb-1" />
-                  <span>Gebruik</span>
-                </button>
-                <button
-                  onClick={() => handleTabChange("instellings")}
-                  className={`flex flex-col items-center justify-center min-w-[70px] px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                    currentTab === "instellings"
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-gray-700/50"
-                  }`}
-                >
-                  <Settings className="h-4 w-4 mb-1" />
-                  <span>Instellings</span>
-                </button>
+                  <button
+                    onClick={() => handleTabChange("verkope")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "verkope"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <ShoppingCart className="h-5 w-5 mb-1.5" />
+                    <span>Verkope</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("produkte")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "produkte"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <Package className="h-5 w-5 mb-1.5" />
+                    <span>Produkte</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("kliente")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "kliente"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <Users className="h-5 w-5 mb-1.5" />
+                    <span>Kliente</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("fakturen")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "fakturen"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <Receipt className="h-5 w-5 mb-1.5" />
+                    <span>Fakture</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("oop-rekeninge")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "oop-rekeninge"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <FileText className="h-5 w-5 mb-1.5" />
+                    <span>Rekeninge</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("verslae")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "verslae"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <BarChart3 className="h-5 w-5 mb-1.5" />
+                    <span>Verslae</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("gebruik")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "gebruik"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <CreditCard className="h-5 w-5 mb-1.5" />
+                    <span>Gebruik</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange("instellings")}
+                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
+                      currentTab === "instellings"
+                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
+                    }`}
+                  >
+                    <Settings className="h-5 w-5 mb-1.5" />
+                    <span>Instellings</span>
+                  </button>
+                </div>
               </div>
             </div>
 
