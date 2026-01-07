@@ -2664,10 +2664,7 @@ ${dateFilteredSales.map(sale =>
                   >
                     {/* Menu Header */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-700">
-                      <div className="flex items-center gap-2">
-                        <img src={stormLogo} alt="Storm" className="h-8" />
-                        <span className="text-white font-semibold">Kieslys</span>
-                      </div>
+                      <span className="text-white font-semibold text-lg">Kieslys</span>
                       <button
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800"
@@ -2730,73 +2727,78 @@ ${dateFilteredSales.map(sale =>
               )}
             </div>
 
-            {/* Desktop Tab Navigation */}
-            <TabsList className="hidden md:grid w-full grid-cols-8 h-14 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl p-1.5 tabs-navigation shadow-lg shadow-blue-900/30">
-              <TabsTrigger 
-                value="verkope" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-sales"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                <span>Verkope</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="produkte" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-products"
-              >
-                <Package className="h-4 w-4" />
-                <span>Produkte</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="kliente" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-customers"
-              >
-                <Users className="h-4 w-4" />
-                <span>Kliente</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="fakturen" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-invoices"
-              >
-                <Receipt className="h-4 w-4 flex-shrink-0" />
-                <span>Fakture & Kwotasies</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="oop-rekeninge" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-open-accounts"
-              >
-                <FileText className="h-4 w-4" />
-                <span>Oop Rekeninge</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="verslae" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-reports"
-              >
-                <BarChart3 className="h-4 w-4" />
-                <span>Verslae</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="gebruik" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-usage"
-              >
-                <CreditCard className="h-4 w-4" />
-                <span>Gebruik</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="instellings" 
-                className="flex items-center space-x-2 h-10 rounded-lg data-[state=active]:bg-[hsl(217,90%,40%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-900/50 text-gray-400 hover:text-white transition-all"
-                data-testid="tab-settings"
-              >
-                <Settings className="h-4 w-4" />
-                <span>Instellings</span>
-              </TabsTrigger>
-            </TabsList>
+            {/* Desktop Tab Navigation - Enterprise Modern Design */}
+            <div className="hidden md:block">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-2xl blur-xl"></div>
+                <TabsList className="relative w-full h-16 bg-gradient-to-b from-gray-800/80 to-gray-900/90 backdrop-blur-2xl border border-gray-600/50 rounded-2xl p-2 tabs-navigation shadow-2xl shadow-black/40 flex justify-between">
+                  <TabsTrigger 
+                    value="verkope" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-sales"
+                  >
+                    <ShoppingCart className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Verkope</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="produkte" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-products"
+                  >
+                    <Package className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Produkte</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="kliente" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-customers"
+                  >
+                    <Users className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Kliente</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="fakturen" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-invoices"
+                  >
+                    <Receipt className="h-4 w-4 flex-shrink-0 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline whitespace-nowrap">Fakture</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="oop-rekeninge" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-open-accounts"
+                  >
+                    <FileText className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline whitespace-nowrap">Rekeninge</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="verslae" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-reports"
+                  >
+                    <BarChart3 className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Verslae</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="gebruik" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-usage"
+                  >
+                    <CreditCard className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Gebruik</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="instellings" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-settings"
+                  >
+                    <Settings className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline">Instellings</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+            </div>
           </div>
 
           {/* Sales Tab */}
