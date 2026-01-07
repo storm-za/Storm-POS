@@ -165,6 +165,10 @@ export default function PosSystemAfrikaans() {
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   
+  // Saved payment details state
+  const [isSavePaymentDialogOpen, setIsSavePaymentDialogOpen] = useState(false);
+  const [savePaymentName, setSavePaymentName] = useState("");
+  
   // Excel import/export state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importType, setImportType] = useState<'products' | 'customers'>('products');
@@ -426,6 +430,17 @@ export default function PosSystemAfrikaans() {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie fakturen laai nie');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  const { data: savedPaymentDetails = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Kon nie betalingsbesonderhede laai nie');
       return response.json();
     },
     enabled: !!currentUser,
@@ -1452,6 +1467,55 @@ export default function PosSystemAfrikaans() {
       toast({
         title: "Fout",
         description: "Kon nie dokumentnommer bywerk nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Saved payment details mutations
+  const savePaymentDetailsMutation = useMutation({
+    mutationFn: async (data: { name: string; details: string }) => {
+      const response = await apiRequest("POST", "/api/pos/saved-payment-details", {
+        userId: currentUser?.id,
+        name: data.name,
+        details: data.details
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/saved-payment-details", currentUser?.id] });
+      setIsSavePaymentDialogOpen(false);
+      setSavePaymentName("");
+      toast({
+        title: "Gestoor",
+        description: "Betalingsbesonderhede suksesvol gestoor",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: "Kon nie betalingsbesonderhede stoor nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deletePaymentDetailsMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/saved-payment-details/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/saved-payment-details", currentUser?.id] });
+      toast({
+        title: "Verwyder",
+        description: "Betalingsbesonderhede verwyder",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: "Kon nie betalingsbesonderhede verwyder nie",
         variant: "destructive",
       });
     },
@@ -5498,7 +5562,33 @@ ${dateFilteredSales.map(sale =>
 
               {/* Payment Details */}
               <div>
-                <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                  {savedPaymentDetails.length > 0 && (
+                    <Select 
+                      value="" 
+                      onValueChange={(id) => {
+                        const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
+                        if (saved) {
+                          setInvoicePaymentDetails(saved.details);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment-af">
+                        <SelectValue placeholder="Gestoorde Besonderhede" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedPaymentDetails.map((saved: any) => (
+                          <SelectItem key={saved.id} value={saved.id.toString()}>
+                            <div className="flex items-center justify-between w-full">
+                              <span>{saved.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
                 <textarea
                   value={invoicePaymentDetails}
                   onChange={(e) => setInvoicePaymentDetails(e.target.value)}
@@ -5506,6 +5596,19 @@ ${dateFilteredSales.map(sale =>
                   rows={2}
                   placeholder="Bankbesonderhede, betalingsinstruksies, ens..."
                 />
+                {invoicePaymentDetails.trim() && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 text-xs"
+                    onClick={() => setIsSavePaymentDialogOpen(true)}
+                    data-testid="button-save-payment-details-af"
+                  >
+                    <PlusCircle className="w-3 h-3 mr-1" />
+                    Stoor as Sjabloon
+                  </Button>
+                )}
               </div>
 
               {/* Notes & Terms - Side by Side */}
@@ -6147,6 +6250,58 @@ ${dateFilteredSales.map(sale =>
                 disabled={updateDocumentNumberMutation.isPending || !newDocumentNumber.trim()}
               >
                 {updateDocumentNumberMutation.isPending ? 'Stoor...' : 'Stoor'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Save Payment Details Dialog */}
+        <Dialog open={isSavePaymentDialogOpen} onOpenChange={setIsSavePaymentDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Stoor Betalingsbesonderhede</DialogTitle>
+              <DialogDescription>
+                Stoor hierdie betalingsbesonderhede vir vinnige toegang wanneer fakturen geskep word
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Sjabloonnaam</Label>
+                <Input
+                  value={savePaymentName}
+                  onChange={(e) => setSavePaymentName(e.target.value)}
+                  placeholder="bv. FNB Besigheidsrekening"
+                  data-testid="input-payment-template-name-af"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Besonderhede Voorskou</Label>
+                <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
+                  {invoicePaymentDetails}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => {
+                setIsSavePaymentDialogOpen(false);
+                setSavePaymentName("");
+              }}>
+                Kanselleer
+              </Button>
+              <Button
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                onClick={() => {
+                  if (savePaymentName.trim() && invoicePaymentDetails.trim()) {
+                    savePaymentDetailsMutation.mutate({
+                      name: savePaymentName.trim(),
+                      details: invoicePaymentDetails.trim()
+                    });
+                  }
+                }}
+                disabled={savePaymentDetailsMutation.isPending || !savePaymentName.trim()}
+                data-testid="button-confirm-save-payment-af"
+              >
+                {savePaymentDetailsMutation.isPending ? 'Stoor...' : 'Stoor Sjabloon'}
               </Button>
             </div>
           </DialogContent>
