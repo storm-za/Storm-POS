@@ -22,7 +22,7 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check
+  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -163,6 +163,7 @@ export default function PosSystem() {
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Excel import/export state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -3149,113 +3150,113 @@ export default function PosSystem() {
 
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
-            {/* Mobile Tab Navigation - Horizontal Scroll */}
+            {/* Mobile Side Menu Navigation */}
             <div className="block md:hidden">
-              {/* Swipe hint indicator */}
-              <div className="flex items-center justify-between mb-2 px-1">
-                <span className="text-xs text-gray-400">Menu</span>
-                <div className="flex items-center gap-1 text-xs text-gray-500">
-                  <span>Swipe for more</span>
-                  <ChevronRight className="h-3 w-3 animate-pulse" />
+              {/* Menu Toggle Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex items-center gap-3 w-full p-3 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl shadow-lg shadow-blue-900/30"
+                data-testid="button-mobile-menu-toggle"
+              >
+                <Menu className="h-5 w-5 text-[hsl(217,90%,40%)]" />
+                <div className="flex items-center gap-2 text-white">
+                  {currentTab === "sales" && <><ShoppingCart className="h-4 w-4" /><span>Sales</span></>}
+                  {currentTab === "products" && <><Package className="h-4 w-4" /><span>Products</span></>}
+                  {currentTab === "customers" && <><Users className="h-4 w-4" /><span>Customers</span></>}
+                  {currentTab === "invoices" && <><Receipt className="h-4 w-4" /><span>Invoices & Quotes</span></>}
+                  {currentTab === "open-accounts" && <><FileText className="h-4 w-4" /><span>Open Accounts</span></>}
+                  {currentTab === "reports" && <><BarChart3 className="h-4 w-4" /><span>Reports</span></>}
+                  {currentTab === "usage" && <><CreditCard className="h-4 w-4" /><span>Usage</span></>}
+                  {currentTab === "settings" && <><Settings className="h-4 w-4" /><span>Settings</span></>}
                 </div>
-              </div>
-              <div className="relative">
-                {/* Gradient fade on right edge to indicate more content */}
-                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900/80 to-transparent z-10 pointer-events-none rounded-r-xl"></div>
-                <div 
-                  className="flex gap-3 p-2 bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-xl overflow-x-auto shadow-lg shadow-blue-900/30"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
-                >
-                  <button
-                    onClick={() => handleTabChange("sales")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "sales"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
+                <ChevronRight className="h-4 w-4 text-gray-400 ml-auto" />
+              </button>
+
+              {/* Slide-out Side Menu */}
+              {isMobileMenuOpen && (
+                <>
+                  {/* Backdrop overlay */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  />
+                  {/* Side menu panel */}
+                  <motion.div
+                    initial={{ x: '-100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '-100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className="fixed left-0 top-0 bottom-0 w-72 bg-gray-900 border-r border-gray-700 z-50 shadow-2xl"
                   >
-                    <ShoppingCart className="h-5 w-5 mb-1.5" />
-                    <span>Sales</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("products")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "products"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <Package className="h-5 w-5 mb-1.5" />
-                    <span>Products</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("customers")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "customers"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <Users className="h-5 w-5 mb-1.5" />
-                    <span>Customers</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("invoices")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "invoices"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <Receipt className="h-5 w-5 mb-1.5" />
-                    <span>Invoices</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("open-accounts")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "open-accounts"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <FileText className="h-5 w-5 mb-1.5" />
-                    <span>Accounts</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("reports")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "reports"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <BarChart3 className="h-5 w-5 mb-1.5" />
-                    <span>Reports</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("usage")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "usage"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <CreditCard className="h-5 w-5 mb-1.5" />
-                    <span>Usage</span>
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("settings")}
-                    className={`flex flex-col items-center justify-center flex-shrink-0 w-[72px] py-3 rounded-xl text-xs font-medium transition-all ${
-                      currentTab === "settings"
-                        ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50"
-                    }`}
-                  >
-                    <Settings className="h-5 w-5 mb-1.5" />
-                    <span>Settings</span>
-                  </button>
-                </div>
-              </div>
+                    {/* Menu Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-700">
+                      <div className="flex items-center gap-2">
+                        <img src={stormLogo} alt="Storm" className="h-8" />
+                        <span className="text-white font-semibold">Menu</span>
+                      </div>
+                      <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800"
+                        data-testid="button-close-mobile-menu"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+
+                    {/* Menu Items */}
+                    <nav className="p-3 space-y-1">
+                      {[
+                        { id: 'sales', label: 'Sales', icon: ShoppingCart },
+                        { id: 'products', label: 'Products', icon: Package },
+                        { id: 'customers', label: 'Customers', icon: Users },
+                        { id: 'invoices', label: 'Invoices & Quotes', icon: Receipt },
+                        { id: 'open-accounts', label: 'Open Accounts', icon: FileText },
+                        { id: 'reports', label: 'Reports', icon: BarChart3 },
+                        { id: 'usage', label: 'Usage', icon: CreditCard },
+                        { id: 'settings', label: 'Settings', icon: Settings },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            handleTabChange(item.id);
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className={`flex items-center gap-3 w-full p-3 rounded-xl text-left transition-all ${
+                            currentTab === item.id
+                              ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
+                              : "text-gray-400 hover:text-white hover:bg-gray-800"
+                          }`}
+                          data-testid={`menu-item-${item.id}`}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span className="font-medium">{item.label}</span>
+                          {currentTab === item.id && (
+                            <Check className="h-4 w-4 ml-auto" />
+                          )}
+                        </button>
+                      ))}
+                    </nav>
+
+                    {/* Logout at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-700">
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setIsLogoutDialogOpen(true);
+                        }}
+                        className="flex items-center gap-3 w-full p-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                        data-testid="menu-item-logout"
+                      >
+                        <LogOut className="h-5 w-5" />
+                        <span className="font-medium">Log Out</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                </>
+              )}
             </div>
 
             {/* Desktop Tab Navigation */}
