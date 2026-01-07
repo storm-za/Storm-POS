@@ -1,9 +1,10 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, systemSettings,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
   type PosOpenAccount, type InsertPosOpenAccount, type PosInvoice, type InsertPosInvoice,
+  type PosSavedPaymentDetails, type InsertPosSavedPaymentDetails,
   type PosStaffAccount, type InsertPosStaffAccount,
   type SystemSetting, type InsertSystemSetting
 } from "@shared/schema";
@@ -90,6 +91,11 @@ export interface IStorage {
   updatePosInvoice(id: number, invoice: Partial<PosInvoice>): Promise<PosInvoice | undefined>;
   deletePosInvoice(id: number): Promise<boolean>;
   getNextDocumentNumber(userId: number, documentType: string): Promise<string>;
+  
+  // Saved Payment Details Operations
+  getSavedPaymentDetails(userId: number): Promise<PosSavedPaymentDetails[]>;
+  createSavedPaymentDetails(details: InsertPosSavedPaymentDetails): Promise<PosSavedPaymentDetails>;
+  deleteSavedPaymentDetails(id: number): Promise<boolean>;
   
   // Staff Account Operations
   getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]>;
@@ -515,6 +521,19 @@ export class MemStorage implements IStorage {
     return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
   }
 
+  // Saved Payment Details Operations (stub implementations for MemStorage)
+  async getSavedPaymentDetails(userId: number): Promise<PosSavedPaymentDetails[]> {
+    return [];
+  }
+
+  async createSavedPaymentDetails(details: InsertPosSavedPaymentDetails): Promise<PosSavedPaymentDetails> {
+    throw new Error("Saved payment details not supported in MemStorage");
+  }
+
+  async deleteSavedPaymentDetails(id: number): Promise<boolean> {
+    return false;
+  }
+
   // Staff Account Operations (stub implementations for MemStorage)
   async getPosStaffAccounts(posUserId: number): Promise<PosStaffAccount[]> {
     return [];
@@ -840,6 +859,24 @@ export class DatabaseStorage implements IStorage {
     const nextNum = parseInt(match[1]) + 1;
     const prefix = documentType === 'invoice' ? 'INV' : 'QUO';
     return `${prefix}-${String(nextNum).padStart(4, '0')}`;
+  }
+
+  // Saved Payment Details Operations
+  async getSavedPaymentDetails(userId: number): Promise<PosSavedPaymentDetails[]> {
+    return db.select().from(posSavedPaymentDetails).where(eq(posSavedPaymentDetails.userId, userId));
+  }
+
+  async createSavedPaymentDetails(details: InsertPosSavedPaymentDetails): Promise<PosSavedPaymentDetails> {
+    const [created] = await db
+      .insert(posSavedPaymentDetails)
+      .values(details)
+      .returning();
+    return created;
+  }
+
+  async deleteSavedPaymentDetails(id: number): Promise<boolean> {
+    const result = await db.delete(posSavedPaymentDetails).where(eq(posSavedPaymentDetails.id, id));
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Staff Account Operations

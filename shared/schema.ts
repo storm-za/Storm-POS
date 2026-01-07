@@ -129,6 +129,15 @@ export const posInvoices = pgTable("pos_invoices", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Saved payment details for invoices
+export const posSavedPaymentDetails = pgTable("pos_saved_payment_details", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(), // User-defined name for the payment details
+  details: text("details").notNull(), // Bank details, payment instructions, etc.
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // System settings for tracking admin operations like monthly resets
 export const systemSettings = pgTable("system_settings", {
   id: serial("id").primaryKey(),
@@ -186,6 +195,11 @@ export const insertPosInvoiceSchema = createInsertSchema(posInvoices).omit({
   id: true,
   createdAt: true,
   createdDate: true,
+});
+
+export const insertPosSavedPaymentDetailsSchema = createInsertSchema(posSavedPaymentDetails).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
@@ -281,6 +295,8 @@ export type InsertPosOpenAccount = z.infer<typeof insertPosOpenAccountSchema>;
 export type PosOpenAccount = typeof posOpenAccounts.$inferSelect;
 export type InsertPosInvoice = z.infer<typeof insertPosInvoiceSchema>;
 export type PosInvoice = typeof posInvoices.$inferSelect;
+export type InsertPosSavedPaymentDetails = z.infer<typeof insertPosSavedPaymentDetailsSchema>;
+export type PosSavedPaymentDetails = typeof posSavedPaymentDetails.$inferSelect;
 export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
