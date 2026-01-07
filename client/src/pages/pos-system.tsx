@@ -150,6 +150,8 @@ export default function PosSystem() {
   const [invoicePaymentDetails, setInvoicePaymentDetails] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
   const [invoiceTaxEnabled, setInvoiceTaxEnabled] = useState(true);
+  const [isSavePaymentDialogOpen, setIsSavePaymentDialogOpen] = useState(false);
+  const [savePaymentName, setSavePaymentName] = useState("");
   
   // Invoice search and filter state
   const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
@@ -430,6 +432,18 @@ export default function PosSystem() {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch invoices');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Fetch saved payment details
+  const { data: savedPaymentDetails = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch saved payment details');
       return response.json();
     },
     enabled: !!currentUser,
@@ -794,6 +808,55 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: "Failed to update document number",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Saved payment details mutations
+  const savePaymentDetailsMutation = useMutation({
+    mutationFn: async (data: { name: string; details: string }) => {
+      const response = await apiRequest("POST", "/api/pos/saved-payment-details", {
+        userId: currentUser?.id,
+        name: data.name,
+        details: data.details
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/saved-payment-details", currentUser?.id] });
+      setIsSavePaymentDialogOpen(false);
+      setSavePaymentName("");
+      toast({
+        title: "Saved",
+        description: "Payment details saved successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to save payment details",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deletePaymentDetailsMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/saved-payment-details/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/saved-payment-details", currentUser?.id] });
+      toast({
+        title: "Deleted",
+        description: "Payment details deleted",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete payment details",
         variant: "destructive",
       });
     },
@@ -6431,7 +6494,33 @@ export default function PosSystem() {
 
             {/* Payment Details */}
             <div>
-              <Label>Payment Details (Optional)</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Payment Details (Optional)</Label>
+                {savedPaymentDetails.length > 0 && (
+                  <Select 
+                    value="" 
+                    onValueChange={(id) => {
+                      const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
+                      if (saved) {
+                        setInvoicePaymentDetails(saved.details);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment">
+                      <SelectValue placeholder="Saved Details" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {savedPaymentDetails.map((saved: any) => (
+                        <SelectItem key={saved.id} value={saved.id.toString()}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{saved.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
               <textarea
                 value={invoicePaymentDetails}
                 onChange={(e) => setInvoicePaymentDetails(e.target.value)}
@@ -6439,6 +6528,19 @@ export default function PosSystem() {
                 rows={2}
                 placeholder="Bank details, payment instructions, etc..."
               />
+              {invoicePaymentDetails.trim() && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 text-xs"
+                  onClick={() => setIsSavePaymentDialogOpen(true)}
+                  data-testid="button-save-payment-details"
+                >
+                  <PlusCircle className="w-3 h-3 mr-1" />
+                  Save as Template
+                </Button>
+              )}
             </div>
 
             {/* Notes & Terms - Side by Side */}
@@ -7082,6 +7184,58 @@ export default function PosSystem() {
               disabled={updateDocumentNumberMutation.isPending || !newDocumentNumber.trim()}
             >
               {updateDocumentNumberMutation.isPending ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Payment Details Dialog */}
+      <Dialog open={isSavePaymentDialogOpen} onOpenChange={setIsSavePaymentDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Save Payment Details</DialogTitle>
+            <DialogDescription>
+              Save these payment details for quick access when creating invoices
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Template Name</Label>
+              <Input
+                value={savePaymentName}
+                onChange={(e) => setSavePaymentName(e.target.value)}
+                placeholder="e.g. FNB Business Account"
+                data-testid="input-payment-template-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Details Preview</Label>
+              <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
+                {invoicePaymentDetails}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => {
+              setIsSavePaymentDialogOpen(false);
+              setSavePaymentName("");
+            }}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (savePaymentName.trim() && invoicePaymentDetails.trim()) {
+                  savePaymentDetailsMutation.mutate({
+                    name: savePaymentName.trim(),
+                    details: invoicePaymentDetails.trim()
+                  });
+                }
+              }}
+              disabled={savePaymentDetailsMutation.isPending || !savePaymentName.trim()}
+              data-testid="button-confirm-save-payment"
+            >
+              {savePaymentDetailsMutation.isPending ? 'Saving...' : 'Save Template'}
             </Button>
           </div>
         </DialogContent>

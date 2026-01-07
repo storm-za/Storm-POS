@@ -753,6 +753,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Saved Payment Details Routes
+  app.get("/api/pos/saved-payment-details", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const details = await storage.getSavedPaymentDetails(userId);
+      res.json(details);
+    } catch (error) {
+      console.error("Error fetching saved payment details:", error);
+      res.status(500).json({ message: "Failed to fetch saved payment details" });
+    }
+  });
+
+  app.post("/api/pos/saved-payment-details", async (req, res) => {
+    try {
+      const { userId, name, details } = req.body;
+      const userIdToUse = userId || 1;
+      
+      if (!name || !details) {
+        return res.status(400).json({ message: "Name and details are required" });
+      }
+      
+      const savedDetails = await storage.createSavedPaymentDetails({
+        userId: userIdToUse,
+        name,
+        details
+      });
+      res.json(savedDetails);
+    } catch (error) {
+      console.error("Error creating saved payment details:", error);
+      res.status(500).json({ message: "Failed to save payment details" });
+    }
+  });
+
+  app.delete("/api/pos/saved-payment-details/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteSavedPaymentDetails(id);
+      if (!success) {
+        return res.status(404).json({ message: "Saved payment details not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting saved payment details:", error);
+      res.status(500).json({ message: "Failed to delete saved payment details" });
+    }
+  });
+
   // Staff Account Routes
   app.get("/api/pos/staff-accounts", async (req, res) => {
     try {
