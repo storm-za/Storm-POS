@@ -164,6 +164,7 @@ export default function PosSystem() {
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showWelcomeToast, setShowWelcomeToast] = useState(true);
   
   // Excel import/export state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -3117,37 +3118,52 @@ export default function PosSystem() {
           </div>
         </div>
       </header>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        {/* Company Banner */}
-        <motion.div 
-          className="mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+      {/* Welcome Toast Popup */}
+      {showWelcomeToast && (
+        <motion.div
+          initial={{ opacity: 0, y: -50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -50, scale: 0.9 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100]"
         >
-          <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl px-6 py-4 shadow-2xl shadow-blue-900/50 border border-blue-400/20 backdrop-blur-sm relative overflow-hidden">
-            {/* Shine effect */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-              animate={{
-                x: ['-100%', '200%'],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatDelay: 2,
-              }}
-            />
-            <div className="flex items-center justify-center relative z-10">
-              <div className="text-center">
-                <h2 className="text-white text-lg font-semibold">
-                  {currentUser?.companyName || "Demo Account"}
-                </h2>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-2xl blur-xl"></div>
+            <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl rounded-2xl px-8 py-5 shadow-2xl shadow-blue-900/40 border border-gray-600/50 min-w-[320px]">
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-2xl"
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3 }}
+              />
+              <button
+                onClick={() => setShowWelcomeToast(false)}
+                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                data-testid="button-close-welcome-toast"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                  <User className="h-6 w-6 text-white drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm font-medium">Welcome back,</p>
+                  <h3 className="text-white text-lg font-semibold">{currentUser?.companyName || "Demo Account"}</h3>
+                </div>
               </div>
+              <motion.div
+                className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-b-2xl"
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: 5, ease: 'linear' }}
+                onAnimationComplete={() => setShowWelcomeToast(false)}
+              />
             </div>
           </div>
         </motion.div>
+      )}
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
             {/* Mobile Side Menu Navigation */}
