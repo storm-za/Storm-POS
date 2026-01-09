@@ -2539,52 +2539,22 @@ ${dateFilteredSales.map(sale =>
                 </DropdownMenu>
               </motion.div>
 
-              {/* Profile Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="flex flex-col items-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-0 h-10 w-10 rounded-full overflow-hidden bg-gray-100 hover:bg-gray-200"
-                      data-testid="profile-dropdown"
-                    >
-                      {currentUser?.companyLogo ? (
-                        <img 
-                          src={currentUser.companyLogo} 
-                          alt="Maatskappy Logo" 
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
-                          {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'G'}
-                        </div>
-                      )}
-                    </Button>
-                    <ChevronDown className="h-3 w-3 text-gray-400 mt-1" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem onClick={() => setIsLogoDialogOpen(true)}>
-                    <User className="mr-2 h-4 w-4" />
-                    Verander Profielfoto
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsReceiptCustomizerOpen(true)}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Personaliseer Jou Kwitansie
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => window.location.href = '/pos/system'}>
-                    <Globe className="mr-2 h-4 w-4" />
-                    Skakel na Engels
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Meld af
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Profile Avatar */}
+              <div className="flex flex-col items-center" data-testid="profile-avatar-af">
+                <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 ring-2 ring-[hsl(217,90%,40%)]/30 shadow-lg shadow-blue-500/20">
+                  {currentUser?.companyLogo ? (
+                    <img 
+                      src={currentUser.companyLogo} 
+                      alt="Maatskappy Logo" 
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center bg-[hsl(217,90%,40%)] text-white text-sm font-medium">
+                      {currentUser?.email ? currentUser.email.charAt(0).toUpperCase() : 'G'}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -4195,6 +4165,108 @@ ${dateFilteredSales.map(sale =>
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
+              {/* Account & Preferences Section */}
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                <CardHeader className="border-b border-white/10 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                    Rekening & Voorkeure
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {/* Profile Picture Setting */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setIsLogoDialogOpen(true)}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                            <User className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Verander Profielfoto</h3>
+                            <p className="text-gray-400 text-sm">Werk jou maatskappy-logo of avatar op</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Receipt Customizer Setting */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setIsReceiptCustomizerOpen(true)}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                            <Receipt className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Personaliseer Jou Kwitansie</h3>
+                            <p className="text-gray-400 text-sm">Pas jou kwitansie-uitleg en handelsmerk aan</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Language Setting */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => window.location.href = '/pos/system'}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                            <Globe className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Skakel na Engels</h3>
+                            <p className="text-gray-400 text-sm">Verander jou taalvoorkeur</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Logout Setting */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={logout}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-shadow duration-300">
+                            <LogOut className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-red-400 transition-colors">Meld Af</h3>
+                            <p className="text-gray-400 text-sm">Meld uit jou rekening af</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Integrations Section */}
               <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                 <CardHeader className="border-b border-white/10 pb-4">
                   <CardTitle className="flex items-center gap-2 text-white">
