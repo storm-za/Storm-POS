@@ -3238,7 +3238,7 @@ ${dateFilteredSales.map(sale =>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-white">{customer.name}</h3>
-                          <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs">
+                          <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs text-[#ffffff]">
                             {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
                           </Badge>
                         </div>
