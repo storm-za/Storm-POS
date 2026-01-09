@@ -22,7 +22,8 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu
+  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
+  AlertTriangle, XCircle
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -3684,50 +3685,144 @@ export default function PosSystem() {
           {/* Products Tab */}
           <TabsContent value="products">
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="space-y-6"
             >
-            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <CardTitle className="text-white">Product Inventory</CardTitle>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20">
-                          <FileSpreadsheet className="h-4 w-4 mr-1" />
-                          Excel
-                          <ChevronDown className="h-3 w-3 ml-1" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={handleExportProducts}>
-                          <Download className="h-4 w-4 mr-2" />
-                          Export Products
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <label className="cursor-pointer flex items-center">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Import Products
-                            <input
-                              type="file"
-                              accept=".xlsx,.xls,.csv"
-                              className="hidden"
-                              onChange={(e) => handleFileUpload(e, 'products')}
-                            />
-                          </label>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button onClick={() => openProductDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Add Product
-                        </Button>
-                      </DialogTrigger>
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                        <Package className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs font-medium">Total Products</p>
+                        <p className="text-white text-xl font-bold">{products.length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-green-500/50 transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/30">
+                        <TrendingUp className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs font-medium">In Stock</p>
+                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity > 5).length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-amber-500/50 transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30">
+                        <AlertTriangle className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs font-medium">Low Stock</p>
+                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity <= 5 && p.quantity > 0).length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="relative group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-rose-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-red-500/50 transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/30">
+                        <XCircle className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs font-medium">Out of Stock</p>
+                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity === 0).length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Main Products Card */}
+              <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
+                <CardHeader className="relative border-b border-white/10 pb-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                        <Package className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-white text-xl font-bold">Product Inventory</CardTitle>
+                        <p className="text-gray-400 text-sm">Manage your product catalog</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50 transition-all">
+                            <FileSpreadsheet className="h-4 w-4 mr-1" />
+                            Excel
+                            <ChevronDown className="h-3 w-3 ml-1" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                          <DropdownMenuItem onClick={handleExportProducts} className="text-gray-200 hover:bg-gray-800">
+                            <Download className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            Export Products
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-gray-700" />
+                          <DropdownMenuItem asChild className="text-gray-200 hover:bg-gray-800">
+                            <label className="cursor-pointer flex items-center">
+                              <Upload className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                              Import Products
+                              <input
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e, 'products')}
+                              />
+                            </label>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            Add Product
+                          </Button>
+                        </DialogTrigger>
                     <DialogContent className="sm:max-w-[500px]" aria-describedby="product-dialog-description">
                       <DialogHeader>
                         <DialogTitle>
@@ -3843,73 +3938,120 @@ export default function PosSystem() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Search Bar */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search products by name or SKU..."
-                      value={productSearchTerm}
-                      onChange={(e) => setProductSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-
-                  {/* Product List */}
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {filteredProducts.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        {productSearchTerm ? 'No products found matching your search.' : 'No products available.'}
+              <CardContent className="relative pt-6">
+                  <div className="space-y-4">
+                    {/* Enhanced Search Bar */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
+                      <div className="relative flex items-center">
+                        <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
+                        <Input
+                          placeholder="Search products by name or SKU..."
+                          value={productSearchTerm}
+                          onChange={(e) => setProductSearchTerm(e.target.value)}
+                          className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
+                        />
                       </div>
-                    ) : (
-                      filteredProducts.map((product) => (
-                        <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">{product.name}</h3>
-                            <p className="text-sm text-gray-500">SKU: {product.sku}</p>
-                          </div>
-                          <div className="text-right mr-4">
-                            <div className="space-y-1">
-                              <p className="text-sm text-gray-600">Cost: R{product.costPrice}</p>
-                              <p className="font-bold text-gray-900">Retail: R{product.retailPrice}</p>
-                              {product.tradePrice && (
-                                <p className="text-sm text-blue-600">Trade: R{product.tradePrice}</p>
-                              )}
+                    </div>
+
+                    {/* Product Grid */}
+                    <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
+                      {filteredProducts.length === 0 ? (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-center py-12"
+                        >
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-gray-800/50 flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-500" />
                             </div>
-                            <p className={`text-sm ${product.quantity <= 5 ? 'text-red-500' : 'text-gray-500'}`}>
-                              Stock: {product.quantity}
-                              {product.quantity <= 5 && (
-                                <span className="ml-1 text-xs bg-red-100 text-red-600 px-1 rounded">Low</span>
-                              )}
-                            </p>
+                            <p className="text-gray-400">{productSearchTerm ? 'No products found matching your search.' : 'No products available.'}</p>
                           </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => openProductDialog(product)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              disabled={deleteProductMutation.isPending}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                        </motion.div>
+                      ) : (
+                        filteredProducts.map((product, index) => (
+                          <motion.div
+                            key={product.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.03 }}
+                            whileHover={{ scale: 1.01 }}
+                            className="group"
+                          >
+                            <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <div className="relative flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                    <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <h3 className="font-semibold text-white text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
+                                    <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                  <div className="text-right hidden sm:block">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Cost</p>
+                                    <p className="text-gray-400 font-medium">R{product.costPrice}</p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Retail</p>
+                                    <p className="text-white font-bold text-lg">R{product.retailPrice}</p>
+                                  </div>
+                                  {product.tradePrice && (
+                                    <div className="text-right hidden md:block">
+                                      <p className="text-xs text-gray-500 uppercase tracking-wide">Trade</p>
+                                      <p className="text-[hsl(217,90%,60%)] font-medium">R{product.tradePrice}</p>
+                                    </div>
+                                  )}
+                                  <div className="text-right">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Stock</p>
+                                    <div className="flex items-center gap-1">
+                                      <p className={`font-bold ${
+                                        product.quantity === 0 ? 'text-red-400' :
+                                        product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
+                                      }`}>
+                                        {product.quantity}
+                                      </p>
+                                      {product.quantity <= 5 && product.quantity > 0 && (
+                                        <span className="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full border border-amber-500/30">Low</span>
+                                      )}
+                                      {product.quantity === 0 && (
+                                        <span className="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">Out</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => openProductDialog(product)}
+                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                    >
+                                      <Edit className="h-4 w-4 text-gray-400 group-hover:text-[hsl(217,90%,50%)]" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleDeleteProduct(product.id)}
+                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      disabled={deleteProductMutation.isPending}
+                                    >
+                                      <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-400" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             </motion.div>
           </TabsContent>
 
