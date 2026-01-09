@@ -5625,7 +5625,7 @@ ${dateFilteredSales.map(sale =>
                     data-testid="button-save-payment-details-af"
                   >
                     <PlusCircle className="w-3 h-3 mr-1" />
-                    Stoor as Sjabloon
+                    Stoor
                   </Button>
                 )}
               </div>
