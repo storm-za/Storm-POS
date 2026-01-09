@@ -3229,69 +3229,69 @@ ${dateFilteredSales.map(sale =>
                             <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-4 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
                               <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
-                              {/* Mobile Layout */}
-                              <div className="relative block sm:hidden space-y-3">
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
-                                      <Package className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+                              {/* Mobile Layout - shows on screens below 768px */}
+                              <div className="relative block md:hidden space-y-3">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                      <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                                     </div>
-                                    <div className="min-w-0 flex-1">
-                                      <h3 className="font-semibold text-white text-base truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
-                                      <p className="text-xs text-gray-400">SKU: {product.sku}</p>
+                                    <div className="min-w-0 flex-1 overflow-hidden">
+                                      <h3 className="font-semibold text-white text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
+                                      <p className="text-[11px] text-gray-400 truncate">SKU: {product.sku}</p>
                                     </div>
                                   </div>
-                                  <div className="flex gap-1.5 flex-shrink-0">
+                                  <div className="flex gap-1 flex-shrink-0">
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => openProductDialog(product)}
-                                      className="h-8 w-8 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
                                     >
-                                      <Edit className="h-3.5 w-3.5 text-gray-400" />
+                                      <Edit className="h-3 w-3 text-gray-400" />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteProduct(product.id)}
-                                      className="h-8 w-8 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
                                       disabled={deleteProductMutation.isPending}
                                     >
-                                      <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+                                      <Trash2 className="h-3 w-3 text-gray-400" />
                                     </Button>
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-700/50">
+                                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-gray-700/50">
                                   <div className="text-center">
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">Kleinhandel</p>
-                                    <p className="text-white font-bold text-sm">R{product.retailPrice}</p>
+                                    <p className="text-[9px] text-gray-500 uppercase">Kleinhandel</p>
+                                    <p className="text-white font-bold text-xs">R{product.retailPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">Kosprys</p>
-                                    <p className="text-gray-400 font-medium text-sm">R{product.costPrice}</p>
+                                    <p className="text-[9px] text-gray-500 uppercase">Kosprys</p>
+                                    <p className="text-gray-400 font-medium text-xs">R{product.costPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[10px] text-gray-500 uppercase tracking-wide">Voorraad</p>
-                                    <div className="flex items-center justify-center gap-1">
-                                      <p className={`font-bold text-sm ${
+                                    <p className="text-[9px] text-gray-500 uppercase">Voorraad</p>
+                                    <div className="flex items-center justify-center gap-0.5">
+                                      <p className={`font-bold text-xs ${
                                         product.quantity === 0 ? 'text-red-400' :
                                         product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
                                       }`}>
                                         {product.quantity}
                                       </p>
                                       {product.quantity <= 5 && product.quantity > 0 && (
-                                        <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1 py-0.5 rounded-full border border-amber-500/30">Laag</span>
+                                        <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1 rounded-full">Laag</span>
                                       )}
                                       {product.quantity === 0 && (
-                                        <span className="text-[9px] bg-red-500/20 text-red-400 px-1 py-0.5 rounded-full border border-red-500/30">Uit</span>
+                                        <span className="text-[8px] bg-red-500/20 text-red-400 px-1 rounded-full">Uit</span>
                                       )}
                                     </div>
                                   </div>
                                 </div>
                               </div>
 
-                              {/* Desktop Layout */}
-                              <div className="relative hidden sm:flex items-center justify-between gap-4">
+                              {/* Desktop Layout - shows on screens 768px and above */}
+                              <div className="relative hidden md:flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                   <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                     <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
