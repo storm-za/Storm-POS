@@ -2604,7 +2604,6 @@ ${dateFilteredSales.map(sale =>
           </div>
         </motion.div>
       )}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
           <div className="mb-8">
@@ -3087,7 +3086,7 @@ ${dateFilteredSales.map(sale =>
                         <TrendingUp className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs font-medium">Op Voorraad</p>
+                        <p className="text-gray-400 text-xs font-medium">In Voorraad</p>
                         <p className="text-white text-xl font-bold">{products.filter(p => p.quantity > 5).length}</p>
                       </div>
                     </div>
