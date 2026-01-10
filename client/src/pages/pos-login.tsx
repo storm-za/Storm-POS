@@ -37,10 +37,6 @@ export default function PosLogin() {
       localStorage.setItem('posUser', JSON.stringify(data.user));
       
       if (data.user.paid) {
-        toast({
-          title: "Login successful",
-          description: "Welcome to Storm POS!",
-        });
         setLocation("/pos/system");
       } else {
         setLocation("/pos/inactive");

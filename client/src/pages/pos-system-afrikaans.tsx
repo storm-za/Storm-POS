@@ -2567,30 +2567,30 @@ ${dateFilteredSales.map(sale =>
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -50, scale: 0.9 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[100]"
+          className="fixed top-20 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[100]"
         >
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-2xl blur-xl"></div>
-            <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl rounded-2xl px-8 py-5 shadow-2xl shadow-blue-900/40 border border-gray-600/50 min-w-[320px]">
+          <div className="relative max-w-sm md:max-w-none mx-auto md:mx-0">
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-xl md:rounded-2xl blur-xl"></div>
+            <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 border border-gray-600/50 md:min-w-[320px]">
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-2xl"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-xl md:rounded-2xl"
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3 }}
               />
               <button
                 onClick={() => setShowWelcomeToast(false)}
-                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                className="absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
                 data-testid="button-close-welcome-toast-af"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </button>
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                  <User className="h-6 w-6 text-white drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+              <div className="flex items-center gap-3 md:gap-4 relative z-10 pr-6">
+                <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+                  <User className="h-5 w-5 md:h-6 md:w-6 text-white drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                 </div>
-                <div>
-                  <p className="text-gray-400 text-sm font-medium">Welkom terug,</p>
-                  <h3 className="text-white text-lg font-semibold">{currentUser?.companyName || "Demo Rekening"}</h3>
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-400 text-xs md:text-sm font-medium">Welkom terug,</p>
+                  <h3 className="text-white text-sm md:text-lg font-semibold truncate">{currentUser?.companyName || "Demo Rekening"}</h3>
                 </div>
               </div>
               <motion.div
