@@ -27,6 +27,7 @@ export const posUsers = pgTable("pos_users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   companyName: text("company_name").notNull().default("My Company"),
+  preferredLanguage: text("preferred_language").notNull().default("en"), // 'en' for English, 'af' for Afrikaans
   paid: boolean("paid").notNull().default(true),
   companyLogo: text("company_logo"), // Base64 encoded image
   currentUsage: decimal("current_usage", { precision: 10, scale: 2 }).notNull().default("0.00"), // Current month usage amount
@@ -168,6 +169,7 @@ export const signupPosUserSchema = createInsertSchema(posUsers).pick({
   email: true,
   password: true,
   companyName: true,
+  preferredLanguage: true,
 });
 
 export const insertPosProductSchema = createInsertSchema(posProducts).omit({

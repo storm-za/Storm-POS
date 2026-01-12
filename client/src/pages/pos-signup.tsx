@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Lock, Mail, User, Building } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, Building, Globe } from "lucide-react";
 import { updatePageSEO } from "@/lib/seo";
 
 export default function PosSignup() {
@@ -26,12 +27,13 @@ export default function PosSignup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState("en");
   const [showPassword, setShowPassword] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const { toast } = useToast();
 
   const signupMutation = useMutation({
-    mutationFn: async (userData: { firstName: string; lastName: string; email: string; password: string; companyName: string }) => {
+    mutationFn: async (userData: { firstName: string; lastName: string; email: string; password: string; companyName: string; preferredLanguage: string }) => {
       const response = await apiRequest("POST", "/api/pos/signup", userData);
       return response.json();
     },
@@ -41,7 +43,12 @@ export default function PosSignup() {
         title: "Account created successfully!",
         description: "Welcome to Storm POS - Your 7-day free trial has started!",
       });
-      setLocation("/pos/system");
+      // Redirect based on preferred language
+      if (data.user.preferredLanguage === 'af') {
+        setLocation("/pos/stelsel");
+      } else {
+        setLocation("/pos/system");
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -62,7 +69,7 @@ export default function PosSignup() {
       });
       return;
     }
-    signupMutation.mutate({ firstName, lastName, email, password, companyName });
+    signupMutation.mutate({ firstName, lastName, email, password, companyName, preferredLanguage });
   };
 
   if (signupSuccess) {
@@ -230,6 +237,34 @@ export default function PosSignup() {
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="preferredLanguage" className="text-sm font-medium text-gray-700">
+                  Preferred Language / Voorkeur Taal
+                </Label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+                  <Select value={preferredLanguage} onValueChange={setPreferredLanguage}>
+                    <SelectTrigger className="pl-10 h-12">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">
+                        <div className="flex items-center gap-2">
+                          <span>🇬🇧</span>
+                          <span>English</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="af">
+                        <div className="flex items-center gap-2">
+                          <span>🇿🇦</span>
+                          <span>Afrikaans</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               
