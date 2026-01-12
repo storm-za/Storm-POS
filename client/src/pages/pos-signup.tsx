@@ -253,7 +253,7 @@ export default function PosSignup() {
                     <SelectContent>
                       <SelectItem value="en">
                         <div className="flex items-center gap-2">
-                          <span>🇬🇧</span>
+                          <span>🇿🇦</span>
                           <span>English</span>
                         </div>
                       </SelectItem>
