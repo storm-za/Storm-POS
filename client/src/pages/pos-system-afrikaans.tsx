@@ -4442,10 +4442,14 @@ ${dateFilteredSales.map(sale =>
                           if (response.ok) {
                             const data = await response.json();
                             localStorage.setItem('posUser', JSON.stringify(data.user));
-                            window.location.href = '/pos/system';
+                            toast({ title: 'Taal Opgedateer', description: 'Skakel na Engels...' });
+                            setTimeout(() => { window.location.href = '/pos/system'; }, 500);
+                          } else {
+                            toast({ title: 'Fout', description: 'Kon nie taalvoorkeur opdateer nie', variant: 'destructive' });
                           }
                         } catch (error) {
                           console.error('Failed to update language preference:', error);
+                          toast({ title: 'Fout', description: 'Kon nie taalvoorkeur opdateer nie', variant: 'destructive' });
                         }
                       }}
                       className="cursor-pointer group"

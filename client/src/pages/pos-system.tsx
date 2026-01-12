@@ -5321,10 +5321,14 @@ export default function PosSystem() {
                           if (response.ok) {
                             const data = await response.json();
                             localStorage.setItem('posUser', JSON.stringify(data.user));
-                            window.location.href = '/pos/stelsel';
+                            toast({ title: 'Language Updated', description: 'Switching to Afrikaans...' });
+                            setTimeout(() => { window.location.href = '/pos/stelsel'; }, 500);
+                          } else {
+                            toast({ title: 'Error', description: 'Failed to update language preference', variant: 'destructive' });
                           }
                         } catch (error) {
                           console.error('Failed to update language preference:', error);
+                          toast({ title: 'Error', description: 'Failed to update language preference', variant: 'destructive' });
                         }
                       }}
                       className="cursor-pointer group"

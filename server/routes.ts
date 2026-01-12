@@ -325,19 +325,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update user preferred language
+  const preferredLanguageSchema = z.object({
+    preferredLanguage: z.enum(['en', 'af'], { 
+      errorMap: () => ({ message: "Language must be 'en' or 'af'" })
+    })
+  });
+  
   app.put("/api/pos/user/:id/preferred-language", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      const { preferredLanguage } = req.body;
-      
       if (isNaN(userId)) {
         return res.status(400).json({ message: "Invalid user ID" });
       }
-      if (!preferredLanguage || !['en', 'af'].includes(preferredLanguage)) {
-        return res.status(400).json({ message: "Invalid language. Must be 'en' or 'af'" });
+      
+      const validation = preferredLanguageSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: validation.error.issues[0].message });
       }
       
-      const updatedUser = await storage.updatePosUserPreferredLanguage(userId, preferredLanguage);
+      const updatedUser = await storage.updatePosUserPreferredLanguage(userId, validation.data.preferredLanguage);
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
