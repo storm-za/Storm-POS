@@ -5322,7 +5322,7 @@ export default function PosSystem() {
                             const data = await response.json();
                             localStorage.setItem('posUser', JSON.stringify(data.user));
                             toast({ title: 'Language Updated', description: 'Switching to Afrikaans...' });
-                            setTimeout(() => { window.location.href = '/pos/stelsel'; }, 500);
+                            setTimeout(() => { window.location.href = '/pos/system/afrikaans'; }, 500);
                           } else {
                             toast({ title: 'Error', description: 'Failed to update language preference', variant: 'destructive' });
                           }

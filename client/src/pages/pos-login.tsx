@@ -39,7 +39,7 @@ export default function PosLogin() {
       if (data.user.paid) {
         // Redirect based on preferred language
         if (data.user.preferredLanguage === 'af') {
-          setLocation("/pos/stelsel");
+          setLocation("/pos/system/afrikaans");
         } else {
           setLocation("/pos/system");
         }
