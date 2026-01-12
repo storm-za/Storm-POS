@@ -62,6 +62,7 @@ export interface IStorage {
   updatePosUserLogo(id: number, logo: string): Promise<PosUser | undefined>;
   updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined>;
   updatePosUserReceiptSettings(id: number, settings: any): Promise<PosUser | undefined>;
+  updatePosUserPreferredLanguage(id: number, language: string): Promise<PosUser | undefined>;
   
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
@@ -308,6 +309,15 @@ export class MemStorage implements IStorage {
     if (!user) return undefined;
     
     const updatedUser: PosUser = { ...user, receiptSettings: settings };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updatePosUserPreferredLanguage(id: number, language: string): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, preferredLanguage: language };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
   }
@@ -664,6 +674,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(posUsers)
       .set({ receiptSettings: settings })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updatePosUserPreferredLanguage(id: number, language: string): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ preferredLanguage: language })
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;

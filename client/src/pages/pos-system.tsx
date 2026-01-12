@@ -5310,7 +5310,23 @@ export default function PosSystem() {
                     <motion.div
                       whileHover={{ scale: 1.02, y: -2 }}
                       transition={{ duration: 0.2 }}
-                      onClick={() => window.location.href = '/pos/system/afrikaans'}
+                      onClick={async () => {
+                        if (!currentUser?.id) return;
+                        try {
+                          const response = await fetch(`/api/pos/user/${currentUser.id}/preferred-language`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ preferredLanguage: 'af' })
+                          });
+                          if (response.ok) {
+                            const data = await response.json();
+                            localStorage.setItem('posUser', JSON.stringify(data.user));
+                            window.location.href = '/pos/stelsel';
+                          }
+                        } catch (error) {
+                          console.error('Failed to update language preference:', error);
+                        }
+                      }}
                       className="cursor-pointer group"
                     >
                       <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
@@ -5321,7 +5337,7 @@ export default function PosSystem() {
                           </div>
                           <div className="flex-1">
                             <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Switch to Afrikaans</h3>
-                            <p className="text-gray-400 text-sm">Change your language preference</p>
+                            <p className="text-gray-400 text-sm">Change your language preference permanently</p>
                           </div>
                           <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
                         </div>

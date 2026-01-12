@@ -37,7 +37,12 @@ export default function PosLogin() {
       localStorage.setItem('posUser', JSON.stringify(data.user));
       
       if (data.user.paid) {
-        setLocation("/pos/system");
+        // Redirect based on preferred language
+        if (data.user.preferredLanguage === 'af') {
+          setLocation("/pos/stelsel");
+        } else {
+          setLocation("/pos/system");
+        }
       } else {
         setLocation("/pos/inactive");
       }

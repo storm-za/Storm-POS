@@ -324,6 +324,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user preferred language
+  app.put("/api/pos/user/:id/preferred-language", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { preferredLanguage } = req.body;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      if (!preferredLanguage || !['en', 'af'].includes(preferredLanguage)) {
+        return res.status(400).json({ message: "Invalid language. Must be 'en' or 'af'" });
+      }
+      
+      const updatedUser = await storage.updatePosUserPreferredLanguage(userId, preferredLanguage);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating preferred language:", error);
+      res.status(500).json({ message: "Failed to update preferred language" });
+    }
+  });
+
   // POS Products
   app.get("/api/pos/products", async (req, res) => {
     try {
