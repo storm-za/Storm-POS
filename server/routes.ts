@@ -160,7 +160,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyLogo: newUser.companyLogo,
           paid: newUser.paid,
           tutorialCompleted: newUser.tutorialCompleted,
-          trialStartDate: newUser.trialStartDate
+          trialStartDate: newUser.trialStartDate,
+          preferredLanguage: newUser.preferredLanguage
         }
       });
     } catch (error) {
@@ -202,7 +203,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyLogo: user.companyLogo, 
           companyName: user.companyName, 
           tutorialCompleted: user.tutorialCompleted,
-          trialStartDate: user.trialStartDate
+          trialStartDate: user.trialStartDate,
+          preferredLanguage: user.preferredLanguage
         }
       });
     } catch (error) {
