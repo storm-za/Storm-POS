@@ -1386,10 +1386,10 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
         return undefined;
       };
 
-      // Column name synonyms for flexible matching
-      const nameSynonyms = ['name', 'product name', 'productname', 'item', 'item name', 'description', 'product', 'artikel', 'produknaam', 'naam'];
-      const skuSynonyms = ['sku', 'code', 'product code', 'item code', 'barcode', 'upc', 'kode', 'produk kode'];
-      const priceSynonyms = ['price', 'retail price', 'retailprice', 'selling price', 'unit price', 'prys', 'kleinhandelprys', 'verkoopprys', 'retail', 'cost'];
+      // Column name synonyms for flexible matching - order matters, first match wins
+      const skuSynonyms = ['product id', 'productid', 'sku', 'code', 'product code', 'item code', 'barcode', 'upc', 'kode', 'produk kode', 'produk id', 'item id'];
+      const nameSynonyms = ['product name', 'productname', 'name', 'item', 'item name', 'artikel', 'produknaam', 'naam', 'product'];
+      const priceSynonyms = ['default price', 'defaultprice', 'price', 'retail price', 'retailprice', 'selling price', 'unit price', 'prys', 'kleinhandelprys', 'verkoopprys', 'retail', 'standaardprys'];
       const costSynonyms = ['cost', 'cost price', 'costprice', 'purchase price', 'buy price', 'kosprys', 'aankoopprys'];
       const tradeSynonyms = ['trade', 'trade price', 'tradeprice', 'wholesale', 'wholesale price', 'groothandelprys'];
       const qtySynonyms = ['quantity', 'qty', 'stock', 'stock quantity', 'inventory', 'count', 'hoeveelheid', 'voorraad'];

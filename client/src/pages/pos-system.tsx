@@ -7613,71 +7613,97 @@ export default function PosSystem() {
 
       {/* Excel Import Preview Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              Import {importType === 'products' ? 'Products' : 'Customers'} from Excel
-            </DialogTitle>
-            <DialogDescription>
-              Review the data before importing. Existing records with matching SKU (products) or name (customers) will be updated.
-            </DialogDescription>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="border-b border-gray-200 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center shadow-lg">
+                <FileSpreadsheet className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-gray-900">
+                  Import {importType === 'products' ? 'Products' : 'Customers'}
+                </DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Review the data before importing. Existing records will be updated.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Found {importData.length} records to import
-              </p>
-              {importPreview.length > 0 && (
+          <div className="flex-1 overflow-y-auto py-4 space-y-4">
+            <div className="bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl p-4 border border-[hsl(217,90%,40%)]/20">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
+                  <Package className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Records Found</p>
+                  <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">{importData.length}</p>
+                </div>
+              </div>
+            </div>
+            {importPreview.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                  <p className="text-sm font-medium text-gray-700">Preview (First 5 rows)</p>
+                </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-xs">
-                    <thead>
-                      <tr className="border-b">
-                        {Object.keys(importPreview[0]).slice(0, 4).map((key) => (
-                          <th key={key} className="px-2 py-1 text-left text-gray-600 font-medium">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {Object.keys(importPreview[0]).slice(0, 5).map((key) => (
+                          <th key={key} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             {key}
                           </th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100">
                       {importPreview.map((row, idx) => (
-                        <tr key={idx} className="border-b">
-                          {Object.values(row).slice(0, 4).map((val: any, i) => (
-                            <td key={i} className="px-2 py-1 text-gray-800 truncate max-w-[120px]">
-                              {String(val || '')}
+                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                          {Object.values(row).slice(0, 5).map((val: any, i) => (
+                            <td key={i} className="px-4 py-3 text-gray-700 truncate max-w-[150px]">
+                              {String(val || '-')}
                             </td>
                           ))}
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  {importData.length > 5 && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      ...and {importData.length - 5} more rows
-                    </p>
-                  )}
                 </div>
+                {importData.length > 5 && (
+                  <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 text-center">
+                    <p className="text-sm text-gray-500">...and {importData.length - 5} more rows</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsImportDialogOpen(false);
+                setImportData([]);
+                setImportPreview([]);
+              }}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleImportConfirm}
+              disabled={isImporting || importData.length === 0}
+              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg"
+            >
+              {isImporting ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Importing...
+                </span>
+              ) : (
+                `Import ${importData.length} Records`
               )}
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsImportDialogOpen(false);
-                  setImportData([]);
-                  setImportPreview([]);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleImportConfirm}
-                disabled={isImporting || importData.length === 0}
-                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-              >
-                {isImporting ? 'Importing...' : `Import ${importData.length} Records`}
-              </Button>
-            </div>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
