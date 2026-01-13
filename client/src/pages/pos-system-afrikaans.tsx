@@ -3057,11 +3057,17 @@ ${dateFilteredSales.map(sale =>
                               type="number"
                               min="0"
                               max="100"
+                              step="1"
                               placeholder="0"
-                              value={discountPercentage > 0 && ![0, 5, 10, 20, 50].includes(discountPercentage) ? discountPercentage : ""}
+                              value={discountPercentage || ""}
                               onChange={(e) => {
-                                const value = Math.min(100, Math.max(0, parseFloat(e.target.value) || 0));
-                                setDiscountPercentage(value);
+                                const inputVal = e.target.value;
+                                if (inputVal === "") {
+                                  setDiscountPercentage(0);
+                                } else {
+                                  const value = Math.min(100, Math.max(0, parseInt(inputVal) || 0));
+                                  setDiscountPercentage(value);
+                                }
                               }}
                               className="w-20 h-8 text-center bg-gray-800/50 border-gray-600 text-white"
                             />
