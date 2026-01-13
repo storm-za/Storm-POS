@@ -2648,7 +2648,7 @@ ${dateFilteredSales.map(sale =>
               />
               <button
                 onClick={() => setShowWelcomeToast(false)}
-                className="absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                className="absolute top-2 right-2 md:top-3 md:right-3 p-1 md:p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all z-20"
                 data-testid="button-close-welcome-toast-af"
               >
                 <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
