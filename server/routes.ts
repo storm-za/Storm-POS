@@ -1368,27 +1368,68 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
         return res.status(400).json({ message: "Invalid data format" });
       }
 
+      // Helper function to normalize header names for flexible matching
+      const normalizeHeader = (header: string): string => {
+        return String(header || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+      };
+
+      // Find value from row using multiple possible column names
+      const findValue = (row: any, synonyms: string[]): any => {
+        for (const key of Object.keys(row)) {
+          const normalizedKey = normalizeHeader(key);
+          for (const synonym of synonyms) {
+            if (normalizedKey === normalizeHeader(synonym) || normalizedKey.includes(normalizeHeader(synonym))) {
+              return row[key];
+            }
+          }
+        }
+        return undefined;
+      };
+
+      // Column name synonyms for flexible matching
+      const nameSynonyms = ['name', 'product name', 'productname', 'item', 'item name', 'description', 'product', 'artikel', 'produknaam', 'naam'];
+      const skuSynonyms = ['sku', 'code', 'product code', 'item code', 'barcode', 'upc', 'kode', 'produk kode'];
+      const priceSynonyms = ['price', 'retail price', 'retailprice', 'selling price', 'unit price', 'prys', 'kleinhandelprys', 'verkoopprys', 'retail', 'cost'];
+      const costSynonyms = ['cost', 'cost price', 'costprice', 'purchase price', 'buy price', 'kosprys', 'aankoopprys'];
+      const tradeSynonyms = ['trade', 'trade price', 'tradeprice', 'wholesale', 'wholesale price', 'groothandelprys'];
+      const qtySynonyms = ['quantity', 'qty', 'stock', 'stock quantity', 'inventory', 'count', 'hoeveelheid', 'voorraad'];
+      const categorySynonyms = ['category', 'type', 'group', 'kategorie', 'tipe'];
+
       const results = {
         imported: 0,
         updated: 0,
         errors: [] as string[]
       };
 
-      for (const row of data) {
+      for (let i = 0; i < data.length; i++) {
+        const row = data[i];
         try {
+          const name = findValue(row, nameSynonyms);
+          const sku = findValue(row, skuSynonyms) || '';
+          const retailPrice = findValue(row, priceSynonyms);
+          const costPrice = findValue(row, costSynonyms);
+          const tradePrice = findValue(row, tradeSynonyms);
+          const quantity = findValue(row, qtySynonyms);
+          const category = findValue(row, categorySynonyms);
+
           const productData = {
             userId,
-            sku: row['SKU'] || row['sku'] || '',
-            name: row['Product Name'] || row['name'] || '',
-            costPrice: String(row['Cost Price (R)'] || row['costPrice'] || '0'),
-            retailPrice: String(row['Retail Price (R)'] || row['retailPrice'] || '0'),
-            tradePrice: row['Trade Price (R)'] || row['tradePrice'] || undefined,
-            quantity: parseInt(row['Stock Quantity'] || row['quantity'] || '0'),
-            category: row['Category'] || row['category'] || undefined
+            sku: String(sku || '').trim(),
+            name: String(name || '').trim(),
+            costPrice: String(parseFloat(String(costPrice || retailPrice || '0').replace(/[^0-9.,]/g, '').replace(',', '.')) || '0'),
+            retailPrice: String(parseFloat(String(retailPrice || '0').replace(/[^0-9.,]/g, '').replace(',', '.')) || '0'),
+            tradePrice: tradePrice ? String(parseFloat(String(tradePrice).replace(/[^0-9.,]/g, '').replace(',', '.')) || undefined) : undefined,
+            quantity: parseInt(String(quantity || '0').replace(/[^0-9]/g, '')) || 0,
+            category: category ? String(category).trim() : undefined
           };
 
           if (!productData.name) {
-            results.errors.push(`Row missing product name`);
+            results.errors.push(`Row ${i + 2}: Missing product name`);
+            continue;
+          }
+
+          if (productData.retailPrice === '0' || productData.retailPrice === 'NaN') {
+            results.errors.push(`Row ${i + 2}: "${productData.name}" - Missing or invalid price`);
             continue;
           }
 
@@ -1404,13 +1445,17 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
             results.imported++;
           }
         } catch (err) {
-          results.errors.push(`Error processing row: ${err instanceof Error ? err.message : 'Unknown error'}`);
+          results.errors.push(`Row ${i + 2}: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
       }
 
+      const errorSummary = results.errors.length > 0 
+        ? ` (${results.errors.length} rows had issues)` 
+        : '';
+
       res.json({
         success: true,
-        message: `Import complete: ${results.imported} new, ${results.updated} updated`,
+        message: `Import complete: ${results.imported} new, ${results.updated} updated${errorSummary}`,
         ...results
       });
     } catch (error) {
