@@ -40,6 +40,7 @@ export const posUsers = pgTable("pos_users", {
   xeroRefreshToken: text("xero_refresh_token"), // XERO OAuth refresh token (encrypted)
   xeroTokenExpiry: timestamp("xero_token_expiry"), // When the access token expires
   xeroLastSync: timestamp("xero_last_sync"), // Last successful sync time
+  selectedStaffAccountId: integer("selected_staff_account_id"), // Persisted staff account selection
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

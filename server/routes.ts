@@ -260,6 +260,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save selected staff account to user profile
+  app.put("/api/pos/user/:id/staff-selection", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { staffAccountId } = req.body;
+      
+      const updatedUser = await storage.updatePosUserStaffSelection(userId, staffAccountId);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({ success: true, selectedStaffAccountId: staffAccountId });
+    } catch (error) {
+      console.error("Error updating staff selection:", error);
+      res.status(500).json({ message: "Failed to save staff selection" });
+    }
+  });
+
   // Update user tutorial completion status
   app.put("/api/pos/user/:id/tutorial", async (req, res) => {
     try {

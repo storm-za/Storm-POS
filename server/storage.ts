@@ -63,6 +63,7 @@ export interface IStorage {
   updatePosUserTutorialStatus(id: number, completed: boolean): Promise<PosUser | undefined>;
   updatePosUserReceiptSettings(id: number, settings: any): Promise<PosUser | undefined>;
   updatePosUserPreferredLanguage(id: number, language: string): Promise<PosUser | undefined>;
+  updatePosUserStaffSelection(id: number, staffAccountId: number | null): Promise<PosUser | undefined>;
   
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
@@ -318,6 +319,15 @@ export class MemStorage implements IStorage {
     if (!user) return undefined;
     
     const updatedUser: PosUser = { ...user, preferredLanguage: language };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updatePosUserStaffSelection(id: number, staffAccountId: number | null): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, selectedStaffAccountId: staffAccountId };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
   }
@@ -683,6 +693,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(posUsers)
       .set({ preferredLanguage: language })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updatePosUserStaffSelection(id: number, staffAccountId: number | null): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ selectedStaffAccountId: staffAccountId })
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;

@@ -429,6 +429,16 @@ export default function PosSystem() {
     enabled: !!currentUser,
   });
 
+  // Load saved staff account selection from user profile on mount
+  useEffect(() => {
+    if (staffAccounts.length > 0 && currentUser?.selectedStaffAccountId && !currentStaff) {
+      const savedStaff = staffAccounts.find(s => s.id === currentUser.selectedStaffAccountId);
+      if (savedStaff) {
+        setCurrentStaff(savedStaff);
+      }
+    }
+  }, [staffAccounts, currentUser?.selectedStaffAccountId, currentStaff]);
+
   // Fetch invoices
   const { data: invoices = [] } = useQuery<any[]>({
     queryKey: ["/api/pos/invoices", currentUser?.id],
@@ -917,11 +927,21 @@ export default function PosSystem() {
       const response = await apiRequest("POST", "/api/pos/staff-accounts/authenticate", credentials);
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setCurrentStaff(data.staffAccount);
       setIsStaffPasswordDialogOpen(false);
       setStaffPassword("");
       setSelectedStaffForAuth(null);
+      // Save staff selection to user profile (persists like language preference)
+      if (currentUser?.id && data.staffAccount?.id) {
+        try {
+          await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { 
+            staffAccountId: data.staffAccount.id 
+          });
+        } catch (error) {
+          console.error("Failed to save staff selection:", error);
+        }
+      }
       toast({
         title: "Welcome back",
         description: `Logged in as ${data.staffAccount.username}`,
