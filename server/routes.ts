@@ -404,13 +404,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Verify current password
-      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+      const isValidPassword = await verifyPassword(currentPassword, user.password);
       if (!isValidPassword) {
         return res.status(403).json({ message: "Current password is incorrect" });
       }
       
       // Hash new password and update
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      const hashedNewPassword = await hashPassword(newPassword);
       const updatedUser = await storage.updatePosUserPassword(userId, hashedNewPassword);
       
       if (!updatedUser) {
