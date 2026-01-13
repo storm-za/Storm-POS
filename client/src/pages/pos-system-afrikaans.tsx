@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash
+  AlertTriangle, XCircle, Tag, Hash, Lock
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -113,6 +113,11 @@ export default function PosSystemAfrikaans() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
@@ -4531,6 +4536,28 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     </motion.div>
 
+                    {/* Change Password Setting */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setIsChangePasswordDialogOpen(true)}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                            <Lock className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Verander Wagwoord</h3>
+                            <p className="text-gray-400 text-sm">Werk jou aanmeld-wagwoord veilig op</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+
                     {/* Language Setting */}
                     <motion.div
                       whileHover={{ scale: 1.02, y: -2 }}
@@ -6932,6 +6959,117 @@ ${dateFilteredSales.map(sale =>
                 )}
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Change Password Dialog */}
+        <Dialog open={isChangePasswordDialogOpen} onOpenChange={(open) => {
+          setIsChangePasswordDialogOpen(open);
+          if (!open) {
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmNewPassword("");
+          }
+        }}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5 text-[hsl(217,90%,40%)]" />
+                Verander Wagwoord
+              </DialogTitle>
+              <DialogDescription>
+                Voer jou huidige wagwoord en 'n nuwe wagwoord in om jou aanmeldbesonderhede op te dateer.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!currentUser?.id) return;
+              
+              if (newPassword !== confirmNewPassword) {
+                toast({ title: "Fout", description: "Nuwe wagwoorde stem nie ooreen nie", variant: "destructive" });
+                return;
+              }
+              
+              if (newPassword.length < 6) {
+                toast({ title: "Fout", description: "Nuwe wagwoord moet minstens 6 karakters wees", variant: "destructive" });
+                return;
+              }
+              
+              setIsChangingPassword(true);
+              try {
+                const response = await fetch(`/api/pos/user/${currentUser.id}/change-password`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ currentPassword, newPassword })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                  toast({ title: "Sukses", description: "Wagwoord suksesvol verander" });
+                  setIsChangePasswordDialogOpen(false);
+                  setCurrentPassword("");
+                  setNewPassword("");
+                  setConfirmNewPassword("");
+                } else {
+                  toast({ title: "Fout", description: data.message || "Kon nie wagwoord verander nie", variant: "destructive" });
+                }
+              } catch (error) {
+                toast({ title: "Fout", description: "Kon nie wagwoord verander nie", variant: "destructive" });
+              } finally {
+                setIsChangingPassword(false);
+              }
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Huidige Wagwoord</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Voer jou huidige wagwoord in"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nuwe Wagwoord</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Voer nuwe wagwoord in (min. 6 karakters)"
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmNewPassword">Bevestig Nuwe Wagwoord</Label>
+                <Input
+                  id="confirmNewPassword"
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  placeholder="Bevestig nuwe wagwoord"
+                  required
+                />
+                {newPassword && confirmNewPassword && newPassword !== confirmNewPassword && (
+                  <p className="text-sm text-red-500">Wagwoorde stem nie ooreen nie</p>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)}>
+                  Kanselleer
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isChangingPassword || !currentPassword || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                >
+                  {isChangingPassword ? "Besig..." : "Verander Wagwoord"}
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
