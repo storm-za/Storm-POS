@@ -1373,12 +1373,35 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
         return String(header || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
       };
 
-      // Find value from row using multiple possible column names
-      const findValue = (row: any, synonyms: string[]): any => {
-        for (const key of Object.keys(row)) {
+      // Find value from row using multiple possible column names - exact match first, then partial
+      const findValue = (row: any, synonyms: string[], excludePatterns: string[] = []): any => {
+        const keys = Object.keys(row);
+        
+        // First pass: exact matches only (most reliable)
+        for (const key of keys) {
           const normalizedKey = normalizeHeader(key);
+          // Skip if key matches any exclude pattern
+          if (excludePatterns.some(pattern => normalizedKey.includes(normalizeHeader(pattern)))) {
+            continue;
+          }
           for (const synonym of synonyms) {
-            if (normalizedKey === normalizeHeader(synonym) || normalizedKey.includes(normalizeHeader(synonym))) {
+            if (normalizedKey === normalizeHeader(synonym)) {
+              return row[key];
+            }
+          }
+        }
+        
+        // Second pass: partial matches (less reliable, but useful for variations)
+        for (const key of keys) {
+          const normalizedKey = normalizeHeader(key);
+          // Skip if key matches any exclude pattern
+          if (excludePatterns.some(pattern => normalizedKey.includes(normalizeHeader(pattern)))) {
+            continue;
+          }
+          for (const synonym of synonyms) {
+            const normalizedSynonym = normalizeHeader(synonym);
+            // Only allow partial match if synonym is long enough to be specific (4+ chars)
+            if (normalizedSynonym.length >= 4 && normalizedKey.includes(normalizedSynonym)) {
               return row[key];
             }
           }
@@ -1386,9 +1409,9 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
         return undefined;
       };
 
-      // Column name synonyms for flexible matching - order matters, first match wins
+      // Column name synonyms for flexible matching
       const skuSynonyms = ['product id', 'productid', 'sku', 'code', 'product code', 'item code', 'barcode', 'upc', 'kode', 'produk kode', 'produk id', 'item id'];
-      const nameSynonyms = ['product name', 'productname', 'name', 'item', 'item name', 'artikel', 'produknaam', 'naam', 'product'];
+      const nameSynonyms = ['product name', 'productname', 'item name', 'itemname', 'artikel', 'produknaam', 'naam', 'name'];
       const priceSynonyms = ['default price', 'defaultprice', 'price', 'retail price', 'retailprice', 'selling price', 'unit price', 'prys', 'kleinhandelprys', 'verkoopprys', 'retail', 'standaardprys'];
       const costSynonyms = ['cost', 'cost price', 'costprice', 'purchase price', 'buy price', 'kosprys', 'aankoopprys'];
       const tradeSynonyms = ['trade', 'trade price', 'tradeprice', 'wholesale', 'wholesale price', 'groothandelprys'];
@@ -1404,7 +1427,7 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
         try {
-          const name = findValue(row, nameSynonyms);
+          const name = findValue(row, nameSynonyms, ['productid', 'product id', 'itemid', 'item id']);
           const sku = findValue(row, skuSynonyms) || '';
           const retailPrice = findValue(row, priceSynonyms);
           const costPrice = findValue(row, costSynonyms);
