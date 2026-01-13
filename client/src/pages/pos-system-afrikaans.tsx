@@ -4892,7 +4892,7 @@ ${dateFilteredSales.map(sale =>
                       type="button" 
                       variant="outline" 
                       onClick={() => setIsProductDialogOpen(false)}
-                      className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-5"
+                      className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5"
                     >
                       Kanselleer
                     </Button>
