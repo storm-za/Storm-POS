@@ -3051,6 +3051,22 @@ ${dateFilteredSales.map(sale =>
                               </Button>
                             ))}
                           </div>
+                          <div className="flex items-center gap-2 mt-3">
+                            <span className="text-sm text-gray-400">Eie:</span>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              placeholder="0"
+                              value={discountPercentage > 0 && ![0, 5, 10, 20, 50].includes(discountPercentage) ? discountPercentage : ""}
+                              onChange={(e) => {
+                                const value = Math.min(100, Math.max(0, parseFloat(e.target.value) || 0));
+                                setDiscountPercentage(value);
+                              }}
+                              className="w-20 h-8 text-center bg-gray-800/50 border-gray-600 text-white"
+                            />
+                            <span className="text-sm text-gray-400">%</span>
+                          </div>
                         </div>
 
                         {/* Tip Option Section */}
