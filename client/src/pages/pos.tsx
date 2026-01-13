@@ -12,7 +12,7 @@ import {
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
 import deviceMockup from "@assets/STORM__16_-removebg-preview_1761854439596.png";
-import laptopMockup from "@assets/STORM__17_-removebg-preview_1761855220519.png";
+import laptopMockup from "@assets/STORM_(3)_1768301814534.png";
 import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
 import laptopScene from "@assets/STORM (500 x 250 px) (1)_1761857579860.png";
 import mobileScene from "@assets/STORM (19)_1761857582315.png";
@@ -235,13 +235,22 @@ export default function POS() {
                       src={laptopMockup}
                       alt="Storm POS Dashboard"
                       className="w-full h-auto relative z-10"
+                      initial={{ opacity: 0, scale: 0.9, rotateY: -15 }}
                       animate={{ 
-                        y: [0, -8, 0]
+                        opacity: 1,
+                        scale: 1,
+                        rotateY: 0,
+                        y: [0, -12, 0]
                       }}
                       transition={{ 
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut"
+                        opacity: { duration: 0.8 },
+                        scale: { duration: 1, ease: "easeOut" },
+                        rotateY: { duration: 1.2, ease: "easeOut" },
+                        y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }
+                      }}
+                      whileHover={{ 
+                        scale: 1.02,
+                        transition: { duration: 0.3 }
                       }}
                     />
                   </div>
