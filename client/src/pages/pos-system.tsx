@@ -1051,23 +1051,45 @@ export default function PosSystem() {
   // Excel Import Handlers
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'products' | 'customers') => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
+
+    console.log("File selected:", file.name, file.type, file.size);
+    toast({
+      title: "Reading File",
+      description: `Processing ${file.name}...`,
+    });
 
     try {
       const buffer = await file.arrayBuffer();
+      console.log("Buffer size:", buffer.byteLength);
       const workbook = XLSX.read(buffer, { type: 'array' });
+      console.log("Workbook sheets:", workbook.SheetNames);
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
+      console.log("Parsed data rows:", data.length, "Sample:", data[0]);
       
+      if (data.length === 0) {
+        toast({
+          title: "No Data Found",
+          description: "The file appears to be empty or has no readable data. Make sure your file has headers in the first row.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setImportType(type);
       setImportData(data);
       setImportPreview(data.slice(0, 5)); // Preview first 5 rows
       setIsImportDialogOpen(true);
     } catch (error) {
+      console.error("Import error:", error);
       toast({
         title: "Import Error",
-        description: "Failed to read the Excel file. Please check the file format.",
+        description: "Failed to read the file. Please check the file format and try again.",
         variant: "destructive",
       });
     }

@@ -2203,23 +2203,45 @@ ${dateFilteredSales.map(sale =>
   // Excel Import Handlers
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'products' | 'customers') => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log("Geen lêer gekies nie");
+      return;
+    }
+
+    console.log("Lêer gekies:", file.name, file.type, file.size);
+    toast({
+      title: "Lees Lêer",
+      description: `Verwerk ${file.name}...`,
+    });
 
     try {
       const buffer = await file.arrayBuffer();
+      console.log("Buffer grootte:", buffer.byteLength);
       const workbook = XLSX.read(buffer, { type: 'array' });
+      console.log("Werkboek blaaie:", workbook.SheetNames);
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
+      console.log("Ontlede data rye:", data.length, "Voorbeeld:", data[0]);
       
+      if (data.length === 0) {
+        toast({
+          title: "Geen Data Gevind",
+          description: "Die lêer lyk leeg of het geen leesbare data nie. Maak seker jou lêer het opskrifte in die eerste ry.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setImportType(type);
       setImportData(data);
       setImportPreview(data.slice(0, 5)); // Preview first 5 rows
       setIsImportDialogOpen(true);
     } catch (error) {
+      console.error("Invoer fout:", error);
       toast({
         title: "Invoerfout",
-        description: "Kon nie die Excel-lêer lees nie. Kontroleer asseblief die lêerformaat.",
+        description: "Kon nie die lêer lees nie. Kontroleer asseblief die lêerformaat en probeer weer.",
         variant: "destructive",
       });
     }
