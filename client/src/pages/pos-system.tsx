@@ -3824,8 +3824,11 @@ export default function PosSystem() {
                             Export Products
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-gray-700" />
-                          <DropdownMenuItem asChild className="text-gray-200 hover:bg-gray-800">
-                            <label className="cursor-pointer flex items-center">
+                          <DropdownMenuItem 
+                            className="text-gray-200 hover:bg-gray-800 cursor-pointer"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <label className="cursor-pointer flex items-center w-full">
                               <Upload className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                               Import Products
                               <input
@@ -4165,8 +4168,11 @@ export default function PosSystem() {
                         Export Customers
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <label className="cursor-pointer flex items-center">
+                      <DropdownMenuItem 
+                        className="cursor-pointer"
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <label className="cursor-pointer flex items-center w-full">
                           <Upload className="h-4 w-4 mr-2" />
                           Import Customers
                           <input

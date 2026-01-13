@@ -3185,8 +3185,11 @@ ${dateFilteredSales.map(sale =>
                             Voer Produkte Uit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-gray-700" />
-                          <DropdownMenuItem asChild className="text-gray-200 hover:bg-gray-800">
-                            <label className="cursor-pointer flex items-center">
+                          <DropdownMenuItem 
+                            className="text-gray-200 hover:bg-gray-800 cursor-pointer"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <label className="cursor-pointer flex items-center w-full">
                               <Upload className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                               Voer Produkte In
                               <input
@@ -3410,8 +3413,11 @@ ${dateFilteredSales.map(sale =>
                           Voer Kliënte Uit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <label className="cursor-pointer flex items-center">
+                        <DropdownMenuItem 
+                          className="cursor-pointer"
+                          onSelect={(e) => e.preventDefault()}
+                        >
+                          <label className="cursor-pointer flex items-center w-full">
                             <Upload className="h-4 w-4 mr-2" />
                             Voer Kliënte In
                             <input
