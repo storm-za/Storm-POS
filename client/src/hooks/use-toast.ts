@@ -6,13 +6,16 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 300
+const TOAST_AUTO_DISMISS_DEFAULT = 2000
+const TOAST_AUTO_DISMISS_ERROR = 4000
 
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  duration?: number
 }
 
 const actionTypes = {
@@ -139,7 +142,7 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+function toast({ duration, ...props }: Toast) {
   const id = genId()
 
   const update = (props: ToasterToast) =>
@@ -160,6 +163,12 @@ function toast({ ...props }: Toast) {
       },
     },
   })
+
+  const autoDismissDelay = duration ?? (props.variant === 'destructive' ? TOAST_AUTO_DISMISS_ERROR : TOAST_AUTO_DISMISS_DEFAULT)
+  
+  setTimeout(() => {
+    dismiss()
+  }, autoDismissDelay)
 
   return {
     id: id,
