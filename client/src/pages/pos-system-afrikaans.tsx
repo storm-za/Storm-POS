@@ -1597,6 +1597,10 @@ export default function PosSystemAfrikaans() {
           await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { 
             staffAccountId: data.staffAccount.id 
           });
+          // Update localStorage and currentUser with new staff selection
+          const updatedUser = { ...currentUser, selectedStaffAccountId: data.staffAccount.id };
+          localStorage.setItem('posUser', JSON.stringify(updatedUser));
+          setCurrentUser(updatedUser);
         } catch (error) {
           console.error("Failed to save staff selection:", error);
         }
