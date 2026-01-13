@@ -95,6 +95,7 @@ export default function PosSystemAfrikaans() {
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+  const [showDeleteAllProductsConfirm, setShowDeleteAllProductsConfirm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
@@ -1231,6 +1232,28 @@ export default function PosSystemAfrikaans() {
       toast({
         title: "Fout",
         description: error.message || "Kon nie produk verwyder nie",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteAllProductsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", `/api/pos/products/all/${currentUser?.id}`, {});
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+      setShowDeleteAllProductsConfirm(false);
+      toast({
+        title: "Alle produkte verwyder",
+        description: `${data.deleted || 0} produkte is verwyder.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Kon nie alle produkte verwyder nie",
         variant: "destructive",
       });
     },
@@ -3200,8 +3223,37 @@ ${dateFilteredSales.map(sale =>
                               />
                             </label>
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-gray-700" />
+                          <DropdownMenuItem 
+                            onClick={() => setShowDeleteAllProductsConfirm(true)}
+                            className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Verwyder Alle Produkte
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      
+                      <AlertDialog open={showDeleteAllProductsConfirm} onOpenChange={setShowDeleteAllProductsConfirm}>
+                        <AlertDialogContent className="bg-gray-900 border-gray-700">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-white">Verwyder Alle Produkte?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-400">
+                              Hierdie aksie kan nie ongedaan gemaak word nie. Alle {products?.length || 0} produkte sal permanent van jou voorraad verwyder word.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700">Kanselleer</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteAllProductsMutation.mutate()}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                              disabled={deleteAllProductsMutation.isPending}
+                            >
+                              {deleteAllProductsMutation.isPending ? "Besig om te verwyder..." : "Verwyder Alles"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
                         <PlusCircle className="h-4 w-4 mr-2" />
                         Voeg Produk By

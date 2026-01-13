@@ -425,6 +425,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete all products for a user
+  app.delete("/api/pos/products/all/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const products = await storage.getPosProducts(userId);
+      let deleted = 0;
+      for (const product of products) {
+        await storage.deletePosProduct(product.id);
+        deleted++;
+      }
+      res.json({ success: true, deleted });
+    } catch (error) {
+      console.error("Error deleting all products:", error);
+      res.status(500).json({ message: "Failed to delete all products" });
+    }
+  });
+
   // POS Customers
   app.get("/api/pos/customers", async (req, res) => {
     try {

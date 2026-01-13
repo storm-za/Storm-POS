@@ -93,6 +93,7 @@ export default function PosSystem() {
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
+  const [showDeleteAllProductsConfirm, setShowDeleteAllProductsConfirm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
@@ -572,6 +573,28 @@ export default function PosSystem() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteAllProductsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", `/api/pos/products/all/${currentUser?.id}`, {});
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+      setShowDeleteAllProductsConfirm(false);
+      toast({
+        title: "All products deleted",
+        description: `${data.deleted || 0} products have been removed.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete all products",
         variant: "destructive",
       });
     },
@@ -3839,8 +3862,37 @@ export default function PosSystem() {
                               />
                             </label>
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-gray-700" />
+                          <DropdownMenuItem 
+                            onClick={() => setShowDeleteAllProductsConfirm(true)}
+                            className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete All Products
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
+                      
+                      <AlertDialog open={showDeleteAllProductsConfirm} onOpenChange={setShowDeleteAllProductsConfirm}>
+                        <AlertDialogContent className="bg-gray-900 border-gray-700">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-white">Delete All Products?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-400">
+                              This action cannot be undone. All {products?.length || 0} products will be permanently deleted from your inventory.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteAllProductsMutation.mutate()}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                              disabled={deleteAllProductsMutation.isPending}
+                            >
+                              {deleteAllProductsMutation.isPending ? "Deleting..." : "Delete All"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                         <DialogTrigger asChild>
                           <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
