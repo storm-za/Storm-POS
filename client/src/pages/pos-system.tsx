@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle
+  AlertTriangle, XCircle, Tag, Hash
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -3900,116 +3900,198 @@ export default function PosSystem() {
                             Add Product
                           </Button>
                         </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]" aria-describedby="product-dialog-description">
-                      <DialogHeader>
-                        <DialogTitle>
-                          {editingProduct ? 'Edit Product' : 'Add New Product'}
-                        </DialogTitle>
-                        <div id="product-dialog-description" className="text-sm text-gray-600">
-                          {editingProduct ? 'Update the product information below.' : 'Enter the details for the new product.'}
-                        </div>
-                      </DialogHeader>
-                      <Form {...productForm}>
-                        <form 
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            console.log("Form submit event triggered");
-                            productForm.handleSubmit(handleProductSubmit)(e);
-                          }} 
-                          className="space-y-4"
-                        >
-                          <FormField
-                            control={productForm.control}
-                            name="sku"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>SKU</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="e.g., PROD001" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={productForm.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Product Name</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="e.g., Coffee - Espresso" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={productForm.control}
-                            name="costPrice"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Cost Price (R)</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="e.g., 12.00" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={productForm.control}
-                            name="retailPrice"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Retail Price (R)</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="e.g., 25.00" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={productForm.control}
-                            name="tradePrice"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Trade Price (R) - Optional</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="e.g., 20.00" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={productForm.control}
-                            name="quantity"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Stock Quantity</FormLabel>
-                                <FormControl>
-                                  <Input type="number" placeholder="e.g., 50" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <div className="flex justify-end space-x-2">
-                            <Button type="button" variant="outline" onClick={() => setIsProductDialogOpen(false)}>
-                              Cancel
-                            </Button>
-                            <Button 
-                              type="submit" 
-                              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                              disabled={createProductMutation.isPending || updateProductMutation.isPending}
-                            >
-                              {editingProduct ? 'Update Product' : 'Add Product'}
-                            </Button>
+                    <DialogContent className="sm:max-w-[560px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden" aria-describedby="product-dialog-description">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
+                      <div className="relative">
+                        <div className="px-6 pt-6 pb-4 border-b border-gray-700/50">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                              <Package className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <DialogTitle className="text-xl font-bold text-white">
+                                {editingProduct ? 'Edit Product' : 'Add New Product'}
+                              </DialogTitle>
+                              <p id="product-dialog-description" className="text-sm text-gray-400 mt-0.5">
+                                {editingProduct ? 'Update the product information below.' : 'Enter the details to add a new product to your inventory.'}
+                              </p>
+                            </div>
                           </div>
-                        </form>
-                      </Form>
+                        </div>
+                        
+                        <Form {...productForm}>
+                          <form 
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              productForm.handleSubmit(handleProductSubmit)(e);
+                            }} 
+                            className="px-6 py-5 space-y-5"
+                          >
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={productForm.control}
+                                name="sku"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                      <Tag className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                                      SKU / Code
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        placeholder="e.g., PROD001" 
+                                        {...field} 
+                                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={productForm.control}
+                                name="quantity"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                      <Hash className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                                      Stock Qty
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        type="number" 
+                                        placeholder="e.g., 50" 
+                                        {...field} 
+                                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <FormField
+                              control={productForm.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                    <Package className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                                    Product Name
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="e.g., Coffee - Espresso" 
+                                      {...field} 
+                                      className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <div className="pt-2">
+                              <div className="flex items-center gap-2 mb-3">
+                                <DollarSign className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                <span className="text-sm font-medium text-gray-300">Pricing</span>
+                                <div className="flex-1 h-px bg-gray-700/50"></div>
+                              </div>
+                              <div className="grid grid-cols-3 gap-3">
+                                <FormField
+                                  control={productForm.control}
+                                  name="costPrice"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="text-gray-400 text-xs font-medium">Cost Price</FormLabel>
+                                      <FormControl>
+                                        <div className="relative">
+                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <Input 
+                                            placeholder="0.00" 
+                                            {...field} 
+                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                          />
+                                        </div>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={productForm.control}
+                                  name="retailPrice"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="text-gray-400 text-xs font-medium">Retail Price</FormLabel>
+                                      <FormControl>
+                                        <div className="relative">
+                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <Input 
+                                            placeholder="0.00" 
+                                            {...field} 
+                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                          />
+                                        </div>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={productForm.control}
+                                  name="tradePrice"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel className="text-gray-400 text-xs font-medium">Trade Price</FormLabel>
+                                      <FormControl>
+                                        <div className="relative">
+                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <Input 
+                                            placeholder="0.00" 
+                                            {...field} 
+                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                          />
+                                        </div>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsProductDialogOpen(false)}
+                                className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-5"
+                              >
+                                Cancel
+                              </Button>
+                              <Button 
+                                type="submit" 
+                                className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 px-6"
+                                disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                              >
+                                {createProductMutation.isPending || updateProductMutation.isPending ? (
+                                  <span className="flex items-center gap-2">
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                    Saving...
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-2">
+                                    {editingProduct ? <Check className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
+                                    {editingProduct ? 'Update Product' : 'Add Product'}
+                                  </span>
+                                )}
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
+                      </div>
                     </DialogContent>
                   </Dialog>
                   </div>
