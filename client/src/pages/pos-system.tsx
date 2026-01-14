@@ -3559,11 +3559,42 @@ export default function PosSystem() {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2 text-white">
-                      <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-                      <span>Products</span>
-                    </CardTitle>
+                  <CardHeader className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center space-x-2 text-white">
+                        <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
+                        <span>Products</span>
+                      </CardTitle>
+                      {/* Display Mode Toggle */}
+                      {categories.length > 0 && (
+                        <div className="flex items-center gap-2 bg-gray-900/50 rounded-lg p-1">
+                          <button
+                            onClick={() => { setSalesDisplayMode('grid'); setSelectedSalesCategory(null); }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                              salesDisplayMode === 'grid' 
+                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            <Grid3X3 className="w-3.5 h-3.5" />
+                            Grid
+                          </button>
+                          <button
+                            onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                              salesDisplayMode === 'tabs' 
+                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            <LayoutList className="w-3.5 h-3.5" />
+                            Tabs
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Search Bar - Always visible */}
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
@@ -3573,10 +3604,126 @@ export default function PosSystem() {
                         className="pl-10"
                       />
                     </div>
+
+                    {/* Category Tabs (when in tabs mode) */}
+                    {salesDisplayMode === 'tabs' && categories.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setSalesCategoryFilter('all')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                            salesCategoryFilter === 'all'
+                              ? 'bg-[hsl(217,90%,40%)] text-white'
+                              : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
+                          }`}
+                        >
+                          All
+                        </button>
+                        {categories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            onClick={() => setSalesCategoryFilter(cat.id)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                              salesCategoryFilter === cat.id
+                                ? 'text-white shadow-lg'
+                                : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
+                            }`}
+                            style={salesCategoryFilter === cat.id ? { backgroundColor: cat.color || '#3b82f6' } : {}}
+                          >
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent className="max-h-96 overflow-y-auto">
-                    <div className="grid gap-2">
-                      {filteredSalesProducts.map((product) => (
+                    {/* Grid Mode: Category Cards */}
+                    {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* All Products Card */}
+                        <div
+                          onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
+                          className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
+                        >
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="w-12 h-12 rounded-xl bg-gray-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Package className="w-6 h-6 text-gray-300" />
+                            </div>
+                            <span className="font-medium text-white text-sm">All Products</span>
+                            <span className="text-xs text-gray-400">{products.length} items</span>
+                          </div>
+                        </div>
+                        {/* Category Cards */}
+                        {categories.map((cat) => (
+                          <div
+                            key={cat.id}
+                            onClick={() => { setSelectedSalesCategory(cat.id); }}
+                            className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
+                            style={{ borderColor: `${cat.color}30` }}
+                          >
+                            <div className="flex flex-col items-center gap-2">
+                              <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
+                                style={{ backgroundColor: `${cat.color}30` }}
+                              >
+                                <Folder className="w-6 h-6" style={{ color: cat.color || '#3b82f6' }} />
+                              </div>
+                              <span className="font-medium text-white text-sm">{cat.name}</span>
+                              <span className="text-xs text-gray-400">{products.filter(p => p.categoryId === cat.id).length} items</span>
+                            </div>
+                          </div>
+                        ))}
+                        {/* Uncategorized Card */}
+                        {products.some(p => !p.categoryId) && (
+                          <div
+                            onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter(0 as any); }}
+                            className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
+                          >
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="w-12 h-12 rounded-xl bg-gray-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Folder className="w-6 h-6 text-gray-400" />
+                              </div>
+                              <span className="font-medium text-white text-sm">Uncategorized</span>
+                              <span className="text-xs text-gray-400">{products.filter(p => !p.categoryId).length} items</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
+                      /* Grid Mode: Products in selected category */
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => setSelectedSalesCategory(null)}
+                          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Back to Categories
+                        </button>
+                        <div className="grid gap-2">
+                          {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
+                            <div
+                              key={product.id}
+                              className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
+                              onClick={() => addToSale(product)}
+                            >
+                              <div>
+                                <p className="font-medium text-white">{product.name}</p>
+                                <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                                <p className="text-sm text-gray-400">Stock: {product.quantity}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-blue-400">
+                                  R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      /* Tabs Mode or No Categories: Regular product list */
+                      <div className="grid gap-2">
+                        {filteredSalesProducts.map((product) => (
                         <div
                           key={product.id}
                           className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
@@ -3601,7 +3748,8 @@ export default function PosSystem() {
                           </div>
                         </div>
                       ))}
-                    </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
