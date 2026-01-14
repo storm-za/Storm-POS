@@ -8,7 +8,8 @@ import {
   insertPosSaleSchema,
   insertPosOpenAccountSchema,
   insertPosInvoiceSchema,
-  signupPosUserSchema
+  signupPosUserSchema,
+  insertPosCategorySchema
 } from "@shared/schema";
 import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail } from "./email";
 import { z } from "zod";
@@ -421,6 +422,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error changing password:", error);
       res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
+  // POS Categories
+  app.get("/api/pos/categories", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const categories = await storage.getPosCategories(userId);
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  app.post("/api/pos/categories", async (req, res) => {
+    try {
+      const { userId, ...categoryData } = req.body;
+      const validatedData = insertPosCategorySchema.parse({
+        ...categoryData,
+        userId: userId || 1,
+      });
+      const category = await storage.createPosCategory(validatedData);
+      res.json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      res.status(500).json({ message: "Failed to create category" });
+    }
+  });
+
+  app.put("/api/pos/categories/:id", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const { userId, ...categoryData } = req.body;
+      const category = await storage.updatePosCategory(categoryId, categoryData);
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+      res.json(category);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      res.status(500).json({ message: "Failed to update category" });
+    }
+  });
+
+  app.delete("/api/pos/categories/:id", async (req, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      const success = await storage.deletePosCategory(categoryId);
+      if (!success) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      res.status(500).json({ message: "Failed to delete category" });
+    }
+  });
+
+  // Update sales display mode
+  app.put("/api/pos/users/:id/display-mode", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { mode } = req.body;
+      if (!['grid', 'tabs'].includes(mode)) {
+        return res.status(400).json({ message: "Invalid display mode" });
+      }
+      const user = await storage.updatePosUserSalesDisplayMode(userId, mode);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating display mode:", error);
+      res.status(500).json({ message: "Failed to update display mode" });
     }
   });
 

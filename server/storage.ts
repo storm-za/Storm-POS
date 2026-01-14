@@ -1,12 +1,13 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings, posCategories,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
   type PosOpenAccount, type InsertPosOpenAccount, type PosInvoice, type InsertPosInvoice,
   type PosSavedPaymentDetails, type InsertPosSavedPaymentDetails,
   type PosStaffAccount, type InsertPosStaffAccount,
-  type SystemSetting, type InsertSystemSetting
+  type SystemSetting, type InsertSystemSetting,
+  type PosCategory, type InsertPosCategory
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -66,10 +67,20 @@ export interface IStorage {
   updatePosUserStaffSelection(id: number, staffAccountId: number | null): Promise<PosUser | undefined>;
   updatePosUserPassword(id: number, hashedPassword: string): Promise<PosUser | undefined>;
   
+  // Category Operations
+  getPosCategories(userId: number): Promise<PosCategory[]>;
+  createPosCategory(category: InsertPosCategory): Promise<PosCategory>;
+  updatePosCategory(id: number, category: Partial<PosCategory>): Promise<PosCategory | undefined>;
+  deletePosCategory(id: number): Promise<boolean>;
+  
+  // Product Operations
   getPosProducts(userId: number): Promise<PosProduct[]>;
   createPosProduct(product: InsertPosProduct): Promise<PosProduct>;
   updatePosProduct(id: number, product: Partial<PosProduct>): Promise<PosProduct | undefined>;
   deletePosProduct(id: number): Promise<boolean>;
+  
+  // Display Mode Operations
+  updatePosUserSalesDisplayMode(id: number, mode: string): Promise<PosUser | undefined>;
   
   getPosCustomers(userId: number): Promise<PosCustomer[]>;
   createPosCustomer(customer: InsertPosCustomer): Promise<PosCustomer>;
@@ -340,6 +351,32 @@ export class MemStorage implements IStorage {
     const updatedUser: PosUser = { ...user, password: hashedPassword };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async updatePosUserSalesDisplayMode(id: number, mode: string): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, salesDisplayMode: mode };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  // Category stub methods (MemStorage - not used in production)
+  async getPosCategories(userId: number): Promise<PosCategory[]> {
+    return [];
+  }
+
+  async createPosCategory(category: InsertPosCategory): Promise<PosCategory> {
+    throw new Error("MemStorage: Categories not supported");
+  }
+
+  async updatePosCategory(id: number, category: Partial<PosCategory>): Promise<PosCategory | undefined> {
+    return undefined;
+  }
+
+  async deletePosCategory(id: number): Promise<boolean> {
+    return false;
   }
 
   // POS Product Methods
@@ -724,6 +761,42 @@ export class DatabaseStorage implements IStorage {
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;
+  }
+
+  async updatePosUserSalesDisplayMode(id: number, mode: string): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ salesDisplayMode: mode })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  // Category Methods
+  async getPosCategories(userId: number): Promise<PosCategory[]> {
+    return db.select().from(posCategories).where(eq(posCategories.userId, userId));
+  }
+
+  async createPosCategory(insertCategory: InsertPosCategory): Promise<PosCategory> {
+    const [category] = await db
+      .insert(posCategories)
+      .values(insertCategory)
+      .returning();
+    return category;
+  }
+
+  async updatePosCategory(id: number, updates: Partial<PosCategory>): Promise<PosCategory | undefined> {
+    const [category] = await db
+      .update(posCategories)
+      .set(updates)
+      .where(eq(posCategories.id, id))
+      .returning();
+    return category || undefined;
+  }
+
+  async deletePosCategory(id: number): Promise<boolean> {
+    const result = await db.delete(posCategories).where(eq(posCategories.id, id));
+    return result.rowCount > 0;
   }
 
   async getPosProducts(userId: number): Promise<PosProduct[]> {

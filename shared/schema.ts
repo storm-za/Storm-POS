@@ -41,6 +41,7 @@ export const posUsers = pgTable("pos_users", {
   xeroTokenExpiry: timestamp("xero_token_expiry"), // When the access token expires
   xeroLastSync: timestamp("xero_last_sync"), // Last successful sync time
   selectedStaffAccountId: integer("selected_staff_account_id"), // Persisted staff account selection
+  salesDisplayMode: text("sales_display_mode").notNull().default("grid"), // 'grid' or 'tabs' for category display
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -54,9 +55,21 @@ export const posStaffAccounts = pgTable("pos_staff_accounts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Product categories for organizing products
+export const posCategories = pgTable("pos_categories", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(),
+  icon: text("icon").notNull().default("Package"), // Lucide icon name
+  color: text("color").notNull().default("blue"), // Tailwind color name
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const posProducts = pgTable("pos_products", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
+  categoryId: integer("category_id").references(() => posCategories.id, { onDelete: 'set null' }),
   sku: text("sku").notNull(),
   name: text("name").notNull(),
   costPrice: decimal("cost_price", { precision: 10, scale: 2 }).notNull().default("0.00"),
@@ -171,6 +184,11 @@ export const signupPosUserSchema = createInsertSchema(posUsers).pick({
   password: true,
   companyName: true,
   preferredLanguage: true,
+});
+
+export const insertPosCategorySchema = createInsertSchema(posCategories).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertPosProductSchema = createInsertSchema(posProducts).omit({
@@ -288,6 +306,8 @@ export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertPosUser = z.infer<typeof insertPosUserSchema>;
 export type SignupPosUser = z.infer<typeof signupPosUserSchema>;
 export type PosUser = typeof posUsers.$inferSelect;
+export type InsertPosCategory = z.infer<typeof insertPosCategorySchema>;
+export type PosCategory = typeof posCategories.$inferSelect;
 export type InsertPosProduct = z.infer<typeof insertPosProductSchema>;
 export type PosProduct = typeof posProducts.$inferSelect;
 export type InsertPosCustomer = z.infer<typeof insertPosCustomerSchema>;
