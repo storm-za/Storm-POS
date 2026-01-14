@@ -16,14 +16,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount, type PosCategory, type InsertPosCategory } from "@shared/schema";
 import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock
+  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -187,6 +187,17 @@ export default function PosSystem() {
   const [isConnectingXero, setIsConnectingXero] = useState(false);
   const [isSyncingXero, setIsSyncingXero] = useState(false);
   
+  // Category system state
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<PosCategory | null>(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryIcon, setCategoryIcon] = useState("folder");
+  const [categoryColor, setCategoryColor] = useState("#3b82f6");
+  const [productCategoryFilter, setProductCategoryFilter] = useState<number | "all">("all");
+  const [salesDisplayMode, setSalesDisplayMode] = useState<'grid' | 'tabs'>('tabs');
+  const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
+  const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | "all">("all");
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -328,6 +339,7 @@ export default function PosSystem() {
     retailPrice: z.string().min(1, "Retail price is required"),
     tradePrice: z.string().optional(),
     quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
+    categoryId: z.coerce.number().nullable().optional(),
   });
 
   // Customer form schema - exclude userId since we'll add it in the mutation
@@ -349,6 +361,7 @@ export default function PosSystem() {
       retailPrice: "",
       tradePrice: "",
       quantity: 0,
+      categoryId: null,
     },
   });
 
@@ -376,12 +389,24 @@ export default function PosSystem() {
   });
 
   // Fetch products
-  const { data: products = [] } = useQuery<Product[]>({
+  const { data: products = [] } = useQuery<(Product & { categoryId?: number | null })[]>({
     queryKey: ["/api/pos/products", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/products?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Fetch categories
+  const { data: categories = [] } = useQuery<PosCategory[]>({
+    queryKey: ["/api/pos/categories", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/categories?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
       return response.json();
     },
     enabled: !!currentUser,
@@ -613,6 +638,76 @@ export default function PosSystem() {
         description: error.message || "Failed to delete all products",
         variant: "destructive",
       });
+    },
+  });
+
+  // Category mutations
+  const createCategoryMutation = useMutation({
+    mutationFn: async (categoryData: { name: string; icon: string; color: string }) => {
+      const response = await apiRequest("POST", "/api/pos/categories", {
+        ...categoryData,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      setIsCategoryDialogOpen(false);
+      setCategoryName("");
+      setCategoryIcon("folder");
+      setCategoryColor("#3b82f6");
+      toast({ title: "Category created", description: "Category has been successfully created." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to create category", variant: "destructive" });
+    },
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { name: string; icon: string; color: string } }) => {
+      const response = await apiRequest("PUT", `/api/pos/categories/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      setIsCategoryDialogOpen(false);
+      setEditingCategory(null);
+      setCategoryName("");
+      setCategoryIcon("folder");
+      setCategoryColor("#3b82f6");
+      toast({ title: "Category updated", description: "Category has been successfully updated." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to update category", variant: "destructive" });
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/categories/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      toast({ title: "Category deleted", description: "Category has been successfully deleted." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to delete category", variant: "destructive" });
+    },
+  });
+
+  // Update display mode preference
+  const updateDisplayModeMutation = useMutation({
+    mutationFn: async (mode: 'grid' | 'tabs') => {
+      const response = await apiRequest("PUT", `/api/pos/users/${currentUser?.id}/display-mode`, { mode });
+      return response.json();
+    },
+    onSuccess: (_, mode) => {
+      setSalesDisplayMode(mode);
+      toast({ title: "Display mode updated", description: `Switched to ${mode === 'grid' ? 'Grid' : 'Tabs'} view.` });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message || "Failed to update display mode", variant: "destructive" });
     },
   });
 
@@ -989,7 +1084,7 @@ export default function PosSystem() {
   });
 
   // Helper functions for product management
-  const openProductDialog = (product?: PosProduct) => {
+  const openProductDialog = (product?: PosProduct & { categoryId?: number | null }) => {
     console.log("Opening product dialog with product:", product);
     if (product) {
       setEditingProduct(product);
@@ -1000,6 +1095,7 @@ export default function PosSystem() {
       productForm.setValue("retailPrice", product.retailPrice.toString());
       productForm.setValue("tradePrice", product.tradePrice ? product.tradePrice.toString() : "");
       productForm.setValue("quantity", product.quantity);
+      productForm.setValue("categoryId", product.categoryId || null);
     } else {
       setEditingProduct(null);
       console.log("Resetting form for new product");
@@ -1010,6 +1106,7 @@ export default function PosSystem() {
         retailPrice: "",
         tradePrice: "",
         quantity: 0,
+        categoryId: null,
       });
     }
     setIsProductDialogOpen(true);
@@ -1057,6 +1154,52 @@ export default function PosSystem() {
     } else {
       createCustomerMutation.mutate(dataWithUserId);
     }
+  };
+
+  // Category helper functions
+  const openCategoryDialog = (category?: PosCategory) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryName(category.name);
+      setCategoryIcon(category.icon || "folder");
+      setCategoryColor(category.color || "#3b82f6");
+    } else {
+      setEditingCategory(null);
+      setCategoryName("");
+      setCategoryIcon("folder");
+      setCategoryColor("#3b82f6");
+    }
+    setIsCategoryDialogOpen(true);
+  };
+
+  const handleCategorySubmit = () => {
+    if (!categoryName.trim()) {
+      toast({ title: "Error", description: "Category name is required", variant: "destructive" });
+      return;
+    }
+    
+    if (editingCategory) {
+      updateCategoryMutation.mutate({ 
+        id: editingCategory.id, 
+        data: { name: categoryName, icon: categoryIcon, color: categoryColor } 
+      });
+    } else {
+      createCategoryMutation.mutate({ name: categoryName, icon: categoryIcon, color: categoryColor });
+    }
+  };
+
+  // Get category name by ID
+  const getCategoryName = (categoryId: number | null | undefined): string => {
+    if (!categoryId) return "Uncategorized";
+    const category = categories.find(c => c.id === categoryId);
+    return category?.name || "Uncategorized";
+  };
+
+  // Get category color by ID
+  const getCategoryColor = (categoryId: number | null | undefined): string => {
+    if (!categoryId) return "#6b7280";
+    const category = categories.find(c => c.id === categoryId);
+    return category?.color || "#6b7280";
   };
 
   const handleDeleteProduct = (id: number) => {
@@ -1246,17 +1389,22 @@ export default function PosSystem() {
     }
   };
 
-  // Filter products based on search term for Products tab
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(productSearchTerm.toLowerCase())
-  );
+  // Filter products based on search term and category for Products tab
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(productSearchTerm.toLowerCase());
+    const matchesCategory = productCategoryFilter === "all" || 
+      (productCategoryFilter === 0 ? !product.categoryId : product.categoryId === productCategoryFilter);
+    return matchesSearch && matchesCategory;
+  });
 
-  // Filter products based on search term for Sales tab
-  const filteredSalesProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter products based on search term and category for Sales tab
+  const filteredSalesProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = salesCategoryFilter === "all" || product.categoryId === salesCategoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   // Get price for product based on customer type
   const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
@@ -3928,6 +4076,37 @@ export default function PosSystem() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                       
+                      {/* Category Filter */}
+                      <Select value={productCategoryFilter === "all" ? "all" : productCategoryFilter.toString()} onValueChange={(val) => setProductCategoryFilter(val === "all" ? "all" : parseInt(val))}>
+                        <SelectTrigger className="w-[160px] bg-gray-800/50 border-gray-700/50 text-white h-9">
+                          <Folder className="w-4 h-4 mr-2 text-[hsl(217,90%,50%)]" />
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-900 border-gray-700">
+                          <SelectItem value="all" className="text-gray-200">All Categories</SelectItem>
+                          <SelectItem value="0" className="text-gray-400">Uncategorized</SelectItem>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                                {cat.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Manage Categories Button */}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => openCategoryDialog()}
+                        className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50 transition-all"
+                      >
+                        <FolderPlus className="h-4 w-4 mr-1" />
+                        Categories
+                      </Button>
+                      
                       <AlertDialog open={showDeleteAllProductsConfirm} onOpenChange={setShowDeleteAllProductsConfirm}>
                         <AlertDialogContent className="bg-gray-900 border-gray-700">
                           <AlertDialogHeader>
@@ -4115,6 +4294,44 @@ export default function PosSystem() {
                                   )}
                                 />
                               </div>
+                            </div>
+                            
+                            {/* Category Selection */}
+                            <div className="pt-2">
+                              <div className="flex items-center gap-2 mb-3">
+                                <Folder className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                <span className="text-sm font-medium text-gray-300">Category</span>
+                                <div className="flex-1 h-px bg-gray-700/50"></div>
+                              </div>
+                              <FormField
+                                control={productForm.control}
+                                name="categoryId"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Select 
+                                        value={field.value?.toString() || "none"} 
+                                        onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
+                                      >
+                                        <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
+                                          <SelectValue placeholder="Select category (optional)" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-gray-900 border-gray-700">
+                                          <SelectItem value="none" className="text-gray-400">No Category</SelectItem>
+                                          {categories.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                                                {cat.name}
+                                              </div>
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
                             </div>
                             
                             <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
@@ -6651,6 +6868,93 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Category Management Dialog */}
+      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+              {editingCategory ? 'Edit Category' : 'Create Category'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {editingCategory ? 'Update category details below.' : 'Create a new category to organize your products.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label className="text-gray-300">Category Name</Label>
+              <Input 
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="e.g., Beverages, Food, Electronics"
+                className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-gray-300 flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Category Color
+              </Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'].map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setCategoryColor(color)}
+                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Existing Categories List */}
+            {categories.length > 0 && !editingCategory && (
+              <div>
+                <Label className="text-gray-300 mb-2 block">Existing Categories</Label>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  {categories.map((cat) => (
+                    <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                        <span className="text-white">{cat.name}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {products.filter(p => p.categoryId === cat.id).length} products
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white h-7 w-7 p-0">
+                          <Edit className="w-3 h-3" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-gray-400 hover:text-red-400 h-7 w-7 p-0">
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleCategorySubmit} 
+              className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)]"
+              disabled={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+            >
+              {createCategoryMutation.isPending || updateCategoryMutation.isPending ? 'Saving...' : (editingCategory ? 'Update Category' : 'Create Category')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Invoice Creation Dialog */}
       <Dialog 
         open={isInvoiceDialogOpen} 
