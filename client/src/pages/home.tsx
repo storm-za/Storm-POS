@@ -35,43 +35,95 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
-      {/* Hero Section */}
-      <section className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* Hero Section - Enterprise Design */}
+      <section className="relative pt-8 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+        {/* Premium Background Effects */}
+        <div className="absolute inset-0">
+          {/* Animated gradient mesh */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(217,90%,25%)]/30 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(217,90%,40%)]/20 via-transparent to-transparent" />
+          
+          {/* Animated grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundSize: '80px 80px'
+          }} />
+          
+          {/* Glowing orbs */}
+          <motion.div 
+            className="absolute top-20 left-1/4 w-64 h-64 bg-[hsl(217,90%,50%)]/20 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute bottom-20 right-1/4 w-80 h-80 bg-[hsl(217,90%,40%)]/15 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.6, 0.4] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          
+          {/* Floating particles */}
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-[hsl(217,90%,60%)]/60 rounded-full"
+              style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+              animate={{ y: [0, -40, 0], opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
+              transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 3, ease: "easeInOut" }}
+            />
+          ))}
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto">
           <motion.div 
             className="text-center"
             initial="initial"
             animate="animate"
             variants={staggerContainer}
           >
+            {/* Logo with glow effect */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="flex justify-center mb-8"
+              className="flex justify-center mb-10"
             >
-              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
+              <div className="relative">
+                <div className="absolute inset-0 bg-[hsl(217,90%,50%)]/30 blur-2xl rounded-full scale-150" />
+                <img src={stormLogo} alt="Storm" className="relative h-36 w-auto drop-shadow-2xl" />
+              </div>
+            </motion.div>
+            
+            {/* Enterprise badge */}
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="inline-flex items-center px-5 py-2 mb-8 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 shadow-lg"
+            >
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse shadow-lg shadow-blue-500/50" />
+              <span className="text-sm font-medium text-gray-300">Enterprise Software Solutions</span>
             </motion.div>
             
             <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+              className="text-5xl md:text-7xl font-bold mb-6"
               variants={fadeInUp}
             >
-              <span className="text-[hsl(217,90%,40%)]">Smart Software.</span><br />
-              Built for Growth.
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] via-[hsl(217,90%,50%)] to-[hsl(217,90%,70%)] bg-clip-text text-transparent">Smart Software.</span>
+              <br />
+              <span className="text-white">Built for Growth.</span>
             </motion.h1>
             
             <motion.p 
-              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
+              className="text-xl md:text-2xl text-gray-400 mb-10 max-w-3xl mx-auto leading-relaxed"
               variants={fadeInUp}
             >
-              From stunning websites to pricing automation – we've got you covered.
+              From stunning websites to intelligent business automation – <span className="text-white font-medium">we've got you covered.</span>
             </motion.p>
             
-            <motion.div variants={fadeInUp}>
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-blue-500/30 px-8 py-6 text-lg font-semibold"
                 onClick={() => {
                   const solutionsSection = document.querySelector('#solutions-section');
                   if (solutionsSection) {
@@ -80,7 +132,37 @@ export default function Home() {
                 }}
               >
                 Explore Our Solutions
+                <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
               </Button>
+              <Button 
+                asChild
+                size="lg" 
+                variant="outline"
+                className="border-2 border-white/20 text-white bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 transition-all duration-300 px-8 py-6 text-lg font-semibold"
+              >
+                <Link href="/contact">Contact Sales</Link>
+              </Button>
+            </motion.div>
+            
+            {/* Trust indicators */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.8 }}
+              className="mt-16 flex flex-wrap items-center justify-center gap-8 text-gray-500 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                <span>No Setup Fees</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                <span>24/7 Support</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                <span>South African Based</span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -300,109 +382,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Us Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              About <span className="text-[hsl(217,90%,40%)]">Storm</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              We're passionate about empowering South African businesses with cutting-edge technology that drives real growth and success.
-            </p>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="space-y-6"
-            >
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Storm was founded with a simple yet powerful mission: to democratize access to premium business technology. We believe every South African business, regardless of size, deserves enterprise-level software solutions.
-              </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                From our headquarters in South Africa, we've built a team of passionate developers, designers, and business strategists who understand the unique challenges local businesses face. Our solutions aren't just software – they're growth accelerators.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="space-y-8"
-            >
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent rounded-2xl border border-[hsl(217,90%,40%)]/10">
-                  <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">500+</div>
-                  <div className="text-sm text-gray-600">Happy Clients</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-[hsl(217,90%,45%)]/5 to-transparent rounded-2xl border border-[hsl(217,90%,45%)]/10">
-                  <div className="text-3xl font-bold text-[hsl(217,90%,45%)] mb-2">99.9%</div>
-                  <div className="text-sm text-gray-600">Uptime</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl border border-purple-500/10">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
-                  <div className="text-sm text-gray-600">Support</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl border border-amber-500/10">
-                  <div className="text-3xl font-bold text-amber-600 mb-2">5+</div>
-                  <div className="text-sm text-gray-600">Years Experience</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-8"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="text-white h-8 w-8" />
-              </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Expert Team</h4>
-              <p className="text-gray-600">Our skilled developers and designers bring years of experience to every project</p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="text-white h-8 w-8" />
-              </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Quality First</h4>
-              <p className="text-gray-600">We never compromise on quality, delivering solutions that exceed expectations</p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="text-white h-8 w-8" />
-              </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-2">Trusted & Secure</h4>
-              <p className="text-gray-600">Enterprise-grade security and reliability you can count on</p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-blue-400/5 to-purple-600/5 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-cyan-400/5 to-blue-600/5 rounded-full blur-3xl"></div>
+      {/* About Us Section - Enterprise Design */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+        {/* Premium Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[hsl(217,90%,30%)]/10 via-transparent to-transparent" />
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
@@ -413,79 +401,224 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              What Our <span className="text-[hsl(217,90%,40%)]">Clients Say</span>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+              <span className="text-sm font-medium text-gray-400">Who We Are</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">About </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Storm</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Real feedback from South African businesses who've transformed their operations with Storm
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Empowering South African businesses with cutting-edge technology that drives <span className="text-white font-medium">real growth and success.</span>
             </p>
           </motion.div>
 
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center px-3 py-1 bg-[hsl(217,90%,40%)]/20 rounded-full">
+                <span className="text-xs font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Our Mission</span>
+              </div>
+              <h3 className="text-3xl font-bold text-white">Building the Future of SA Business</h3>
+              <p className="text-lg text-gray-400 leading-relaxed">
+                Storm was founded with a simple yet powerful mission: to democratize access to premium business technology. We believe every South African business, regardless of size, deserves <span className="text-white">enterprise-level software solutions.</span>
+              </p>
+              <p className="text-lg text-gray-400 leading-relaxed">
+                From our headquarters in South Africa, we've built a team of passionate developers, designers, and business strategists who understand the unique challenges local businesses face. <span className="text-white">Our solutions aren't just software – they're growth accelerators.</span>
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent mb-2">500+</div>
+                  <div className="text-sm text-gray-400 font-medium">Happy Clients</div>
+                </div>
+                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] bg-clip-text text-transparent mb-2">99.9%</div>
+                  <div className="text-sm text-gray-400 font-medium">Uptime</div>
+                </div>
+                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent mb-2">24/7</div>
+                  <div className="text-sm text-gray-400 font-medium">Support</div>
+                </div>
+                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-amber-500/30 transition-all duration-300">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent mb-2">5+</div>
+                  <div className="text-sm text-gray-400 font-medium">Years Experience</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
           <motion.div
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-6"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-2xl p-8 hover:shadow-3xl transition-all duration-300">
-                <div className="flex items-center mb-6">
+              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,40%)] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="text-white h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-3">Expert Team</h4>
+                <p className="text-gray-400">Our skilled developers and designers bring years of experience to every project</p>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <Award className="text-white h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-3">Quality First</h4>
+                <p className="text-gray-400">We never compromise on quality, delivering solutions that exceed expectations</p>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-purple-500/25 group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="text-white h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-bold text-white mb-3">Trusted & Secure</h4>
+                <p className="text-gray-400">Enterprise-grade security and reliability you can count on</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Reviews Section - Enterprise Design */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 overflow-hidden">
+        {/* Premium Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[hsl(217,90%,30%)]/15 via-transparent to-transparent" />
+          <motion.div 
+            className="absolute -top-40 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <Star className="w-4 h-4 text-yellow-400 fill-current mr-2" />
+              <span className="text-sm font-medium text-gray-400">Client Testimonials</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">What Our </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Clients Say</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Real feedback from South African businesses who've <span className="text-white font-medium">transformed their operations</span> with Storm
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp}>
+              <Card className="group h-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 p-8">
+                <div className="flex items-center gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "Storm transformed our online presence completely. Our new website converts visitors into customers like never before. Sales increased by 300% in just two months!"
+                <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
+                  "Storm transformed our online presence completely. Our new website converts visitors into customers like never before. <span className="text-white font-medium">Sales increased by 300%</span> in just two months!"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,50%)] to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
                     <span className="text-white font-bold text-lg">SA</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Sarah Anderson</div>
+                    <div className="font-semibold text-white">Sarah Anderson</div>
+                    <div className="text-sm text-gray-500">Business Owner</div>
                   </div>
                 </div>
               </Card>
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-2xl p-8 hover:shadow-3xl transition-all duration-300">
-                <div className="flex items-center mb-6">
+              <Card className="group h-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 p-8">
+                <div className="flex items-center gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "Storm POS revolutionized our retail operations. The all device design means we can serve customers anywhere in our store. It's incredibly intuitive and reliable."
+                <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
+                  "Storm POS revolutionized our retail operations. The all device design means we can <span className="text-white font-medium">serve customers anywhere</span> in our store. It's incredibly intuitive and reliable."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-green-500/25">
                     <span className="text-white font-bold text-lg">MV</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Michael Van Der Merwe</div>
+                    <div className="font-semibold text-white">Michael Van Der Merwe</div>
+                    <div className="text-sm text-gray-500">Retail Manager</div>
                   </div>
                 </div>
               </Card>
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-2xl p-8 hover:shadow-3xl transition-all duration-300">
-                <div className="flex items-center mb-6">
+              <Card className="group h-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-purple-500/30 transition-all duration-300 p-8">
+                <div className="flex items-center gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "The support team at Storm is exceptional. They understand our business needs and always deliver beyond expectations. Their solutions just work!"
+                <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
+                  "The support team at Storm is exceptional. They understand our business needs and <span className="text-white font-medium">always deliver beyond expectations.</span> Their solutions just work!"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-purple-500/25">
                     <span className="text-white font-bold text-lg">TM</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">Thabo Mthembu</div>
+                    <div className="font-semibold text-white">Thabo Mthembu</div>
+                    <div className="text-sm text-gray-500">CEO, Tech Startup</div>
                   </div>
                 </div>
               </Card>
@@ -494,9 +627,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-4xl mx-auto">
+      {/* FAQ Section - Enterprise Design */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 to-slate-800 overflow-hidden">
+        {/* Premium Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(217,90%,25%)]/20 via-transparent to-transparent" />
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+        </div>
+
+        <div className="relative max-w-4xl mx-auto">
           <motion.div 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
@@ -504,11 +646,22 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Frequently Asked <span className="text-[hsl(217,90%,40%)]">Questions</span>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+              <span className="text-sm font-medium text-gray-400">Got Questions?</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">Frequently Asked </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to know about our services and solutions
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Everything you need to know about our <span className="text-white font-medium">services and solutions</span>
             </p>
           </motion.div>
 
@@ -542,16 +695,16 @@ export default function Home() {
               }
             ].map((faq, index) => (
               <motion.div key={index} variants={fadeInUp}>
-                <Card className="border border-gray-200 hover:border-[hsl(217,90%,40%)]/30 transition-all duration-300 overflow-hidden">
+                <Card className="group bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 overflow-hidden">
                   <button
-                    className="w-full p-6 text-left hover:bg-gray-50 transition-colors duration-200"
+                    className="w-full p-6 text-left hover:bg-white/5 transition-colors duration-200"
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900 pr-8">{faq.question}</h3>
-                      <div className="flex-shrink-0">
+                      <h3 className="text-lg font-semibold text-white pr-8">{faq.question}</h3>
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${openFaq === index ? 'bg-[hsl(217,90%,40%)]' : 'bg-white/10'}`}>
                         {openFaq === index ? (
-                          <ChevronUp className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                          <ChevronUp className="w-5 h-5 text-white" />
                         ) : (
                           <ChevronDown className="w-5 h-5 text-gray-400" />
                         )}
@@ -559,7 +712,7 @@ export default function Home() {
                     </div>
                   </button>
                   <div className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+                    <div className="px-6 pb-6 text-gray-400 leading-relaxed border-t border-white/5 pt-4">
                       {faq.answer}
                     </div>
                   </div>
@@ -570,12 +723,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
-        {/* Background Elements */}
+      {/* Call to Action - Enterprise Design */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-[hsl(217,90%,35%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,45%)] text-white overflow-hidden">
+        {/* Premium Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-white/10 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" />
+          <motion.div 
+            className="absolute -top-40 -right-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
@@ -585,56 +753,67 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Transform Your Business?
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-5 py-2 mb-8 bg-white/10 backdrop-blur-xl rounded-full border border-white/20"
+            >
+              <span className="w-2 h-2 bg-white rounded-full mr-3 animate-pulse shadow-lg shadow-white/50" />
+              <span className="text-sm font-medium text-white/90">Start Your Journey Today</span>
+            </motion.div>
+
+            <h2 className="text-4xl md:text-6xl font-bold mb-6">
+              Ready to Transform<br />Your Business?
             </h2>
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed max-w-2xl mx-auto">
-              Join hundreds of South African businesses who've accelerated their growth with Storm's innovative solutions
+            <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
+              Join hundreds of South African businesses who've <span className="text-white font-semibold">accelerated their growth</span> with Storm's innovative solutions
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 asChild
                 size="lg"
-                className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl px-8 py-4 text-lg font-semibold"
+                className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-black/20 px-10 py-6 text-lg font-bold rounded-xl"
               >
                 <Link href="/web-development">
                   Get Your Website
-                  <motion.span 
-                    className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                    initial={{ x: 0 }}
-                  >
-                    →
-                  </motion.span>
+                  <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
                 </Link>
               </Button>
               <Button 
                 asChild
                 variant="outline"
                 size="lg"
-                className="group border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-300 font-semibold px-8 py-4 text-lg"
+                className="group border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-300 font-bold px-10 py-6 text-lg rounded-xl"
               >
                 <Link href="/pos">
                   Try Storm POS
-                  <motion.span 
-                    className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                    initial={{ x: 0 }}
-                  >
-                    →
-                  </motion.span>
+                  <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}>→</motion.span>
                 </Link>
               </Button>
             </div>
 
             <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="flex items-center justify-center mt-8 text-blue-200 text-sm"
+              className="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/80 text-sm"
             >
-              <CheckCircle className="w-5 h-5 mr-2" />
-              No setup fees • Start immediately • Cancel anytime
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
+                <CheckCircle className="w-4 h-4 text-white" />
+                <span>No Setup Fees</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
+                <CheckCircle className="w-4 h-4 text-white" />
+                <span>Start Immediately</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
+                <CheckCircle className="w-4 h-4 text-white" />
+                <span>Cancel Anytime</span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
