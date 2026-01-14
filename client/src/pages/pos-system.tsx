@@ -97,6 +97,7 @@ export default function PosSystem() {
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
+  const [isStaffSwitchMode, setIsStaffSwitchMode] = useState(false);
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
   const [selectedStaffForAuth, setSelectedStaffForAuth] = useState<StaffAccount | null>(null);
   const [isStaffPasswordDialogOpen, setIsStaffPasswordDialogOpen] = useState(false);
@@ -436,13 +437,13 @@ export default function PosSystem() {
 
   // Load saved staff account selection from user profile on mount
   useEffect(() => {
-    if (staffAccounts.length > 0 && currentUser?.selectedStaffAccountId && !currentStaff) {
+    if (staffAccounts.length > 0 && currentUser?.selectedStaffAccountId && !currentStaff && !isStaffSwitchMode) {
       const savedStaff = staffAccounts.find(s => s.id === currentUser.selectedStaffAccountId);
       if (savedStaff) {
         setCurrentStaff(savedStaff);
       }
     }
-  }, [staffAccounts, currentUser?.selectedStaffAccountId, currentStaff]);
+  }, [staffAccounts, currentUser?.selectedStaffAccountId, currentStaff, isStaffSwitchMode]);
 
   // Fetch invoices
   const { data: invoices = [] } = useQuery<any[]>({
@@ -934,6 +935,7 @@ export default function PosSystem() {
     },
     onSuccess: async (data) => {
       setCurrentStaff(data.staffAccount);
+      setIsStaffSwitchMode(false);
       setIsStaffPasswordDialogOpen(false);
       setStaffPassword("");
       setSelectedStaffForAuth(null);
@@ -3133,7 +3135,10 @@ export default function PosSystem() {
                           User Management
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={() => setCurrentStaff(null)}>
+                      <DropdownMenuItem onClick={() => {
+                        setIsStaffSwitchMode(true);
+                        setCurrentStaff(null);
+                      }}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Switch User
                       </DropdownMenuItem>
