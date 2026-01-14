@@ -22,8 +22,8 @@ import {
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock
+  ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
+  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -83,6 +83,14 @@ interface StaffAccount {
   userType: 'staff' | 'management';
   isActive: boolean;
   createdAt: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  color?: string;
+  icon?: string;
+  sortOrder?: number;
 }
 
 export default function PosSystemAfrikaans() {
@@ -191,6 +199,17 @@ export default function PosSystemAfrikaans() {
   const [xeroClientSecret, setXeroClientSecret] = useState('');
   const [isConnectingXero, setIsConnectingXero] = useState(false);
   const [isSyncingXero, setIsSyncingXero] = useState(false);
+  
+  // Category state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryColor, setCategoryColor] = useState("#3b82f6");
+  const [productCategoryFilter, setProductCategoryFilter] = useState<number | 'all'>('all');
+  const [salesDisplayMode, setSalesDisplayMode] = useState<'grid' | 'tabs'>('grid');
+  const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
+  const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | 'all'>('all');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -379,13 +398,27 @@ export default function PosSystemAfrikaans() {
   ]);
 
   // Data fetching queries
-  const { data: products = [] } = useQuery<Product[]>({
+  const { data: products = [] } = useQuery<(Product & { categoryId?: number })[]>({
     queryKey: ["/api/pos/products", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/products?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie produkte laai nie');
       return response.json();
+    },
+    enabled: !!currentUser,
+  });
+  
+  // Fetch categories
+  useQuery<Category[]>({
+    queryKey: ["/api/pos/categories", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/categories?userId=${currentUser.id}`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      setCategories(data);
+      return data;
     },
     enabled: !!currentUser,
   });
@@ -1179,6 +1212,80 @@ export default function PosSystemAfrikaans() {
     setPendingTab(null);
     setHighlightStaffButton(true);
     setTimeout(() => setHighlightStaffButton(false), 5000);
+  };
+
+  // Category mutations
+  const createCategoryMutation = useMutation({
+    mutationFn: async (data: { name: string; color?: string }) => {
+      const response = await apiRequest("POST", "/api/pos/categories", {
+        ...data,
+        userId: currentUser?.id
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      toast({ title: "Kategorie geskep", description: "Kategorie is suksesvol geskep." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Kon nie kategorie skep nie", variant: "destructive" });
+    },
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: { name: string; color?: string } }) => {
+      const response = await apiRequest("PUT", `/api/pos/categories/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      toast({ title: "Kategorie bygewerk", description: "Kategorie is suksesvol bygewerk." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Kon nie kategorie bywerk nie", variant: "destructive" });
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/pos/categories/${id}`, {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/categories", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+      toast({ title: "Kategorie verwyder", description: "Kategorie is suksesvol verwyder." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Kon nie kategorie verwyder nie", variant: "destructive" });
+    },
+  });
+
+  // Category helper functions
+  const openCategoryDialog = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryName(category.name);
+      setCategoryColor(category.color || "#3b82f6");
+    } else {
+      setEditingCategory(null);
+      setCategoryName("");
+      setCategoryColor("#3b82f6");
+    }
+    setIsCategoryDialogOpen(true);
+  };
+
+  const handleSaveCategory = () => {
+    if (!categoryName.trim()) return;
+    if (editingCategory) {
+      updateCategoryMutation.mutate({ id: editingCategory.id, data: { name: categoryName, color: categoryColor } });
+    } else {
+      createCategoryMutation.mutate({ name: categoryName, color: categoryColor });
+    }
+    setIsCategoryDialogOpen(false);
+    setCategoryName("");
+    setCategoryColor("#3b82f6");
+    setEditingCategory(null);
   };
 
   // Product mutations
@@ -2472,15 +2579,19 @@ ${dateFilteredSales.map(sale =>
   };
 
   // Filter functions
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(productSearchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(productSearchTerm.toLowerCase());
+    const matchesCategory = productCategoryFilter === 'all' || product.categoryId === productCategoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
-  const filteredSalesProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSalesProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = salesCategoryFilter === 'all' || product.categoryId === salesCategoryFilter;
+    return matchesSearch && matchesCategory;
+  });
 
   // Calculate monthly usage
   const currentDate = new Date();
@@ -3435,6 +3546,14 @@ ${dateFilteredSales.map(sale =>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+                      <Button 
+                        onClick={() => openCategoryDialog()} 
+                        variant="outline" 
+                        className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50"
+                      >
+                        <Folder className="h-4 w-4 mr-2" />
+                        Kategoriee
+                      </Button>
                       <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
                         <PlusCircle className="h-4 w-4 mr-2" />
                         Voeg Produk By
@@ -3444,18 +3563,39 @@ ${dateFilteredSales.map(sale =>
                 </CardHeader>
                 <CardContent className="relative pt-6">
                   <div className="space-y-4">
-                    {/* Enhanced Search Bar */}
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
-                      <div className="relative flex items-center">
-                        <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
-                        <Input
-                          placeholder="Soek produkte op naam of SKU..."
-                          value={productSearchTerm}
-                          onChange={(e) => setProductSearchTerm(e.target.value)}
-                          className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
-                        />
+                    {/* Enhanced Search Bar with Category Filter */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative flex-1">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
+                        <div className="relative flex items-center">
+                          <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
+                          <Input
+                            placeholder="Soek produkte op naam of SKU..."
+                            value={productSearchTerm}
+                            onChange={(e) => setProductSearchTerm(e.target.value)}
+                            className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
+                          />
+                        </div>
                       </div>
+                      {categories.length > 0 && (
+                        <Select value={productCategoryFilter === 'all' ? 'all' : productCategoryFilter.toString()} onValueChange={(v) => setProductCategoryFilter(v === 'all' ? 'all' : parseInt(v))}>
+                          <SelectTrigger className="w-full sm:w-48 h-12 bg-gray-900/50 border-gray-700/50 text-white">
+                            <Folder className="w-4 h-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            <SelectValue placeholder="Alle Kategoriee" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-900 border-gray-700">
+                            <SelectItem value="all" className="text-gray-200">Alle Kategoriee</SelectItem>
+                            {categories.map((cat) => (
+                              <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
+                                <span className="flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                                  {cat.name}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
 
                     {/* Product Grid */}
