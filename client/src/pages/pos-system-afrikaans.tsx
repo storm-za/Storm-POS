@@ -6240,14 +6240,12 @@ ${dateFilteredSales.map(sale =>
               const username = formData.get('username') as string;
               const password = formData.get('password') as string;
               const userType = formData.get('user-type') as 'staff' | 'management';
-              const managementPassword = formData.get('management-password') as string;
               
               if (username && password && userType) {
                 createStaffAccountMutation.mutate({
                   username,
                   password,
                   userType,
-                  managementPassword: userType === 'management' ? managementPassword : undefined,
                   userId: currentUser?.id
                 });
               }
@@ -6284,16 +6282,6 @@ ${dateFilteredSales.map(sale =>
                     required
                     placeholder="Voer wagwoord in"
                   />
-                </div>
-                <div>
-                  <Label htmlFor="create-management-password">Bestuurswagwoord</Label>
-                  <Input
-                    id="create-management-password"
-                    name="management-password"
-                    type="password"
-                    placeholder="Vereis vir bestuurrol"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Slegs nodig indien 'n bestuurder geskep word</p>
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button 
@@ -6444,14 +6432,12 @@ ${dateFilteredSales.map(sale =>
                     const username = formData.get('new-username') as string;
                     const password = formData.get('new-password') as string;
                     const userType = formData.get('user-type') as 'staff' | 'management';
-                    const managementPassword = formData.get('management-password') as string;
                     
                     if (username && password && userType) {
                       createStaffAccountMutation.mutate({
                         username,
                         password,
                         userType,
-                        managementPassword: userType === 'management' ? managementPassword : undefined,
                         userId: currentUser?.id
                       });
                       (e.target as HTMLFormElement).reset();
@@ -6481,30 +6467,17 @@ ${dateFilteredSales.map(sale =>
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                      <div>
-                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
-                        <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
-                          <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
-                            <SelectValue placeholder="Kies rol" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700">
-                            <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
-                            <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Bestuurswagwoord</Label>
-                        <Input
-                          id="management-password"
-                          name="management-password"
-                          type="password"
-                          placeholder="Slegs vir bestuur"
-                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
-                        />
-                        <p className="text-xs text-gray-500 mt-1.5">Vereis slegs vir bestuurdersrol</p>
-                      </div>
+                    <div className="mb-5">
+                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
+                      <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
+                        <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                          <SelectValue placeholder="Kies rol" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
+                          <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <Button 
                       type="submit" 

@@ -6758,14 +6758,12 @@ export default function PosSystem() {
             const username = formData.get('username') as string;
             const password = formData.get('password') as string;
             const userType = formData.get('user-type') as 'staff' | 'management';
-            const managementPassword = formData.get('management-password') as string;
             
             if (username && password && userType) {
               createStaffAccountMutation.mutate({
                 username,
                 password,
                 userType,
-                managementPassword: userType === 'management' ? managementPassword : undefined,
                 userId: currentUser?.id
               });
             }
@@ -6802,16 +6800,6 @@ export default function PosSystem() {
                   required
                   placeholder="Enter password"
                 />
-              </div>
-              <div>
-                <Label htmlFor="create-management-password">Management Password</Label>
-                <Input
-                  id="create-management-password"
-                  name="management-password"
-                  type="password"
-                  placeholder="Required for management role"
-                />
-                <p className="text-xs text-muted-foreground mt-1">Only required if creating a management user</p>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button 
@@ -6961,14 +6949,12 @@ export default function PosSystem() {
                   const username = formData.get('new-username') as string;
                   const password = formData.get('new-password') as string;
                   const userType = formData.get('user-type') as 'staff' | 'management';
-                  const managementPassword = formData.get('management-password') as string;
                   
                   if (username && password && userType) {
                     createStaffAccountMutation.mutate({
                       username,
                       password,
                       userType,
-                      managementPassword: userType === 'management' ? managementPassword : undefined,
                       userId: currentUser?.id
                     });
                     (e.target as HTMLFormElement).reset();
@@ -6998,30 +6984,17 @@ export default function PosSystem() {
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                    <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Role</Label>
-                      <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
-                        <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700">
-                          <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Staff</SelectItem>
-                          <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Manager</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Management Password</Label>
-                      <Input
-                        id="management-password"
-                        name="management-password"
-                        type="password"
-                        placeholder="For managers only"
-                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
-                      />
-                      <p className="text-xs text-gray-500 mt-1.5">Only required for manager role</p>
-                    </div>
+                  <div className="mb-5">
+                    <Label className="text-gray-300 text-sm font-medium mb-2 block">Role</Label>
+                    <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
+                      <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Staff</SelectItem>
+                        <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Manager</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button 
                     type="submit" 
