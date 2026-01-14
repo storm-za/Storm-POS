@@ -3123,19 +3123,103 @@ ${dateFilteredSales.map(sale =>
                           </div>
                         </div>
 
-                        {/* Checkout Button */}
-                        <Button
-                          onClick={() => checkoutMutation.mutate()}
-                          disabled={currentSale.length === 0 || checkoutMutation.isPending}
-                          className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
-                        >
-                          {checkoutMutation.isPending ? "Verwerk..." : (
-                            <>
-                              <Receipt className="w-4 h-4 mr-2" />
-                              Voltooi Verkoop
-                            </>
+                        {/* Checkout Options */}
+                        <div className="space-y-3">
+                          <div>
+                            <Label className="text-white">Betaalopsie</Label>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={checkoutOption === 'complete' ? "default" : "outline"}
+                                onClick={() => setCheckoutOption('complete')}
+                                className={checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                <Receipt className="h-4 w-4 mr-2" />
+                                Voltooi Verkoop
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={checkoutOption === 'open-account' ? "default" : "outline"}
+                                onClick={() => setCheckoutOption('open-account')}
+                                className={checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                Maak Rekening Oop
+                              </Button>
+                              {openAccounts.length > 0 && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant={checkoutOption === 'add-to-account' ? "default" : "outline"}
+                                  onClick={() => setCheckoutOption('add-to-account')}
+                                  className={checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                                >
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  Voeg by Rekening
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Open Account Selection */}
+                          {checkoutOption === 'add-to-account' && (
+                            <div>
+                              <Label className="text-white">Kies Oop Rekening</Label>
+                              <Select 
+                                value={selectedOpenAccountId?.toString() || ""} 
+                                onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Kies 'n oop rekening" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {openAccounts.map((account) => (
+                                    <SelectItem key={account.id} value={account.id.toString()}>
+                                      <div className="flex flex-col">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium">{account.accountName}</span>
+                                          <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="text-xs">
+                                            {account.accountType === 'table' ? 'Tafel' : 'Klient'}
+                                          </Badge>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                                          <span>Huidig: R{account.total}</span>
+                                          <span>•</span>
+                                          <span>{Array.isArray(account.items) ? account.items.length : 0} items</span>
+                                        </div>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           )}
-                        </Button>
+                          {/* Checkout Button */}
+                          <Button
+                            className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
+                            onClick={() => checkoutMutation.mutate()}
+                            disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}
+                          >
+                            {checkoutOption === 'complete' ? (
+                              <>
+                                <Receipt className="h-4 w-4 mr-2" />
+                                {checkoutMutation.isPending ? "Verwerk..." : "Voltooi Verkoop"}
+                              </>
+                            ) : checkoutOption === 'open-account' ? (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                {checkoutMutation.isPending ? "Verwerk..." : "Skep Oop Rekening"}
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4 mr-2" />
+                                {checkoutMutation.isPending ? "Verwerk..." : "Voeg by Rekening"}
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
