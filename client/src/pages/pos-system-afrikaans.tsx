@@ -5344,7 +5344,7 @@ ${dateFilteredSales.map(sale =>
                     type="button" 
                     variant="outline" 
                     onClick={() => setIsOpenAccountDialogOpen(false)}
-                    className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-6"
+                    className="bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white px-6"
                   >
                     Kanselleer
                   </Button>
