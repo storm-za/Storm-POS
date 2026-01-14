@@ -167,8 +167,8 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-      {/* Solutions Section with Modern Design */}
-      <section id="solutions-section" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+      {/* Solutions Section - Enterprise Design */}
+      <section id="solutions-section" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 overflow-hidden">
         {/* High-Tech Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Animated Gradient Orbs */}
@@ -285,96 +285,109 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center px-4 py-2 bg-[hsl(217,90%,40%)]/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-[hsl(217,90%,40%)]/20"
+              className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-xl rounded-full text-sm font-medium mb-6 border border-white/10"
             >
-              <span className="w-2 h-2 bg-[hsl(217,90%,40%)] rounded-full mr-2 animate-pulse"></span>
-              Our Premium Solutions
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-2 animate-pulse shadow-lg shadow-blue-500/50"></span>
+              <span className="text-gray-400">Our Premium Solutions</span>
             </motion.div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Everything Your Business 
-              <span className="text-[hsl(217,90%,40%)]"> Needs to Thrive</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">Everything Your Business </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Needs to Thrive</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              From stunning websites to intelligent business tools – we deliver solutions that scale with your success
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              From stunning websites to intelligent business tools – we deliver <span className="text-white font-medium">solutions that scale</span> with your success
             </p>
           </motion.div>
           
           <motion.div 
-            className="grid md:grid-cols-3 gap-8 mb-16"
+            className="grid md:grid-cols-3 gap-6 mb-16"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            {/* Web Development Card */}
+            {/* Web Development Card - Enterprise Design */}
             <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <Card className="group relative overflow-hidden bg-slate-800/80 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/40 transition-all duration-500 h-full hover:-translate-y-2 shadow-2xl">
+                {/* Animated gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,50%)]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Subtle glow effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(217,90%,50%)]/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+                
                 <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,40%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:shadow-blue-500/50 transition-all duration-300">
                     <Code className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-[hsl(217,90%,40%)] transition-colors duration-300">Web Development</h3>
-                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Professional websites that convert visitors into customers with modern design and lightning-fast performance</p>
-                  <Button asChild className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] shadow-lg hover:shadow-xl transition-all duration-300">
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Web Development</h3>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Professional websites that convert visitors into customers with <span className="text-white font-medium">modern design</span> and lightning-fast performance</p>
+                  <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold">
                     <Link href="/web-development">
                       Start Your Project
-                      <motion.span 
-                        className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                        initial={{ x: 0 }}
-                      >
-                        →
-                      </motion.span>
+                      <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
                     </Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
             
-            {/* POS Software Card */}
+            {/* POS Software Card - Enterprise Design */}
             <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg z-10">
-                  Available Now
+              <Card className="group relative overflow-hidden bg-slate-800/80 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/40 transition-all duration-500 h-full hover:-translate-y-2 shadow-2xl">
+                {/* Available Now badge */}
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,60%)] text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/30 z-10">
+                  <span className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                    Available Now
+                  </span>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Animated gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,50%)]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Subtle glow effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(217,90%,50%)]/20 to-cyan-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+                
                 <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:shadow-blue-500/50 transition-all duration-300">
                     <ScanBarcode className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-[hsl(217,90%,40%)] transition-colors duration-300">Storm POS</h3>
-                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Revolutionary all device design point of sale system designed specifically for South African retailers</p>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Storm POS</h3>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Revolutionary all device design <span className="text-white font-medium">point of sale system</span> designed specifically for South African retailers</p>
                   <Button 
                     asChild 
-                    className="bg-[hsl(217,90%,45%)] text-white hover:bg-[hsl(217,90%,40%)] shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,45%)] text-white hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,50%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold"
                   >
                     <Link href="/pos">
                       Explore POS System
-                      <motion.span 
-                        className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                        initial={{ x: 0 }}
-                      >
-                        →
-                      </motion.span>
+                      <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
                     </Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
             
-            {/* Pricing Tracker Card */}
+            {/* Pricing Tracker Card - Enterprise Design */}
             <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+              <Card className="group relative overflow-hidden bg-slate-800/80 backdrop-blur-xl border border-white/10 hover:border-amber-500/40 transition-all duration-500 h-full hover:-translate-y-2 shadow-2xl">
+                {/* Coming Soon badge */}
+                <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg shadow-amber-500/30 z-10">
                   Coming Soon
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Animated gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {/* Subtle glow effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+                
                 <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/30 group-hover:scale-110 group-hover:shadow-amber-500/50 transition-all duration-300">
                     <TrendingUp className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-amber-600 transition-colors duration-300">Pricing Intelligence</h3>
-                  <p className="text-gray-600 mb-6 flex-grow leading-relaxed">Advanced market analysis and competitor tracking to optimize your pricing strategy in real-time</p>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors duration-300">Pricing Intelligence</h3>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Advanced market analysis and <span className="text-white font-medium">competitor tracking</span> to optimize your pricing strategy in real-time</p>
+                  <div className="mt-auto">
+                    <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 text-gray-400 text-sm">
+                      <span className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse"></span>
+                      Notify me when available
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
