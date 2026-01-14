@@ -3703,18 +3703,17 @@ export default function PosSystem() {
                                 <FileText className="h-4 w-4 mr-2" />
                                 Open Account
                               </Button>
-                              {openAccounts.length > 0 && (
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant={checkoutOption === 'add-to-account' ? "default" : "outline"}
-                                  onClick={() => setCheckoutOption('add-to-account')}
-                                  className={checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  Add to Account
-                                </Button>
-                              )}
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={checkoutOption === 'add-to-account' ? "default" : "outline"}
+                                onClick={() => setCheckoutOption('add-to-account')}
+                                disabled={openAccounts.length === 0}
+                                className={checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add to Account
+                              </Button>
                             </div>
                           </div>
 
