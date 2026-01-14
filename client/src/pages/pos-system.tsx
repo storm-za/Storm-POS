@@ -3691,7 +3691,7 @@ export default function PosSystem() {
                                 className={checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
                               >
                                 <Receipt className="h-4 w-4 mr-2" />
-                                Complete Sale
+                                Cash/Card
                               </Button>
                               <Button
                                 type="button"
