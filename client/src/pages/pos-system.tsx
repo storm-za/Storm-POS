@@ -3212,89 +3212,153 @@ export default function PosSystem() {
                 <span className="hidden sm:inline">Help</span>
               </Button>
 
-              {/* Staff Account Dropdown */}
+              {/* Staff Account Dropdown - Enterprise Design */}
               <motion.div
                 animate={highlightStaffButton ? {
-                  scale: [1, 1.1, 1, 1.1, 1],
+                  scale: [1, 1.05, 1, 1.05, 1],
                   boxShadow: [
                     "0 0 0 0px rgba(59, 130, 246, 0)",
-                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
-                    "0 0 0 8px rgba(59, 130, 246, 0)",
-                    "0 0 0 8px rgba(59, 130, 246, 0.4)",
+                    "0 0 0 6px rgba(59, 130, 246, 0.3)",
+                    "0 0 0 6px rgba(59, 130, 246, 0)",
+                    "0 0 0 6px rgba(59, 130, 246, 0.3)",
                     "0 0 0 0px rgba(59, 130, 246, 0)"
                   ]
                 } : {}}
                 transition={{ duration: 0.8, repeat: highlightStaffButton ? 5 : 0, repeatType: "loop" }}
-                className={highlightStaffButton ? "rounded-md" : ""}
+                className={highlightStaffButton ? "rounded-xl" : ""}
               >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      className={`flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm transition-all ${
-                        highlightStaffButton ? 'ring-4 ring-blue-400 ring-opacity-50 bg-blue-50 border-blue-400' : ''
-                      }`}
+                      className={`relative flex items-center gap-2 px-3 py-2 h-auto text-sm font-medium transition-all duration-200 rounded-xl
+                        bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100
+                        border border-gray-300 hover:border-[hsl(217,90%,40%)]/50
+                        shadow-lg shadow-gray-200/50 hover:shadow-blue-200/50
+                        text-gray-800 hover:text-gray-900
+                        ${highlightStaffButton ? 'ring-2 ring-[hsl(217,90%,50%)] ring-opacity-70 border-[hsl(217,90%,50%)]' : ''}`}
                       data-testid="staff-dropdown"
                     >
-                      <User className="h-4 w-4" />
-                      <span className="hidden sm:inline">{currentStaff ? currentStaff.username : 'Select Staff'}</span>
-                      <span className="sm:hidden">{currentStaff ? currentStaff.username.substring(0, 8) + '...' : 'Staff'}</span>
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="hidden sm:flex flex-col items-start">
+                        <span className="text-xs text-gray-500 leading-tight">Logged in as</span>
+                        <span className="font-semibold text-gray-800 leading-tight">{currentStaff ? currentStaff.username : 'Select User'}</span>
+                      </div>
+                      <span className="sm:hidden font-medium">{currentStaff ? currentStaff.username.substring(0, 6) : 'User'}</span>
                       {currentStaff && (
-                        <Badge variant={currentStaff.userType === 'management' ? 'default' : 'secondary'} className="text-xs hidden sm:inline">
-                          {currentStaff.userType}
+                        <Badge 
+                          className={`text-[10px] px-1.5 py-0 h-4 hidden sm:inline-flex ${
+                            currentStaff.userType === 'management' 
+                              ? 'bg-[hsl(217,90%,40%)] text-white border-0' 
+                              : 'bg-gray-500 text-white border-0'
+                          }`}
+                        >
+                          {currentStaff.userType === 'management' ? 'Manager' : 'Staff'}
                         </Badge>
                       )}
+                      <ChevronDown className="h-4 w-4 text-gray-500 ml-1" />
                     </Button>
                   </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {!currentStaff ? (
-                    <>
-                      {staffAccounts.map((staff) => (
-                        <DropdownMenuItem 
-                          key={staff.id} 
-                          onClick={() => {
-                            setSelectedStaffForAuth(staff);
-                            setIsStaffPasswordDialogOpen(true);
-                          }}
-                        >
-                          <User className="mr-2 h-4 w-4" />
-                          <div className="flex-1">
-                            <div className="font-medium">{staff.username}</div>
-                            <div className="text-xs text-muted-foreground capitalize">{staff.userType}</div>
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
-                      {staffAccounts.length > 0 && <DropdownMenuSeparator />}
-                      <DropdownMenuItem onClick={() => setIsStaffDialogOpen(true)}>
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Create New User
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <div className="px-2 py-2 text-sm">
-                        <div className="font-medium">{currentStaff.username}</div>
-                        <div className="text-muted-foreground capitalize">{currentStaff.userType}</div>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-72 p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-black/50 rounded-xl overflow-hidden"
+                  >
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-4 py-3 border-b border-gray-700/50">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Team Members</span>
                       </div>
-                      <DropdownMenuSeparator />
-                      {currentStaff.userType === 'management' && (
-                        <DropdownMenuItem onClick={() => setIsUserManagementOpen(true)}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          User Management
-                        </DropdownMenuItem>
+                    </div>
+                    
+                    {/* Users List */}
+                    <div className="py-2 max-h-[300px] overflow-y-auto">
+                      {staffAccounts.map((staff) => {
+                        const isCurrentUser = currentStaff?.id === staff.id;
+                        return (
+                          <button
+                            key={staff.id}
+                            onClick={() => {
+                              if (!isCurrentUser) {
+                                setCurrentStaff(null);
+                                setSelectedStaffForAuth(staff);
+                                setIsStaffPasswordDialogOpen(true);
+                              }
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
+                              isCurrentUser 
+                                ? 'bg-[hsl(217,90%,40%)]/10 cursor-default' 
+                                : 'hover:bg-gray-700/50 cursor-pointer'
+                            }`}
+                          >
+                            <div className={`relative flex items-center justify-center w-10 h-10 rounded-xl ${
+                              staff.userType === 'management'
+                                ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
+                                : 'bg-gradient-to-br from-gray-600 to-gray-700'
+                            } shadow-lg`}>
+                              <User className="h-5 w-5 text-white" />
+                              {isCurrentUser && (
+                                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[hsl(217,90%,50%)] rounded-full border-2 border-gray-900 shadow-lg shadow-blue-500/50" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className={`font-semibold truncate ${isCurrentUser ? 'text-[hsl(217,90%,60%)]' : 'text-white'}`}>
+                                  {staff.displayName || staff.username}
+                                </span>
+                                {isCurrentUser && (
+                                  <Badge className="text-[10px] px-1.5 py-0 h-4 bg-[hsl(217,90%,40%)] text-white border-0">
+                                    Active
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-500 capitalize">
+                                {staff.userType === 'management' ? 'Manager' : 'Staff'}
+                              </div>
+                            </div>
+                            {!isCurrentUser && (
+                              <ChevronRight className="h-4 w-4 text-gray-500" />
+                            )}
+                          </button>
+                        );
+                      })}
+                      
+                      {staffAccounts.length === 0 && (
+                        <div className="px-4 py-6 text-center text-gray-500">
+                          <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No users yet</p>
+                        </div>
                       )}
-                      <DropdownMenuItem onClick={() => {
-                        setIsStaffSwitchMode(true);
-                        setCurrentStaff(null);
-                      }}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Switch User
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </div>
+                    
+                    {/* Footer Actions */}
+                    <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
+                      {currentStaff?.userType === 'management' && (
+                        <button
+                          onClick={() => setIsUserManagementOpen(true)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-gray-700/50 transition-colors group"
+                        >
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-700/50 group-hover:bg-gray-600/50">
+                            <Settings className="h-4 w-4 text-gray-400 group-hover:text-white" />
+                          </div>
+                          <span className="text-sm text-gray-400 group-hover:text-white font-medium">User Management</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setIsStaffDialogOpen(true)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
+                      >
+                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 group-hover:bg-[hsl(217,90%,40%)]/30">
+                          <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                        </div>
+                        <span className="text-sm text-[hsl(217,90%,50%)] font-medium">Add New User</span>
+                      </button>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </motion.div>
 
               {/* Profile Avatar */}
