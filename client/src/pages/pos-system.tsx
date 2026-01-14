@@ -3754,16 +3754,14 @@ export default function PosSystem() {
                 </Card>
               </motion.div>
 
-              {/* Current Sale - Enterprise styling with distinct background */}
+              {/* Current Sale - Subtle distinct background */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/10 via-[hsl(217,90%,35%)]/5 to-transparent rounded-xl blur-xl"></div>
-                <Card data-testid="current-sale-card" className="relative bg-gradient-to-br from-gray-900/95 via-[hsl(217,90%,15%)]/30 to-gray-900/90 backdrop-blur-xl border-[hsl(217,90%,40%)]/30 shadow-2xl shadow-[hsl(217,90%,30%)]/30 ring-1 ring-[hsl(217,90%,40%)]/10">
-                  <CardHeader className="border-b border-[hsl(217,90%,40%)]/20 pb-4">
+                <Card data-testid="current-sale-card" className="bg-[hsl(217,30%,12%)]/80 backdrop-blur-xl border-[hsl(217,40%,25%)]/50 shadow-2xl shadow-blue-900/20">
+                  <CardHeader className="border-b border-[hsl(217,40%,25%)]/30 pb-4">
                     <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-3 text-white">
                         <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
