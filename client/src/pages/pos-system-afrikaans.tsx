@@ -2810,18 +2810,20 @@ ${dateFilteredSales.map(sale =>
                       )}
                     </div>
                     
-                    {/* Footer Actions */}
-                    <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
-                      <button
-                        onClick={() => setIsUserManagementOpen(true)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
-                      >
-                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 group-hover:bg-[hsl(217,90%,40%)]/30">
-                          <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                        </div>
-                        <span className="text-sm text-[hsl(217,90%,50%)] font-medium">Voeg Nuwe Gebruiker By</span>
-                      </button>
-                    </div>
+                    {/* Footer Actions - Only management can add users */}
+                    {currentStaff?.userType === 'management' && (
+                      <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
+                        <button
+                          onClick={() => setIsUserManagementOpen(true)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
+                        >
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 group-hover:bg-[hsl(217,90%,40%)]/30">
+                            <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                          </div>
+                          <span className="text-sm text-[hsl(217,90%,50%)] font-medium">Voeg Nuwe Gebruiker By</span>
+                        </button>
+                      </div>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </motion.div>
