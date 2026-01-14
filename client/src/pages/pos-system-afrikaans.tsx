@@ -3151,7 +3151,7 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
                       /* Grid Mode: Products in selected category */
-                      <div className="space-y-3">
+                      (<div className="space-y-3">
                         <button
                           onClick={() => setSelectedSalesCategory(null)}
                           className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
@@ -3179,10 +3179,10 @@ ${dateFilteredSales.map(sale =>
                             </div>
                           ))}
                         </div>
-                      </div>
+                      </div>)
                     ) : (
                       /* Tabs Mode or No Categories: Regular product list */
-                      <div className="grid gap-2">
+                      (<div className="grid gap-2">
                         {filteredSalesProducts.map((product) => (
                           <div
                             key={product.id}
@@ -3208,7 +3208,7 @@ ${dateFilteredSales.map(sale =>
                             </div>
                           </div>
                         ))}
-                      </div>
+                      </div>)
                     )}
                   </CardContent>
                 </Card>
@@ -4402,7 +4402,6 @@ ${dateFilteredSales.map(sale =>
                         </CardContent>
                       </Card>
                     </div>
-
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Payment Methods Pie Chart */}
@@ -4462,7 +4461,6 @@ ${dateFilteredSales.map(sale =>
                         </CardContent>
                       </Card>
                     </div>
-
                     {/* Detailed Sales List */}
                     <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader>
@@ -4479,7 +4477,7 @@ ${dateFilteredSales.map(sale =>
                               <div key={sale.id} className={`flex items-center justify-between p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2">
-                                    <span className={`font-medium ${sale.isVoided ? 'line-through text-red-600' : ''}`}>
+                                    <span className="font-medium text-[#ffffff]">
                                       Verkoop #{sale.id}
                                     </span>
                                     {sale.isVoided && (
