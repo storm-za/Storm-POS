@@ -16,6 +16,7 @@ import { HelpCenter } from "@/pages/HelpCenter";
 import { HelpCenterAfrikaans } from "@/pages/HelpCenterAfrikaans";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
+import Contact from "@/pages/contact";
 import Navigation from "@/components/navigation";
 import { useEffect } from "react";
 
@@ -32,6 +33,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/web-development" component={WebDevelopment} />
+        <Route path="/contact" component={Contact} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogPost} />
         <Route path="/pos" component={POS} />
