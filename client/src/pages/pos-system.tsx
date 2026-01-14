@@ -173,6 +173,7 @@ export default function PosSystem() {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showWelcomeToast, setShowWelcomeToast] = useState(true);
+  const [expandedSales, setExpandedSales] = useState<Set<number>>(new Set());
   
   // Excel import/export state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -5351,88 +5352,170 @@ export default function PosSystem() {
                         <CardTitle className="text-white">Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
-                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                        <div className="space-y-2">
                           {dateFilteredSales.length > 0 ? (
-                            dateFilteredSales.map((sale) => (
-                              <div key={sale.id} className={`flex justify-between items-center p-3 border rounded-lg ${sale.isVoided ? 'bg-red-900/20 border-red-500/30' : 'bg-white/5 border-white/10'}`}>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-4">
-                                    <div>
-                                      <div className="flex items-center gap-2">
-                                        <p className={`font-medium ${sale.isVoided ? 'line-through text-red-400' : 'text-white'}`}>
-                                          R{sale.total}
-                                        </p>
-                                        {sale.isVoided && (
-                                          <Badge variant="destructive" className="text-xs">
-                                            VOIDED
+                            dateFilteredSales.map((sale) => {
+                              const isExpanded = expandedSales.has(sale.id);
+                              const saleItems = Array.isArray(sale.items) ? sale.items : [];
+                              
+                              return (
+                                <motion.div 
+                                  key={sale.id} 
+                                  initial={false}
+                                  animate={{ backgroundColor: isExpanded ? 'rgba(30, 58, 138, 0.1)' : 'transparent' }}
+                                  className={`border rounded-xl overflow-hidden transition-all duration-300 ${
+                                    sale.isVoided 
+                                      ? 'bg-red-950/30 border-red-800/50' 
+                                      : isExpanded 
+                                        ? 'border-[hsl(217,90%,40%)]/50 shadow-lg shadow-blue-900/20' 
+                                        : 'border-gray-700/50 hover:border-gray-600/50'
+                                  }`}
+                                >
+                                  <div 
+                                    className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
+                                      isExpanded ? 'bg-gradient-to-r from-[hsl(217,30%,15%)]/80 to-transparent' : 'hover:bg-gray-800/30'
+                                    }`}
+                                    onClick={() => {
+                                      const newExpanded = new Set(expandedSales);
+                                      if (isExpanded) {
+                                        newExpanded.delete(sale.id);
+                                      } else {
+                                        newExpanded.add(sale.id);
+                                      }
+                                      setExpandedSales(newExpanded);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3 flex-1">
+                                      <motion.div
+                                        animate={{ rotate: isExpanded ? 90 : 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className={`p-1.5 rounded-lg ${isExpanded ? 'bg-[hsl(217,90%,40%)]/20' : 'bg-gray-700/50'}`}
+                                      >
+                                        <ChevronRight className={`w-4 h-4 ${isExpanded ? 'text-[hsl(217,90%,50%)]' : 'text-gray-400'}`} />
+                                      </motion.div>
+                                      
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className="font-semibold text-white">
+                                            Sale #{sale.id}
+                                          </span>
+                                          <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">
+                                            {saleItems.length} {saleItems.length === 1 ? 'item' : 'items'}
                                           </Badge>
-                                        )}
+                                          <Badge variant="outline" className="text-xs bg-blue-600/20 text-blue-300 border-blue-500/30">
+                                            {sale.paymentType.toUpperCase()}
+                                          </Badge>
+                                          {sale.isVoided && (
+                                            <Badge variant="destructive" className="text-xs">
+                                              VOIDED
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-gray-400 mt-0.5">
+                                          {new Date(sale.createdAt).toLocaleString()} 
+                                          {sale.customerName && ` • ${sale.customerName}`}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          Served by: {
+                                            sale.staffAccountId 
+                                              ? (() => {
+                                                  const staff = staffAccounts.find(s => s.id === sale.staffAccountId);
+                                                  return staff ? (staff.displayName || staff.username || `Staff #${staff.id}`) : 'Staff Member';
+                                                })()
+                                              : currentUser?.email?.split('@')[0] || 'Manager'
+                                          }
+                                          {sale.isVoided && sale.voidReason && ` • Void: ${sale.voidReason}`}
+                                        </p>
                                       </div>
-                                      <p className="text-sm text-gray-400">
-                                        {new Date(sale.createdAt).toLocaleTimeString()}
-                                      </p>
                                     </div>
-                                    {sale.customerName && (
-                                      <div>
-                                        <p className="text-sm font-medium text-white">{sale.customerName}</p>
-                                        <p className="text-xs text-gray-400">Customer</p>
+                                    
+                                    <div className="flex items-center gap-3">
+                                      <div className="text-right">
+                                        <span className={`text-lg font-bold ${sale.isVoided ? 'line-through text-red-500' : 'text-[hsl(217,90%,50%)]'}`}>
+                                          R{sale.total}
+                                        </span>
                                       </div>
-                                    )}
-                                    <div>
-                                      <p className="text-sm font-medium text-white">
-                                        Served by: {
-                                          sale.staffAccountId 
-                                            ? (() => {
-                                                const staff = staffAccounts.find(staff => staff.id === sale.staffAccountId);
-                                                return staff ? (staff.displayName || staff.username || `Staff #${staff.id}`) : 'Staff Member';
-                                              })()
-                                            : currentUser?.email?.split('@')[0] || 'Manager'
-                                        }
-                                      </p>
-                                      <p className="text-xs text-gray-400">Staff</p>
+                                      {!sale.isVoided && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => { e.stopPropagation(); handleVoidSaleClick(sale); }}
+                                          className="h-7 px-2 text-xs border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                                        >
+                                          <X className="h-3 w-3 mr-1" />
+                                          Void
+                                        </Button>
+                                      )}
+                                      {sale.isVoided && sale.voidReason && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => { e.stopPropagation(); handleViewVoidReason(sale); }}
+                                          className="h-7 px-2 text-xs border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
+                                        >
+                                          <Eye className="h-3 w-3 mr-1" />
+                                          View
+                                        </Button>
+                                      )}
                                     </div>
                                   </div>
-                                  <div className="mt-2">
-                                    <p className="text-xs text-gray-300">
-                                      Items: {sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}
-                                    </p>
-                                    {sale.isVoided && sale.voidReason && (
-                                      <p className="text-xs text-red-400 mt-1">
-                                        Void Reason: {sale.voidReason}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="text-right flex flex-col items-end gap-1">
-                                  <Badge variant="outline" className="mb-1 bg-blue-600/20 text-blue-300 border-blue-500/30">
-                                    {sale.paymentType.toUpperCase()}
-                                  </Badge>
-                                  <p className="text-xs text-gray-400">#{sale.id}</p>
-                                  {!sale.isVoided && (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleVoidSaleClick(sale)}
-                                      className="h-6 px-2 text-xs border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                                    >
-                                      <X className="h-3 w-3 mr-1" />
-                                      Void
-                                    </Button>
-                                  )}
-                                  {sale.isVoided && sale.voidReason && (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleViewVoidReason(sale)}
-                                      className="h-6 px-2 text-xs border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
-                                    >
-                                      <Eye className="h-3 w-3 mr-1" />
-                                      View
-                                    </Button>
-                                  )}
-                                </div>
-                              </div>
-                            ))
+                                  
+                                  {/* Expandable Items Section */}
+                                  <motion.div
+                                    initial={false}
+                                    animate={{ 
+                                      height: isExpanded ? 'auto' : 0,
+                                      opacity: isExpanded ? 1 : 0
+                                    }}
+                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
+                                      <div className="bg-gray-900/50 rounded-lg border border-gray-700/30 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
+                                          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaction Details</span>
+                                        </div>
+                                        <div className="divide-y divide-gray-700/30">
+                                          {saleItems.map((item: any, index: number) => (
+                                            <div key={index} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/30 transition-colors">
+                                              <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">
+                                                  <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                                </div>
+                                                <div>
+                                                  <p className="text-white font-medium">{item.name || 'Unknown Product'}</p>
+                                                  <p className="text-xs text-gray-500">SKU: {item.sku || 'N/A'}</p>
+                                                </div>
+                                              </div>
+                                              <div className="text-right">
+                                                <div className="flex items-center gap-4">
+                                                  <div className="text-center">
+                                                    <p className="text-xs text-gray-500">Qty</p>
+                                                    <p className="text-white font-medium">{item.quantity || 1}</p>
+                                                  </div>
+                                                  <div className="text-center">
+                                                    <p className="text-xs text-gray-500">Price</p>
+                                                    <p className="text-white font-medium">R{parseFloat(item.price || 0).toFixed(2)}</p>
+                                                  </div>
+                                                  <div className="text-center min-w-[80px]">
+                                                    <p className="text-xs text-gray-500">Subtotal</p>
+                                                    <p className="text-[hsl(217,90%,50%)] font-semibold">R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-3 border-t border-gray-700/30 flex justify-between items-center">
+                                          <span className="text-sm font-medium text-gray-300">Total</span>
+                                          <span className="text-lg font-bold text-[hsl(217,90%,50%)]">R{sale.total}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                </motion.div>
+                              );
+                            })
                           ) : (
                             <div className="text-center py-8 text-gray-400">
                               No sales recorded for {new Date(selectedDate).toLocaleDateString()}

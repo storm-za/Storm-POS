@@ -182,6 +182,7 @@ export default function PosSystemAfrikaans() {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showWelcomeToast, setShowWelcomeToast] = useState(true);
+  const [expandedSales, setExpandedSales] = useState<Set<number>>(new Set());
   
   // Saved payment details state
   const [isSavePaymentDialogOpen, setIsSavePaymentDialogOpen] = useState(false);
@@ -4473,53 +4474,154 @@ ${dateFilteredSales.map(sale =>
                               Geen verkope vir geselekteerde datum en filter nie
                             </div>
                           ) : (
-                            dateFilteredSales.map((sale) => (
-                              <div key={sale.id} className={`flex items-center justify-between p-3 border rounded-lg ${sale.isVoided ? 'bg-red-50 border-red-200' : ''}`}>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-[#ffffff]">
-                                      Verkoop #{sale.id}
-                                    </span>
-                                    {sale.isVoided && (
-                                      <Badge variant="destructive" className="text-xs">
-                                        Gekanselleer
-                                      </Badge>
-                                    )}
+                            dateFilteredSales.map((sale) => {
+                              const isExpanded = expandedSales.has(sale.id);
+                              const saleItems = Array.isArray(sale.items) ? sale.items : [];
+                              
+                              return (
+                                <motion.div 
+                                  key={sale.id} 
+                                  initial={false}
+                                  animate={{ backgroundColor: isExpanded ? 'rgba(30, 58, 138, 0.1)' : 'transparent' }}
+                                  className={`border rounded-xl overflow-hidden transition-all duration-300 ${
+                                    sale.isVoided 
+                                      ? 'bg-red-950/30 border-red-800/50' 
+                                      : isExpanded 
+                                        ? 'border-[hsl(217,90%,40%)]/50 shadow-lg shadow-blue-900/20' 
+                                        : 'border-gray-700/50 hover:border-gray-600/50'
+                                  }`}
+                                >
+                                  <div 
+                                    className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
+                                      isExpanded ? 'bg-gradient-to-r from-[hsl(217,30%,15%)]/80 to-transparent' : 'hover:bg-gray-800/30'
+                                    }`}
+                                    onClick={() => {
+                                      const newExpanded = new Set(expandedSales);
+                                      if (isExpanded) {
+                                        newExpanded.delete(sale.id);
+                                      } else {
+                                        newExpanded.add(sale.id);
+                                      }
+                                      setExpandedSales(newExpanded);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3 flex-1">
+                                      <motion.div
+                                        animate={{ rotate: isExpanded ? 90 : 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className={`p-1.5 rounded-lg ${isExpanded ? 'bg-[hsl(217,90%,40%)]/20' : 'bg-gray-700/50'}`}
+                                      >
+                                        <ChevronRight className={`w-4 h-4 ${isExpanded ? 'text-[hsl(217,90%,50%)]' : 'text-gray-400'}`} />
+                                      </motion.div>
+                                      
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className="font-semibold text-white">
+                                            Verkoop #{sale.id}
+                                          </span>
+                                          <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">
+                                            {saleItems.length} {saleItems.length === 1 ? 'item' : 'items'}
+                                          </Badge>
+                                          {sale.isVoided && (
+                                            <Badge variant="destructive" className="text-xs">
+                                              Gekanselleer
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-sm text-gray-400 mt-0.5">
+                                          {new Date(sale.createdAt).toLocaleString('af-ZA')} • {sale.paymentType === 'kontant' ? 'Kontant' : sale.paymentType === 'kaart' ? 'Kaart' : sale.paymentType === 'eft' ? 'EFT' : sale.paymentType}
+                                          {sale.customerName && ` • ${sale.customerName}`}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          {sale.staffAccount ? `Bedien deur: ${sale.staffAccount.username}` : 'Bedien deur: Bestuur'}
+                                          {sale.notes && ` • Nota: ${sale.notes}`}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                      <div className="text-right">
+                                        <span className={`text-lg font-bold ${sale.isVoided ? 'line-through text-red-500' : 'text-[hsl(217,90%,50%)]'}`}>
+                                          R{sale.total}
+                                        </span>
+                                      </div>
+                                      {sale.isVoided ? (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={(e) => { e.stopPropagation(); setViewVoidDialog({ open: true, sale }); }}
+                                          className="bg-gray-800 border-gray-600 hover:bg-gray-700"
+                                        >
+                                          <Eye className="h-4 w-4" />
+                                        </Button>
+                                      ) : currentStaff?.userType === 'management' && (
+                                        <Button
+                                          variant="destructive"
+                                          size="sm"
+                                          onClick={(e) => { e.stopPropagation(); setVoidSaleDialog({ open: true, sale }); }}
+                                        >
+                                          Kanselleer
+                                        </Button>
+                                      )}
+                                    </div>
                                   </div>
-                                  <p className="text-sm text-gray-500">
-                                    {new Date(sale.createdAt).toLocaleString('af-ZA')} • {sale.paymentType === 'kontant' ? 'Kontant' : sale.paymentType === 'kaart' ? 'Kaart' : sale.paymentType === 'eft' ? 'EFT' : sale.paymentType}
-                                    {sale.customerName && ` • ${sale.customerName}`}
-                                    {sale.staffAccount ? ` • Bedien deur: ${sale.staffAccount.username}` : ' • Bedien deur: Bestuur'}
-                                  </p>
-                                  <p className="text-xs text-gray-400">
-                                    Items: {Array.isArray(sale.items) ? sale.items.length : 0}
-                                    {sale.notes && ` • Nota: ${sale.notes}`}
-                                  </p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className={`font-bold ${sale.isVoided ? 'line-through text-red-600' : 'text-[hsl(217,90%,40%)]'}`}>
-                                    R{sale.total}
-                                  </span>
-                                  {sale.isVoided ? (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => setViewVoidDialog({ open: true, sale })}
-                                    >
-                                      <Eye className="h-4 w-4" />
-                                    </Button>
-                                  ) : currentStaff?.userType === 'management' && (
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() => setVoidSaleDialog({ open: true, sale })}
-                                    >
-                                      Kanselleer
-                                    </Button>
-                                  )}
-                                </div>
-                              </div>
-                            ))
+                                  
+                                  {/* Expandable Items Section */}
+                                  <motion.div
+                                    initial={false}
+                                    animate={{ 
+                                      height: isExpanded ? 'auto' : 0,
+                                      opacity: isExpanded ? 1 : 0
+                                    }}
+                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
+                                      <div className="bg-gray-900/50 rounded-lg border border-gray-700/30 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
+                                          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaksie Besonderhede</span>
+                                        </div>
+                                        <div className="divide-y divide-gray-700/30">
+                                          {saleItems.map((item: any, index: number) => (
+                                            <div key={index} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/30 transition-colors">
+                                              <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">
+                                                  <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                                </div>
+                                                <div>
+                                                  <p className="text-white font-medium">{item.name || 'Onbekende Produk'}</p>
+                                                  <p className="text-xs text-gray-500">SKU: {item.sku || 'N/A'}</p>
+                                                </div>
+                                              </div>
+                                              <div className="text-right">
+                                                <div className="flex items-center gap-4">
+                                                  <div className="text-center">
+                                                    <p className="text-xs text-gray-500">Hoev.</p>
+                                                    <p className="text-white font-medium">{item.quantity || 1}</p>
+                                                  </div>
+                                                  <div className="text-center">
+                                                    <p className="text-xs text-gray-500">Prys</p>
+                                                    <p className="text-white font-medium">R{parseFloat(item.price || 0).toFixed(2)}</p>
+                                                  </div>
+                                                  <div className="text-center min-w-[80px]">
+                                                    <p className="text-xs text-gray-500">Subtotaal</p>
+                                                    <p className="text-[hsl(217,90%,50%)] font-semibold">R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-3 border-t border-gray-700/30 flex justify-between items-center">
+                                          <span className="text-sm font-medium text-gray-300">Totaal</span>
+                                          <span className="text-lg font-bold text-[hsl(217,90%,50%)]">R{sale.total}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                </motion.div>
+                              );
+                            })
                           )}
                         </div>
                       </CardContent>
