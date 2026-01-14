@@ -5219,64 +5219,86 @@ ${dateFilteredSales.map(sale =>
 
         {/* Category Management Dialog */}
         <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-          <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-700">
+          <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-white flex items-center gap-2">
-                <Folder className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                Bestuur Kategoriee
+                <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+                {editingCategory ? 'Wysig Kategorie' : 'Skep Kategorie'}
               </DialogTitle>
               <DialogDescription className="text-gray-400">
-                Skep en organiseer produkkategoriee
+                {editingCategory ? 'Werk kategorie besonderhede hieronder by.' : 'Skep \'n nuwe kategorie om jou produkte te organiseer.'}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              {/* Add/Edit Category Form */}
-              <div className="flex gap-2">
-                <Input
+            
+            <div className="space-y-4 py-4">
+              <div>
+                <Label className="text-gray-300">Kategorienaam</Label>
+                <Input 
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="Kategorienaam"
-                  className="flex-1 bg-gray-800 border-gray-700 text-white"
+                  placeholder="bv. Drankies, Kos, Elektronika"
+                  className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
                 />
-                <div className="flex gap-1">
+              </div>
+              
+              <div>
+                <Label className="text-gray-300 flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  Kategoriekleur
+                </Label>
+                <div className="flex flex-wrap gap-2 mt-2">
                   {['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'].map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setCategoryColor(color)}
-                      className={`w-8 h-8 rounded-lg transition-all ${categoryColor === color ? 'ring-2 ring-white scale-110' : 'hover:scale-105'}`}
+                      className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
-                <Button onClick={handleSaveCategory} disabled={!categoryName.trim()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)]">
-                  {editingCategory ? 'Stoor' : 'Voeg By'}
-                </Button>
               </div>
 
-              {/* Categories List */}
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {categories.map((cat) => (
-                  <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                      <span className="text-white font-medium">{cat.name}</span>
-                      <span className="text-xs text-gray-400">({products.filter(p => p.categoryId === cat.id).length} produkte)</span>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-red-400 hover:text-red-300">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+              {/* Existing Categories List */}
+              {categories.length > 0 && !editingCategory && (
+                <div>
+                  <Label className="text-gray-300 mb-2 block">Bestaande Kategoriee</Label>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {categories.map((cat) => (
+                      <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                          <span className="text-white">{cat.name}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {products.filter(p => p.categoryId === cat.id).length} produkte
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white h-7 w-7 p-0">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-gray-400 hover:text-red-400 h-7 w-7 p-0">
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                {categories.length === 0 && (
-                  <p className="text-center text-gray-500 py-4">Geen kategoriee nie. Skep jou eerste kategorie hierbo.</p>
-                )}
-              </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={handleSaveCategory} 
+                className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)]"
+                disabled={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+              >
+                {createCategoryMutation.isPending || updateCategoryMutation.isPending ? 'Stoor...' : (editingCategory ? 'Werk Kategorie By' : 'Skep Kategorie')}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
