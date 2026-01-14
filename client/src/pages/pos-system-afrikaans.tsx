@@ -5212,10 +5212,35 @@ ${dateFilteredSales.map(sale =>
 
         {/* Oop Rekening Skep Dialog */}
         <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Skep Oop Rekening</DialogTitle>
+          <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
+            <DialogHeader className="border-b border-gray-700/50 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-white text-xl font-bold">Skep Oop Rekening</DialogTitle>
+                  <p className="text-gray-400 text-sm mt-1">Voeg items by 'n nuwe tafel of klient rekening</p>
+                </div>
+              </div>
             </DialogHeader>
+            
+            {/* Current Sale Summary */}
+            {currentSale.length > 0 && (
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-gray-400 text-sm font-medium">Huidige Items</span>
+                  <Badge variant="outline" className="border-[hsl(217,90%,40%)]/50 text-[hsl(217,90%,60%)]">
+                    {currentSale.length} {currentSale.length === 1 ? 'item' : 'items'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Totaal Bedrag:</span>
+                  <span className="text-2xl font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>
+                </div>
+              </div>
+            )}
+            
             <Form {...openAccountForm}>
               <form 
                 onSubmit={openAccountForm.handleSubmit((data) => {
@@ -5227,16 +5252,20 @@ ${dateFilteredSales.map(sale =>
                   };
                   createOpenAccountMutation.mutate(accountData);
                 })} 
-                className="space-y-4"
+                className="space-y-5"
               >
                 <FormField
                   control={openAccountForm.control}
                   name="accountName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rekeningnaam</FormLabel>
+                      <FormLabel className="text-gray-300 font-medium">Rekeningnaam</FormLabel>
                       <FormControl>
-                        <Input placeholder="bv., Tafel 5, Jan Smit" {...field} />
+                        <Input 
+                          placeholder="bv., Tafel 5, Jan Smit" 
+                          {...field} 
+                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -5247,18 +5276,47 @@ ${dateFilteredSales.map(sale =>
                   name="accountType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rekeningtipe</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Kies rekeningtipe" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="table">Tafel</SelectItem>
-                          <SelectItem value="customer">Klient</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel className="text-gray-300 font-medium">Rekeningtipe</FormLabel>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => field.onChange('table')}
+                          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                            field.value === 'table' 
+                              ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                              : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
+                            field.value === 'table' 
+                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                              : 'bg-gray-700/50'
+                          }`}>
+                            <FileText className={`w-5 h-5 ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`} />
+                          </div>
+                          <span className={`font-medium ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`}>Tafel</span>
+                          <span className="text-xs text-gray-500 mt-1">Restaurant tafel</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => field.onChange('customer')}
+                          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                            field.value === 'customer' 
+                              ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                              : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
+                            field.value === 'customer' 
+                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                              : 'bg-gray-700/50'
+                          }`}>
+                            <Users className={`w-5 h-5 ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`} />
+                          </div>
+                          <span className={`font-medium ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`}>Klient</span>
+                          <span className="text-xs text-gray-500 mt-1">Klient rekening</span>
+                        </button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -5268,24 +5326,44 @@ ${dateFilteredSales.map(sale =>
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notas (Opsioneel)</FormLabel>
+                      <FormLabel className="text-gray-300 font-medium">Notas (Opsioneel)</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enige addisionele notas..." {...field} />
+                        <Textarea 
+                          placeholder="Enige addisionele notas..." 
+                          {...field} 
+                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none"
+                          rows={3}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <div className="flex justify-end space-x-2">
-                  <Button type="button" variant="outline" onClick={() => setIsOpenAccountDialogOpen(false)}>
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsOpenAccountDialogOpen(false)}
+                    className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-6"
+                  >
                     Kanselleer
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                    disabled={createOpenAccountMutation.isPending}
+                    className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 px-6"
+                    disabled={createOpenAccountMutation.isPending || currentSale.length === 0}
                   >
-                    {createOpenAccountMutation.isPending ? 'Besig...' : 'Skep Rekening'}
+                    {createOpenAccountMutation.isPending ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                        Besig...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Skep Rekening
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>
