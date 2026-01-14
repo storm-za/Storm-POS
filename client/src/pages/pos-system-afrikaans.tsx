@@ -2812,19 +2812,8 @@ ${dateFilteredSales.map(sale =>
                     
                     {/* Footer Actions */}
                     <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
-                      {currentStaff?.userType === 'management' && (
-                        <button
-                          onClick={() => setIsUserManagementOpen(true)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-gray-700/50 transition-colors group"
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-700/50 group-hover:bg-gray-600/50">
-                            <Settings className="h-4 w-4 text-gray-400 group-hover:text-white" />
-                          </div>
-                          <span className="text-sm text-gray-400 group-hover:text-white font-medium">Gebruikersbestuur</span>
-                        </button>
-                      )}
                       <button
-                        onClick={() => setIsStaffDialogOpen(true)}
+                        onClick={() => setIsUserManagementOpen(true)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
                       >
                         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 group-hover:bg-[hsl(217,90%,40%)]/30">
@@ -6325,136 +6314,229 @@ ${dateFilteredSales.map(sale =>
           </DialogContent>
         </Dialog>
 
-        {/* User Management Dialog */}
+        {/* User Management Dialog - Enterprise Design */}
         <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-          <DialogContent className="sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {staffAccounts.length === 0 ? "Skep Jou Eerste Personeelrekening" : "Gebruikersbestuur"}
-              </DialogTitle>
-              <DialogDescription>
-                {staffAccounts.length === 0 
-                  ? "Stel jou eerste personeelrekening op om die personeelbestuurstelsel te begin gebruik."
-                  : "Bestuur personeelrekeninge en toestemmings."
-                }
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6">
-              {/* Create New Staff Account */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold mb-3">Voeg Nuwe Personeelrekening By</h3>
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const username = formData.get('new-username') as string;
-                  const password = formData.get('new-password') as string;
-                  const userType = formData.get('user-type') as 'staff' | 'management';
-                  const managementPassword = formData.get('management-password') as string;
-                  
-                  if (username && password && userType) {
-                    createStaffAccountMutation.mutate({
-                      username,
-                      password,
-                      userType,
-                      managementPassword: userType === 'management' ? managementPassword : undefined,
-                      userId: currentUser?.id
-                    });
-                    (e.target as HTMLFormElement).reset();
-                  }
-                }}>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="new-username">Gebruikersnaam</Label>
-                      <Input
-                        id="new-username"
-                        name="new-username"
-                        type="text"
-                        required
-                        placeholder="Voer gebruikersnaam in"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="new-password">Wagwoord</Label>
-                      <Input
-                        id="new-password"
-                        name="new-password"
-                        type="password"
-                        required
-                        placeholder="Voer wagwoord in"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="user-type">Gebruikertipe</Label>
-                      <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : undefined}>
-                        <SelectTrigger>
-                          <SelectValue placeholder={staffAccounts.length === 0 ? "Bestuur (Verstekk)" : "Kies gebruikertipe"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="staff">Personeel</SelectItem>
-                          <SelectItem value="management">Bestuur</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="management-password">Bestuurswagwoord (indien nodig)</Label>
-                      <Input
-                        id="management-password"
-                        name="management-password"
-                        type="password"
-                        placeholder="Vereis vir bestuursrekeninge"
-                      />
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    disabled={createStaffAccountMutation.isPending}
-                    className="w-full"
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    {createStaffAccountMutation.isPending ? "Skep..." : "Skep Personeelrekening"}
-                  </Button>
-                </form>
-              </div>
-
-              {/* Existing Staff Accounts */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold mb-3">Bestaande Personeelrekeninge</h3>
-                <div className="space-y-2">
-                  {staffAccounts.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Nog geen personeelrekeninge geskep nie.</p>
-                  ) : (
-                    staffAccounts.map((staff) => (
-                      <div key={staff.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium">{staff.username}</div>
-                          <div className="text-sm text-muted-foreground capitalize">
-                            {staff.userType === 'management' ? 'Bestuur' : 'Personeel'} • {staff.isActive ? 'Aktief' : 'Onaktief'}
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={staff.userType === 'management' ? 'default' : 'secondary'}>
-                            {staff.userType === 'management' ? 'Bestuur' : 'Personeel'}
-                          </Badge>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (window.confirm(`Is jy seker jy wil ${staff.username} verwyder?`)) {
-                                deleteStaffAccountMutation.mutate(staff.id);
-                              }
-                            }}
-                            disabled={deleteStaffAccountMutation.isPending}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  )}
+          <DialogContent className="sm:max-w-2xl p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold text-white">
+                    {staffAccounts.length === 0 ? "Skep Jou Eerste Gebruiker" : "Gebruikersbestuur"}
+                  </DialogTitle>
+                  <DialogDescription className="text-gray-400 text-sm mt-0.5">
+                    {staffAccounts.length === 0 
+                      ? "Stel jou eerste rekening op om te begin."
+                      : `${staffAccounts.length} gebruiker${staffAccounts.length === 1 ? '' : 's'} geregistreer`
+                    }
+                  </DialogDescription>
                 </div>
               </div>
+            </div>
+
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* Existing Staff Accounts */}
+              {staffAccounts.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Span Lede</h3>
+                    <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                  </div>
+                  <div className="space-y-3">
+                    {staffAccounts.map((staff) => {
+                      const isCurrentLoggedIn = currentStaff?.id === staff.id;
+                      return (
+                        <motion.div 
+                          key={staff.id} 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
+                            isCurrentLoggedIn 
+                              ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
+                              : 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50'
+                          }`}
+                        >
+                          {/* User Avatar */}
+                          <div className={`relative flex items-center justify-center w-12 h-12 rounded-xl ${
+                            staff.userType === 'management'
+                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
+                              : 'bg-gradient-to-br from-gray-600 to-gray-700'
+                          } shadow-lg`}>
+                            <User className="h-6 w-6 text-white" />
+                            {isCurrentLoggedIn && (
+                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg" />
+                            )}
+                          </div>
+                          
+                          {/* User Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-white truncate">
+                                {staff.displayName || staff.username}
+                              </span>
+                              {isCurrentLoggedIn && (
+                                <Badge className="text-[10px] px-1.5 py-0 h-4 bg-green-500/20 text-green-400 border border-green-500/30">
+                                  Aanlyn
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge 
+                                className={`text-[10px] px-1.5 py-0 h-4 ${
+                                  staff.userType === 'management' 
+                                    ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)] border border-[hsl(217,90%,40%)]/30' 
+                                    : 'bg-gray-700 text-gray-300 border border-gray-600'
+                                }`}
+                              >
+                                {staff.userType === 'management' ? 'Bestuur' : 'Personeel'}
+                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                {staff.isActive ? 'Aktief' : 'Onaktief'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (window.confirm(`Is jy seker jy wil ${staff.username} verwyder? Hierdie aksie kan nie ontdoen word nie.`)) {
+                                  deleteStaffAccountMutation.mutate(staff.id);
+                                }
+                              }}
+                              disabled={deleteStaffAccountMutation.isPending || isCurrentLoggedIn}
+                              className={`p-2 h-9 w-9 rounded-lg transition-all ${
+                                isCurrentLoggedIn 
+                                  ? 'opacity-30 cursor-not-allowed' 
+                                  : 'hover:bg-red-500/20 hover:text-red-400 text-gray-400'
+                              }`}
+                              title={isCurrentLoggedIn ? "Kan nie jouself verwyder nie" : "Verwyder gebruiker"}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Create New Staff Account */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Voeg Nuwe Gebruiker By</h3>
+                  <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                </div>
+                <div className="bg-gray-800/30 rounded-xl border border-gray-700/50 p-5">
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const username = formData.get('new-username') as string;
+                    const password = formData.get('new-password') as string;
+                    const userType = formData.get('user-type') as 'staff' | 'management';
+                    const managementPassword = formData.get('management-password') as string;
+                    
+                    if (username && password && userType) {
+                      createStaffAccountMutation.mutate({
+                        username,
+                        password,
+                        userType,
+                        managementPassword: userType === 'management' ? managementPassword : undefined,
+                        userId: currentUser?.id
+                      });
+                      (e.target as HTMLFormElement).reset();
+                    }
+                  }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Gebruikersnaam</Label>
+                        <Input
+                          id="new-username"
+                          name="new-username"
+                          type="text"
+                          required
+                          placeholder="Voer naam in"
+                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Wagwoord</Label>
+                        <Input
+                          id="new-password"
+                          name="new-password"
+                          type="password"
+                          required
+                          placeholder="Voer wagwoord in"
+                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                      <div>
+                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
+                        <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
+                          <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                            <SelectValue placeholder="Kies rol" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-700">
+                            <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
+                            <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Bestuurswagwoord</Label>
+                        <Input
+                          id="management-password"
+                          name="management-password"
+                          type="password"
+                          placeholder="Slegs vir bestuur"
+                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        />
+                        <p className="text-xs text-gray-500 mt-1.5">Vereis slegs vir bestuurdersrol</p>
+                      </div>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      disabled={createStaffAccountMutation.isPending}
+                      className="w-full bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-blue-500/25 transition-all"
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      {createStaffAccountMutation.isPending ? "Skep tans..." : "Skep Gebruiker"}
+                    </Button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Empty State */}
+              {staffAccounts.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+                    <Users className="h-8 w-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-500 text-sm">Nog geen gebruikers geskep nie.</p>
+                  <p className="text-gray-600 text-xs mt-1">Gebruik die vorm hierbo om jou eerste gebruiker te skep.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-900/50 border-t border-gray-700/50 px-6 py-4 flex justify-end">
+              <Button 
+                onClick={() => setIsUserManagementOpen(false)}
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-700/50"
+              >
+                Sluit
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
