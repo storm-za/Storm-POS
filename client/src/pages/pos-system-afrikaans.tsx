@@ -3136,7 +3136,7 @@ ${dateFilteredSales.map(sale =>
                                 className={checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
                               >
                                 <Receipt className="h-4 w-4 mr-2" />
-                                Kontant/Kaart
+                                Voltooi Verkoop
                               </Button>
                               <Button
                                 type="button"
