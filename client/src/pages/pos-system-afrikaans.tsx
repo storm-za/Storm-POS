@@ -3034,11 +3034,42 @@ ${dateFilteredSales.map(sale =>
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2 text-white">
-                      <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-                      <span>Produkte</span>
-                    </CardTitle>
+                  <CardHeader className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center space-x-2 text-white">
+                        <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
+                        <span>Produkte</span>
+                      </CardTitle>
+                      {/* Display Mode Toggle */}
+                      {categories.length > 0 && (
+                        <div className="flex items-center gap-2 bg-gray-900/50 rounded-lg p-1">
+                          <button
+                            onClick={() => { setSalesDisplayMode('grid'); setSelectedSalesCategory(null); }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                              salesDisplayMode === 'grid' 
+                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            <Grid3X3 className="w-3.5 h-3.5" />
+                            Rooster
+                          </button>
+                          <button
+                            onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                              salesDisplayMode === 'tabs' 
+                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            <LayoutList className="w-3.5 h-3.5" />
+                            Oortjies
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Search Bar */}
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
@@ -3048,35 +3079,137 @@ ${dateFilteredSales.map(sale =>
                         className="pl-10"
                       />
                     </div>
+
+                    {/* Category Tabs (when in tabs mode) */}
+                    {salesDisplayMode === 'tabs' && categories.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setSalesCategoryFilter('all')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                            salesCategoryFilter === 'all'
+                              ? 'bg-[hsl(217,90%,40%)] text-white'
+                              : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
+                          }`}
+                        >
+                          Alles
+                        </button>
+                        {categories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            onClick={() => setSalesCategoryFilter(cat.id)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                              salesCategoryFilter === cat.id
+                                ? 'text-white shadow-lg'
+                                : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
+                            }`}
+                            style={salesCategoryFilter === cat.id ? { backgroundColor: cat.color || '#3b82f6' } : {}}
+                          >
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                            {cat.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent className="max-h-96 overflow-y-auto">
-                    <div className="grid gap-2">
-                      {filteredSalesProducts.map((product) => (
+                    {/* Grid Mode: Category Cards */}
+                    {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* All Products Card */}
                         <div
-                          key={product.id}
-                          className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
-                          onClick={() => addToSale(product)}
+                          onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
+                          className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
                         >
-                          <div>
-                            <p className="font-medium text-white">{product.name}</p>
-                            <p className="text-sm text-gray-400">SKU: {product.sku}</p>
-                            <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-blue-400">
-                              R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
-                            </p>
-                            {product.tradePrice && (
-                              <p className="text-xs text-gray-400">
-                                {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
-                                  ? `Kleinhandel: R${product.retailPrice}` 
-                                  : `Groothandel: R${product.tradePrice}`}
-                              </p>
-                            )}
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="w-12 h-12 rounded-xl bg-gray-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Package className="w-6 h-6 text-gray-300" />
+                            </div>
+                            <span className="font-medium text-white text-sm">Alle Produkte</span>
+                            <span className="text-xs text-gray-400">{products.length} items</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                        {/* Category Cards */}
+                        {categories.map((cat) => (
+                          <div
+                            key={cat.id}
+                            onClick={() => { setSelectedSalesCategory(cat.id); }}
+                            className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
+                            style={{ borderColor: `${cat.color}30` }}
+                          >
+                            <div className="flex flex-col items-center gap-2">
+                              <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
+                                style={{ backgroundColor: `${cat.color}30` }}
+                              >
+                                <Folder className="w-6 h-6" style={{ color: cat.color || '#3b82f6' }} />
+                              </div>
+                              <span className="font-medium text-white text-sm">{cat.name}</span>
+                              <span className="text-xs text-gray-400">{products.filter(p => p.categoryId === cat.id).length} items</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
+                      /* Grid Mode: Products in selected category */
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => setSelectedSalesCategory(null)}
+                          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Terug na Kategoriee
+                        </button>
+                        <div className="grid gap-2">
+                          {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
+                            <div
+                              key={product.id}
+                              className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
+                              onClick={() => addToSale(product)}
+                            >
+                              <div>
+                                <p className="font-medium text-white">{product.name}</p>
+                                <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                                <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-blue-400">
+                                  R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      /* Tabs Mode or No Categories: Regular product list */
+                      <div className="grid gap-2">
+                        {filteredSalesProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
+                            onClick={() => addToSale(product)}
+                          >
+                            <div>
+                              <p className="font-medium text-white">{product.name}</p>
+                              <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                              <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-blue-400">
+                                R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
+                              </p>
+                              {product.tradePrice && (
+                                <p className="text-xs text-gray-400">
+                                  {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
+                                    ? `Kleinhandel: R${product.retailPrice}` 
+                                    : `Groothandel: R${product.tradePrice}`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -5071,6 +5204,70 @@ ${dateFilteredSales.map(sale =>
 
         {/* All dialogs and modals would go here - Product Dialog, Customer Dialog, etc. */}
         {/* For brevity, I'm including the key ones */}
+
+        {/* Category Management Dialog */}
+        <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+          <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-700">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Folder className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                Bestuur Kategoriee
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Skep en organiseer produkkategoriee
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {/* Add/Edit Category Form */}
+              <div className="flex gap-2">
+                <Input
+                  value={categoryName}
+                  onChange={(e) => setCategoryName(e.target.value)}
+                  placeholder="Kategorienaam"
+                  className="flex-1 bg-gray-800 border-gray-700 text-white"
+                />
+                <div className="flex gap-1">
+                  {['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'].map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setCategoryColor(color)}
+                      className={`w-8 h-8 rounded-lg transition-all ${categoryColor === color ? 'ring-2 ring-white scale-110' : 'hover:scale-105'}`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                <Button onClick={handleSaveCategory} disabled={!categoryName.trim()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)]">
+                  {editingCategory ? 'Stoor' : 'Voeg By'}
+                </Button>
+              </div>
+
+              {/* Categories List */}
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                      <span className="text-white font-medium">{cat.name}</span>
+                      <span className="text-xs text-gray-400">({products.filter(p => p.categoryId === cat.id).length} produkte)</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-red-400 hover:text-red-300">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {categories.length === 0 && (
+                  <p className="text-center text-gray-500 py-4">Geen kategoriee nie. Skep jou eerste kategorie hierbo.</p>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Product Dialog */}
         <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
