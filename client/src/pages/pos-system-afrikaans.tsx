@@ -1868,6 +1868,48 @@ export default function PosSystemAfrikaans() {
     },
   });
 
+  // Create open account mutation
+  const createOpenAccountMutation = useMutation({
+    mutationFn: async (accountData: any) => {
+      const response = await apiRequest("POST", "/api/pos/open-accounts", {
+        ...accountData,
+        userId: currentUser?.id
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Kon nie oop rekening skep nie");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Oop rekening geskep",
+        description: `Rekening "${data.accountName}" suksesvol geskep`,
+      });
+      
+      // Clear current sale
+      setCurrentSale([]);
+      setSelectedCustomerId(null);
+      setSaleNotes("");
+      setPaymentType("kontant");
+      setDiscountPercentage(0);
+      setTipOptionEnabled(false);
+      setIsOpenAccountDialogOpen(false);
+      setCheckoutOption('complete');
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Kon nie oop rekening skep nie",
+        description: error.message || "'n Fout het voorgekom terwyl die rekening geskep is",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Merge receipt settings with defaults - Afrikaans
   const mergeReceiptSettingsAfrikaans = (settings: any) => {
     const defaults = defaultReceiptSettings();
@@ -5161,6 +5203,89 @@ ${dateFilteredSales.map(sale =>
                     disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
                   >
                     {createCustomerMutation.isPending || updateCustomerMutation.isPending ? 'Stoor...' : (editingCustomer ? 'Bywerk' : 'Skep')}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Oop Rekening Skep Dialog */}
+        <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Skep Oop Rekening</DialogTitle>
+            </DialogHeader>
+            <Form {...openAccountForm}>
+              <form 
+                onSubmit={openAccountForm.handleSubmit((data) => {
+                  const accountData = {
+                    ...data,
+                    items: currentSale,
+                    total: calculateTotal(),
+                    notes: saleNotes || null,
+                  };
+                  createOpenAccountMutation.mutate(accountData);
+                })} 
+                className="space-y-4"
+              >
+                <FormField
+                  control={openAccountForm.control}
+                  name="accountName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rekeningnaam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="bv., Tafel 5, Jan Smit" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={openAccountForm.control}
+                  name="accountType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rekeningtipe</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Kies rekeningtipe" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="table">Tafel</SelectItem>
+                          <SelectItem value="customer">Klient</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={openAccountForm.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notas (Opsioneel)</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Enige addisionele notas..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end space-x-2">
+                  <Button type="button" variant="outline" onClick={() => setIsOpenAccountDialogOpen(false)}>
+                    Kanselleer
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                    disabled={createOpenAccountMutation.isPending}
+                  >
+                    {createOpenAccountMutation.isPending ? 'Besig...' : 'Skep Rekening'}
                   </Button>
                 </div>
               </form>
