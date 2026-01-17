@@ -151,6 +151,15 @@ Drawing inspiration from: Linear (clean typography, spatial design), Stripe (pro
 - Validation states: Blue for focus, red for errors
 - Submit button: Primary style
 
+**Form Button Pattern (Dialog/Modal Forms)**:
+- **Cancel Button**: Use `variant="outline"` only, with NO additional className styling. This ensures consistent appearance across all dialogs.
+  - Correct: `<Button variant="outline">Cancel</Button>`
+  - Wrong: `<Button variant="outline" className="border-gray-600 text-gray-300">Cancel</Button>`
+- **Submit/Save Button**: Use storm blue background with appropriate styling
+  - Example: `className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"`
+- Button order: Cancel on left, Submit/Save on right
+- Wrapper: `<div className="flex justify-end space-x-2">` or `<div className="flex gap-2">`
+
 ### Footer
 **Multi-column layout** (4 columns desktop):
 - Product links, Resources, Company, Contact
