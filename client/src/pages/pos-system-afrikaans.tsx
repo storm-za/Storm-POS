@@ -3255,6 +3255,23 @@ ${dateFilteredSales.map(sale =>
                             Voeg Produkte By
                           </Button>
                         </div>
+                        {/* Category Title */}
+                        <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
+                          <div 
+                            className="w-8 h-8 rounded-lg flex items-center justify-center"
+                            style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}
+                          >
+                            <Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">
+                              {categories.find(c => c.id === selectedSalesCategory)?.name || 'Kategorie'}
+                            </h3>
+                            <p className="text-xs text-gray-400">
+                              {products.filter(p => p.categoryId === selectedSalesCategory).length} produkte
+                            </p>
+                          </div>
+                        </div>
                         <div className="grid gap-2">
                           {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
                             <div
