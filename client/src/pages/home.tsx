@@ -3,13 +3,50 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, ScanBarcode, TrendingUp, Users, Award, Shield, CheckCircle, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Code, ScanBarcode, TrendingUp, Users, Award, Shield, CheckCircle, Star, ChevronDown, ChevronUp, Mail, Sparkles, X, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 import { updatePageSEO } from "@/lib/seo";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [pricingInterestOpen, setPricingInterestOpen] = useState(false);
+  const [pricingEmail, setPricingEmail] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const { toast } = useToast();
+
+  const pricingInterestMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await apiRequest("POST", "/api/pricing-interest", { email });
+      return response.json();
+    },
+    onSuccess: () => {
+      setEmailSubmitted(true);
+      toast({
+        title: "Success!",
+        description: "You'll be notified when Pricing Intelligence launches.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePricingInterestSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pricingEmail && pricingEmail.includes("@")) {
+      pricingInterestMutation.mutate(pricingEmail);
+    }
+  };
 
   useEffect(() => {
     updatePageSEO({
@@ -383,10 +420,13 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors duration-300">Pricing Intelligence</h3>
                   <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Advanced market analysis and <span className="text-white font-medium">competitor tracking</span> to optimize your pricing strategy in real-time</p>
                   <div className="mt-auto">
-                    <div className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 text-gray-400 text-sm">
+                    <button 
+                      onClick={() => setPricingInterestOpen(true)}
+                      className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 text-gray-400 text-sm hover:bg-amber-500/20 hover:border-amber-500/30 hover:text-amber-400 transition-all duration-300 cursor-pointer"
+                    >
                       <span className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse"></span>
                       Notify me when available
-                    </div>
+                    </button>
                   </div>
                 </CardContent>
               </Card>
@@ -833,6 +873,108 @@ export default function Home() {
       </section>
 
       <Footer />
+
+      {/* Pricing Intelligence Interest Dialog */}
+      <Dialog open={pricingInterestOpen} onOpenChange={(open) => {
+        setPricingInterestOpen(open);
+        if (!open) {
+          setPricingEmail("");
+          setEmailSubmitted(false);
+        }
+      }}>
+        <DialogContent className="sm:max-w-[480px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-white/10 shadow-2xl p-0 overflow-hidden">
+          {/* Premium Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px'
+            }} />
+          </div>
+
+          <div className="relative p-8">
+            {!emailSubmitted ? (
+              <>
+                <DialogHeader className="text-center mb-6">
+                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30">
+                    <TrendingUp className="text-white h-8 w-8" />
+                  </div>
+                  <DialogTitle className="text-2xl font-bold text-white mb-2">
+                    Pricing Intelligence
+                  </DialogTitle>
+                  <DialogDescription className="text-gray-400 text-base leading-relaxed">
+                    Be the first to know when our advanced pricing intelligence platform launches. Get early access to <span className="text-amber-400 font-medium">market analysis</span> and <span className="text-amber-400 font-medium">competitor tracking</span> tools.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <form onSubmit={handlePricingInterestSubmit} className="space-y-4">
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={pricingEmail}
+                      onChange={(e) => setPricingEmail(e.target.value)}
+                      required
+                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:border-amber-500/50 focus:ring-amber-500/20 transition-all"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={pricingInterestMutation.isPending || !pricingEmail.includes("@")}
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold py-4 rounded-xl shadow-lg shadow-amber-500/25 transition-all duration-300 disabled:opacity-50"
+                  >
+                    {pricingInterestMutation.isPending ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                        />
+                        Submitting...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Bell className="w-5 h-5" />
+                        Notify Me When Available
+                      </span>
+                    )}
+                  </Button>
+                </form>
+
+                <p className="text-center text-xs text-gray-500 mt-4">
+                  We'll only email you about this product. No spam.
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-6">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  className="mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-500/30"
+                >
+                  <CheckCircle className="text-white h-10 w-10" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-2">You're on the list!</h3>
+                <p className="text-gray-400 mb-6">
+                  We'll notify you at <span className="text-white font-medium">{pricingEmail}</span> when Pricing Intelligence launches.
+                </p>
+                <Button
+                  onClick={() => {
+                    setPricingInterestOpen(false);
+                    setPricingEmail("");
+                    setEmailSubmitted(false);
+                  }}
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl px-6 py-3"
+                >
+                  Close
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

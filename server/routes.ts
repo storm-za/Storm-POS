@@ -11,7 +11,7 @@ import {
   signupPosUserSchema,
   insertPosCategorySchema
 } from "@shared/schema";
-import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail } from "./email";
+import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -115,6 +115,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching submissions:", error);
       res.status(500).json({ message: "Failed to fetch submissions" });
+    }
+  });
+
+  // Pricing Intelligence interest notification
+  app.post("/api/pricing-interest", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({ success: false, message: "Valid email is required" });
+      }
+      
+      const emailSent = await sendPricingInterestEmail(email);
+      
+      if (emailSent) {
+        console.log(`✅ Pricing Intelligence interest captured: ${email}`);
+        res.json({ success: true, message: "Thank you! We'll notify you when Pricing Intelligence launches." });
+      } else {
+        console.log(`⚠️ Pricing interest captured but notification failed: ${email}`);
+        res.json({ success: true, message: "Thank you! We'll notify you when Pricing Intelligence launches." });
+      }
+    } catch (error) {
+      console.error("Pricing interest error:", error);
+      res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
     }
   });
 

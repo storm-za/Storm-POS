@@ -342,3 +342,86 @@ Storm Contact System
     return false;
   }
 }
+
+export async function sendPricingInterestEmail(email: string): Promise<boolean> {
+  const transporter = createTransporter();
+  
+  if (!transporter) {
+    console.log('📧 Pricing Intelligence interest (no email configured):', {
+      email,
+      date: new Date().toISOString()
+    });
+    return true;
+  }
+
+  try {
+    const emailContent = `
+🔔 New Pricing Intelligence Interest!
+
+Someone is interested in your upcoming Pricing Intelligence software.
+
+Contact Details:
+• Email: ${email}
+• Date: ${new Date().toLocaleString('en-ZA')}
+
+---
+This person wants to be notified when Pricing Intelligence launches.
+    `.trim();
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #0f172a; color: #e2e8f0; margin: 0; padding: 20px; }
+    .container { max-width: 500px; margin: 0 auto; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; text-align: center; }
+    .header h1 { margin: 0; color: white; font-size: 24px; }
+    .content { padding: 30px; }
+    .email-box { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }
+    .email-address { font-size: 20px; font-weight: bold; color: #fbbf24; }
+    .label { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔔 New Lead!</h1>
+    </div>
+    <div class="content">
+      <p style="color: #e2e8f0; margin-bottom: 20px;">Someone is interested in <strong style="color: #fbbf24;">Pricing Intelligence</strong>:</p>
+      <div class="email-box">
+        <div class="label">Email Address</div>
+        <div class="email-address">${email}</div>
+      </div>
+      <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">
+        📅 ${new Date().toLocaleString('en-ZA')}<br>
+        This person wants to be notified when the product launches.
+      </p>
+    </div>
+    <div class="footer">
+      Storm Lead Notification System
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_USER,
+      subject: `🔔 Pricing Intelligence Interest: ${email}`,
+      text: emailContent,
+      html: htmlContent,
+    });
+
+    console.log(`✅ Pricing interest notification sent for: ${email}`);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Failed to send pricing interest email:', error.message);
+    console.log(`📧 Pricing interest from: ${email}`);
+    return false;
+  }
+}
