@@ -212,6 +212,10 @@ export default function PosSystemAfrikaans() {
   const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | 'all'>('all');
   
+  // Add products to category dialog
+  const [isAddProductsToCategoryOpen, setIsAddProductsToCategoryOpen] = useState(false);
+  const [selectedProductsForCategory, setSelectedProductsForCategory] = useState<number[]>([]);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -1259,6 +1263,27 @@ export default function PosSystemAfrikaans() {
     },
     onError: () => {
       toast({ title: "Fout", description: "Kon nie kategorie verwyder nie", variant: "destructive" });
+    },
+  });
+
+  // Bulk update products to category
+  const bulkAddProductsToCategoryMutation = useMutation({
+    mutationFn: async ({ productIds, categoryId }: { productIds: number[]; categoryId: number }) => {
+      const response = await apiRequest("POST", "/api/pos/products/bulk-category", {
+        userId: currentUser?.id,
+        productIds,
+        categoryId
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+      setIsAddProductsToCategoryOpen(false);
+      setSelectedProductsForCategory([]);
+      toast({ title: "Produkte bygevoeg", description: "Produkte is by die kategorie gevoeg." });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Fout", description: error.message || "Kon nie produkte by kategorie voeg nie", variant: "destructive" });
     },
   });
 
@@ -3208,13 +3233,28 @@ ${dateFilteredSales.map(sale =>
                     ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
                       /* Grid Mode: Products in selected category */
                       (<div className="space-y-3">
-                        <button
-                          onClick={() => setSelectedSalesCategory(null)}
-                          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                          Terug na Kategoriee
-                        </button>
+                        <div className="flex items-center justify-between">
+                          <button
+                            onClick={() => setSelectedSalesCategory(null)}
+                            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                            Terug na Kategoriee
+                          </button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedProductsForCategory(
+                                products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)
+                              );
+                              setIsAddProductsToCategoryOpen(true);
+                            }}
+                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white text-xs"
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Voeg Produkte By
+                          </Button>
+                        </div>
                         <div className="grid gap-2">
                           {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
                             <div
@@ -5616,6 +5656,44 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   </div>
                   
+                  {/* Category Selection */}
+                  <div className="pt-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Tag className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                      <span className="text-sm font-medium text-gray-300">Kategorie</span>
+                      <div className="flex-1 h-px bg-gray-700/50"></div>
+                    </div>
+                    <FormField
+                      control={productForm.control}
+                      name="categoryId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Select 
+                              value={field.value?.toString() || "none"} 
+                              onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
+                            >
+                              <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
+                                <SelectValue placeholder="Kies kategorie (opsioneel)" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-gray-900 border-gray-700">
+                                <SelectItem value="none" className="text-gray-400">Geen Kategorie</SelectItem>
+                                {categories.map((cat) => (
+                                  <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                                      {cat.name}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
                     <Button 
                       type="button" 
@@ -5913,6 +5991,97 @@ ${dateFilteredSales.map(sale =>
               >
                 Verstaan
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Products to Category Dialog */}
+        <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
+          <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader className="border-b border-gray-700/50 pb-4">
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+                Voeg Produkte by Kategorie
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Kies produkte om by "{categories.find(c => c.id === selectedSalesCategory)?.name || 'hierdie kategorie'}" te voeg. Produkte kan aan meerdere kategoriee behoort.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto py-4 space-y-2">
+              {products.map((product) => {
+                const isSelected = selectedProductsForCategory.includes(product.id);
+                const productCategories = categories.filter(c => c.id === product.categoryId);
+                return (
+                  <div
+                    key={product.id}
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedProductsForCategory(prev => prev.filter(id => id !== product.id));
+                      } else {
+                        setSelectedProductsForCategory(prev => [...prev, product.id]);
+                      }
+                    }}
+                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/20' 
+                        : 'border-gray-700/50 bg-gray-800/50 hover:border-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          isSelected ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,50%)]' : 'border-gray-600'
+                        }`}>
+                          {isSelected && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                        <div>
+                          <p className="font-medium text-white">{product.name}</p>
+                          <p className="text-xs text-gray-400">SKU: {product.sku}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-[hsl(217,90%,60%)]">R{product.retailPrice}</p>
+                        <p className="text-xs text-gray-500">
+                          {productCategories.length > 0 
+                            ? productCategories.map(c => c.name).join(', ')
+                            : 'Geen kategorie'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex justify-between items-center pt-4 border-t border-gray-700/50">
+              <span className="text-sm text-gray-400">
+                {selectedProductsForCategory.length} produkte gekies
+              </span>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsAddProductsToCategoryOpen(false);
+                    setSelectedProductsForCategory([]);
+                  }}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                >
+                  Kanselleer
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (selectedSalesCategory) {
+                      bulkAddProductsToCategoryMutation.mutate({
+                        productIds: selectedProductsForCategory,
+                        categoryId: selectedSalesCategory
+                      });
+                    }
+                  }}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"
+                  disabled={bulkAddProductsToCategoryMutation.isPending}
+                >
+                  {bulkAddProductsToCategoryMutation.isPending ? 'Stoor...' : 'Stoor'}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

@@ -585,6 +585,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk update products category
+  app.post("/api/pos/products/bulk-category", async (req, res) => {
+    try {
+      const { userId, productIds, categoryId } = req.body;
+      
+      // Validate input
+      if (!userId || typeof userId !== 'number') {
+        return res.status(400).json({ message: "Invalid userId" });
+      }
+      if (!Array.isArray(productIds) || productIds.length === 0) {
+        return res.status(400).json({ message: "productIds must be a non-empty array" });
+      }
+      if (categoryId !== null && typeof categoryId !== 'number') {
+        return res.status(400).json({ message: "Invalid categoryId" });
+      }
+      
+      // Fetch all products once for efficiency
+      const allProducts = await storage.getPosProducts(userId);
+      const productMap = new Map(allProducts.map(p => [p.id, p]));
+      
+      const results = [];
+      for (const productId of productIds) {
+        try {
+          const existingProduct = productMap.get(productId);
+          if (existingProduct) {
+            // Only update with essential fields
+            const updated = await storage.updatePosProduct(productId, {
+              userId: existingProduct.userId,
+              sku: existingProduct.sku,
+              name: existingProduct.name,
+              costPrice: existingProduct.costPrice,
+              retailPrice: existingProduct.retailPrice,
+              tradePrice: existingProduct.tradePrice,
+              quantity: existingProduct.quantity,
+              categoryId: categoryId
+            });
+            results.push(updated);
+          }
+        } catch (err) {
+          console.error(`Error updating product ${productId}:`, err);
+        }
+      }
+      
+      res.json({ success: true, updated: results.length });
+    } catch (error) {
+      console.error("Error bulk updating product categories:", error);
+      res.status(500).json({ message: "Failed to update product categories" });
+    }
+  });
+
   // POS Customers
   app.get("/api/pos/customers", async (req, res) => {
     try {
