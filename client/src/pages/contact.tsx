@@ -91,7 +91,7 @@ export default function Contact() {
               className="flex justify-center mb-8 sm:mb-10"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-[hsl(217,90%,50%)]/30 blur-2xl rounded-full scale-150" />
+                <div className="absolute inset-0 bg-white/40 blur-2xl rounded-full scale-150" />
                 <img src={stormLogo} alt="Storm" className="relative h-16 sm:h-24 w-auto drop-shadow-2xl" />
               </div>
             </motion.div>

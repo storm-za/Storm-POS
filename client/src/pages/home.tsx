@@ -88,7 +88,7 @@ export default function Home() {
               className="flex justify-center mb-10"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-[hsl(217,90%,50%)]/30 blur-2xl rounded-full scale-150" />
+                <div className="absolute inset-0 bg-white/40 blur-2xl rounded-full scale-150" />
                 <img src={stormLogo} alt="Storm" className="relative h-36 w-auto drop-shadow-2xl" />
               </div>
             </motion.div>
