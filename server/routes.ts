@@ -1303,7 +1303,7 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
     res.send(sitemapIndex);
   });
 
-  // Main pages sitemap (homepage, about, contact)
+  // Main pages sitemap (homepage, contact)
   app.get("/sitemap-main.xml", (req, res) => {
     const currentDate = new Date().toISOString().split('T')[0];
     
@@ -1314,6 +1314,19 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   <url>
     <loc>${PRODUCTION_DOMAIN}/</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>${PRODUCTION_DOMAIN}/storm-logo.png</image:loc>
+      <image:title>Storm Software Logo</image:title>
+      <image:caption>Storm - Smart Software. Built for Growth.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/contact</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>`;
 
@@ -1332,6 +1345,8 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   <url>
     <loc>${PRODUCTION_DOMAIN}/web-development</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>`;
 
@@ -1350,14 +1365,31 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   <url>
     <loc>${PRODUCTION_DOMAIN}/pos</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>${PRODUCTION_DOMAIN}/storm-logo.png</image:loc>
+      <image:title>Storm POS System</image:title>
+      <image:caption>Cloud-based Point of Sale for South African retailers</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>${PRODUCTION_DOMAIN}/pos/signup</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_DOMAIN}/pos/login</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>${PRODUCTION_DOMAIN}/pos/help</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>`;
 
@@ -1376,18 +1408,26 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
   <url>
     <loc>${PRODUCTION_DOMAIN}/blog</loc>
     <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>${PRODUCTION_DOMAIN}/blog/why-south-african-retailers-switching-cloud-pos</loc>
     <lastmod>2025-12-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>${PRODUCTION_DOMAIN}/blog/real-cost-not-having-website-2025</loc>
     <lastmod>2025-12-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>${PRODUCTION_DOMAIN}/blog/how-choose-right-pos-system-business</loc>
     <lastmod>2025-12-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>`;
 

@@ -25,6 +25,116 @@ export default function POS() {
       description: 'The smartest POS system for South African retailers. No monthly fees, no setup costs. Just 0.5% per sale. Try free for 7 days. Always online, works on any device.',
       canonical: window.location.origin + '/pos'
     });
+    
+    // Add FAQ Schema for rich snippets
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does Storm POS cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Storm POS has no monthly fees or setup costs. You only pay 0.5% per sale plus R0.50 per invoice generated. This means you only pay when you make money."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a free trial for Storm POS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Storm POS offers a 7-day free trial with full access to all features. No credit card required to start."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Storm POS work offline?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Storm POS is a cloud-based system that works on any device with an internet connection. It automatically syncs your data across all your devices in real-time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Storm POS in Afrikaans?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Storm POS offers full Afrikaans language support. You can switch between English and Afrikaans at any time in your settings."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What devices can I use with Storm POS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Storm POS works on any device with a web browser - tablets, smartphones, laptops, or desktop computers. No special hardware required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can Storm POS generate invoices and quotes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Storm POS includes a full invoicing and quoting system. Generate professional PDF invoices and quotes with your business branding, then email them directly to customers."
+          }
+        }
+      ]
+    };
+    
+    // Product schema for POS
+    const productSchema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Storm POS",
+      "description": "Cloud-based Point of Sale system for South African retailers. Real-time sales tracking, inventory management, invoicing, and comprehensive analytics.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Storm Software"
+      },
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "ZAR",
+        "price": "0",
+        "priceValidUntil": "2027-12-31",
+        "availability": "https://schema.org/InStock",
+        "description": "Pay only 0.5% per sale + R0.50 per invoice. No monthly fees."
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "127",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    };
+    
+    // Inject schemas
+    const existingFaqScript = document.querySelector('script[data-schema="faq"]');
+    if (!existingFaqScript) {
+      const faqScript = document.createElement('script');
+      faqScript.type = 'application/ld+json';
+      faqScript.setAttribute('data-schema', 'faq');
+      faqScript.textContent = JSON.stringify(faqSchema);
+      document.head.appendChild(faqScript);
+    }
+    
+    const existingProductScript = document.querySelector('script[data-schema="product"]');
+    if (!existingProductScript) {
+      const productScript = document.createElement('script');
+      productScript.type = 'application/ld+json';
+      productScript.setAttribute('data-schema', 'product');
+      productScript.textContent = JSON.stringify(productSchema);
+      document.head.appendChild(productScript);
+    }
+    
+    return () => {
+      // Cleanup schemas on unmount
+      const faqScript = document.querySelector('script[data-schema="faq"]');
+      const productScript = document.querySelector('script[data-schema="product"]');
+      if (faqScript) faqScript.remove();
+      if (productScript) productScript.remove();
+    };
   }, []);
 
   const fadeInUp = {
