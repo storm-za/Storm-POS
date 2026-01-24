@@ -198,6 +198,7 @@ export default function PosSystem() {
   const [salesDisplayMode, setSalesDisplayMode] = useState<'grid' | 'tabs'>('tabs');
   const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | "all">("all");
+  const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
   
   // Add products to category dialog
   const [isAddProductsToCategoryOpen, setIsAddProductsToCategoryOpen] = useState(false);
@@ -1424,13 +1425,27 @@ export default function PosSystem() {
     return matchesSearch && matchesCategory;
   });
 
-  // Filter products based on search term and category for Sales tab
-  const filteredSalesProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = salesCategoryFilter === "all" || product.categoryId === salesCategoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  // Filter and sort products based on search term, category, and sort order for Sales tab
+  const filteredSalesProducts = products
+    .filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = salesCategoryFilter === "all" || product.categoryId === salesCategoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (productSortOrder) {
+        case 'name-asc': return a.name.localeCompare(b.name);
+        case 'name-desc': return b.name.localeCompare(a.name);
+        case 'sku-asc': return a.sku.localeCompare(b.sku);
+        case 'sku-desc': return b.sku.localeCompare(a.sku);
+        case 'price-asc': return parseFloat(a.retailPrice) - parseFloat(b.retailPrice);
+        case 'price-desc': return parseFloat(b.retailPrice) - parseFloat(a.retailPrice);
+        case 'stock-asc': return a.quantity - b.quantity;
+        case 'stock-desc': return b.quantity - a.quantity;
+        default: return 0;
+      }
+    });
 
   // Get price for product based on customer type
   const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
@@ -3641,38 +3656,58 @@ export default function PosSystem() {
               >
                 <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                   <CardHeader className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                       <CardTitle className="flex items-center space-x-2 text-white">
                         <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                         <span>Products</span>
                       </CardTitle>
-                      {/* Display Mode Toggle */}
-                      {categories.length > 0 && (
-                        <div className="flex items-center gap-2 bg-gray-900/50 rounded-lg p-1">
-                          <button
-                            onClick={() => { setSalesDisplayMode('grid'); setSelectedSalesCategory(null); }}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                              salesDisplayMode === 'grid' 
-                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
-                                : 'text-gray-400 hover:text-white'
-                            }`}
+                      {/* Display Mode & Sort Dropdowns */}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {categories.length > 0 && (
+                          <Select
+                            value={salesDisplayMode}
+                            onValueChange={(value: 'grid' | 'tabs') => {
+                              setSalesDisplayMode(value);
+                              if (value === 'grid') setSelectedSalesCategory(null);
+                              if (value === 'tabs') setSalesCategoryFilter('all');
+                            }}
                           >
-                            <Grid3X3 className="w-3.5 h-3.5" />
-                            Grid
-                          </button>
-                          <button
-                            onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                              salesDisplayMode === 'tabs' 
-                                ? 'bg-[hsl(217,90%,40%)] text-white shadow-lg' 
-                                : 'text-gray-400 hover:text-white'
-                            }`}
-                          >
-                            <LayoutList className="w-3.5 h-3.5" />
-                            Tabs
-                          </button>
-                        </div>
-                      )}
+                            <SelectTrigger className="w-[110px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="grid">
+                                <span className="flex items-center gap-1.5">
+                                  <Grid3X3 className="w-3 h-3" /> Grid
+                                </span>
+                              </SelectItem>
+                              <SelectItem value="tabs">
+                                <span className="flex items-center gap-1.5">
+                                  <LayoutList className="w-3 h-3" /> Tabs
+                                </span>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                        <Select
+                          value={productSortOrder}
+                          onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}
+                        >
+                          <SelectTrigger className="w-[130px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="name-asc">Name A-Z</SelectItem>
+                            <SelectItem value="name-desc">Name Z-A</SelectItem>
+                            <SelectItem value="sku-asc">SKU A-Z</SelectItem>
+                            <SelectItem value="sku-desc">SKU Z-A</SelectItem>
+                            <SelectItem value="price-asc">Price Low-High</SelectItem>
+                            <SelectItem value="price-desc">Price High-Low</SelectItem>
+                            <SelectItem value="stock-asc">Stock Low-High</SelectItem>
+                            <SelectItem value="stock-desc">Stock High-Low</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     
                     {/* Search Bar - Always visible */}
