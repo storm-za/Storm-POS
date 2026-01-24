@@ -212,6 +212,7 @@ export default function PosSystemAfrikaans() {
   const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | 'all'>('all');
   const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
+  const [inventorySortOrder, setInventorySortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
   
   // Add products to category dialog
   const [isAddProductsToCategoryOpen, setIsAddProductsToCategoryOpen] = useState(false);
@@ -2606,12 +2607,26 @@ ${dateFilteredSales.map(sale =>
   };
 
   // Filter functions
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(productSearchTerm.toLowerCase());
-    const matchesCategory = productCategoryFilter === 'all' || product.categoryId === productCategoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = products
+    .filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(productSearchTerm.toLowerCase());
+      const matchesCategory = productCategoryFilter === 'all' || product.categoryId === productCategoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (inventorySortOrder) {
+        case 'name-asc': return a.name.localeCompare(b.name);
+        case 'name-desc': return b.name.localeCompare(a.name);
+        case 'sku-asc': return a.sku.localeCompare(b.sku);
+        case 'sku-desc': return b.sku.localeCompare(a.sku);
+        case 'price-asc': return parseFloat(a.retailPrice) - parseFloat(b.retailPrice);
+        case 'price-desc': return parseFloat(b.retailPrice) - parseFloat(a.retailPrice);
+        case 'stock-asc': return a.quantity - b.quantity;
+        case 'stock-desc': return b.quantity - a.quantity;
+        default: return 0;
+      }
+    });
 
   const filteredSalesProducts = products
     .filter(product => {
@@ -3779,6 +3794,24 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
+                      <Select
+                        value={inventorySortOrder}
+                        onValueChange={(value: typeof inventorySortOrder) => setInventorySortOrder(value)}
+                      >
+                        <SelectTrigger className="w-[150px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="name-asc">Naam A-Z</SelectItem>
+                          <SelectItem value="name-desc">Naam Z-A</SelectItem>
+                          <SelectItem value="sku-asc">SKU A-Z</SelectItem>
+                          <SelectItem value="sku-desc">SKU Z-A</SelectItem>
+                          <SelectItem value="price-asc">Prys Laag-Hoog</SelectItem>
+                          <SelectItem value="price-desc">Prys Hoog-Laag</SelectItem>
+                          <SelectItem value="stock-asc">Voorraad Laag-Hoog</SelectItem>
+                          <SelectItem value="stock-desc">Voorraad Hoog-Laag</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm" className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50 transition-all">
