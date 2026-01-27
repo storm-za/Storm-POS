@@ -464,6 +464,131 @@ export default function POS() {
           </motion.div>
         </motion.div>
       </section>
+      {/* 7-Day Free Trial Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            className="absolute -top-40 -right-32 w-96 h-96 bg-[hsl(217,90%,40%)]/15 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.2, 0.4]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"
+            animate={{ 
+              rotate: 360,
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Zero Risk Forever
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              7 Days <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Completely Free</span>, Then Only Pay When You Sell
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              No credit card. No monthly fees. No risk—ever. If you don't make sales, you don't pay a cent.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid md:grid-cols-3 gap-8 mb-12"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Full 7 Days Free</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Complete access to all features with zero charges for your entire first week
+              </p>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">No Credit Card Needed</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Sign up instantly without any payment information. Start selling right away
+              </p>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pay Only What You Sell</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Don't use it? Don't pay. Simple as that—only 0.5% when you make sales
+              </p>
+            </motion.div>
+          </motion.div>
+
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <Button 
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] font-bold px-12 py-6 text-lg shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all"
+              data-testid="button-trial-cta"
+            >
+              <Link href="/pos/signup">Start Your Free Trial Now →</Link>
+            </Button>
+            <p className="mt-6 text-gray-600 text-sm">
+              After 7 days: 0.5% per sale + R0.50 per invoice. No sales? No charge. Ever.
+            </p>
+          </motion.div>
+        </div>
+      </section>
       {/* What is Storm POS Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background Elements */}
@@ -1784,131 +1909,6 @@ export default function POS() {
               "Gebou deur Suid-Afrikaners, vir Suid-Afrikaners"
             </p>
             <p className="text-gray-400 mt-2">Built by South Africans, for South Africans</p>
-          </motion.div>
-        </div>
-      </section>
-      {/* 7-Day Free Trial Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
-            className="absolute -top-40 -right-32 w-96 h-96 bg-[hsl(217,90%,40%)]/15 rounded-full blur-3xl"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3]
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute -bottom-40 -left-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.4, 0.2, 0.4]
-            }}
-            transition={{ duration: 10, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(217,90%,40%)]/5 rounded-full blur-3xl"
-            animate={{ 
-              rotate: 360,
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          />
-          
-          {/* Grid Pattern Overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
-        </div>
-
-        <div className="relative max-w-6xl mx-auto">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="inline-block mb-6"
-            >
-              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
-                Zero Risk Forever
-              </span>
-            </motion.div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              7 Days <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Completely Free</span>, Then Only Pay When You Sell
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              No credit card. No monthly fees. No risk—ever. If you don't make sales, you don't pay a cent.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid md:grid-cols-3 gap-8 mb-12"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
-              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Full 7 Days Free</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Complete access to all features with zero charges for your entire first week
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
-              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">No Credit Card Needed</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Sign up instantly without any payment information. Start selling right away
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="bg-white/70 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all group">
-              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pay Only What You Sell</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Don't use it? Don't pay. Simple as that—only 0.5% when you make sales
-              </p>
-            </motion.div>
-          </motion.div>
-
-          <motion.div 
-            className="text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <Button 
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] font-bold px-12 py-6 text-lg shadow-2xl shadow-blue-500/30 transform hover:scale-105 transition-all"
-              data-testid="button-trial-cta"
-            >
-              <Link href="/pos/signup">Start Your Free Trial Now →</Link>
-            </Button>
-            <p className="mt-6 text-gray-600 text-sm">
-              After 7 days: 0.5% per sale + R0.50 per invoice. No sales? No charge. Ever.
-            </p>
           </motion.div>
         </div>
       </section>
