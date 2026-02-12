@@ -63,7 +63,6 @@ export default function PosSignupSuccess() {
         />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
       </div>
-
       <div className="relative z-10 w-full max-w-2xl">
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
@@ -157,9 +156,7 @@ export default function PosSignupSuccess() {
             Take Me to the POS
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <p className="mt-4 text-gray-500 text-sm">
-            Your trial started today — enjoy full access for 7 days
-          </p>
+          <p className="mt-4 text-gray-500 text-sm">Your trial started today, enjoy full access for 7 days</p>
         </motion.div>
 
         <motion.div
