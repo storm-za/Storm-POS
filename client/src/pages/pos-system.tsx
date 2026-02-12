@@ -3389,8 +3389,8 @@ export default function PosSystem() {
                       )}
                     </div>
                     
-                    {/* Footer Actions - Only management can add users */}
-                    {currentStaff?.userType === 'management' && (
+                    {/* Footer Actions - Management can add users, or always show when no staff exists */}
+                    {(currentStaff?.userType === 'management' || staffAccounts.length === 0) && (
                       <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
                         <button
                           onClick={() => setIsUserManagementOpen(true)}
