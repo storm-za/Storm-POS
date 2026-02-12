@@ -156,6 +156,8 @@ export default function PosSystemAfrikaans() {
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
   const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
+  const [invoiceClientEmail, setInvoiceClientEmail] = useState("");
+  const [invoiceClientPhone, setInvoiceClientPhone] = useState("");
   const [isCustomClient, setIsCustomClient] = useState(false);
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
@@ -675,8 +677,14 @@ export default function PosSystemAfrikaans() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     let clientY = y + 15;
-    if (client?.phone) {
-      doc.text(`Tel: ${client.phone}`, leftColX, clientY);
+    const clientPhone = invoice.clientPhone || client?.phone;
+    const clientEmail = invoice.clientEmail || client?.email;
+    if (clientPhone) {
+      doc.text(`Tel: ${clientPhone}`, leftColX, clientY);
+      clientY += 5;
+    }
+    if (clientEmail) {
+      doc.text(`E-pos: ${clientEmail}`, leftColX, clientY);
       clientY += 5;
     }
     if (client?.notes) {
@@ -1000,7 +1008,10 @@ export default function PosSystemAfrikaans() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     let clientY = y + 15;
-    if (client?.phone) { doc.text(`Tel: ${client.phone}`, leftColX, clientY); clientY += 5; }
+    const clientPhone2 = invoice.clientPhone || client?.phone;
+    const clientEmail2 = invoice.clientEmail || client?.email;
+    if (clientPhone2) { doc.text(`Tel: ${clientPhone2}`, leftColX, clientY); clientY += 5; }
+    if (clientEmail2) { doc.text(`E-pos: ${clientEmail2}`, leftColX, clientY); clientY += 5; }
     if (client?.notes) { doc.text(client.notes, leftColX, clientY); }
     
     doc.setFont('helvetica', 'bold');
@@ -1498,6 +1509,8 @@ export default function PosSystemAfrikaans() {
       setInvoiceItems([]);
       setInvoiceClientId(null);
       setInvoiceCustomClient("");
+      setInvoiceClientEmail("");
+      setInvoiceClientPhone("");
       setIsCustomClient(false);
       setInvoiceDueDate("");
       setInvoiceNotes("");
@@ -1543,6 +1556,8 @@ export default function PosSystemAfrikaans() {
       setInvoiceItems([]);
       setInvoiceClientId(null);
       setInvoiceCustomClient("");
+      setInvoiceClientEmail("");
+      setInvoiceClientPhone("");
       setIsCustomClient(false);
       setInvoiceDueDate("");
       setInvoiceNotes("");
@@ -6865,6 +6880,8 @@ ${dateFilteredSales.map(sale =>
               setInvoiceItems([]);
               setInvoiceClientId(null);
               setInvoiceCustomClient("");
+              setInvoiceClientEmail("");
+              setInvoiceClientPhone("");
               setIsCustomClient(false);
               setInvoiceDueDate("");
               setInvoiceNotes("");
@@ -6957,6 +6974,30 @@ ${dateFilteredSales.map(sale =>
                 )}
               </div>
 
+              {/* Kliënt E-pos */}
+              <div>
+                <Label>Kliënt E-pos (Opsioneel)</Label>
+                <input
+                  type="email"
+                  value={invoiceClientEmail}
+                  onChange={(e) => setInvoiceClientEmail(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="klient@voorbeeld.com"
+                />
+              </div>
+
+              {/* Kliënt Telefoon */}
+              <div>
+                <Label>Kliënt Telefoon (Opsioneel)</Label>
+                <input
+                  type="tel"
+                  value={invoiceClientPhone}
+                  onChange={(e) => setInvoiceClientPhone(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="+27 12 345 6789"
+                />
+              </div>
+
               {/* PO Number */}
               <div>
                 <Label>PO Nommer (Opsioneel)</Label>
@@ -7007,12 +7048,48 @@ ${dateFilteredSales.map(sale =>
                     const itemName = item.customName || product?.name || 'Onbekende Produk';
                     return (
                       <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                        <div className="flex-1">
-                          <span className="font-medium">{itemName}</span>
-                          {item.customName && <span className="text-xs text-purple-600 ml-1">(Aangepas)</span>}
-                          <span className="text-sm text-gray-500 ml-2">x{item.quantity}</span>
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={itemName}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
+                          />
                         </div>
-                        <div className="text-right font-medium">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-14 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
+                          />
+                          <span className="text-xs text-gray-400">x</span>
+                          <div className="flex items-center">
+                            <span className="text-xs text-gray-400 mr-0.5">R</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={item.price}
+                              onChange={(e) => {
+                                const updated = [...invoiceItems];
+                                updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                                setInvoiceItems(updated);
+                              }}
+                              className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
+                            />
+                          </div>
+                        </div>
+                        <div className="text-right font-medium text-sm min-w-[70px]">
                           R{(item.price * item.quantity).toFixed(2)}
                         </div>
                         <Button
@@ -7396,6 +7473,8 @@ ${dateFilteredSales.map(sale =>
                       status: editingInvoice ? editingInvoice.status : 'draft',
                       clientId: isCustomClient ? undefined : invoiceClientId,
                       clientName: isCustomClient ? trimmedCustomClient : undefined,
+                      clientEmail: invoiceClientEmail || null,
+                      clientPhone: invoiceClientPhone || null,
                       title: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${clientName}`,
                       poNumber: invoicePoNumber || undefined,
                       dueTerms: invoiceDueTerms === 'none' ? undefined : invoiceDueTerms,
@@ -7491,6 +7570,12 @@ ${dateFilteredSales.map(sale =>
                     <div>
                       <Label className="text-xs text-gray-500">Kliënt</Label>
                       <p className="font-medium text-sm truncate">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
+                      {(selectedInvoice.clientEmail || selectedInvoice.clientPhone) && (
+                        <div className="mt-0.5 space-y-0.5">
+                          {selectedInvoice.clientPhone && <p className="text-xs text-gray-500">Tel: {selectedInvoice.clientPhone}</p>}
+                          {selectedInvoice.clientEmail && <p className="text-xs text-gray-500">E-pos: {selectedInvoice.clientEmail}</p>}
+                        </div>
+                      )}
                     </div>
                     {selectedInvoice.poNumber && (
                       <div>
@@ -7645,6 +7730,8 @@ ${dateFilteredSales.map(sale =>
                             setInvoiceClientId(null);
                           }
                           
+                          setInvoiceClientEmail(selectedInvoice.clientEmail || '');
+                          setInvoiceClientPhone(selectedInvoice.clientPhone || '');
                           setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                           setInvoiceNotes(selectedInvoice.notes || '');
                           setInvoicePoNumber(selectedInvoice.poNumber || '');
@@ -7744,6 +7831,8 @@ ${dateFilteredSales.map(sale =>
                               setInvoiceClientId(null);
                             }
                             
+                            setInvoiceClientEmail(selectedInvoice.clientEmail || '');
+                            setInvoiceClientPhone(selectedInvoice.clientPhone || '');
                             setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
                             setInvoiceNotes(selectedInvoice.notes || '');
                             setInvoicePoNumber(selectedInvoice.poNumber || '');

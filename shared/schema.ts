@@ -125,6 +125,8 @@ export const posInvoices = pgTable("pos_invoices", {
   status: text("status").notNull().default('draft'), // 'draft', 'sent', 'paid', 'cancelled'
   clientId: integer("client_id").references(() => posCustomers.id),
   clientName: text("client_name"), // Fallback if client is not in customers
+  clientEmail: text("client_email"),
+  clientPhone: text("client_phone"),
   title: text("title").default('INVOICE'),
   poNumber: text("po_number"), // Purchase order number (optional)
   createdDate: timestamp("created_date").defaultNow().notNull(),
