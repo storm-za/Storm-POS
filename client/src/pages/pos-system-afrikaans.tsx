@@ -7662,6 +7662,7 @@ ${dateFilteredSales.map(sale =>
                           const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
                           setInvoiceItems(items.map((item: any) => ({
                             productId: item.productId,
+                            customName: item.productId ? undefined : (item.name || item.customName),
                             quantity: parseFloat(item.quantity) || item.quantity,
                             price: parseFloat(item.price)
                           })));
@@ -7759,6 +7760,7 @@ ${dateFilteredSales.map(sale =>
                             const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
                             setInvoiceItems(items.map((item: any) => ({
                               productId: item.productId,
+                              customName: item.productId ? undefined : (item.name || item.customName),
                               quantity: parseFloat(item.quantity) || item.quantity,
                               price: parseFloat(item.price)
                             })));
