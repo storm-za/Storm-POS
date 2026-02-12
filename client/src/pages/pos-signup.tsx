@@ -39,16 +39,7 @@ export default function PosSignup() {
     },
     onSuccess: (data) => {
       localStorage.setItem('posUser', JSON.stringify(data.user));
-      toast({
-        title: "Account created successfully!",
-        description: "Welcome to Storm POS - Your 7-day free trial has started!",
-      });
-      // Redirect based on preferred language
-      if (data.user.preferredLanguage === 'af') {
-        setLocation("/pos/system/afrikaans");
-      } else {
-        setLocation("/pos/system");
-      }
+      setLocation("/pos/signup/success");
     },
     onError: (error: Error) => {
       toast({
