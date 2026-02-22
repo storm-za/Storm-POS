@@ -1020,6 +1020,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Purchase Order Routes
+  app.get("/api/pos/purchase-orders", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const orders = await storage.getPosPurchaseOrders(userId);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+      res.status(500).json({ message: "Failed to fetch purchase orders" });
+    }
+  });
+
+  app.get("/api/pos/purchase-orders/next-number", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const poNumber = await storage.getNextPONumber(userId);
+      res.json({ poNumber });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get next PO number" });
+    }
+  });
+
+  app.post("/api/pos/purchase-orders", async (req, res) => {
+    try {
+      const { userId, ...poData } = req.body;
+      const userIdToUse = userId || 1;
+      const poNumber = await storage.getNextPONumber(userIdToUse);
+
+      const processedData = {
+        ...poData,
+        userId: userIdToUse,
+        poNumber,
+        expectedDate: poData.expectedDate ? new Date(poData.expectedDate) : null,
+        receivedDate: poData.receivedDate ? new Date(poData.receivedDate) : null,
+        subtotal: String(poData.subtotal || 0),
+        taxPercent: String(poData.taxPercent || 15),
+        shippingAmount: String(poData.shippingAmount || 0),
+        total: String(poData.total || 0),
+      };
+
+      const order = await storage.createPosPurchaseOrder(processedData);
+      res.json(order);
+    } catch (error: any) {
+      if (error?.name === 'ZodError') {
+        console.error("PO validation errors:", JSON.stringify(error.errors, null, 2));
+        res.status(400).json({ message: "Validation failed", errors: error.errors });
+      } else {
+        console.error("Error creating purchase order:", error);
+        res.status(500).json({ message: "Failed to create purchase order" });
+      }
+    }
+  });
+
+  app.put("/api/pos/purchase-orders/:id", async (req, res) => {
+    try {
+      const poId = parseInt(req.params.id);
+      const order = await storage.updatePosPurchaseOrder(poId, req.body);
+      if (!order) {
+        return res.status(404).json({ message: "Purchase order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      console.error("Error updating purchase order:", error);
+      res.status(500).json({ message: "Failed to update purchase order" });
+    }
+  });
+
+  app.patch("/api/pos/purchase-orders/:id", async (req, res) => {
+    try {
+      const poId = parseInt(req.params.id);
+      const { status } = req.body;
+      const updates: any = { status };
+      if (status === 'received') {
+        updates.receivedDate = new Date();
+      }
+      const order = await storage.updatePosPurchaseOrder(poId, updates);
+      if (!order) {
+        return res.status(404).json({ message: "Purchase order not found" });
+      }
+      res.json(order);
+    } catch (error) {
+      console.error("Error updating purchase order status:", error);
+      res.status(500).json({ message: "Failed to update purchase order status" });
+    }
+  });
+
+  app.delete("/api/pos/purchase-orders/:id", async (req, res) => {
+    try {
+      const poId = parseInt(req.params.id);
+      const success = await storage.deletePosPurchaseOrder(poId);
+      if (!success) {
+        return res.status(404).json({ message: "Purchase order not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting purchase order:", error);
+      res.status(500).json({ message: "Failed to delete purchase order" });
+    }
+  });
+
   // Saved Payment Details Routes
   app.get("/api/pos/saved-payment-details", async (req, res) => {
     try {

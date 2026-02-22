@@ -1,5 +1,5 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings, posCategories,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings, posCategories, posPurchaseOrders,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
@@ -7,7 +7,8 @@ import {
   type PosSavedPaymentDetails, type InsertPosSavedPaymentDetails,
   type PosStaffAccount, type InsertPosStaffAccount,
   type SystemSetting, type InsertSystemSetting,
-  type PosCategory, type InsertPosCategory
+  type PosCategory, type InsertPosCategory,
+  type PosPurchaseOrder, type InsertPosPurchaseOrder
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -117,6 +118,13 @@ export interface IStorage {
   updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined>;
   deletePosStaffAccount(id: number): Promise<boolean>;
   authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined>;
+
+  // Purchase Order Operations
+  getPosPurchaseOrders(userId: number): Promise<PosPurchaseOrder[]>;
+  createPosPurchaseOrder(po: InsertPosPurchaseOrder): Promise<PosPurchaseOrder>;
+  updatePosPurchaseOrder(id: number, po: Partial<PosPurchaseOrder>): Promise<PosPurchaseOrder | undefined>;
+  deletePosPurchaseOrder(id: number): Promise<boolean>;
+  getNextPONumber(userId: number): Promise<string>;
 
   // Usage tracking
   incrementUserUsage(userId: number, amount: string): Promise<void>;
@@ -588,6 +596,27 @@ export class MemStorage implements IStorage {
     return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
   }
 
+  // Purchase Order Operations (stub implementations for MemStorage)
+  async getPosPurchaseOrders(userId: number): Promise<PosPurchaseOrder[]> {
+    return [];
+  }
+
+  async createPosPurchaseOrder(po: InsertPosPurchaseOrder): Promise<PosPurchaseOrder> {
+    throw new Error("Purchase order operations not supported in MemStorage");
+  }
+
+  async updatePosPurchaseOrder(id: number, updates: Partial<PosPurchaseOrder>): Promise<PosPurchaseOrder | undefined> {
+    return undefined;
+  }
+
+  async deletePosPurchaseOrder(id: number): Promise<boolean> {
+    return false;
+  }
+
+  async getNextPONumber(userId: number): Promise<string> {
+    return 'PO-0001';
+  }
+
   // Saved Payment Details Operations (stub implementations for MemStorage)
   async getSavedPaymentDetails(userId: number): Promise<PosSavedPaymentDetails[]> {
     return [];
@@ -989,6 +1018,45 @@ export class DatabaseStorage implements IStorage {
     const nextNum = parseInt(match[1]) + 1;
     const prefix = documentType === 'invoice' ? 'INV' : 'QUO';
     return `${prefix}-${String(nextNum).padStart(4, '0')}`;
+  }
+
+  // Purchase Order Operations
+  async getPosPurchaseOrders(userId: number): Promise<PosPurchaseOrder[]> {
+    return db.select().from(posPurchaseOrders).where(eq(posPurchaseOrders.userId, userId));
+  }
+
+  async createPosPurchaseOrder(po: InsertPosPurchaseOrder): Promise<PosPurchaseOrder> {
+    const [created] = await db.insert(posPurchaseOrders).values(po).returning();
+    return created;
+  }
+
+  async updatePosPurchaseOrder(id: number, updates: Partial<PosPurchaseOrder>): Promise<PosPurchaseOrder | undefined> {
+    const [updated] = await db.update(posPurchaseOrders).set(updates).where(eq(posPurchaseOrders.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deletePosPurchaseOrder(id: number): Promise<boolean> {
+    const result = await db.delete(posPurchaseOrders).where(eq(posPurchaseOrders.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async getNextPONumber(userId: number): Promise<string> {
+    const [latest] = await db
+      .select({ poNumber: posPurchaseOrders.poNumber })
+      .from(posPurchaseOrders)
+      .where(eq(posPurchaseOrders.userId, userId))
+      .orderBy(sql`id DESC`)
+      .limit(1);
+
+    if (!latest || !latest.poNumber) {
+      return 'PO-0001';
+    }
+
+    const match = latest.poNumber.match(/(\d+)$/);
+    if (!match) return 'PO-0001';
+
+    const nextNum = parseInt(match[1]) + 1;
+    return `PO-${String(nextNum).padStart(4, '0')}`;
   }
 
   // Saved Payment Details Operations

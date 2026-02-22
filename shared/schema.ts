@@ -155,6 +155,27 @@ export const posSavedPaymentDetails = pgTable("pos_saved_payment_details", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Purchase Orders
+export const posPurchaseOrders = pgTable("pos_purchase_orders", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  poNumber: text("po_number").notNull(),
+  status: text("status").notNull().default('draft'), // 'draft', 'sent', 'partial', 'received', 'cancelled'
+  supplierName: text("supplier_name").notNull(),
+  supplierEmail: text("supplier_email"),
+  supplierPhone: text("supplier_phone"),
+  supplierAddress: text("supplier_address"),
+  items: jsonb("items").notNull(), // Array of {productId, name, sku, quantity, costPrice, lineTotal, receivedQty}
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxPercent: decimal("tax_percent", { precision: 5, scale: 2 }).notNull().default("15.00"),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).notNull().default("0.00"),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  expectedDate: timestamp("expected_date"),
+  receivedDate: timestamp("received_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // System settings for tracking admin operations like monthly resets
 export const systemSettings = pgTable("system_settings", {
   id: serial("id").primaryKey(),
@@ -226,6 +247,11 @@ export const insertPosSavedPaymentDetailsSchema = createInsertSchema(posSavedPay
 });
 
 export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPosPurchaseOrderSchema = createInsertSchema(posPurchaseOrders).omit({
   id: true,
   createdAt: true,
 });
@@ -324,6 +350,8 @@ export type InsertPosSavedPaymentDetails = z.infer<typeof insertPosSavedPaymentD
 export type PosSavedPaymentDetails = typeof posSavedPaymentDetails.$inferSelect;
 export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
+export type InsertPosPurchaseOrder = z.infer<typeof insertPosPurchaseOrderSchema>;
+export type PosPurchaseOrder = typeof posPurchaseOrders.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type ReceiptSettings = z.infer<typeof receiptSettingsSchema>;

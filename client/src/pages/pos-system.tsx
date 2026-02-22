@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette
+  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -202,6 +202,25 @@ export default function PosSystem() {
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | "all">("all");
   const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
   const [inventorySortOrder, setInventorySortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
+
+  // Purchase Order state
+  const [isPODialogOpen, setIsPODialogOpen] = useState(false);
+  const [isPOViewOpen, setIsPOViewOpen] = useState(false);
+  const [selectedPO, setSelectedPO] = useState<any>(null);
+  const [editingPO, setEditingPO] = useState<any>(null);
+  const [poSupplierName, setPOSupplierName] = useState("");
+  const [poSupplierEmail, setPOSupplierEmail] = useState("");
+  const [poSupplierPhone, setPOSupplierPhone] = useState("");
+  const [poSupplierAddress, setPOSupplierAddress] = useState("");
+  const [poItems, setPOItems] = useState<any[]>([]);
+  const [poExpectedDate, setPOExpectedDate] = useState("");
+  const [poNotes, setPONotes] = useState("");
+  const [poTaxPercent, setPOTaxPercent] = useState(15);
+  const [poShippingAmount, setPOShippingAmount] = useState(0);
+  const [poSearchTerm, setPOSearchTerm] = useState("");
+  const [poStatusFilter, setPOStatusFilter] = useState("all");
+  const [isDeletePODialogOpen, setIsDeletePODialogOpen] = useState(false);
+  const [deletingPOId, setDeletingPOId] = useState<number | null>(null);
   
   // Add products to category dialog
   const [isAddProductsToCategoryOpen, setIsAddProductsToCategoryOpen] = useState(false);
@@ -486,6 +505,18 @@ export default function PosSystem() {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch invoices');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Fetch purchase orders
+  const { data: purchaseOrders = [], isLoading: isPOLoading } = useQuery<any[]>({
+    queryKey: ["/api/pos/purchase-orders", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch purchase orders');
       return response.json();
     },
     enabled: !!currentUser,
@@ -814,6 +845,171 @@ export default function PosSystem() {
   });
 
   // Invoice mutations
+  // Purchase Order mutations
+  const createPOMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/pos/purchase-orders", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] });
+      setIsPODialogOpen(false);
+      resetPOForm();
+      toast({ title: "Purchase Order Created", description: "Purchase order has been created successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to create purchase order", variant: "destructive" });
+    },
+  });
+
+  const updatePOMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const res = await apiRequest("PUT", `/api/pos/purchase-orders/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] });
+      setIsPODialogOpen(false);
+      setEditingPO(null);
+      resetPOForm();
+      toast({ title: "Purchase Order Updated", description: "Purchase order has been updated successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update purchase order", variant: "destructive" });
+    },
+  });
+
+  const updatePOStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const res = await apiRequest("PATCH", `/api/pos/purchase-orders/${id}`, { status });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] });
+      toast({ title: "Status Updated", description: "Purchase order status has been updated." });
+    },
+  });
+
+  const deletePOMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/pos/purchase-orders/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] });
+      setIsDeletePODialogOpen(false);
+      setDeletingPOId(null);
+      toast({ title: "Deleted", description: "Purchase order has been deleted." });
+    },
+  });
+
+  const resetPOForm = () => {
+    setPOSupplierName(""); setPOSupplierEmail(""); setPOSupplierPhone(""); setPOSupplierAddress("");
+    setPOItems([]); setPOExpectedDate(""); setPONotes(""); setPOTaxPercent(15); setPOShippingAmount(0);
+    setEditingPO(null);
+  };
+
+  const handleSubmitPO = () => {
+    if (!poSupplierName) { toast({ title: "Error", description: "Supplier name is required", variant: "destructive" }); return; }
+    if (poItems.length === 0) { toast({ title: "Error", description: "Add at least one item", variant: "destructive" }); return; }
+    const subtotal = poItems.reduce((sum: number, item: any) => sum + (item.costPrice * item.quantity), 0);
+    const taxAmount = subtotal * (poTaxPercent / 100);
+    const total = subtotal + taxAmount + poShippingAmount;
+    const poData = {
+      userId: posUser?.id, supplierName: poSupplierName, supplierEmail: poSupplierEmail || null,
+      supplierPhone: poSupplierPhone || null, supplierAddress: poSupplierAddress || null,
+      items: poItems.map((item: any) => ({ ...item, lineTotal: item.costPrice * item.quantity, receivedQty: item.receivedQty || 0 })),
+      subtotal, taxPercent: poTaxPercent, shippingAmount: poShippingAmount, total,
+      expectedDate: poExpectedDate || null, notes: poNotes || null, status: 'draft',
+    };
+    if (editingPO) { updatePOMutation.mutate({ id: editingPO.id, data: poData }); }
+    else { createPOMutation.mutate(poData); }
+  };
+
+  const addPOItem = (product?: any) => {
+    if (product) {
+      setPOItems([...poItems, { productId: product.id, name: product.name, sku: product.sku, quantity: 1, costPrice: parseFloat(product.costPrice || product.retailPrice || "0"), receivedQty: 0 }]);
+    } else {
+      setPOItems([...poItems, { productId: null, name: "", sku: "", quantity: 1, costPrice: 0, receivedQty: 0 }]);
+    }
+  };
+
+  const loadPOForEdit = (po: any) => {
+    setEditingPO(po); setPOSupplierName(po.supplierName); setPOSupplierEmail(po.supplierEmail || "");
+    setPOSupplierPhone(po.supplierPhone || ""); setPOSupplierAddress(po.supplierAddress || "");
+    setPOItems(po.items || []); setPOExpectedDate(po.expectedDate ? new Date(po.expectedDate).toISOString().split('T')[0] : "");
+    setPONotes(po.notes || ""); setPOTaxPercent(parseFloat(po.taxPercent) || 15);
+    setPOShippingAmount(parseFloat(po.shippingAmount) || 0); setIsPODialogOpen(true);
+  };
+
+  const getPOStatusBadge = (status: string) => {
+    const styles: Record<string, string> = { draft: "bg-gray-500/20 text-gray-300 border-gray-500/30", sent: "bg-blue-500/20 text-blue-300 border-blue-500/30", partial: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30", received: "bg-green-500/20 text-green-300 border-green-500/30", cancelled: "bg-red-500/20 text-red-300 border-red-500/30" };
+    const labels: Record<string, string> = { draft: "Draft", sent: "Sent", partial: "Partially Received", received: "Received", cancelled: "Cancelled" };
+    return <Badge className={`${styles[status] || styles.draft} border`}>{labels[status] || status}</Badge>;
+  };
+
+  const generatePOPdf = async (po: any) => {
+    const jsPDF = (await import("jspdf")).default;
+    const doc = new jsPDF();
+    doc.setFillColor(0, 0, 0); doc.rect(0, 0, 210, 297, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold");
+    doc.text("PURCHASE ORDER", 20, 30);
+    doc.setFontSize(12); doc.setTextColor(100, 150, 255); doc.text(po.poNumber, 20, 40);
+    doc.setTextColor(180, 180, 180); doc.setFontSize(10);
+    doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 30);
+    doc.text(`Date: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 37);
+    if (po.expectedDate) doc.text(`Expected: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 44);
+    if (posUser?.companyName) {
+      doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+      doc.text("FROM:", 20, 60); doc.setFont("helvetica", "normal"); doc.text(posUser.companyName, 20, 67);
+    }
+    doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+    doc.text("SUPPLIER:", 120, 60); doc.setFont("helvetica", "normal"); doc.setTextColor(200, 200, 200);
+    let supplierY = 67; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
+    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, 120, supplierY); supplierY += 6; }
+    if (po.supplierEmail) { doc.text(`Email: ${po.supplierEmail}`, 120, supplierY); supplierY += 6; }
+    if (po.supplierAddress) { const addrLines = doc.splitTextToSize(po.supplierAddress, 70); addrLines.forEach((l: string) => { doc.text(l, 120, supplierY); supplierY += 5; }); }
+    let tableY = Math.max(supplierY, 85) + 10;
+    doc.setFillColor(30, 64, 175); doc.rect(20, tableY, 170, 8, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+    doc.text("Item", 22, tableY + 6); doc.text("SKU", 85, tableY + 6); doc.text("Qty", 115, tableY + 6);
+    doc.text("Cost Price", 135, tableY + 6); doc.text("Total", 165, tableY + 6); tableY += 10;
+    doc.setFont("helvetica", "normal");
+    (po.items || []).forEach((item: any, idx: number) => {
+      if (idx % 2 === 0) { doc.setFillColor(20, 20, 30); doc.rect(20, tableY - 4, 170, 7, 'F'); }
+      doc.setTextColor(200, 200, 200);
+      doc.text(item.name || "Custom Item", 22, tableY); doc.text(item.sku || "-", 85, tableY);
+      doc.text(String(item.quantity), 115, tableY); doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
+      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY); tableY += 7;
+    });
+    tableY += 5; doc.setDrawColor(50, 50, 70); doc.line(120, tableY, 190, tableY); tableY += 7;
+    doc.setTextColor(180, 180, 180); doc.text("Subtotal:", 130, tableY);
+    doc.text(`R${parseFloat(po.subtotal).toFixed(2)}`, 165, tableY); tableY += 6;
+    if (parseFloat(po.taxPercent) > 0) {
+      doc.text(`VAT (${po.taxPercent}%):`, 130, tableY);
+      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY); tableY += 6;
+    }
+    if (parseFloat(po.shippingAmount) > 0) {
+      doc.text("Shipping:", 130, tableY); doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY); tableY += 6;
+    }
+    doc.setTextColor(100, 150, 255); doc.setFontSize(12); doc.setFont("helvetica", "bold");
+    doc.text("TOTAL:", 130, tableY + 3); doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+    if (po.notes) {
+      tableY += 15; doc.setTextColor(180, 180, 180); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+      doc.text("Notes:", 20, tableY); doc.setFont("helvetica", "normal");
+      doc.splitTextToSize(po.notes, 170).forEach((l: string) => { tableY += 5; doc.text(l, 20, tableY); });
+    }
+    doc.save(`${po.poNumber}.pdf`);
+  };
+
+  const filteredPurchaseOrders = useMemo(() => {
+    return (purchaseOrders || []).filter((po: any) => {
+      const matchesSearch = poSearchTerm === "" || po.poNumber?.toLowerCase().includes(poSearchTerm.toLowerCase()) || po.supplierName?.toLowerCase().includes(poSearchTerm.toLowerCase());
+      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter;
+      return matchesSearch && matchesStatus;
+    }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [purchaseOrders, poSearchTerm, poStatusFilter]);
+
   const createInvoiceMutation = useMutation({
     mutationFn: async (invoiceData: any) => {
       const response = await apiRequest("POST", "/api/pos/invoices", {
@@ -3504,6 +3700,7 @@ export default function PosSystem() {
                   {currentTab === "products" && <><Package className="h-4 w-4" /><span>Products</span></>}
                   {currentTab === "customers" && <><Users className="h-4 w-4" /><span>Customers</span></>}
                   {currentTab === "invoices" && <><Receipt className="h-4 w-4" /><span>Invoices & Quotes</span></>}
+                  {currentTab === "purchase-orders" && <><ClipboardList className="h-4 w-4" /><span>Purchase Orders</span></>}
                   {currentTab === "open-accounts" && <><FileText className="h-4 w-4" /><span>Open Accounts</span></>}
                   {currentTab === "reports" && <><BarChart3 className="h-4 w-4" /><span>Reports</span></>}
                   {currentTab === "usage" && <><CreditCard className="h-4 w-4" /><span>Usage</span></>}
@@ -3550,6 +3747,7 @@ export default function PosSystem() {
                         { id: 'products', label: 'Products', icon: Package },
                         { id: 'customers', label: 'Customers', icon: Users },
                         { id: 'invoices', label: 'Invoices & Quotes', icon: Receipt },
+                        { id: 'purchase-orders', label: 'Purchase Orders', icon: ClipboardList },
                         { id: 'open-accounts', label: 'Open Accounts', icon: FileText },
                         { id: 'reports', label: 'Reports', icon: BarChart3 },
                         { id: 'usage', label: 'Usage', icon: CreditCard },
@@ -3632,6 +3830,14 @@ export default function PosSystem() {
                   >
                     <Receipt className="h-4 w-4 flex-shrink-0 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                     <span className="hidden lg:inline whitespace-nowrap">Invoices</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="purchase-orders" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-purchase-orders"
+                  >
+                    <ClipboardList className="h-4 w-4 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline whitespace-nowrap">Orders</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="open-accounts" 
@@ -5210,6 +5416,112 @@ export default function PosSystem() {
           </TabsContent>
 
           {/* Open Accounts Tab */}
+          {/* Purchase Orders Tab */}
+          <TabsContent value="purchase-orders">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Purchase Orders</h2>
+                  <p className="text-gray-400 text-sm mt-1">Manage supplier orders and track deliveries</p>
+                </div>
+                <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white shadow-lg shadow-blue-900/30">
+                  <Plus className="h-4 w-4 mr-2" />New Purchase Order
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <Input placeholder="Search by PO number or supplier..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className="pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-500" />
+                </div>
+                <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-48 bg-gray-900 border-gray-700 text-white">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-700">
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="partial">Partially Received</SelectItem>
+                    <SelectItem value="received">Received</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {[
+                  { label: "Total", count: purchaseOrders.length, color: "from-gray-700 to-gray-800" },
+                  { label: "Draft", count: purchaseOrders.filter((p: any) => p.status === 'draft').length, color: "from-gray-600 to-gray-700" },
+                  { label: "Sent", count: purchaseOrders.filter((p: any) => p.status === 'sent').length, color: "from-blue-900 to-blue-800" },
+                  { label: "Partial", count: purchaseOrders.filter((p: any) => p.status === 'partial').length, color: "from-yellow-900 to-yellow-800" },
+                  { label: "Received", count: purchaseOrders.filter((p: any) => p.status === 'received').length, color: "from-green-900 to-green-800" },
+                ].map((stat) => (
+                  <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-3 border border-gray-700/50`}>
+                    <p className="text-gray-400 text-xs">{stat.label}</p>
+                    <p className="text-white text-xl font-bold">{stat.count}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                {isPOLoading ? (
+                  <div className="text-center py-12 text-gray-400">Loading purchase orders...</div>
+                ) : filteredPurchaseOrders.length === 0 ? (
+                  <div className="text-center py-16">
+                    <ClipboardList className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-400">No purchase orders found</h3>
+                    <p className="text-gray-500 mt-2">Create your first purchase order to get started</p>
+                  </div>
+                ) : (
+                  filteredPurchaseOrders.map((po: any) => (
+                    <motion.div key={po.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all group">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="text-[hsl(217,90%,60%)] font-mono font-bold text-sm">{po.poNumber}</span>
+                            {getPOStatusBadge(po.status)}
+                          </div>
+                          <h3 className="text-white font-semibold truncate">{po.supplierName}</h3>
+                          <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
+                            <span>{(po.items || []).length} item{(po.items || []).length !== 1 ? 's' : ''}</span>
+                            <span>R{parseFloat(po.total).toFixed(2)}</span>
+                            <span>{new Date(po.createdAt).toLocaleDateString()}</span>
+                            {po.expectedDate && <span className="text-yellow-400/70">Due: {new Date(po.expectedDate).toLocaleDateString()}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => { setSelectedPO(po); setIsPOViewOpen(true); }} className="text-gray-400 hover:text-white hover:bg-gray-800"><Eye className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-white hover:bg-gray-800" disabled={po.status === 'received' || po.status === 'cancelled'}><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-white hover:bg-gray-800"><Download className="h-4 w-4" /></Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800"><ChevronDown className="h-4 w-4" /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                              {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Mark as Sent</DropdownMenuItem>}
+                              {(po.status === 'sent' || po.status === 'partial') && (
+                                <>
+                                  <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-yellow-400 hover:text-yellow-300">Partially Received</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-green-400 hover:text-green-300">Mark as Received</DropdownMenuItem>
+                                </>
+                              )}
+                              {po.status !== 'cancelled' && po.status !== 'received' && (
+                                <><DropdownMenuSeparator className="bg-gray-700" /><DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Cancel Order</DropdownMenuItem></>
+                              )}
+                              <DropdownMenuSeparator className="bg-gray-700" />
+                              <DropdownMenuItem onClick={() => { setDeletingPOId(po.id); setIsDeletePODialogOpen(true); }} className="text-red-400 hover:text-red-300">Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </TabsContent>
+
           <TabsContent value="open-accounts">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -6419,6 +6731,163 @@ export default function PosSystem() {
           </TabsContent>
         </Tabs>
       </div>
+      {/* Purchase Order Create/Edit Dialog */}
+      <Dialog open={isPODialogOpen} onOpenChange={(open) => { if (!open) { resetPOForm(); } setIsPODialogOpen(open); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">{editingPO ? `Edit ${editingPO.poNumber}` : "New Purchase Order"}</DialogTitle>
+            <DialogDescription className="text-gray-400">{editingPO ? "Update purchase order details" : "Create a new purchase order for a supplier"}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
+              <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Supplier Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><Label className="text-gray-300 text-xs">Supplier Name *</Label><Input value={poSupplierName} onChange={(e) => setPOSupplierName(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="Supplier company name" /></div>
+                <div><Label className="text-gray-300 text-xs">Email</Label><Input type="email" value={poSupplierEmail} onChange={(e) => setPOSupplierEmail(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="supplier@example.com" /></div>
+                <div><Label className="text-gray-300 text-xs">Phone</Label><Input type="tel" value={poSupplierPhone} onChange={(e) => setPOSupplierPhone(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="+27 12 345 6789" /></div>
+                <div><Label className="text-gray-300 text-xs">Expected Delivery</Label><Input type="date" value={poExpectedDate} onChange={(e) => setPOExpectedDate(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" /></div>
+              </div>
+              <div><Label className="text-gray-300 text-xs">Address</Label><Textarea value={poSupplierAddress} onChange={(e) => setPOSupplierAddress(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="Supplier address" rows={2} /></div>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Order Items</h3>
+                <div className="flex gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="border-gray-700 text-gray-300 hover:text-white bg-gray-800"><Package className="h-3 w-3 mr-1" />Add Product</Button></DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-60 overflow-y-auto">
+                      {(products || []).map((product: any) => (
+                        <DropdownMenuItem key={product.id} onClick={() => addPOItem(product)} className="text-gray-300 hover:text-white">
+                          <div className="flex justify-between w-full"><span>{product.name}</span><span className="text-gray-500 ml-4">R{parseFloat(product.costPrice || product.retailPrice).toFixed(2)}</span></div>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Button variant="outline" size="sm" onClick={() => addPOItem()} className="border-gray-700 text-gray-300 hover:text-white bg-gray-800"><Plus className="h-3 w-3 mr-1" />Custom Item</Button>
+                </div>
+              </div>
+              {poItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-500"><Package className="h-8 w-8 mx-auto mb-2 opacity-50" /><p className="text-sm">No items added yet</p></div>
+              ) : (
+                <div className="space-y-2">
+                  {poItems.map((item: any, index: number) => (
+                    <div key={index} className="flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                      <div className="flex-1 min-w-0">
+                        <input type="text" value={item.name} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], name: e.target.value, productId: null }; setPOItems(u); }} className="w-full bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm font-medium text-white px-0 py-0.5" placeholder="Item name" />
+                        {item.sku && <span className="text-xs text-gray-500">{item.sku}</span>}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <input type="number" min="1" value={item.quantity} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], quantity: Math.max(1, parseInt(e.target.value) || 1) }; setPOItems(u); }} className="w-14 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-center text-white px-0 py-0.5" />
+                        <span className="text-xs text-gray-500">x</span>
+                        <div className="flex items-center"><span className="text-xs text-gray-500 mr-0.5">R</span><input type="number" step="0.01" min="0" value={item.costPrice} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], costPrice: parseFloat(e.target.value) || 0 }; setPOItems(u); }} className="w-20 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-white px-0 py-0.5" /></div>
+                      </div>
+                      <div className="text-right font-medium text-sm min-w-[70px] text-white">R{(item.costPrice * item.quantity).toFixed(2)}</div>
+                      <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="text-gray-500 hover:text-red-400"><Trash2 className="w-4 h-4" /></Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label className="text-gray-300 text-xs">VAT %</Label><Input type="number" value={poTaxPercent} onChange={(e) => setPOTaxPercent(parseFloat(e.target.value) || 0)} className="bg-gray-800 border-gray-700 text-white mt-1" /></div>
+                <div><Label className="text-gray-300 text-xs">Shipping (R)</Label><Input type="number" step="0.01" value={poShippingAmount} onChange={(e) => setPOShippingAmount(parseFloat(e.target.value) || 0)} className="bg-gray-800 border-gray-700 text-white mt-1" /></div>
+              </div>
+              {(() => {
+                const subtotal = poItems.reduce((sum: number, item: any) => sum + (item.costPrice * item.quantity), 0);
+                const taxAmount = subtotal * (poTaxPercent / 100);
+                const total = subtotal + taxAmount + poShippingAmount;
+                return (
+                  <div className="space-y-1 pt-2 border-t border-gray-800">
+                    <div className="flex justify-between text-sm text-gray-400"><span>Subtotal</span><span>R{subtotal.toFixed(2)}</span></div>
+                    {poTaxPercent > 0 && <div className="flex justify-between text-sm text-gray-400"><span>VAT ({poTaxPercent}%)</span><span>R{taxAmount.toFixed(2)}</span></div>}
+                    {poShippingAmount > 0 && <div className="flex justify-between text-sm text-gray-400"><span>Shipping</span><span>R{poShippingAmount.toFixed(2)}</span></div>}
+                    <div className="flex justify-between text-lg font-bold text-white pt-1"><span>Total</span><span className="text-[hsl(217,90%,60%)]">R{total.toFixed(2)}</span></div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div><Label className="text-gray-300 text-xs">Notes</Label><Textarea value={poNotes} onChange={(e) => setPONotes(e.target.value)} className="bg-gray-900 border-gray-700 text-white mt-1" placeholder="Additional notes..." rows={2} /></div>
+
+            <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white py-3 text-base font-semibold shadow-lg shadow-blue-900/30">
+              {(createPOMutation.isPending || updatePOMutation.isPending) ? "Saving..." : editingPO ? "Update Purchase Order" : "Create Purchase Order"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Purchase Order View Panel */}
+      <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
+              <span className="text-[hsl(217,90%,60%)] font-mono">{selectedPO?.poNumber}</span>
+              {selectedPO && getPOStatusBadge(selectedPO.status)}
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">Purchase order details</DialogDescription>
+          </DialogHeader>
+          {selectedPO && (
+            <div className="space-y-4 mt-2">
+              <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                <h4 className="text-xs font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider mb-2">Supplier</h4>
+                <p className="text-white font-semibold">{selectedPO.supplierName}</p>
+                {selectedPO.supplierPhone && <p className="text-gray-400 text-sm">Tel: {selectedPO.supplierPhone}</p>}
+                {selectedPO.supplierEmail && <p className="text-gray-400 text-sm">Email: {selectedPO.supplierEmail}</p>}
+                {selectedPO.supplierAddress && <p className="text-gray-400 text-sm mt-1">{selectedPO.supplierAddress}</p>}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Created</p><p className="text-white text-sm font-medium">{new Date(selectedPO.createdAt).toLocaleDateString()}</p></div>
+                {selectedPO.expectedDate && <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Expected</p><p className="text-white text-sm font-medium">{new Date(selectedPO.expectedDate).toLocaleDateString()}</p></div>}
+                {selectedPO.receivedDate && <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Received</p><p className="text-green-400 text-sm font-medium">{new Date(selectedPO.receivedDate).toLocaleDateString()}</p></div>}
+              </div>
+              <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                <h4 className="text-xs font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider mb-3">Items</h4>
+                <div className="space-y-2">
+                  {(selectedPO.items || []).map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
+                      <div><p className="text-white text-sm font-medium">{item.name || "Custom Item"}</p>{item.sku && <p className="text-gray-500 text-xs">{item.sku}</p>}</div>
+                      <div className="text-right"><p className="text-white text-sm">{item.quantity} x R{parseFloat(item.costPrice).toFixed(2)}</p><p className="text-gray-400 text-xs">R{(item.costPrice * item.quantity).toFixed(2)}</p></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm text-gray-400"><span>Subtotal</span><span>R{parseFloat(selectedPO.subtotal).toFixed(2)}</span></div>
+                  {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between text-sm text-gray-400"><span>VAT ({selectedPO.taxPercent}%)</span><span>R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
+                  {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between text-sm text-gray-400"><span>Shipping</span><span>R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
+                  <div className="flex justify-between text-lg font-bold text-white pt-2 border-t border-gray-800"><span>Total</span><span className="text-[hsl(217,90%,60%)]">R{parseFloat(selectedPO.total).toFixed(2)}</span></div>
+                </div>
+              </div>
+              {selectedPO.notes && <div className="bg-gray-900 rounded-xl p-4 border border-gray-800"><h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Notes</h4><p className="text-gray-300 text-sm">{selectedPO.notes}</p></div>}
+              <div className="flex gap-2">
+                <Button onClick={() => generatePOPdf(selectedPO)} className="flex-1 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"><Download className="h-4 w-4 mr-2" />Download PDF</Button>
+                {selectedPO.status !== 'received' && selectedPO.status !== 'cancelled' && (
+                  <Button onClick={() => { loadPOForEdit(selectedPO); setIsPOViewOpen(false); }} variant="outline" className="border-gray-700 text-gray-300 hover:text-white bg-gray-800"><Edit className="h-4 w-4 mr-2" />Edit</Button>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete PO Confirmation */}
+      <AlertDialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
+        <AlertDialogContent className="bg-gray-950 border-gray-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Purchase Order</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">Are you sure you want to delete this purchase order? This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deletingPOId && deletePOMutation.mutate(deletingPOId)} className="bg-red-600 hover:bg-red-700 text-white">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
         <DialogContent className="sm:max-w-[500px]" aria-describedby="customer-dialog-description">

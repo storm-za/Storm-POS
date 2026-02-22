@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, Palette
+  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, Palette, ClipboardList
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -215,7 +215,26 @@ export default function PosSystemAfrikaans() {
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | 'all'>('all');
   const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
   const [inventorySortOrder, setInventorySortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
-  
+
+  // Aankoopbestellings staat
+  const [isPODialogOpen, setIsPODialogOpen] = useState(false);
+  const [isPOViewOpen, setIsPOViewOpen] = useState(false);
+  const [selectedPO, setSelectedPO] = useState<any>(null);
+  const [editingPO, setEditingPO] = useState<any>(null);
+  const [poSupplierName, setPOSupplierName] = useState("");
+  const [poSupplierEmail, setPOSupplierEmail] = useState("");
+  const [poSupplierPhone, setPOSupplierPhone] = useState("");
+  const [poSupplierAddress, setPOSupplierAddress] = useState("");
+  const [poItems, setPOItems] = useState<any[]>([]);
+  const [poExpectedDate, setPOExpectedDate] = useState("");
+  const [poNotes, setPONotes] = useState("");
+  const [poTaxPercent, setPOTaxPercent] = useState(15);
+  const [poShippingAmount, setPOShippingAmount] = useState(0);
+  const [poSearchTerm, setPOSearchTerm] = useState("");
+  const [poStatusFilter, setPOStatusFilter] = useState("all");
+  const [isDeletePODialogOpen, setIsDeletePODialogOpen] = useState(false);
+  const [deletingPOId, setDeletingPOId] = useState<number | null>(null);
+
   // Add products to category dialog
   const [isAddProductsToCategoryOpen, setIsAddProductsToCategoryOpen] = useState(false);
   const [selectedProductsForCategory, setSelectedProductsForCategory] = useState<number[]>([]);
@@ -492,6 +511,18 @@ export default function PosSystemAfrikaans() {
       if (!currentUser?.id) return [];
       const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie fakturen laai nie');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
+  // Haal aankoopbestellings
+  const { data: purchaseOrders = [], isLoading: isPOLoading } = useQuery<any[]>({
+    queryKey: ["/api/pos/purchase-orders", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Kon nie aankoopbestellings laai nie');
       return response.json();
     },
     enabled: !!currentUser,
@@ -1494,6 +1525,129 @@ export default function PosSystemAfrikaans() {
   });
 
   // Invoice mutations
+  // Aankoopbestelling mutasies
+  const createPOMutation = useMutation({
+    mutationFn: async (data: any) => { const res = await apiRequest("POST", "/api/pos/purchase-orders", data); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); setIsPODialogOpen(false); resetPOForm(); toast({ title: "Aankoopbestelling Geskep", description: "Aankoopbestelling is suksesvol geskep." }); },
+    onError: (error: any) => { toast({ title: "Fout", description: error.message || "Kon nie aankoopbestelling skep nie", variant: "destructive" }); },
+  });
+  const updatePOMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => { const res = await apiRequest("PUT", `/api/pos/purchase-orders/${id}`, data); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); setIsPODialogOpen(false); setEditingPO(null); resetPOForm(); toast({ title: "Aankoopbestelling Opgedateer", description: "Aankoopbestelling is suksesvol opgedateer." }); },
+    onError: (error: any) => { toast({ title: "Fout", description: error.message || "Kon nie aankoopbestelling opdateer nie", variant: "destructive" }); },
+  });
+  const updatePOStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => { const res = await apiRequest("PATCH", `/api/pos/purchase-orders/${id}`, { status }); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); toast({ title: "Status Opgedateer", description: "Aankoopbestelling status is opgedateer." }); },
+  });
+  const deletePOMutation = useMutation({
+    mutationFn: async (id: number) => { const res = await apiRequest("DELETE", `/api/pos/purchase-orders/${id}`); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); setIsDeletePODialogOpen(false); setDeletingPOId(null); toast({ title: "Verwyder", description: "Aankoopbestelling is verwyder." }); },
+  });
+
+  const resetPOForm = () => {
+    setPOSupplierName(""); setPOSupplierEmail(""); setPOSupplierPhone(""); setPOSupplierAddress("");
+    setPOItems([]); setPOExpectedDate(""); setPONotes(""); setPOTaxPercent(15); setPOShippingAmount(0); setEditingPO(null);
+  };
+
+  const handleSubmitPO = () => {
+    if (!poSupplierName) { toast({ title: "Fout", description: "Verskaffer naam is verpligtend", variant: "destructive" }); return; }
+    if (poItems.length === 0) { toast({ title: "Fout", description: "Voeg ten minste een item by", variant: "destructive" }); return; }
+    const subtotal = poItems.reduce((sum: number, item: any) => sum + (item.costPrice * item.quantity), 0);
+    const taxAmount = subtotal * (poTaxPercent / 100);
+    const total = subtotal + taxAmount + poShippingAmount;
+    const poData = {
+      userId: posUser?.id, supplierName: poSupplierName, supplierEmail: poSupplierEmail || null,
+      supplierPhone: poSupplierPhone || null, supplierAddress: poSupplierAddress || null,
+      items: poItems.map((item: any) => ({ ...item, lineTotal: item.costPrice * item.quantity, receivedQty: item.receivedQty || 0 })),
+      subtotal, taxPercent: poTaxPercent, shippingAmount: poShippingAmount, total,
+      expectedDate: poExpectedDate || null, notes: poNotes || null, status: 'draft',
+    };
+    if (editingPO) { updatePOMutation.mutate({ id: editingPO.id, data: poData }); }
+    else { createPOMutation.mutate(poData); }
+  };
+
+  const addPOItem = (product?: any) => {
+    if (product) { setPOItems([...poItems, { productId: product.id, name: product.name, sku: product.sku, quantity: 1, costPrice: parseFloat(product.costPrice || product.retailPrice || "0"), receivedQty: 0 }]); }
+    else { setPOItems([...poItems, { productId: null, name: "", sku: "", quantity: 1, costPrice: 0, receivedQty: 0 }]); }
+  };
+
+  const loadPOForEdit = (po: any) => {
+    setEditingPO(po); setPOSupplierName(po.supplierName); setPOSupplierEmail(po.supplierEmail || "");
+    setPOSupplierPhone(po.supplierPhone || ""); setPOSupplierAddress(po.supplierAddress || "");
+    setPOItems(po.items || []); setPOExpectedDate(po.expectedDate ? new Date(po.expectedDate).toISOString().split('T')[0] : "");
+    setPONotes(po.notes || ""); setPOTaxPercent(parseFloat(po.taxPercent) || 15);
+    setPOShippingAmount(parseFloat(po.shippingAmount) || 0); setIsPODialogOpen(true);
+  };
+
+  const getPOStatusBadge = (status: string) => {
+    const styles: Record<string, string> = { draft: "bg-gray-500/20 text-gray-300 border-gray-500/30", sent: "bg-blue-500/20 text-blue-300 border-blue-500/30", partial: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30", received: "bg-green-500/20 text-green-300 border-green-500/30", cancelled: "bg-red-500/20 text-red-300 border-red-500/30" };
+    const labels: Record<string, string> = { draft: "Konsep", sent: "Gestuur", partial: "Gedeeltelik Ontvang", received: "Ontvang", cancelled: "Gekanselleer" };
+    return <Badge className={`${styles[status] || styles.draft} border`}>{labels[status] || status}</Badge>;
+  };
+
+  const generatePOPdf = async (po: any) => {
+    const jsPDF = (await import("jspdf")).default;
+    const doc = new jsPDF();
+    doc.setFillColor(0, 0, 0); doc.rect(0, 0, 210, 297, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold");
+    doc.text("AANKOOPBESTELLING", 20, 30);
+    doc.setFontSize(12); doc.setTextColor(100, 150, 255); doc.text(po.poNumber, 20, 40);
+    doc.setTextColor(180, 180, 180); doc.setFontSize(10);
+    doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 30);
+    doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 37);
+    if (po.expectedDate) doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 44);
+    if (posUser?.companyName) {
+      doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+      doc.text("VAN:", 20, 60); doc.setFont("helvetica", "normal"); doc.text(posUser.companyName, 20, 67);
+    }
+    doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+    doc.text("VERSKAFFER:", 120, 60); doc.setFont("helvetica", "normal"); doc.setTextColor(200, 200, 200);
+    let supplierY = 67; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
+    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, 120, supplierY); supplierY += 6; }
+    if (po.supplierEmail) { doc.text(`E-pos: ${po.supplierEmail}`, 120, supplierY); supplierY += 6; }
+    if (po.supplierAddress) { const addrLines = doc.splitTextToSize(po.supplierAddress, 70); addrLines.forEach((l: string) => { doc.text(l, 120, supplierY); supplierY += 5; }); }
+    let tableY = Math.max(supplierY, 85) + 10;
+    doc.setFillColor(30, 64, 175); doc.rect(20, tableY, 170, 8, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+    doc.text("Item", 22, tableY + 6); doc.text("SKU", 85, tableY + 6); doc.text("Hv", 115, tableY + 6);
+    doc.text("Kosprys", 135, tableY + 6); doc.text("Totaal", 165, tableY + 6); tableY += 10;
+    doc.setFont("helvetica", "normal");
+    (po.items || []).forEach((item: any, idx: number) => {
+      if (idx % 2 === 0) { doc.setFillColor(20, 20, 30); doc.rect(20, tableY - 4, 170, 7, 'F'); }
+      doc.setTextColor(200, 200, 200);
+      doc.text(item.name || "Pasgemaakte Item", 22, tableY); doc.text(item.sku || "-", 85, tableY);
+      doc.text(String(item.quantity), 115, tableY); doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
+      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY); tableY += 7;
+    });
+    tableY += 5; doc.setDrawColor(50, 50, 70); doc.line(120, tableY, 190, tableY); tableY += 7;
+    doc.setTextColor(180, 180, 180); doc.text("Subtotaal:", 130, tableY);
+    doc.text(`R${parseFloat(po.subtotal).toFixed(2)}`, 165, tableY); tableY += 6;
+    if (parseFloat(po.taxPercent) > 0) {
+      doc.text(`BTW (${po.taxPercent}%):`, 130, tableY);
+      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY); tableY += 6;
+    }
+    if (parseFloat(po.shippingAmount) > 0) {
+      doc.text("Versending:", 130, tableY); doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY); tableY += 6;
+    }
+    doc.setTextColor(100, 150, 255); doc.setFontSize(12); doc.setFont("helvetica", "bold");
+    doc.text("TOTAAL:", 130, tableY + 3); doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+    if (po.notes) {
+      tableY += 15; doc.setTextColor(180, 180, 180); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+      doc.text("Notas:", 20, tableY); doc.setFont("helvetica", "normal");
+      doc.splitTextToSize(po.notes, 170).forEach((l: string) => { tableY += 5; doc.text(l, 20, tableY); });
+    }
+    doc.save(`${po.poNumber}.pdf`);
+  };
+
+  const filteredPurchaseOrders = useMemo(() => {
+    return (purchaseOrders || []).filter((po: any) => {
+      const matchesSearch = poSearchTerm === "" || po.poNumber?.toLowerCase().includes(poSearchTerm.toLowerCase()) || po.supplierName?.toLowerCase().includes(poSearchTerm.toLowerCase());
+      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter;
+      return matchesSearch && matchesStatus;
+    }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [purchaseOrders, poSearchTerm, poStatusFilter]);
+
   const createInvoiceMutation = useMutation({
     mutationFn: async (invoiceData: any) => {
       const response = await apiRequest("POST", "/api/pos/invoices", {
@@ -2979,6 +3133,7 @@ ${dateFilteredSales.map(sale =>
                   {currentTab === "produkte" && <><Package className="h-4 w-4" /><span>Produkte</span></>}
                   {currentTab === "kliente" && <><Users className="h-4 w-4" /><span>Kliente</span></>}
                   {currentTab === "fakturen" && <><Receipt className="h-4 w-4" /><span>Fakture & Kwotasies</span></>}
+                  {currentTab === "aankoopbestellings" && <><ClipboardList className="h-4 w-4" /><span>Aankoopbestellings</span></>}
                   {currentTab === "oop-rekeninge" && <><FileText className="h-4 w-4" /><span>Oop Rekeninge</span></>}
                   {currentTab === "verslae" && <><BarChart3 className="h-4 w-4" /><span>Verslae</span></>}
                   {currentTab === "gebruik" && <><CreditCard className="h-4 w-4" /><span>Gebruik</span></>}
@@ -3025,6 +3180,7 @@ ${dateFilteredSales.map(sale =>
                         { id: 'produkte', label: 'Produkte', icon: Package },
                         { id: 'kliente', label: 'Kliente', icon: Users },
                         { id: 'fakturen', label: 'Fakture & Kwotasies', icon: Receipt },
+                        { id: 'aankoopbestellings', label: 'Aankoopbestellings', icon: ClipboardList },
                         { id: 'oop-rekeninge', label: 'Oop Rekeninge', icon: FileText },
                         { id: 'verslae', label: 'Verslae', icon: BarChart3 },
                         { id: 'gebruik', label: 'Gebruik', icon: CreditCard },
@@ -3107,6 +3263,14 @@ ${dateFilteredSales.map(sale =>
                   >
                     <Receipt className="h-4 w-4 flex-shrink-0 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                     <span className="hidden lg:inline whitespace-nowrap">Fakture</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="aankoopbestellings" 
+                    className="group relative flex items-center justify-center gap-2 h-12 px-4 rounded-xl font-medium text-sm transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-[hsl(217,90%,45%)] data-[state=active]:to-[hsl(217,90%,35%)] data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 data-[state=active]:border data-[state=active]:border-blue-400/30 text-gray-400 hover:text-white hover:bg-white/5"
+                    data-testid="tab-purchase-orders"
+                  >
+                    <ClipboardList className="h-4 w-4 flex-shrink-0 group-data-[state=active]:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                    <span className="hidden lg:inline whitespace-nowrap">Bestellings</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="oop-rekeninge" 
@@ -4390,6 +4554,232 @@ ${dateFilteredSales.map(sale =>
             </Card>
             </motion.div>
           </TabsContent>
+
+          {/* Aankoopbestellings Tab */}
+          <TabsContent value="aankoopbestellings">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="border-gray-800 bg-black shadow-2xl">
+                <CardHeader className="border-b border-gray-800 bg-black">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <CardTitle className="text-white text-lg sm:text-xl font-bold flex items-center gap-2">
+                      <ClipboardList className="h-5 w-5 text-blue-400" />
+                      Aankoopbestellings
+                    </CardTitle>
+                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/25">
+                      <Plus className="h-4 w-4 mr-2" /> Nuwe Bestelling
+                    </Button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                      <Input placeholder="Soek bestellings..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500" />
+                    </div>
+                    <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
+                      <SelectTrigger className="w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white">
+                        <SelectValue placeholder="Filter Status" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 border-gray-700">
+                        <SelectItem value="all">Alle Status</SelectItem>
+                        <SelectItem value="draft">Konsep</SelectItem>
+                        <SelectItem value="sent">Gestuur</SelectItem>
+                        <SelectItem value="partial">Gedeeltelik</SelectItem>
+                        <SelectItem value="received">Ontvang</SelectItem>
+                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0 bg-black">
+                  {isPOLoading ? (
+                    <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
+                  ) : filteredPurchaseOrders.length === 0 ? (
+                    <div className="text-center py-12">
+                      <ClipboardList className="h-12 w-12 text-gray-600 mx-auto mb-3" />
+                      <p className="text-gray-400 text-lg mb-2">Geen aankoopbestellings nog nie</p>
+                      <p className="text-gray-500 text-sm">Skep jou eerste aankoopbestelling om voorraad van verskaffers te bestel</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-800/50">
+                      {filteredPurchaseOrders.map((po: any) => (
+                        <div key={po.id} className="p-4 hover:bg-gray-900/30 transition-colors">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="text-blue-400 font-mono font-bold text-sm">{po.poNumber}</span>
+                                {getPOStatusBadge(po.status)}
+                              </div>
+                              <p className="text-white font-medium">{po.supplierName}</p>
+                              <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(po.createdAt).toLocaleDateString()}</span>
+                                {po.expectedDate && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Verwag: {new Date(po.expectedDate).toLocaleDateString()}</span>}
+                                <span>{(po.items || []).length} items</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-white font-bold text-lg">R{parseFloat(po.total || 0).toFixed(2)}</span>
+                              <div className="flex gap-1">
+                                <Button variant="ghost" size="sm" onClick={() => { setSelectedPO(po); setIsPOViewOpen(true); }} className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><Eye className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 h-8 w-8 p-0"><Edit className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-green-400 hover:bg-green-500/10 h-8 w-8 p-0"><Download className="h-4 w-4" /></Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><ChevronDown className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                  <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                                    {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-gray-300 hover:text-white">Merk as Gestuur</DropdownMenuItem>}
+                                    {(po.status === 'sent' || po.status === 'partial') && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-gray-300 hover:text-white">Gedeeltelik Ontvang</DropdownMenuItem>}
+                                    {(po.status === 'sent' || po.status === 'partial') && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-gray-300 hover:text-white">Volledig Ontvang</DropdownMenuItem>}
+                                    {po.status !== 'cancelled' && po.status !== 'received' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Kanselleer</DropdownMenuItem>}
+                                    <DropdownMenuSeparator className="bg-gray-700" />
+                                    <DropdownMenuItem onClick={() => { setDeletingPOId(po.id); setIsDeletePODialogOpen(true); }} className="text-red-400 hover:text-red-300">Verwyder</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* PO View Dialog */}
+          <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
+            <DialogContent className="max-w-2xl bg-black border-gray-700 text-white max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle className="text-white text-xl">Aankoopbestelling: {selectedPO?.poNumber}</DialogTitle></DialogHeader>
+              {selectedPO && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    {getPOStatusBadge(selectedPO.status)}
+                    <span className="text-gray-400 text-sm">{new Date(selectedPO.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+                      <h4 className="text-sm text-gray-400 mb-2 font-medium">Verskaffer</h4>
+                      <p className="text-white font-semibold">{selectedPO.supplierName}</p>
+                      {selectedPO.supplierPhone && <p className="text-gray-400 text-sm mt-1">Tel: {selectedPO.supplierPhone}</p>}
+                      {selectedPO.supplierEmail && <p className="text-gray-400 text-sm">E-pos: {selectedPO.supplierEmail}</p>}
+                      {selectedPO.supplierAddress && <p className="text-gray-400 text-sm mt-1">{selectedPO.supplierAddress}</p>}
+                    </div>
+                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+                      <h4 className="text-sm text-gray-400 mb-2 font-medium">Besonderhede</h4>
+                      {selectedPO.expectedDate && <p className="text-gray-300 text-sm">Verwag: {new Date(selectedPO.expectedDate).toLocaleDateString()}</p>}
+                      <p className="text-gray-300 text-sm">{(selectedPO.items || []).length} items</p>
+                    </div>
+                  </div>
+                  <div className="border border-gray-800 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead><tr className="bg-gray-900/80"><th className="text-left p-3 text-gray-400 font-medium">Item</th><th className="text-left p-3 text-gray-400 font-medium">SKU</th><th className="text-center p-3 text-gray-400 font-medium">Hv</th><th className="text-right p-3 text-gray-400 font-medium">Kosprys</th><th className="text-right p-3 text-gray-400 font-medium">Totaal</th></tr></thead>
+                      <tbody>
+                        {(selectedPO.items || []).map((item: any, i: number) => (
+                          <tr key={i} className="border-t border-gray-800/50"><td className="p-3 text-white">{item.name}</td><td className="p-3 text-gray-400">{item.sku || '-'}</td><td className="p-3 text-center text-white">{item.quantity}</td><td className="p-3 text-right text-gray-300">R{parseFloat(item.costPrice || 0).toFixed(2)}</td><td className="p-3 text-right text-white font-medium">R{(item.costPrice * item.quantity).toFixed(2)}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 pt-2 border-t border-gray-800">
+                    <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">Subtotaal:</span><span className="text-white">R{parseFloat(selectedPO.subtotal || 0).toFixed(2)}</span></div>
+                    {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">BTW ({selectedPO.taxPercent}%):</span><span className="text-white">R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
+                    {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">Versending:</span><span className="text-white">R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
+                    <div className="flex justify-between w-48 text-sm font-bold border-t border-gray-700 pt-1"><span className="text-blue-400">Totaal:</span><span className="text-blue-400">R{parseFloat(selectedPO.total || 0).toFixed(2)}</span></div>
+                  </div>
+                  {selectedPO.notes && <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-800"><h4 className="text-sm text-gray-400 mb-1">Notas</h4><p className="text-gray-300 text-sm">{selectedPO.notes}</p></div>}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* PO Create/Edit Dialog */}
+          <Dialog open={isPODialogOpen} onOpenChange={(open) => { if (!open) { resetPOForm(); } setIsPODialogOpen(open); }}>
+            <DialogContent className="max-w-3xl bg-black border-gray-700 text-white max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle className="text-white text-xl">{editingPO ? 'Wysig Aankoopbestelling' : 'Nuwe Aankoopbestelling'}</DialogTitle></DialogHeader>
+              <div className="space-y-4">
+                <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+                  <h4 className="text-sm text-gray-400 mb-3 font-medium flex items-center gap-2"><User className="h-4 w-4" /> Verskaffer Besonderhede</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div><Label className="text-gray-400 text-xs">Verskaffer Naam *</Label><Input value={poSupplierName} onChange={(e) => setPOSupplierName(e.target.value)} placeholder="Verskaffer naam" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                    <div><Label className="text-gray-400 text-xs">E-pos</Label><Input value={poSupplierEmail} onChange={(e) => setPOSupplierEmail(e.target.value)} placeholder="verskaffer@epos.com" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                    <div><Label className="text-gray-400 text-xs">Telefoon</Label><Input value={poSupplierPhone} onChange={(e) => setPOSupplierPhone(e.target.value)} placeholder="Telefoonnommer" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                    <div><Label className="text-gray-400 text-xs">Adres</Label><Input value={poSupplierAddress} onChange={(e) => setPOSupplierAddress(e.target.value)} placeholder="Verskaffer adres" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                  </div>
+                </div>
+                <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm text-gray-400 font-medium flex items-center gap-2"><Package className="h-4 w-4" /> Items</h4>
+                    <div className="flex gap-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"><Plus className="h-3 w-3 mr-1" /> Voeg Produk By</Button></DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-48 overflow-y-auto">
+                          {(products || []).map((p: any) => (
+                            <DropdownMenuItem key={p.id} onClick={() => addPOItem(p)} className="text-gray-300 hover:text-white">{p.name} {p.sku ? `(${p.sku})` : ''}</DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <Button variant="outline" size="sm" onClick={() => addPOItem()} className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"><Plus className="h-3 w-3 mr-1" /> Pasgemaakte Item</Button>
+                    </div>
+                  </div>
+                  {poItems.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500"><Package className="h-8 w-8 mx-auto mb-2 opacity-50" /><p className="text-sm">Voeg items by om te begin</p></div>
+                  ) : (
+                    <div className="space-y-2">
+                      {poItems.map((item: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2 p-2 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                          <Input value={item.name} onChange={(e) => { const updated = [...poItems]; updated[index].name = e.target.value; setPOItems(updated); }} placeholder="Item naam" className="flex-1 bg-gray-900 border-gray-700 text-white text-sm h-8" />
+                          <Input value={item.sku || ''} onChange={(e) => { const updated = [...poItems]; updated[index].sku = e.target.value; setPOItems(updated); }} placeholder="SKU" className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" />
+                          <Input type="number" min="1" value={item.quantity} onChange={(e) => { const updated = [...poItems]; updated[index].quantity = parseInt(e.target.value) || 1; setPOItems(updated); }} className="w-16 bg-gray-900 border-gray-700 text-white text-sm h-8 text-center" />
+                          <div className="flex items-center"><span className="text-gray-500 text-sm mr-1">R</span><Input type="number" step="0.01" value={item.costPrice} onChange={(e) => { const updated = [...poItems]; updated[index].costPrice = parseFloat(e.target.value) || 0; setPOItems(updated); }} className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" /></div>
+                          <span className="text-gray-300 text-sm w-24 text-right font-medium">R{(item.costPrice * item.quantity).toFixed(2)}</span>
+                          <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8 p-0"><Trash2 className="h-3 w-3" /></Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div><Label className="text-gray-400 text-xs">Verwagte Datum</Label><Input type="date" value={poExpectedDate} onChange={(e) => setPOExpectedDate(e.target.value)} className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                  <div><Label className="text-gray-400 text-xs">BTW %</Label><Input type="number" step="0.1" value={poTaxPercent} onChange={(e) => setPOTaxPercent(parseFloat(e.target.value) || 0)} className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                  <div><Label className="text-gray-400 text-xs">Versending (R)</Label><Input type="number" step="0.01" value={poShippingAmount} onChange={(e) => setPOShippingAmount(parseFloat(e.target.value) || 0)} className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-xs">Notas</Label>
+                  <textarea value={poNotes} onChange={(e) => setPONotes(e.target.value)} rows={3} placeholder="Bykomende notas..." className="w-full mt-1 bg-gray-900 border border-gray-700 text-white rounded-md p-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                </div>
+                {poItems.length > 0 && (() => {
+                  const subtotal = poItems.reduce((s: number, i: any) => s + (i.costPrice * i.quantity), 0);
+                  const tax = subtotal * (poTaxPercent / 100);
+                  return (
+                    <div className="bg-gray-900/80 p-4 rounded-lg border border-gray-700">
+                      <div className="flex justify-between text-sm text-gray-400"><span>Subtotaal:</span><span className="text-white">R{subtotal.toFixed(2)}</span></div>
+                      {poTaxPercent > 0 && <div className="flex justify-between text-sm text-gray-400 mt-1"><span>BTW ({poTaxPercent}%):</span><span className="text-white">R{tax.toFixed(2)}</span></div>}
+                      {poShippingAmount > 0 && <div className="flex justify-between text-sm text-gray-400 mt-1"><span>Versending:</span><span className="text-white">R{poShippingAmount.toFixed(2)}</span></div>}
+                      <div className="flex justify-between text-lg font-bold mt-2 pt-2 border-t border-gray-700"><span className="text-blue-400">Totaal:</span><span className="text-blue-400">R{(subtotal + tax + poShippingAmount).toFixed(2)}</span></div>
+                    </div>
+                  );
+                })()}
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button variant="outline" onClick={() => { resetPOForm(); setIsPODialogOpen(false); }} className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800">Kanselleer</Button>
+                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white">
+                    {(createPOMutation.isPending || updatePOMutation.isPending) ? 'Stoor...' : editingPO ? 'Dateer Op' : 'Skep Bestelling'}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* PO Delete Confirmation */}
+          <Dialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
+            <DialogContent className="bg-black border-gray-700 text-white">
+              <DialogHeader><DialogTitle className="text-white">Bevestig Verwydering</DialogTitle></DialogHeader>
+              <p className="text-gray-400">Is jy seker jy wil hierdie aankoopbestelling verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.</p>
+              <div className="flex justify-end gap-3 mt-4">
+                <Button variant="outline" onClick={() => setIsDeletePODialogOpen(false)} className="border-gray-600 text-gray-300">Kanselleer</Button>
+                <Button variant="destructive" onClick={() => deletingPOId && deletePOMutation.mutate(deletingPOId)} disabled={deletePOMutation.isPending}>
+                  {deletePOMutation.isPending ? 'Verwyder...' : 'Verwyder'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Open Accounts Tab */}
           <TabsContent value="oop-rekeninge">
