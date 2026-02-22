@@ -522,6 +522,17 @@ export default function PosSystem() {
     enabled: !!currentUser,
   });
 
+  const { data: suppliers = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/suppliers", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/suppliers?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Failed to fetch suppliers');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
   // Fetch saved payment details
   const { data: savedPaymentDetails = [] } = useQuery<any[]>({
     queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
@@ -846,6 +857,29 @@ export default function PosSystem() {
 
   // Invoice mutations
   // Purchase Order mutations
+  const saveSupplierMutation = useMutation({
+    mutationFn: async (data: any) => { const res = await apiRequest("POST", "/api/pos/suppliers", data); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/suppliers", currentUser?.id] }); toast({ title: "Supplier Saved", description: "Supplier has been saved to your directory." }); },
+    onError: (error: any) => { toast({ title: "Error", description: error.message || "Failed to save supplier", variant: "destructive" }); },
+  });
+
+  const deleteSupplierMutation = useMutation({
+    mutationFn: async (id: number) => { const res = await apiRequest("DELETE", `/api/pos/suppliers/${id}`); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/suppliers", currentUser?.id] }); toast({ title: "Supplier Removed", description: "Supplier has been removed." }); },
+  });
+
+  const handleSaveSupplier = () => {
+    if (!poSupplierName) { toast({ title: "Error", description: "Supplier name is required to save", variant: "destructive" }); return; }
+    saveSupplierMutation.mutate({ userId: posUser?.id, name: poSupplierName, email: poSupplierEmail || null, phone: poSupplierPhone || null, address: poSupplierAddress || null });
+  };
+
+  const loadSupplier = (supplier: any) => {
+    setPOSupplierName(supplier.name);
+    setPOSupplierEmail(supplier.email || "");
+    setPOSupplierPhone(supplier.phone || "");
+    setPOSupplierAddress(supplier.address || "");
+  };
+
   const createPOMutation = useMutation({
     mutationFn: async (data: any) => {
       const res = await apiRequest("POST", "/api/pos/purchase-orders", data);
@@ -6740,7 +6774,39 @@ export default function PosSystem() {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
-              <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Supplier Details</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Supplier Details</h3>
+                <div className="flex items-center gap-2">
+                  {suppliers.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="border-[hsl(217,90%,30%)] text-[hsl(217,90%,60%)] hover:text-white hover:bg-[hsl(217,90%,25%)] bg-[hsl(217,90%,15%)] text-xs h-8 gap-1.5">
+                          <Users className="h-3 w-3" />
+                          Select Supplier
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-gray-900 border-gray-700 min-w-[240px] max-h-60 overflow-y-auto">
+                        {suppliers.map((s: any) => (
+                          <DropdownMenuItem key={s.id} onClick={() => loadSupplier(s)} className="text-gray-300 hover:text-white flex items-center justify-between group">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{s.name}</p>
+                              {s.phone && <p className="text-xs text-gray-500 truncate">{s.phone}</p>}
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteSupplierMutation.mutate(s.id); }} className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 text-gray-500 hover:text-red-400 hover:bg-red-500/10 ml-2">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  <Button variant="outline" size="sm" onClick={handleSaveSupplier} disabled={!poSupplierName || saveSupplierMutation.isPending} className="border-green-600/30 text-green-400 hover:text-green-300 hover:bg-green-500/10 bg-green-500/5 text-xs h-8 gap-1.5">
+                    <Check className="h-3 w-3" />
+                    {saveSupplierMutation.isPending ? "Saving..." : "Save Supplier"}
+                  </Button>
+                </div>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div><Label className="text-gray-300 text-xs">Supplier Name *</Label><Input value={poSupplierName} onChange={(e) => setPOSupplierName(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="Supplier company name" /></div>
                 <div><Label className="text-gray-300 text-xs">Email</Label><Input type="email" value={poSupplierEmail} onChange={(e) => setPOSupplierEmail(e.target.value)} className="bg-gray-800 border-gray-700 text-white mt-1" placeholder="supplier@example.com" /></div>

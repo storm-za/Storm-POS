@@ -528,6 +528,17 @@ export default function PosSystemAfrikaans() {
     enabled: !!currentUser,
   });
 
+  const { data: suppliers = [] } = useQuery<any[]>({
+    queryKey: ["/api/pos/suppliers", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const response = await fetch(`/api/pos/suppliers?userId=${currentUser.id}`);
+      if (!response.ok) throw new Error('Kon nie verskaffers laai nie');
+      return response.json();
+    },
+    enabled: !!currentUser,
+  });
+
   const { data: savedPaymentDetails = [] } = useQuery<any[]>({
     queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
     queryFn: async () => {
@@ -1525,6 +1536,30 @@ export default function PosSystemAfrikaans() {
   });
 
   // Invoice mutations
+  // Verskaffer mutasies
+  const saveSupplierMutation = useMutation({
+    mutationFn: async (data: any) => { const res = await apiRequest("POST", "/api/pos/suppliers", data); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/suppliers", currentUser?.id] }); toast({ title: "Verskaffer Gestoor", description: "Verskaffer is suksesvol gestoor." }); },
+    onError: (error: any) => { toast({ title: "Fout", description: error.message || "Kon nie verskaffer stoor nie", variant: "destructive" }); },
+  });
+
+  const deleteSupplierMutation = useMutation({
+    mutationFn: async (id: number) => { const res = await apiRequest("DELETE", `/api/pos/suppliers/${id}`); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/suppliers", currentUser?.id] }); toast({ title: "Verskaffer Verwyder", description: "Verskaffer is verwyder." }); },
+  });
+
+  const handleSaveSupplier = () => {
+    if (!poSupplierName) { toast({ title: "Fout", description: "Verskaffer naam is verpligtend om te stoor", variant: "destructive" }); return; }
+    saveSupplierMutation.mutate({ userId: posUser?.id, name: poSupplierName, email: poSupplierEmail || null, phone: poSupplierPhone || null, address: poSupplierAddress || null });
+  };
+
+  const loadSupplier = (supplier: any) => {
+    setPOSupplierName(supplier.name);
+    setPOSupplierEmail(supplier.email || "");
+    setPOSupplierPhone(supplier.phone || "");
+    setPOSupplierAddress(supplier.address || "");
+  };
+
   // Aankoopbestelling mutasies
   const createPOMutation = useMutation({
     mutationFn: async (data: any) => { const res = await apiRequest("POST", "/api/pos/purchase-orders", data); return res.json(); },
@@ -4696,7 +4731,39 @@ ${dateFilteredSales.map(sale =>
               <DialogHeader><DialogTitle className="text-white text-xl">{editingPO ? 'Wysig Aankoopbestelling' : 'Nuwe Aankoopbestelling'}</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-sm text-gray-400 mb-3 font-medium flex items-center gap-2"><User className="h-4 w-4" /> Verskaffer Besonderhede</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm text-gray-400 font-medium flex items-center gap-2"><User className="h-4 w-4" /> Verskaffer Besonderhede</h4>
+                    <div className="flex items-center gap-2">
+                      {suppliers.length > 0 && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="border-[hsl(217,90%,30%)] text-[hsl(217,90%,60%)] hover:text-white hover:bg-[hsl(217,90%,25%)] bg-[hsl(217,90%,15%)] text-xs h-8 gap-1.5">
+                              <Users className="h-3 w-3" />
+                              Kies Verskaffer
+                              <ChevronDown className="h-3 w-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-gray-900 border-gray-700 min-w-[240px] max-h-60 overflow-y-auto">
+                            {suppliers.map((s: any) => (
+                              <DropdownMenuItem key={s.id} onClick={() => loadSupplier(s)} className="text-gray-300 hover:text-white flex items-center justify-between group">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm truncate">{s.name}</p>
+                                  {s.phone && <p className="text-xs text-gray-500 truncate">{s.phone}</p>}
+                                </div>
+                                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); deleteSupplierMutation.mutate(s.id); }} className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 text-gray-500 hover:text-red-400 hover:bg-red-500/10 ml-2">
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                      <Button variant="outline" size="sm" onClick={handleSaveSupplier} disabled={!poSupplierName || saveSupplierMutation.isPending} className="border-green-600/30 text-green-400 hover:text-green-300 hover:bg-green-500/10 bg-green-500/5 text-xs h-8 gap-1.5">
+                        <Check className="h-3 w-3" />
+                        {saveSupplierMutation.isPending ? "Stoor..." : "Stoor Verskaffer"}
+                      </Button>
+                    </div>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div><Label className="text-gray-400 text-xs">Verskaffer Naam *</Label><Input value={poSupplierName} onChange={(e) => setPOSupplierName(e.target.value)} placeholder="Verskaffer naam" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>
                     <div><Label className="text-gray-400 text-xs">E-pos</Label><Input value={poSupplierEmail} onChange={(e) => setPOSupplierEmail(e.target.value)} placeholder="verskaffer@epos.com" className="bg-gray-900 border-gray-700 text-white mt-1" /></div>

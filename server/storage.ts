@@ -1,5 +1,5 @@
 import { 
-  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings, posCategories, posPurchaseOrders,
+  users, contactSubmissions, posUsers, posProducts, posCustomers, posSales, posOpenAccounts, posInvoices, posStaffAccounts, posSavedPaymentDetails, systemSettings, posCategories, posPurchaseOrders, posSuppliers,
   type User, type InsertUser, type ContactSubmission, type InsertContactSubmission,
   type PosUser, type InsertPosUser, type PosProduct, type InsertPosProduct,
   type PosCustomer, type InsertPosCustomer, type PosSale, type InsertPosSale,
@@ -8,7 +8,8 @@ import {
   type PosStaffAccount, type InsertPosStaffAccount,
   type SystemSetting, type InsertSystemSetting,
   type PosCategory, type InsertPosCategory,
-  type PosPurchaseOrder, type InsertPosPurchaseOrder
+  type PosPurchaseOrder, type InsertPosPurchaseOrder,
+  type PosSupplier, type InsertPosSupplier
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -118,6 +119,12 @@ export interface IStorage {
   updatePosStaffAccount(id: number, staffAccount: Partial<PosStaffAccount>): Promise<PosStaffAccount | undefined>;
   deletePosStaffAccount(id: number): Promise<boolean>;
   authenticateStaffAccount(posUserId: number, username: string, password: string): Promise<PosStaffAccount | undefined>;
+
+  // Supplier Operations
+  getPosSuppliers(userId: number): Promise<PosSupplier[]>;
+  createPosSupplier(supplier: InsertPosSupplier): Promise<PosSupplier>;
+  updatePosSupplier(id: number, supplier: Partial<PosSupplier>): Promise<PosSupplier | undefined>;
+  deletePosSupplier(id: number): Promise<boolean>;
 
   // Purchase Order Operations
   getPosPurchaseOrders(userId: number): Promise<PosPurchaseOrder[]>;
@@ -596,6 +603,12 @@ export class MemStorage implements IStorage {
     return documentType === 'invoice' ? 'INV-0001' : 'QUO-0001';
   }
 
+  // Supplier Operations (stub implementations for MemStorage)
+  async getPosSuppliers(userId: number): Promise<PosSupplier[]> { return []; }
+  async createPosSupplier(supplier: InsertPosSupplier): Promise<PosSupplier> { throw new Error("Not supported in MemStorage"); }
+  async updatePosSupplier(id: number, updates: Partial<PosSupplier>): Promise<PosSupplier | undefined> { return undefined; }
+  async deletePosSupplier(id: number): Promise<boolean> { return false; }
+
   // Purchase Order Operations (stub implementations for MemStorage)
   async getPosPurchaseOrders(userId: number): Promise<PosPurchaseOrder[]> {
     return [];
@@ -1018,6 +1031,26 @@ export class DatabaseStorage implements IStorage {
     const nextNum = parseInt(match[1]) + 1;
     const prefix = documentType === 'invoice' ? 'INV' : 'QUO';
     return `${prefix}-${String(nextNum).padStart(4, '0')}`;
+  }
+
+  // Supplier Operations
+  async getPosSuppliers(userId: number): Promise<PosSupplier[]> {
+    return db.select().from(posSuppliers).where(eq(posSuppliers.userId, userId));
+  }
+
+  async createPosSupplier(supplier: InsertPosSupplier): Promise<PosSupplier> {
+    const [created] = await db.insert(posSuppliers).values(supplier).returning();
+    return created;
+  }
+
+  async updatePosSupplier(id: number, updates: Partial<PosSupplier>): Promise<PosSupplier | undefined> {
+    const [updated] = await db.update(posSuppliers).set(updates).where(eq(posSuppliers.id, id)).returning();
+    return updated || undefined;
+  }
+
+  async deletePosSupplier(id: number): Promise<boolean> {
+    const result = await db.delete(posSuppliers).where(eq(posSuppliers.id, id));
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Purchase Order Operations

@@ -155,6 +155,17 @@ export const posSavedPaymentDetails = pgTable("pos_saved_payment_details", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Suppliers
+export const posSuppliers = pgTable("pos_suppliers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  address: text("address"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Purchase Orders
 export const posPurchaseOrders = pgTable("pos_purchase_orders", {
   id: serial("id").primaryKey(),
@@ -247,6 +258,11 @@ export const insertPosSavedPaymentDetailsSchema = createInsertSchema(posSavedPay
 });
 
 export const insertPosStaffAccountSchema = createInsertSchema(posStaffAccounts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPosSupplierSchema = createInsertSchema(posSuppliers).omit({
   id: true,
   createdAt: true,
 });
@@ -350,6 +366,8 @@ export type InsertPosSavedPaymentDetails = z.infer<typeof insertPosSavedPaymentD
 export type PosSavedPaymentDetails = typeof posSavedPaymentDetails.$inferSelect;
 export type InsertPosStaffAccount = z.infer<typeof insertPosStaffAccountSchema>;
 export type PosStaffAccount = typeof posStaffAccounts.$inferSelect;
+export type InsertPosSupplier = z.infer<typeof insertPosSupplierSchema>;
+export type PosSupplier = typeof posSuppliers.$inferSelect;
 export type InsertPosPurchaseOrder = z.infer<typeof insertPosPurchaseOrderSchema>;
 export type PosPurchaseOrder = typeof posPurchaseOrders.$inferSelect;
 export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;

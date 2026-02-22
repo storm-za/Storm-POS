@@ -1020,6 +1020,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Supplier Routes
+  app.get("/api/pos/suppliers", async (req, res) => {
+    try {
+      const userId = parseInt(req.query.userId as string) || 1;
+      const suppliers = await storage.getPosSuppliers(userId);
+      res.json(suppliers);
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      res.status(500).json({ message: "Failed to fetch suppliers" });
+    }
+  });
+
+  app.post("/api/pos/suppliers", async (req, res) => {
+    try {
+      const { userId, name, email, phone, address } = req.body;
+      if (!userId || !name) return res.status(400).json({ message: "userId and name are required" });
+      const supplier = await storage.createPosSupplier({ userId, name, email: email || null, phone: phone || null, address: address || null });
+      res.json(supplier);
+    } catch (error) {
+      console.error("Error creating supplier:", error);
+      res.status(500).json({ message: "Failed to create supplier" });
+    }
+  });
+
+  app.put("/api/pos/suppliers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, email, phone, address } = req.body;
+      const supplier = await storage.updatePosSupplier(id, { name, email, phone, address });
+      if (!supplier) return res.status(404).json({ message: "Supplier not found" });
+      res.json(supplier);
+    } catch (error) {
+      console.error("Error updating supplier:", error);
+      res.status(500).json({ message: "Failed to update supplier" });
+    }
+  });
+
+  app.delete("/api/pos/suppliers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deletePosSupplier(id);
+      if (!deleted) return res.status(404).json({ message: "Supplier not found" });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting supplier:", error);
+      res.status(500).json({ message: "Failed to delete supplier" });
+    }
+  });
+
   // Purchase Order Routes
   app.get("/api/pos/purchase-orders", async (req, res) => {
     try {
