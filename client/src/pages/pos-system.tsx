@@ -985,21 +985,22 @@ export default function PosSystem() {
   const generatePOPdf = async (po: any) => {
     const jsPDF = (await import("jspdf")).default;
     const doc = new jsPDF();
-    doc.setFillColor(0, 0, 0); doc.rect(0, 0, 210, 297, 'F');
+    doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 45, 'F');
     doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold");
-    doc.text("PURCHASE ORDER", 20, 30);
-    doc.setFontSize(12); doc.setTextColor(100, 150, 255); doc.text(po.poNumber, 20, 40);
-    doc.setTextColor(180, 180, 180); doc.setFontSize(10);
-    doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 30);
-    doc.text(`Date: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 37);
-    if (po.expectedDate) doc.text(`Expected: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 44);
+    doc.text("PURCHASE ORDER", 20, 25);
+    doc.setFontSize(12); doc.setTextColor(200, 220, 255); doc.text(po.poNumber, 20, 35);
+    doc.setTextColor(220, 230, 255); doc.setFontSize(10);
+    doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 20);
+    doc.text(`Date: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 27);
+    if (po.expectedDate) doc.text(`Expected: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 34);
+    let infoY = 55;
     if (currentUser?.companyName) {
-      doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text("FROM:", 20, 60); doc.setFont("helvetica", "normal"); doc.text(currentUser.companyName, 20, 67);
+      doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+      doc.text("FROM:", 20, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50); doc.text(currentUser.companyName, 20, infoY + 7);
     }
-    doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    doc.text("SUPPLIER:", 120, 60); doc.setFont("helvetica", "normal"); doc.setTextColor(200, 200, 200);
-    let supplierY = 67; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
+    doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
+    doc.text("SUPPLIER:", 120, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+    let supplierY = infoY + 7; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
     if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, 120, supplierY); supplierY += 6; }
     if (po.supplierEmail) { doc.text(`Email: ${po.supplierEmail}`, 120, supplierY); supplierY += 6; }
     if (po.supplierAddress) { const addrLines = doc.splitTextToSize(po.supplierAddress, 70); addrLines.forEach((l: string) => { doc.text(l, 120, supplierY); supplierY += 5; }); }
@@ -1010,14 +1011,14 @@ export default function PosSystem() {
     doc.text("Cost Price", 135, tableY + 6); doc.text("Total", 165, tableY + 6); tableY += 10;
     doc.setFont("helvetica", "normal");
     (po.items || []).forEach((item: any, idx: number) => {
-      if (idx % 2 === 0) { doc.setFillColor(20, 20, 30); doc.rect(20, tableY - 4, 170, 7, 'F'); }
-      doc.setTextColor(200, 200, 200);
+      if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(20, tableY - 4, 170, 7, 'F'); }
+      doc.setTextColor(40, 40, 40);
       doc.text(item.name || "Custom Item", 22, tableY); doc.text(item.sku || "-", 85, tableY);
       doc.text(String(item.quantity), 115, tableY); doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
       doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY); tableY += 7;
     });
-    tableY += 5; doc.setDrawColor(50, 50, 70); doc.line(120, tableY, 190, tableY); tableY += 7;
-    doc.setTextColor(180, 180, 180); doc.text("Subtotal:", 130, tableY);
+    tableY += 5; doc.setDrawColor(200, 200, 200); doc.line(120, tableY, 190, tableY); tableY += 7;
+    doc.setTextColor(80, 80, 80); doc.text("Subtotal:", 130, tableY);
     doc.text(`R${parseFloat(po.subtotal).toFixed(2)}`, 165, tableY); tableY += 6;
     if (parseFloat(po.taxPercent) > 0) {
       doc.text(`VAT (${po.taxPercent}%):`, 130, tableY);
@@ -1026,10 +1027,10 @@ export default function PosSystem() {
     if (parseFloat(po.shippingAmount) > 0) {
       doc.text("Shipping:", 130, tableY); doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY); tableY += 6;
     }
-    doc.setTextColor(100, 150, 255); doc.setFontSize(12); doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 64, 175); doc.setFontSize(12); doc.setFont("helvetica", "bold");
     doc.text("TOTAL:", 130, tableY + 3); doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
     if (po.notes) {
-      tableY += 15; doc.setTextColor(180, 180, 180); doc.setFontSize(9); doc.setFont("helvetica", "bold");
+      tableY += 15; doc.setTextColor(80, 80, 80); doc.setFontSize(9); doc.setFont("helvetica", "bold");
       doc.text("Notes:", 20, tableY); doc.setFont("helvetica", "normal");
       doc.splitTextToSize(po.notes, 170).forEach((l: string) => { tableY += 5; doc.text(l, 20, tableY); });
     }
