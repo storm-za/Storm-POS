@@ -1633,9 +1633,8 @@ export default function PosSystemAfrikaans() {
     doc.text("AANKOOPBESTELLING", 20, 25);
     doc.setFontSize(12); doc.setTextColor(200, 220, 255); doc.text(po.poNumber, 20, 35);
     doc.setTextColor(220, 230, 255); doc.setFontSize(10);
-    doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 20);
-    doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 27);
-    if (po.expectedDate) doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 34);
+    doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 25);
+    if (po.expectedDate) doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 32);
     let infoY = 55;
     if (currentUser?.companyName) {
       doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
@@ -1650,8 +1649,8 @@ export default function PosSystemAfrikaans() {
     let tableY = Math.max(supplierY, 85) + 10;
     doc.setFillColor(30, 64, 175); doc.rect(20, tableY, 170, 8, 'F');
     doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Item", 22, tableY + 6); doc.text("SKU", 85, tableY + 6); doc.text("Hv", 115, tableY + 6);
-    doc.text("Kosprys", 135, tableY + 6); doc.text("Totaal", 165, tableY + 6); tableY += 10;
+    doc.text("Item", 22, tableY + 5.5); doc.text("SKU", 85, tableY + 5.5); doc.text("Hv", 115, tableY + 5.5);
+    doc.text("Kosprys", 135, tableY + 5.5); doc.text("Totaal", 165, tableY + 5.5); tableY += 10;
     doc.setFont("helvetica", "normal");
     (po.items || []).forEach((item: any, idx: number) => {
       if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(20, tableY - 4, 170, 7, 'F'); }
