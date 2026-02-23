@@ -4823,7 +4823,7 @@ export default function PosSystem() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
+              <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6 bg-black">
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
                   <div className="space-y-3">
