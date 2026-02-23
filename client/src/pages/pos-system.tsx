@@ -3468,7 +3468,6 @@ export default function PosSystem() {
           </div>
         </motion.div>
       )}
-
       {isMobileMenuOpen && (
         <>
           <motion.div
@@ -3557,7 +3556,6 @@ export default function PosSystem() {
           </motion.div>
         </>
       )}
-
       <div className="flex min-h-screen relative z-10">
         <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
           <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
@@ -3971,7 +3969,7 @@ export default function PosSystem() {
                           <Label className="text-xs text-gray-400 mb-1.5 block">Discount</Label>
                           <div className="flex flex-wrap gap-1.5">
                             {[0, 5, 10, 20, 50].map((percentage) => (
-                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className={`h-7 text-xs px-2.5 ${discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400 hover:text-white"}`}>{percentage === 0 ? "None" : `${percentage}%`}</Button>
+                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent rounded-md h-7 text-xs px-2.5 border-gray-700/50 hover:text-white text-[#000000]">{percentage === 0 ? "None" : `${percentage}%`}</Button>
                             ))}
                             <div className="flex items-center gap-1 ml-1">
                               <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
@@ -6410,7 +6408,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Purchase Order View Panel */}
       <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
@@ -6465,7 +6462,6 @@ export default function PosSystem() {
           )}
         </DialogContent>
       </Dialog>
-
       {/* Delete PO Confirmation */}
       <AlertDialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
         <AlertDialogContent className="bg-gray-950 border-gray-800">
@@ -6479,7 +6475,6 @@ export default function PosSystem() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
         <DialogContent className="sm:max-w-[500px]" aria-describedby="customer-dialog-description">
@@ -6893,7 +6888,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -7523,7 +7517,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Category Management Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
@@ -7609,7 +7602,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Invoice Creation Dialog */}
       <Dialog 
         open={isInvoiceDialogOpen} 
@@ -8686,7 +8678,6 @@ export default function PosSystem() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Change Status Dialog */}
       <Dialog open={isStatusChangeDialogOpen} onOpenChange={setIsStatusChangeDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -8733,7 +8724,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Edit Document Number Dialog */}
       <Dialog open={isEditDocNumberDialogOpen} onOpenChange={setIsEditDocNumberDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -8778,7 +8768,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Save Payment Details Dialog */}
       <Dialog open={isSavePaymentDialogOpen} onOpenChange={setIsSavePaymentDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -8830,7 +8819,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Logout Confirmation Dialog */}
       <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
         <AlertDialogContent>
@@ -8856,7 +8844,6 @@ export default function PosSystem() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Excel Import Preview Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -8953,7 +8940,6 @@ export default function PosSystem() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Change Password Dialog */}
       <Dialog open={isChangePasswordDialogOpen} onOpenChange={(open) => {
         setIsChangePasswordDialogOpen(open);
