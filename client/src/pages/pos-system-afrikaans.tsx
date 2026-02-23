@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, Palette, ClipboardList
+  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -3565,45 +3565,86 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Select
-                        value={inventorySortOrder}
-                        onValueChange={(value: typeof inventorySortOrder) => setInventorySortOrder(value)}
-                      >
-                        <SelectTrigger className="w-[150px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="name-asc">Naam A-Z</SelectItem>
-                          <SelectItem value="name-desc">Naam Z-A</SelectItem>
-                          <SelectItem value="sku-asc">SKU A-Z</SelectItem>
-                          <SelectItem value="sku-desc">SKU Z-A</SelectItem>
-                          <SelectItem value="price-asc">Prys Laag-Hoog</SelectItem>
-                          <SelectItem value="price-desc">Prys Hoog-Laag</SelectItem>
-                          <SelectItem value="stock-asc">Voorraad Laag-Hoog</SelectItem>
-                          <SelectItem value="stock-desc">Voorraad Hoog-Laag</SelectItem>
-                        </SelectContent>
-                      </Select>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50 transition-all">
-                            <FileSpreadsheet className="h-4 w-4 mr-1" />
-                            Excel
-                            <ChevronDown className="h-3 w-3 ml-1" />
+                          <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                            <SlidersHorizontal className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            Filters
+                            <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-gray-900 border-gray-700">
-                          <DropdownMenuItem onClick={handleExportProducts} className="text-gray-200 hover:bg-gray-800">
-                            <Download className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
-                            Voer Produkte Uit
+                        <DropdownMenuContent className="w-56 bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-xl shadow-black/50 p-1" align="start">
+                          <div className="px-3 py-2">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[hsl(217,90%,50%)]">Sorteer Volgens</p>
+                          </div>
+                          {[
+                            { value: 'name-asc', label: 'Naam A-Z' },
+                            { value: 'name-desc', label: 'Naam Z-A' },
+                            { value: 'sku-asc', label: 'SKU A-Z' },
+                            { value: 'sku-desc', label: 'SKU Z-A' },
+                            { value: 'price-asc', label: 'Prys Laag-Hoog' },
+                            { value: 'price-desc', label: 'Prys Hoog-Laag' },
+                            { value: 'stock-asc', label: 'Voorraad Laag-Hoog' },
+                            { value: 'stock-desc', label: 'Voorraad Hoog-Laag' },
+                          ].map((item) => (
+                            <DropdownMenuItem
+                              key={item.value}
+                              onClick={() => setInventorySortOrder(item.value as typeof inventorySortOrder)}
+                              className={`text-sm rounded-md transition-colors ${inventorySortOrder === item.value ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
+                            >
+                              {inventorySortOrder === item.value && <Check className="h-3 w-3 mr-2 text-[hsl(217,90%,50%)]" />}
+                              {inventorySortOrder !== item.value && <span className="w-5" />}
+                              {item.label}
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuSeparator className="bg-[hsl(217,90%,40%)]/20 my-1" />
+                          <div className="px-3 py-2">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[hsl(217,90%,50%)]">Kategorie</p>
+                          </div>
+                          <DropdownMenuItem
+                            onClick={() => setProductCategoryFilter('all')}
+                            className={`text-sm rounded-md transition-colors ${productCategoryFilter === 'all' ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
+                          >
+                            {productCategoryFilter === 'all' && <Check className="h-3 w-3 mr-2 text-[hsl(217,90%,50%)]" />}
+                            {productCategoryFilter !== 'all' && <span className="w-5" />}
+                            Alle Kategoriee
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-gray-700" />
+                          {categories.map((cat) => (
+                            <DropdownMenuItem
+                              key={cat.id}
+                              onClick={() => setProductCategoryFilter(cat.id)}
+                              className={`text-sm rounded-md transition-colors ${productCategoryFilter === cat.id ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}
+                            >
+                              {productCategoryFilter === cat.id && <Check className="h-3 w-3 mr-2 text-[hsl(217,90%,50%)]" />}
+                              {productCategoryFilter !== cat.id && <span className="w-5" />}
+                              <div className="w-2.5 h-2.5 rounded-full mr-1.5" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                              {cat.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                            <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            Invoer / Uitvoer
+                            <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-52 bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-xl shadow-black/50 p-1" align="start">
+                          <DropdownMenuItem onClick={handleExportProducts} className="text-gray-200 hover:bg-[hsl(217,90%,40%)]/10 hover:text-white rounded-md">
+                            <Download className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            Uitvoer na Excel
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-[hsl(217,90%,40%)]/20 my-1" />
                           <DropdownMenuItem 
-                            className="text-gray-200 hover:bg-gray-800 cursor-pointer"
+                            className="text-gray-200 hover:bg-[hsl(217,90%,40%)]/10 hover:text-white cursor-pointer rounded-md"
                             onSelect={(e) => e.preventDefault()}
                           >
                             <label className="cursor-pointer flex items-center w-full">
                               <Upload className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
-                              Voer Produkte In
+                              Invoer met Excel
                               <input
                                 type="file"
                                 accept=".xlsx,.xls,.csv"
@@ -3612,10 +3653,10 @@ ${dateFilteredSales.map(sale =>
                               />
                             </label>
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-gray-700" />
+                          <DropdownMenuSeparator className="bg-[hsl(217,90%,40%)]/20 my-1" />
                           <DropdownMenuItem 
                             onClick={() => setShowDeleteAllProductsConfirm(true)}
-                            className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                            className="text-red-400 hover:bg-red-500/10 cursor-pointer rounded-md"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Verwyder Alle Produkte
@@ -3646,9 +3687,10 @@ ${dateFilteredSales.map(sale =>
                       <Button 
                         onClick={() => openCategoryDialog()} 
                         variant="outline" 
-                        className="border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] hover:bg-[hsl(217,90%,40%)]/20 hover:border-[hsl(217,90%,40%)]/50"
+                        size="sm"
+                        className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200"
                       >
-                        <Folder className="h-4 w-4 mr-2" />
+                        <FolderPlus className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                         Kategoriee
                       </Button>
                       <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
@@ -3660,39 +3702,18 @@ ${dateFilteredSales.map(sale =>
                 </CardHeader>
                 <CardContent className="relative pt-6">
                   <div className="space-y-4">
-                    {/* Enhanced Search Bar with Category Filter */}
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="relative flex-1">
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
-                        <div className="relative flex items-center">
-                          <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
-                          <Input
-                            placeholder="Soek produkte op naam of SKU..."
-                            value={productSearchTerm}
-                            onChange={(e) => setProductSearchTerm(e.target.value)}
-                            className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
-                          />
-                        </div>
+                    {/* Enhanced Search Bar */}
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
+                      <div className="relative flex items-center">
+                        <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
+                        <Input
+                          placeholder="Soek produkte op naam of SKU..."
+                          value={productSearchTerm}
+                          onChange={(e) => setProductSearchTerm(e.target.value)}
+                          className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
+                        />
                       </div>
-                      {categories.length > 0 && (
-                        <Select value={productCategoryFilter === 'all' ? 'all' : productCategoryFilter.toString()} onValueChange={(v) => setProductCategoryFilter(v === 'all' ? 'all' : parseInt(v))}>
-                          <SelectTrigger className="w-full sm:w-48 h-12 bg-gray-900/50 border-gray-700/50 text-white">
-                            <Folder className="w-4 h-4 mr-2 text-[hsl(217,90%,50%)]" />
-                            <SelectValue placeholder="Alle Kategoriee" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-gray-900 border-gray-700">
-                            <SelectItem value="all" className="text-gray-200">Alle Kategoriee</SelectItem>
-                            {categories.map((cat) => (
-                              <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
-                                <span className="flex items-center gap-2">
-                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                                  {cat.name}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
                     </div>
 
                     {/* Product Grid */}
