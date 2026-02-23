@@ -4119,7 +4119,7 @@ export default function PosSystem() {
               {/* Main Products Card */}
               <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
-                <CardHeader className="relative border-b border-white/10 pb-4">
+                <CardHeader className="relative border-b border-white/10 pb-4 bg-[#000000]">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
