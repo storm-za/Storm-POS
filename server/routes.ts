@@ -1139,10 +1139,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/pos/purchase-orders/:id", async (req, res) => {
     try {
       const poId = parseInt(req.params.id);
-      const { status } = req.body;
-      const updates: any = { status };
-      if (status === 'received') {
-        updates.receivedDate = new Date();
+      const { status, isPaid } = req.body;
+      const updates: any = {};
+      if (status !== undefined) {
+        updates.status = status;
+        if (status === 'received') {
+          updates.receivedDate = new Date();
+        }
+      }
+      if (isPaid !== undefined) {
+        updates.isPaid = isPaid;
+      }
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No valid fields to update" });
       }
       const order = await storage.updatePosPurchaseOrder(poId, updates);
       if (!order) {
@@ -1150,8 +1159,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(order);
     } catch (error) {
-      console.error("Error updating purchase order status:", error);
-      res.status(500).json({ message: "Failed to update purchase order status" });
+      console.error("Error updating purchase order:", error);
+      res.status(500).json({ message: "Failed to update purchase order" });
     }
   });
 
