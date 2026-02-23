@@ -4767,7 +4767,7 @@ export default function PosSystem() {
                           variant="outline"
                           size="sm"
                           onClick={() => openCustomerDialog(customer)}
-                          className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
+                          className="bg-transparent border-blue-500/30 text-white hover:bg-blue-500/20 hover:text-blue-200"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
