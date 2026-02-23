@@ -2878,52 +2878,7 @@ ${dateFilteredSales.map(sale =>
   const stormFee = monthlyRevenue * 0.005;
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        {/* Grid Pattern */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(90deg, hsl(217,90%,40%) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}
-        />
-        
-        {/* Floating Particles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-        
-        {/* Scanning Lines */}
-        <motion.div
-          className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
-          animate={{
-            top: ['0%', '100%'],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-black relative">
       {/* Welcome Toast Popup */}
       {showWelcomeToast && (
         <motion.div
