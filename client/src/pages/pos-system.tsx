@@ -4482,7 +4482,7 @@ export default function PosSystem() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="relative pt-6">
+              <CardContent className="p-6 relative pt-6 bg-[#000000]">
                   <div className="space-y-4">
                     {/* Enhanced Search Bar */}
                     <div className="relative">
