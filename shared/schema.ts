@@ -183,6 +183,7 @@ export const posPurchaseOrders = pgTable("pos_purchase_orders", {
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   expectedDate: timestamp("expected_date"),
   receivedDate: timestamp("received_date"),
+  isPaid: boolean("is_paid").notNull().default(false),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

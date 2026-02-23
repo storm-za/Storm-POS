@@ -1575,6 +1575,10 @@ export default function PosSystemAfrikaans() {
     mutationFn: async ({ id, status }: { id: number; status: string }) => { const res = await apiRequest("PATCH", `/api/pos/purchase-orders/${id}`, { status }); return res.json(); },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); toast({ title: "Status Opgedateer", description: "Aankoopbestelling status is opgedateer." }); },
   });
+  const togglePOPaidMutation = useMutation({
+    mutationFn: async ({ id, isPaid }: { id: number; isPaid: boolean }) => { const res = await apiRequest("PATCH", `/api/pos/purchase-orders/${id}`, { isPaid }); return res.json(); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); toast({ title: "Betaalstatus Opgedateer", description: "Aankoopbestelling betaalstatus is opgedateer." }); },
+  });
   const deletePOMutation = useMutation({
     mutationFn: async (id: number) => { const res = await apiRequest("DELETE", `/api/pos/purchase-orders/${id}`); return res.json(); },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] }); setIsDeletePODialogOpen(false); setDeletingPOId(null); toast({ title: "Verwyder", description: "Aankoopbestelling is verwyder." }); },
@@ -4643,6 +4647,7 @@ ${dateFilteredSales.map(sale =>
                               <div className="flex items-center gap-3 mb-1">
                                 <span className="text-blue-400 font-mono font-bold text-sm">{po.poNumber}</span>
                                 {getPOStatusBadge(po.status)}
+                                <Badge className={`cursor-pointer text-xs ${po.isPaid ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} border`} onClick={(e) => { e.stopPropagation(); togglePOPaidMutation.mutate({ id: po.id, isPaid: !po.isPaid }); }}>{po.isPaid ? 'Betaal' : 'Nie Betaal'}</Badge>
                               </div>
                               <p className="text-white font-medium">{po.supplierName}</p>
                               <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">

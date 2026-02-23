@@ -924,6 +924,17 @@ export default function PosSystem() {
     },
   });
 
+  const togglePOPaidMutation = useMutation({
+    mutationFn: async ({ id, isPaid }: { id: number; isPaid: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/pos/purchase-orders/${id}`, { isPaid });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/purchase-orders"] });
+      toast({ title: "Payment Status Updated", description: "Purchase order payment status has been updated." });
+    },
+  });
+
   const deletePOMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("DELETE", `/api/pos/purchase-orders/${id}`);
@@ -5516,6 +5527,7 @@ export default function PosSystem() {
                           <div className="flex items-center gap-3 mb-1">
                             <span className="text-[hsl(217,90%,60%)] font-mono font-bold text-sm">{po.poNumber}</span>
                             {getPOStatusBadge(po.status)}
+                            <Badge className={`cursor-pointer text-xs ${po.isPaid ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} border`} onClick={(e) => { e.stopPropagation(); togglePOPaidMutation.mutate({ id: po.id, isPaid: !po.isPaid }); }}>{po.isPaid ? 'Paid' : 'Not Paid'}</Badge>
                           </div>
                           <h3 className="text-white font-semibold truncate">{po.supplierName}</h3>
                           <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
