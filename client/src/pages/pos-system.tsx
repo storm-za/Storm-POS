@@ -174,6 +174,7 @@ export default function PosSystem() {
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcomeToast, setShowWelcomeToast] = useState(true);
   const [expandedSales, setExpandedSales] = useState<Set<number>>(new Set());
   
@@ -3630,9 +3631,9 @@ export default function PosSystem() {
       )}
 
       <div className="flex min-h-screen relative z-10">
-        <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-gradient-to-b from-gray-900 to-[hsl(217,30%,8%)] border-r border-gray-700/50 z-40">
-          <div className="p-5 border-b border-gray-700/30">
-            <img src={stormLogo} alt="Storm POS" className="h-36 w-auto" />
+        <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+          <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
+            <img src={stormLogo} alt="Storm POS" className={`transition-all duration-300 ${sidebarCollapsed ? 'h-8 w-auto' : 'h-12 w-auto'}`} />
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {[
@@ -3649,27 +3650,28 @@ export default function PosSystem() {
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all duration-200 ${
+                title={sidebarCollapsed ? item.label : undefined}
+                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all duration-200 ${sidebarCollapsed ? 'justify-center' : ''} ${
                   currentTab === item.id
-                    ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 <item.icon className={`h-5 w-5 flex-shrink-0 ${currentTab === item.id ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : ''}`} />
-                <span>{item.label}</span>
+                {!sidebarCollapsed && <span>{item.label}</span>}
               </button>
             ))}
           </nav>
           <div className="px-3 py-2">
             <button
               onClick={() => window.location.href = '/pos/help'}
-              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all ${sidebarCollapsed ? 'justify-center' : ''}`}
             >
               <HelpCircle className="h-5 w-5" />
-              <span>Help</span>
+              {!sidebarCollapsed && <span>Help</span>}
             </button>
           </div>
-          <div className="p-3 border-t border-gray-700/30 space-y-2">
+          <div className="p-3 border-t border-gray-100 space-y-2">
             <motion.div
               animate={highlightStaffButton ? {
                 scale: [1, 1.02, 1, 1.02, 1],
@@ -3687,7 +3689,7 @@ export default function PosSystem() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left hover:bg-white/5 transition-all ${highlightStaffButton ? 'ring-2 ring-[hsl(217,90%,50%)] ring-opacity-70' : ''}`}
+                    className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left hover:bg-gray-100 transition-all ${highlightStaffButton ? 'ring-2 ring-[hsl(217,90%,50%)] ring-opacity-70' : ''}`}
                     data-testid="staff-dropdown"
                   >
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
@@ -3697,16 +3699,18 @@ export default function PosSystem() {
                         <User className="h-4 w-4 text-white" />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-xs text-gray-500 leading-tight block">Logged in as</span>
-                      <span className="text-sm font-semibold text-white leading-tight truncate block">{currentStaff ? currentStaff.username : 'Select User'}</span>
-                    </div>
-                    {currentStaff && (
+                    {!sidebarCollapsed && (
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs text-gray-400 leading-tight block">Logged in as</span>
+                        <span className="text-sm font-semibold text-gray-900 leading-tight truncate block">{currentStaff ? currentStaff.username : 'Select User'}</span>
+                      </div>
+                    )}
+                    {!sidebarCollapsed && currentStaff && (
                       <Badge className={`text-[10px] px-1.5 py-0 h-4 ${currentStaff.userType === 'management' ? 'bg-[hsl(217,90%,40%)] text-white border-0' : 'bg-gray-600 text-white border-0'}`}>
                         {currentStaff.userType === 'management' ? 'Manager' : 'Staff'}
                       </Badge>
                     )}
-                    <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    {!sidebarCollapsed && <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />}
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
@@ -3794,15 +3798,21 @@ export default function PosSystem() {
             </motion.div>
             <button
               onClick={() => setIsLogoutDialogOpen(true)}
-              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-all ${sidebarCollapsed ? 'justify-center' : ''}`}
             >
               <LogOut className="h-5 w-5" />
-              <span>Log Out</span>
+              {!sidebarCollapsed && <span>Log Out</span>}
             </button>
           </div>
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 hover:shadow-lg transition-all duration-200 z-50"
+          >
+            <ChevronLeft className={`h-3.5 w-3.5 text-gray-600 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+          </button>
         </aside>
 
-        <main className="flex-1 md:ml-64 min-h-screen">
+        <main className={`flex-1 min-h-screen transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <div className="md:hidden flex items-center gap-3 p-4 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50 sticky top-0 z-30">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10">
               <Menu className="h-5 w-5" />
