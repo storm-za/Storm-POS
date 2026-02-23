@@ -322,6 +322,17 @@ export default function PosSystemAfrikaans() {
 
   // Get current user from localStorage or session
   useEffect(() => {
+    const loginTimestamp = localStorage.getItem('posLoginTimestamp');
+    if (loginTimestamp) {
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      if (Date.now() - parseInt(loginTimestamp) > thirtyDaysMs) {
+        localStorage.removeItem('posUser');
+        localStorage.removeItem('posLoginTimestamp');
+        window.location.href = '/pos/login';
+        return;
+      }
+    }
+
     const userData = localStorage.getItem('posUser');
     if (userData) {
       try {
@@ -330,7 +341,6 @@ export default function PosSystemAfrikaans() {
         console.log('Huidige gebruiker gelaai:', parsedUser);
       } catch (error) {
         console.error('Fout met ontleding van gebruikerdata:', error);
-        // Fallback for demo account
         setCurrentUser({
           id: 1,
           email: 'demo@storm.co.za',
@@ -8194,6 +8204,7 @@ ${dateFilteredSales.map(sale =>
                 className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                 onClick={() => {
                   localStorage.removeItem('posUser');
+                  localStorage.removeItem('posLoginTimestamp');
                   window.location.href = '/pos/login';
                 }}
               >

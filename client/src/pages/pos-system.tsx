@@ -265,6 +265,17 @@ export default function PosSystem() {
 
   // Get current user from localStorage or session
   useEffect(() => {
+    const loginTimestamp = localStorage.getItem('posLoginTimestamp');
+    if (loginTimestamp) {
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      if (Date.now() - parseInt(loginTimestamp) > thirtyDaysMs) {
+        localStorage.removeItem('posUser');
+        localStorage.removeItem('posLoginTimestamp');
+        window.location.href = '/pos/login';
+        return;
+      }
+    }
+
     const userData = localStorage.getItem('posUser');
     if (userData) {
       try {
@@ -273,7 +284,6 @@ export default function PosSystem() {
         console.log('Current user loaded:', parsedUser);
       } catch (error) {
         console.error('Error parsing user data:', error);
-        // Fallback for demo account
         setCurrentUser({
           id: 1,
           email: 'demo@storm.co.za',
@@ -8912,6 +8922,7 @@ export default function PosSystem() {
               className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
               onClick={() => {
                 localStorage.removeItem('posUser');
+                localStorage.removeItem('posLoginTimestamp');
                 window.location.href = '/pos/login';
               }}
             >

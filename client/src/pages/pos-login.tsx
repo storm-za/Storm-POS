@@ -33,8 +33,8 @@ export default function PosLogin() {
       return response.json();
     },
     onSuccess: (data) => {
-      // Store user data in localStorage
       localStorage.setItem('posUser', JSON.stringify(data.user));
+      localStorage.setItem('posLoginTimestamp', Date.now().toString());
       
       if (data.user.paid) {
         // Redirect based on preferred language
