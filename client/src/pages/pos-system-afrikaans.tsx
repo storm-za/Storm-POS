@@ -3019,7 +3019,6 @@ ${dateFilteredSales.map(sale =>
           </motion.div>
         </>
       )}
-
       <div className="flex min-h-screen relative z-10">
         <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
           <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
@@ -4235,7 +4234,7 @@ ${dateFilteredSales.map(sale =>
                   ) : filteredPurchaseOrders.length === 0 ? (
                     <div className="text-center py-12">
                       <ClipboardList className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-                      <p className="text-gray-400 text-lg mb-2">Geen aankoopbestellings nog nie</p>
+                      <p className="text-gray-400 text-lg mb-2">Nog geen aankoopbestellings nie</p>
                       <p className="text-gray-500 text-sm">Skep jou eerste aankoopbestelling om voorraad van verskaffers te bestel</p>
                     </div>
                   ) : (
@@ -5605,175 +5604,129 @@ ${dateFilteredSales.map(sale =>
       </div>
     </main>
   </div>
-
-        {/* All dialogs and modals would go here - Product Dialog, Customer Dialog, etc. */}
-        {/* For brevity, I'm including the key ones */}
-
-        {/* Category Management Dialog */}
-        <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-          <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-white flex items-center gap-2">
-                <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
-                {editingCategory ? 'Wysig Kategorie' : 'Skep Kategorie'}
-              </DialogTitle>
-              <DialogDescription className="text-gray-400">
-                {editingCategory ? 'Werk kategorie besonderhede hieronder by.' : 'Skep \'n nuwe kategorie om jou produkte te organiseer.'}
-              </DialogDescription>
-            </DialogHeader>
+      {/* All dialogs and modals would go here - Product Dialog, Customer Dialog, etc. */}
+      {/* For brevity, I'm including the key ones */}
+      {/* Category Management Dialog */}
+      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+              {editingCategory ? 'Wysig Kategorie' : 'Skep Kategorie'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {editingCategory ? 'Werk kategorie besonderhede hieronder by.' : 'Skep \'n nuwe kategorie om jou produkte te organiseer.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label className="text-gray-300">Kategorienaam</Label>
+              <Input 
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="bv. Drankies, Kos, Elektronika"
+                className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
+              />
+            </div>
             
-            <div className="space-y-4 py-4">
-              <div>
-                <Label className="text-gray-300">Kategorienaam</Label>
-                <Input 
-                  value={categoryName}
-                  onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="bv. Drankies, Kos, Elektronika"
-                  className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
-                />
+            <div>
+              <Label className="text-gray-300 flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Kategoriekleur
+              </Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'].map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setCategoryColor(color)}
+                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
               </div>
-              
+            </div>
+
+            {/* Existing Categories List */}
+            {categories.length > 0 && !editingCategory && (
               <div>
-                <Label className="text-gray-300 flex items-center gap-2">
-                  <Palette className="w-4 h-4" />
-                  Kategoriekleur
-                </Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'].map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setCategoryColor(color)}
-                      className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
-                      style={{ backgroundColor: color }}
-                    />
+                <Label className="text-gray-300 mb-2 block">Bestaande Kategoriee</Label>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  {categories.map((cat) => (
+                    <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                        <span className="text-white">{cat.name}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {products.filter(p => p.categoryId === cat.id).length} produkte
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white h-7 w-7 p-0">
+                          <Edit className="w-3 h-3" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-gray-400 hover:text-red-400 h-7 w-7 p-0">
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              {/* Existing Categories List */}
-              {categories.length > 0 && !editingCategory && (
-                <div>
-                  <Label className="text-gray-300 mb-2 block">Bestaande Kategoriee</Label>
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                    {categories.map((cat) => (
-                      <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                          <span className="text-white">{cat.name}</span>
-                          <Badge variant="secondary" className="text-xs">
-                            {products.filter(p => p.categoryId === cat.id).length} produkte
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => openCategoryDialog(cat)} className="text-gray-400 hover:text-white h-7 w-7 p-0">
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => deleteCategoryMutation.mutate(cat.id)} className="text-gray-400 hover:text-red-400 h-7 w-7 p-0">
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            )}
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+              Kanselleer
+            </Button>
+            <Button 
+              onClick={handleSaveCategory} 
+              className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)]"
+              disabled={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+            >
+              {createCategoryMutation.isPending || updateCategoryMutation.isPending ? 'Stoor...' : (editingCategory ? 'Werk Kategorie By' : 'Skep Kategorie')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Product Dialog */}
+      <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
+        <DialogContent className="sm:max-w-[560px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
+          <div className="relative">
+            <div className="px-6 pt-6 pb-4 border-b border-gray-700/50">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                  <Package className="w-6 h-6 text-white" />
                 </div>
-              )}
-            </div>
-            
-            <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
-                Kanselleer
-              </Button>
-              <Button 
-                onClick={handleSaveCategory} 
-                className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)]"
-                disabled={createCategoryMutation.isPending || updateCategoryMutation.isPending}
-              >
-                {createCategoryMutation.isPending || updateCategoryMutation.isPending ? 'Stoor...' : (editingCategory ? 'Werk Kategorie By' : 'Skep Kategorie')}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Product Dialog */}
-        <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-          <DialogContent className="sm:max-w-[560px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
-            <div className="relative">
-              <div className="px-6 pt-6 pb-4 border-b border-gray-700/50">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <DialogTitle className="text-xl font-bold text-white">
-                      {editingProduct ? "Redigeer Produk" : "Voeg Nuwe Produk By"}
-                    </DialogTitle>
-                    <p className="text-sm text-gray-400 mt-0.5">
-                      {editingProduct ? 'Werk die produkinligting hieronder by.' : 'Voer die besonderhede in om \'n nuwe produk by te voeg.'}
-                    </p>
-                  </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold text-white">
+                    {editingProduct ? "Redigeer Produk" : "Voeg Nuwe Produk By"}
+                  </DialogTitle>
+                  <p className="text-sm text-gray-400 mt-0.5">
+                    {editingProduct ? 'Werk die produkinligting hieronder by.' : 'Voer die besonderhede in om \'n nuwe produk by te voeg.'}
+                  </p>
                 </div>
               </div>
-              
-              <Form {...productForm}>
-                <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={productForm.control}
-                      name="sku"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
-                            <Tag className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
-                            SKU / Kode
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="bv. PROD001" 
-                              {...field} 
-                              className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={productForm.control}
-                      name="quantity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
-                            <Hash className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
-                            Voorraad
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              placeholder="bv. 50" 
-                              {...field} 
-                              className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
+            </div>
+            
+            <Form {...productForm}>
+              <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5">
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={productForm.control}
-                    name="name"
+                    name="sku"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
-                          <Package className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
-                          Produknaam
+                          <Tag className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                          SKU / Kode
                         </FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="bv. Koffie - Espresso" 
+                            placeholder="bv. PROD001" 
                             {...field} 
                             className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
                           />
@@ -5782,2038 +5735,2169 @@ ${dateFilteredSales.map(sale =>
                       </FormItem>
                     )}
                   />
-                  
-                  <div className="pt-2">
-                    <div className="flex items-center gap-2 mb-3">
-                      <DollarSign className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                      <span className="text-sm font-medium text-gray-300">Pryse</span>
-                      <div className="flex-1 h-px bg-gray-700/50"></div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      <FormField
-                        control={productForm.control}
-                        name="costPrice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400 text-xs font-medium">Kosprys</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
-                                <Input 
-                                  placeholder="0.00" 
-                                  {...field} 
-                                  className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={productForm.control}
-                        name="retailPrice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400 text-xs font-medium">Kleinhandelprys</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
-                                <Input 
-                                  placeholder="0.00" 
-                                  {...field} 
-                                  className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={productForm.control}
-                        name="tradePrice"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400 text-xs font-medium">Groothandelprys</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
-                                <Input 
-                                  placeholder="0.00" 
-                                  {...field} 
-                                  className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <FormField
+                    control={productForm.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                          <Hash className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                          Voorraad
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="bv. 50" 
+                            {...field} 
+                            className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={productForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                        <Package className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                        Produknaam
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="bv. Koffie - Espresso" 
+                          {...field} 
+                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="pt-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                    <span className="text-sm font-medium text-gray-300">Pryse</span>
+                    <div className="flex-1 h-px bg-gray-700/50"></div>
                   </div>
-                  
-                  {/* Category Selection */}
-                  <div className="pt-2">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Tag className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                      <span className="text-sm font-medium text-gray-300">Kategorie</span>
-                      <div className="flex-1 h-px bg-gray-700/50"></div>
-                    </div>
+                  <div className="grid grid-cols-3 gap-3">
                     <FormField
                       control={productForm.control}
-                      name="categoryId"
+                      name="costPrice"
                       render={({ field }) => (
                         <FormItem>
+                          <FormLabel className="text-gray-400 text-xs font-medium">Kosprys</FormLabel>
                           <FormControl>
-                            <Select 
-                              value={field.value?.toString() || "none"} 
-                              onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
-                            >
-                              <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
-                                <SelectValue placeholder="Kies kategorie (opsioneel)" />
-                              </SelectTrigger>
-                              <SelectContent className="bg-gray-900 border-gray-700">
-                                <SelectItem value="none" className="text-gray-400">Geen Kategorie</SelectItem>
-                                {categories.map((cat) => (
-                                  <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                                      {cat.name}
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <Input 
+                                placeholder="0.00" 
+                                {...field} 
+                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                              />
+                            </div>
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={productForm.control}
+                      name="retailPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400 text-xs font-medium">Kleinhandelprys</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <Input 
+                                placeholder="0.00" 
+                                {...field} 
+                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={productForm.control}
+                      name="tradePrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400 text-xs font-medium">Groothandelprys</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <Input 
+                                placeholder="0.00" 
+                                {...field} 
+                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-                  
-                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsProductDialogOpen(false)}
-                      className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5"
-                    >
-                      Kanselleer
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 px-6"
-                      disabled={createProductMutation.isPending || updateProductMutation.isPending}
-                    >
-                      {createProductMutation.isPending || updateProductMutation.isPending ? (
-                        <span className="flex items-center gap-2">
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                          Stoor...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          {editingProduct ? <Check className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
-                          {editingProduct ? 'Bywerk Produk' : 'Voeg Produk By'}
-                        </span>
-                      )}
-                    </Button>
+                </div>
+                
+                {/* Category Selection */}
+                <div className="pt-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Tag className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                    <span className="text-sm font-medium text-gray-300">Kategorie</span>
+                    <div className="flex-1 h-px bg-gray-700/50"></div>
                   </div>
-                </form>
-              </Form>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Customer Dialog */}
-        <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {editingCustomer ? "Redigeer Klient" : "Voeg Nuwe Klient By"}
-              </DialogTitle>
-            </DialogHeader>
-            <Form {...customerForm}>
-              <form onSubmit={customerForm.handleSubmit(handleCustomerSubmit)} className="space-y-4">
-                <FormField
-                  control={customerForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Naam</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Klientnaam" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={customerForm.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefoon (Opsioneel)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="0123456789" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={customerForm.control}
-                  name="customerType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Klienttipe</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormField
+                    control={productForm.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <FormItem>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Kies klienttipe" />
-                          </SelectTrigger>
+                          <Select 
+                            value={field.value?.toString() || "none"} 
+                            onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
+                          >
+                            <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
+                              <SelectValue placeholder="Kies kategorie (opsioneel)" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-900 border-gray-700">
+                              <SelectItem value="none" className="text-gray-400">Geen Kategorie</SelectItem>
+                              {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                                    {cat.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="retail">Kleinhandel</SelectItem>
-                          <SelectItem value="trade">Groothandel</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={customerForm.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notas (Opsioneel)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Enige addisionele notas..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-end space-x-2">
-                  <Button type="button" variant="outline" onClick={() => setIsCustomerDialogOpen(false)}>
-                    Kanselleer
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                    disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
-                  >
-                    {createCustomerMutation.isPending || updateCustomerMutation.isPending ? 'Stoor...' : (editingCustomer ? 'Bywerk' : 'Skep')}
-                  </Button>
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-
-        {/* Oop Rekening Skep Dialog */}
-        <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-          <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
-            <DialogHeader className="border-b border-gray-700/50 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-white text-xl font-bold">Skep Oop Rekening</DialogTitle>
-                  <p className="text-gray-400 text-sm mt-1">Voeg items by 'n nuwe tafel of klient rekening</p>
-                </div>
-              </div>
-            </DialogHeader>
-            
-            {/* Current Sale Summary */}
-            {currentSale.length > 0 && (
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-gray-400 text-sm font-medium">Huidige Items</span>
-                  <Badge variant="outline" className="border-[hsl(217,90%,40%)]/50 text-[hsl(217,90%,60%)]">
-                    {currentSale.length} {currentSale.length === 1 ? 'item' : 'items'}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Totaal Bedrag:</span>
-                  <span className="text-2xl font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>
-                </div>
-              </div>
-            )}
-            
-            <Form {...openAccountForm}>
-              <form 
-                onSubmit={openAccountForm.handleSubmit((data) => {
-                  const accountData = {
-                    ...data,
-                    items: currentSale,
-                    total: calculateTotal(),
-                    notes: saleNotes || null,
-                  };
-                  createOpenAccountMutation.mutate(accountData);
-                })} 
-                className="space-y-5"
-              >
-                <FormField
-                  control={openAccountForm.control}
-                  name="accountName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-300 font-medium">Rekeningnaam</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="bv., Tafel 5, Jan Smit" 
-                          {...field} 
-                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={openAccountForm.control}
-                  name="accountType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-300 font-medium">Rekeningtipe</FormLabel>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => field.onChange('table')}
-                          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
-                            field.value === 'table' 
-                              ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
-                              : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
-                          }`}
-                        >
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
-                            field.value === 'table' 
-                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
-                              : 'bg-gray-700/50'
-                          }`}>
-                            <FileText className={`w-5 h-5 ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`} />
-                          </div>
-                          <span className={`font-medium ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`}>Tafel</span>
-                          <span className="text-xs text-gray-500 mt-1">Restaurant tafel</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => field.onChange('customer')}
-                          className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
-                            field.value === 'customer' 
-                              ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
-                              : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
-                          }`}
-                        >
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
-                            field.value === 'customer' 
-                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
-                              : 'bg-gray-700/50'
-                          }`}>
-                            <Users className={`w-5 h-5 ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`} />
-                          </div>
-                          <span className={`font-medium ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`}>Klient</span>
-                          <span className="text-xs text-gray-500 mt-1">Klient rekening</span>
-                        </button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={openAccountForm.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-300 font-medium">Notas (Opsioneel)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Enige addisionele notas..." 
-                          {...field} 
-                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none"
-                          rows={3}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => setIsOpenAccountDialogOpen(false)}
-                    className="bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white px-6"
+                    onClick={() => setIsProductDialogOpen(false)}
+                    className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5"
                   >
                     Kanselleer
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 px-6"
-                    disabled={createOpenAccountMutation.isPending || currentSale.length === 0}
+                    className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 px-6"
+                    disabled={createProductMutation.isPending || updateProductMutation.isPending}
                   >
-                    {createOpenAccountMutation.isPending ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                        Besig...
-                      </>
+                    {createProductMutation.isPending || updateProductMutation.isPending ? (
+                      <span className="flex items-center gap-2">
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Stoor...
+                      </span>
                     ) : (
-                      <>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Skep Rekening
-                      </>
+                      <span className="flex items-center gap-2">
+                        {editingProduct ? <Check className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
+                        {editingProduct ? 'Bywerk Produk' : 'Voeg Produk By'}
+                      </span>
                     )}
                   </Button>
                 </div>
               </form>
             </Form>
-          </DialogContent>
-        </Dialog>
-
-        {/* Management Password Dialog */}
-        <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Bestuurstoegang Vereis</DialogTitle>
-              <DialogDescription>
-                Die Produkte en Verslae afdelings is beperk tot bestuurders. Meld asseblief aan met 'n bestuursrekening om toegang tot hierdie funksies te kry.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center">
-              <Button
-                onClick={closeManagementDialog}
-                className="w-full"
-              >
-                Verstaan
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Add Products to Category Dialog */}
-        <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-          <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
-            <DialogHeader className="border-b border-gray-700/50 pb-4">
-              <DialogTitle className="text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
-                Voeg Produkte by Kategorie
-              </DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Kies produkte om by "{categories.find(c => c.id === selectedSalesCategory)?.name || 'hierdie kategorie'}" te voeg. Produkte kan aan meerdere kategoriee behoort.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto py-4 space-y-2">
-              {products.map((product) => {
-                const isSelected = selectedProductsForCategory.includes(product.id);
-                const productCategories = categories.filter(c => c.id === product.categoryId);
-                return (
-                  <div
-                    key={product.id}
-                    onClick={() => {
-                      if (isSelected) {
-                        setSelectedProductsForCategory(prev => prev.filter(id => id !== product.id));
-                      } else {
-                        setSelectedProductsForCategory(prev => [...prev, product.id]);
-                      }
-                    }}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/20' 
-                        : 'border-gray-700/50 bg-gray-800/50 hover:border-gray-600'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                          isSelected ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,50%)]' : 'border-gray-600'
-                        }`}>
-                          {isSelected && <Check className="w-3 h-3 text-white" />}
-                        </div>
-                        <div>
-                          <p className="font-medium text-white">{product.name}</p>
-                          <p className="text-xs text-gray-400">SKU: {product.sku}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-[hsl(217,90%,60%)]">R{product.retailPrice}</p>
-                        <p className="text-xs text-gray-500">
-                          {productCategories.length > 0 
-                            ? productCategories.map(c => c.name).join(', ')
-                            : 'Geen kategorie'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex justify-between items-center pt-4 border-t border-gray-700/50">
-              <span className="text-sm text-gray-400">
-                {selectedProductsForCategory.length} produkte gekies
-              </span>
-              <div className="flex gap-2">
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Customer Dialog */}
+      <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingCustomer ? "Redigeer Klient" : "Voeg Nuwe Klient By"}
+            </DialogTitle>
+          </DialogHeader>
+          <Form {...customerForm}>
+            <form onSubmit={customerForm.handleSubmit(handleCustomerSubmit)} className="space-y-4">
+              <FormField
+                control={customerForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Naam</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Klientnaam" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefoon (Opsioneel)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0123456789" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="customerType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Klienttipe</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kies klienttipe" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="retail">Kleinhandel</SelectItem>
+                        <SelectItem value="trade">Groothandel</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notas (Opsioneel)</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Enige addisionele notas..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsCustomerDialogOpen(false)}>
+                  Kanselleer
+                </Button>
                 <Button 
+                  type="submit" 
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
+                >
+                  {createCustomerMutation.isPending || updateCustomerMutation.isPending ? 'Stoor...' : (editingCustomer ? 'Bywerk' : 'Skep')}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      {/* Oop Rekening Skep Dialog */}
+      <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
+          <DialogHeader className="border-b border-gray-700/50 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-xl font-bold">Skep Oop Rekening</DialogTitle>
+                <p className="text-gray-400 text-sm mt-1">Voeg items by 'n nuwe tafel of klient rekening</p>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          {/* Current Sale Summary */}
+          {currentSale.length > 0 && (
+            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-gray-400 text-sm font-medium">Huidige Items</span>
+                <Badge variant="outline" className="border-[hsl(217,90%,40%)]/50 text-[hsl(217,90%,60%)]">
+                  {currentSale.length} {currentSale.length === 1 ? 'item' : 'items'}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Totaal Bedrag:</span>
+                <span className="text-2xl font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>
+              </div>
+            </div>
+          )}
+          
+          <Form {...openAccountForm}>
+            <form 
+              onSubmit={openAccountForm.handleSubmit((data) => {
+                const accountData = {
+                  ...data,
+                  items: currentSale,
+                  total: calculateTotal(),
+                  notes: saleNotes || null,
+                };
+                createOpenAccountMutation.mutate(accountData);
+              })} 
+              className="space-y-5"
+            >
+              <FormField
+                control={openAccountForm.control}
+                name="accountName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300 font-medium">Rekeningnaam</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="bv., Tafel 5, Jan Smit" 
+                        {...field} 
+                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={openAccountForm.control}
+                name="accountType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300 font-medium">Rekeningtipe</FormLabel>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => field.onChange('table')}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                          field.value === 'table' 
+                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                            : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
+                          field.value === 'table' 
+                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                            : 'bg-gray-700/50'
+                        }`}>
+                          <FileText className={`w-5 h-5 ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`} />
+                        </div>
+                        <span className={`font-medium ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`}>Tafel</span>
+                        <span className="text-xs text-gray-500 mt-1">Restaurant tafel</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => field.onChange('customer')}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+                          field.value === 'customer' 
+                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                            : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
+                          field.value === 'customer' 
+                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                            : 'bg-gray-700/50'
+                        }`}>
+                          <Users className={`w-5 h-5 ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`} />
+                        </div>
+                        <span className={`font-medium ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`}>Klient</span>
+                        <span className="text-xs text-gray-500 mt-1">Klient rekening</span>
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={openAccountForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300 font-medium">Notas (Opsioneel)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enige addisionele notas..." 
+                        {...field} 
+                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none"
+                        rows={3}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                <Button 
+                  type="button" 
                   variant="outline" 
-                  onClick={() => {
-                    setIsAddProductsToCategoryOpen(false);
-                    setSelectedProductsForCategory([]);
-                  }}
+                  onClick={() => setIsOpenAccountDialogOpen(false)}
+                  className="bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white px-6"
                 >
                   Kanselleer
                 </Button>
                 <Button 
+                  type="submit" 
+                  className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 px-6"
+                  disabled={createOpenAccountMutation.isPending || currentSale.length === 0}
+                >
+                  {createOpenAccountMutation.isPending ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Besig...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Skep Rekening
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      {/* Management Password Dialog */}
+      <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Bestuurstoegang Vereis</DialogTitle>
+            <DialogDescription>
+              Die Produkte en Verslae afdelings is beperk tot bestuurders. Meld asseblief aan met 'n bestuursrekening om toegang tot hierdie funksies te kry.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center">
+            <Button
+              onClick={closeManagementDialog}
+              className="w-full"
+            >
+              Verstaan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Add Products to Category Dialog */}
+      <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader className="border-b border-gray-700/50 pb-4">
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+              Voeg Produkte by Kategorie
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Kies produkte om by "{categories.find(c => c.id === selectedSalesCategory)?.name || 'hierdie kategorie'}" te voeg. Produkte kan aan meerdere kategoriee behoort.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto py-4 space-y-2">
+            {products.map((product) => {
+              const isSelected = selectedProductsForCategory.includes(product.id);
+              const productCategories = categories.filter(c => c.id === product.categoryId);
+              return (
+                <div
+                  key={product.id}
                   onClick={() => {
-                    if (selectedSalesCategory) {
-                      bulkAddProductsToCategoryMutation.mutate({
-                        productIds: selectedProductsForCategory,
-                        categoryId: selectedSalesCategory
-                      });
+                    if (isSelected) {
+                      setSelectedProductsForCategory(prev => prev.filter(id => id !== product.id));
+                    } else {
+                      setSelectedProductsForCategory(prev => [...prev, product.id]);
                     }
                   }}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"
-                  disabled={bulkAddProductsToCategoryMutation.isPending}
+                  className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                    isSelected 
+                      ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/20' 
+                      : 'border-gray-700/50 bg-gray-800/50 hover:border-gray-600'
+                  }`}
                 >
-                  {bulkAddProductsToCategoryMutation.isPending ? 'Stoor...' : 'Stoor'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Logo Upload Dialog */}
-        <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Bywerk Maatskappy Logo</DialogTitle>
-              <DialogDescription>
-                Laai jou maatskappy logo op om jou POS sisteem te personaliseer.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {currentUser?.companyLogo && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">Huidige Logo:</p>
-                  <img 
-                    src={currentUser.companyLogo} 
-                    alt="Huidige Logo" 
-                    className="h-20 w-20 object-cover rounded-lg mx-auto border"
-                  />
-                </div>
-              )}
-              
-              <div>
-                <Label htmlFor="logoUpload">Kies Nuwe Logo</Label>
-                <Input
-                  id="logoUpload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoFileUpload}
-                  className="mt-1"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Aanbeveling: Vierkantige beelde werk die beste (PNG, JPG, maks 2MB)
-                </p>
-              </div>
-              
-              {logoFile && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">Nuwe Logo Voorskou:</p>
-                  <img 
-                    src={logoFile} 
-                    alt="Nuwe Logo Voorskou" 
-                    className="h-20 w-20 object-cover rounded-lg mx-auto border"
-                  />
-                </div>
-              )}
-              
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setIsLogoDialogOpen(false);
-                    setLogoFile(null);
-                  }}
-                >
-                  Kanselleer
-                </Button>
-                <Button 
-                  onClick={() => logoFile && logoUploadMutation.mutate(logoFile)}
-                  disabled={!logoFile || logoUploadMutation.isPending}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                >
-                  {logoUploadMutation.isPending ? "Laai op..." : "Bywerk Logo"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Receipt Customizer Dialog */}
-        <ReceiptCustomizerDialog 
-          isOpen={isReceiptCustomizerOpen}
-          onClose={() => setIsReceiptCustomizerOpen(false)}
-          currentUser={currentUser}
-          setCurrentUser={setCurrentUser}
-          toast={toast}
-          labels={{
-            title: "Personaliseer Jou Kwitansie",
-            description: "Personaliseer jou kwitansie met jou besigheidsinligting en pas die uitleg aan.",
-            
-            // Section labels
-            sections: {
-              logo: "Logo",
-              businessInfo: "Besigheidsinligting",
-              dateTime: "Datum & Tyd",
-              staffInfo: "Personeellid Inligting",
-              customerInfo: "Kliënt Inligting",
-              items: "Items Lys",
-              totals: "Totale",
-              paymentInfo: "Betalingsinligting",
-              messages: "Pasgemaakte Boodskappe",
-            },
-            
-            // Card titles
-            sectionOrderTitle: "Kwitansie Afdeling Volgorde",
-            logoTitle: "Kwitansie Logo",
-            businessInfoTitle: "Besigheidsinligting",
-            displayOptionsTitle: "Vertoon Opsies",
-            customMessagesTitle: "Pasgemaakte Boodskappe",
-            
-            // Logo section
-            currentLogo: "Huidige Logo:",
-            uploadLogoLabel: "Laai Pasgemaakte Logo Op (Opsioneel)",
-            logoHelp: "Laai 'n pasgemaakte logo op vir kwitansies. Aanbeveel: Vierkant beelde werk beste (PNG, JPG, maks 2MB)",
-            newLogoPreview: "Nuwe Logo Voorskou:",
-            removeButton: "Verwyder",
-            
-            // Business info fields
-            businessName: "Besigheidsnaam",
-            phoneNumber: "Telefoonnommer",
-            addressLine1: "Adreslyn 1",
-            addressLine2: "Adreslyn 2",
-            email: "E-pos",
-            website: "Webwerf",
-            registrationNumber: "Registrasienommer",
-            vatNumber: "BTW Nommer",
-            
-            // Placeholders
-            businessNamePlaceholder: "Jou Besigheidsnaam",
-            phonePlaceholder: "+27 123 456 7890",
-            addressLine1Placeholder: "123 Hoofstraat",
-            addressLine2Placeholder: "Stad, Poskode",
-            emailPlaceholder: "info@besigheid.com",
-            websitePlaceholder: "www.besigheid.com",
-            regNumberPlaceholder: "REG123456",
-            vatNumberPlaceholder: "BTW123456",
-            
-            // Display options
-            showLogo: "Wys Logo",
-            showDateTime: "Wys Datum & Tyd",
-            showStaffInfo: "Wys Personeellid Inligting",
-            showCustomerInfo: "Wys Kliënt Inligting",
-            showPaymentMethod: "Wys Betaalmetode",
-            
-            // Custom messages
-            headerMessage: "Kopskrif Boodskap",
-            headerPlaceholder: "Welkom! Spesiale aanbiedinge vandag...",
-            thankYouMessage: "Dankie Boodskap",
-            thankYouPlaceholder: "Dankie vir jou besigheid!",
-            footerMessage: "Voetskrif Boodskap",
-            footerPlaceholder: "Besoek ons weer! Terugsendings aanvaar binne 30 dae...",
-            
-            // Buttons and messages
-            save: "Stoor Instellings",
-            cancel: "Kanselleer",
-            saving: "Stoor...",
-            saveSuccess: "Kwitansie instellings suksesvol gestoor!",
-            saveError: "Kon nie kwitansie instellings stoor nie",
-          }}
-        />
-
-        {/* Void Sale Dialog */}
-        <Dialog open={voidSaleDialog.open} onOpenChange={(open) => {
-          if (!open) {
-            setVoidSaleDialog({ open: false, sale: null });
-            setVoidReason("");
-          }
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Kanselleer Verkoop</DialogTitle>
-              <DialogDescription>
-                Voer die rede in vir die kansellasie van hierdie verkoop. Hierdie aksie kan nie ongedaan gemaak word nie.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              {voidSaleDialog.sale && (
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="font-medium">Verkoop #{voidSaleDialog.sale.id}</p>
-                  <p className="text-sm text-gray-600">Bedrag: R{voidSaleDialog.sale.total}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(voidSaleDialog.sale.createdAt).toLocaleString('af-ZA')}
-                  </p>
-                </div>
-              )}
-              <div>
-                <Label htmlFor="voidReason">Rede vir kansellasie</Label>
-                <Textarea
-                  id="voidReason"
-                  value={voidReason}
-                  onChange={(e) => setVoidReason(e.target.value)}
-                  placeholder="Voer die rede in vir die kansellasie van hierdie verkoop..."
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setVoidSaleDialog({ open: false, sale: null });
-                    setVoidReason("");
-                  }}
-                >
-                  Kanselleer
-                </Button>
-                <Button 
-                  onClick={handleVoidSaleSubmit}
-                  disabled={!voidReason.trim() || voidSaleMutation.isPending}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  {voidSaleMutation.isPending ? "Kanselleer..." : "Kanselleer Verkoop"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* View Void Reason Dialog */}
-        <Dialog open={viewVoidDialog.open} onOpenChange={(open) => {
-          if (!open) {
-            setViewVoidDialog({ open: false, sale: null });
-          }
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Gekanselleerde Verkoop Besonderhede</DialogTitle>
-            </DialogHeader>
-            {viewVoidDialog.sale && (
-              <div className="space-y-4">
-                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                  <p className="font-medium text-red-800">Verkoop #{viewVoidDialog.sale.id}</p>
-                  <p className="text-sm text-red-600">Bedrag: R{viewVoidDialog.sale.total}</p>
-                  <p className="text-xs text-red-500">
-                    Oorspronklik: {new Date(viewVoidDialog.sale.createdAt).toLocaleString('af-ZA')}
-                  </p>
-                  {viewVoidDialog.sale.voidedAt && (
-                    <p className="text-xs text-red-500">
-                      Gekanselleer: {new Date(viewVoidDialog.sale.voidedAt).toLocaleString('af-ZA')}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label>Rede vir kansellasie:</Label>
-                  <div className="mt-1 p-3 bg-gray-50 rounded border">
-                    <p className="text-sm">{viewVoidDialog.sale.voidReason || 'Geen rede verskaf nie'}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        isSelected ? 'border-[hsl(217,90%,50%)] bg-[hsl(217,90%,50%)]' : 'border-gray-600'
+                      }`}>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">{product.name}</p>
+                        <p className="text-xs text-gray-400">SKU: {product.sku}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-[hsl(217,90%,60%)]">R{product.retailPrice}</p>
+                      <p className="text-xs text-gray-500">
+                        {productCategories.length > 0 
+                          ? productCategories.map(c => c.name).join(', ')
+                          : 'Geen kategorie'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-end">
-                  <Button onClick={() => setViewVoidDialog({ open: false, sale: null })}>
-                    Sluit
-                  </Button>
-                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between items-center pt-4 border-t border-gray-700/50">
+            <span className="text-sm text-gray-400">
+              {selectedProductsForCategory.length} produkte gekies
+            </span>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsAddProductsToCategoryOpen(false);
+                  setSelectedProductsForCategory([]);
+                }}
+              >
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (selectedSalesCategory) {
+                    bulkAddProductsToCategoryMutation.mutate({
+                      productIds: selectedProductsForCategory,
+                      categoryId: selectedSalesCategory
+                    });
+                  }
+                }}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"
+                disabled={bulkAddProductsToCategoryMutation.isPending}
+              >
+                {bulkAddProductsToCategoryMutation.isPending ? 'Stoor...' : 'Stoor'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Logo Upload Dialog */}
+      <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bywerk Maatskappy Logo</DialogTitle>
+            <DialogDescription>
+              Laai jou maatskappy logo op om jou POS sisteem te personaliseer.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {currentUser?.companyLogo && (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">Huidige Logo:</p>
+                <img 
+                  src={currentUser.companyLogo} 
+                  alt="Huidige Logo" 
+                  className="h-20 w-20 object-cover rounded-lg mx-auto border"
+                />
               </div>
             )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Staff Password Verification Dialog */}
-        <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {
-          setIsStaffPasswordDialogOpen(open);
-          if (!open) {
-            setStaffPassword("");
-            setSelectedStaffForAuth(null);
-          }
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Voer Wagwoord In</DialogTitle>
-              <DialogDescription>
-                Voer die wagwoord in vir {selectedStaffForAuth?.username}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (selectedStaffForAuth && staffPassword) {
-                authenticateStaffMutation.mutate({ 
-                  username: selectedStaffForAuth.username, 
-                  password: staffPassword, 
-                  userId: currentUser?.id 
-                });
-              }
-            }}>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="staff-password-input">Wagwoord</Label>
-                  <Input
-                    id="staff-password-input"
-                    type="password"
-                    required
-                    value={staffPassword}
-                    onChange={(e) => setStaffPassword(e.target.value)}
-                    placeholder="Voer wagwoord in"
-                    autoFocus
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    onClick={() => {
-                      setIsStaffPasswordDialogOpen(false);
-                      setStaffPassword("");
-                      setSelectedStaffForAuth(null);
-                    }}
-                  >
-                    Kanselleer
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={authenticateStaffMutation.isPending}
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                  >
-                    {authenticateStaffMutation.isPending ? "Verifieer..." : "Meld aan"}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-        {/* Simplified Staff Creation Dialog */}
-        <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Skep Nuwe Gebruiker</DialogTitle>
-              <DialogDescription>
-                Voeg 'n nuwe personeel of bestuurder by jou POS-stelsel.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const username = formData.get('username') as string;
-              const password = formData.get('password') as string;
-              const userType = formData.get('user-type') as 'staff' | 'management';
-              
-              if (username && password && userType) {
-                createStaffAccountMutation.mutate({
-                  username,
-                  password,
-                  userType,
-                  userId: currentUser?.id
-                });
-              }
-            }}>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="create-username">Naam</Label>
-                  <Input
-                    id="create-username"
-                    name="username"
-                    type="text"
-                    required
-                    placeholder="Voer gebruikersnaam in"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="create-user-type">Rol</Label>
-                  <Select name="user-type" required defaultValue="staff">
-                    <SelectTrigger id="create-user-type">
-                      <SelectValue placeholder="Kies rol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="staff">Personeel</SelectItem>
-                      <SelectItem value="management">Bestuur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="create-password">Wagwoord</Label>
-                  <Input
-                    id="create-password"
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="Voer wagwoord in"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    onClick={() => setIsStaffDialogOpen(false)}
-                  >
-                    Kanselleer
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={createStaffAccountMutation.isPending}
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                  >
-                    {createStaffAccountMutation.isPending ? "Skep..." : "Skep Gebruiker"}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {/* User Management Dialog - Enterprise Design */}
-        <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-          <DialogContent className="sm:max-w-2xl p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-bold text-white">
-                    {staffAccounts.length === 0 ? "Skep Jou Eerste Gebruiker" : "Gebruikersbestuur"}
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-400 text-sm mt-0.5">
-                    {staffAccounts.length === 0 
-                      ? "Stel jou eerste rekening op om te begin."
-                      : `${staffAccounts.length} gebruiker${staffAccounts.length === 1 ? '' : 's'} geregistreer`
-                    }
-                  </DialogDescription>
-                </div>
-              </div>
+            
+            <div>
+              <Label htmlFor="logoUpload">Kies Nuwe Logo</Label>
+              <Input
+                id="logoUpload"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoFileUpload}
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Aanbeveling: Vierkantige beelde werk die beste (PNG, JPG, maks 2MB)
+              </p>
             </div>
-
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-              {/* Existing Staff Accounts */}
-              {staffAccounts.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Span Lede</h3>
-                    <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
-                  </div>
-                  <div className="space-y-3">
-                    {staffAccounts.map((staff) => {
-                      const isCurrentLoggedIn = currentStaff?.id === staff.id;
-                      return (
-                        <motion.div 
-                          key={staff.id} 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
-                            isCurrentLoggedIn 
-                              ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
-                              : 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50'
-                          }`}
-                        >
-                          {/* User Avatar */}
-                          <div className={`relative flex items-center justify-center w-12 h-12 rounded-xl ${
-                            staff.userType === 'management'
-                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
-                              : 'bg-gradient-to-br from-gray-600 to-gray-700'
-                          } shadow-lg`}>
-                            <User className="h-6 w-6 text-white" />
-                            {isCurrentLoggedIn && (
-                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg" />
-                            )}
-                          </div>
-                          
-                          {/* User Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-white truncate">
-                                {staff.displayName || staff.username}
-                              </span>
-                              {isCurrentLoggedIn && (
-                                <Badge className="text-[10px] px-1.5 py-0 h-4 bg-green-500/20 text-green-400 border border-green-500/30">
-                                  Aanlyn
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge 
-                                className={`text-[10px] px-1.5 py-0 h-4 ${
-                                  staff.userType === 'management' 
-                                    ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)] border border-[hsl(217,90%,40%)]/30' 
-                                    : 'bg-gray-700 text-gray-300 border border-gray-600'
-                                }`}
-                              >
-                                {staff.userType === 'management' ? 'Bestuur' : 'Personeel'}
-                              </Badge>
-                              <span className="text-xs text-gray-500">
-                                {staff.isActive ? 'Aktief' : 'Onaktief'}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          {/* Actions */}
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (window.confirm(`Is jy seker jy wil ${staff.username} verwyder? Hierdie aksie kan nie ontdoen word nie.`)) {
-                                  deleteStaffAccountMutation.mutate(staff.id);
-                                }
-                              }}
-                              disabled={deleteStaffAccountMutation.isPending || isCurrentLoggedIn}
-                              className={`p-2 h-9 w-9 rounded-lg transition-all ${
-                                isCurrentLoggedIn 
-                                  ? 'opacity-30 cursor-not-allowed' 
-                                  : 'hover:bg-red-500/20 hover:text-red-400 text-gray-400'
-                              }`}
-                              title={isCurrentLoggedIn ? "Kan nie jouself verwyder nie" : "Verwyder gebruiker"}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Create New Staff Account */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Voeg Nuwe Gebruiker By</h3>
-                  <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
-                </div>
-                <div className="bg-gray-800/30 rounded-xl border border-gray-700/50 p-5">
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const username = formData.get('new-username') as string;
-                    const password = formData.get('new-password') as string;
-                    const userType = formData.get('user-type') as 'staff' | 'management';
-                    
-                    if (username && password && userType) {
-                      createStaffAccountMutation.mutate({
-                        username,
-                        password,
-                        userType,
-                        userId: currentUser?.id
-                      });
-                      (e.target as HTMLFormElement).reset();
-                    }
-                  }}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Gebruikersnaam</Label>
-                        <Input
-                          id="new-username"
-                          name="new-username"
-                          type="text"
-                          required
-                          placeholder="Voer naam in"
-                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-gray-300 text-sm font-medium mb-2 block">Wagwoord</Label>
-                        <Input
-                          id="new-password"
-                          name="new-password"
-                          type="password"
-                          required
-                          placeholder="Voer wagwoord in"
-                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
-                        />
-                      </div>
-                    </div>
-                    <div className="mb-5">
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
-                      <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
-                        <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
-                          <SelectValue placeholder="Kies rol" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700">
-                          <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
-                          <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button 
-                      type="submit" 
-                      disabled={createStaffAccountMutation.isPending}
-                      className="w-full bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-blue-500/25 transition-all"
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      {createStaffAccountMutation.isPending ? "Skep tans..." : "Skep Gebruiker"}
-                    </Button>
-                  </form>
-                </div>
+            
+            {logoFile && (
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">Nuwe Logo Voorskou:</p>
+                <img 
+                  src={logoFile} 
+                  alt="Nuwe Logo Voorskou" 
+                  className="h-20 w-20 object-cover rounded-lg mx-auto border"
+                />
               </div>
-
-              {/* Empty State */}
-              {staffAccounts.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
-                    <Users className="h-8 w-8 text-gray-600" />
-                  </div>
-                  <p className="text-gray-500 text-sm">Nog geen gebruikers geskep nie.</p>
-                  <p className="text-gray-600 text-xs mt-1">Gebruik die vorm hierbo om jou eerste gebruiker te skep.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="bg-gray-900/50 border-t border-gray-700/50 px-6 py-4 flex justify-end">
+            )}
+            
+            <div className="flex justify-end space-x-2">
               <Button 
-                onClick={() => setIsUserManagementOpen(false)}
-                variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-700/50"
+                variant="outline" 
+                onClick={() => {
+                  setIsLogoDialogOpen(false);
+                  setLogoFile(null);
+                }}
               >
-                Sluit
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={() => logoFile && logoUploadMutation.mutate(logoFile)}
+                disabled={!logoFile || logoUploadMutation.isPending}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              >
+                {logoUploadMutation.isPending ? "Laai op..." : "Bywerk Logo"}
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Bank Details Dialog - Afrikaans */}
-        <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
-          <DialogContent className="sm:max-w-[560px] max-w-[95vw] max-h-[90vh] overflow-y-auto bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-2xl shadow-blue-900/30 p-0">
-            <div className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(217,90%,50%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]"></div>
-              
-              <DialogHeader className="px-6 pt-6 pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] flex items-center justify-center shadow-lg shadow-blue-500/30">
-                    <CreditCard className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <DialogTitle className="text-xl font-bold text-white">Betalingsbesonderhede</DialogTitle>
-                    <DialogDescription className="text-gray-400 mt-0.5">
-                      Bankrekeningbesonderhede vir Storm POS diensfooi betalings
-                    </DialogDescription>
-                  </div>
-                </div>
-              </DialogHeader>
-            
-              <div className="px-6 pb-6 space-y-5">
-                <div className="bg-gray-900/80 rounded-xl border border-[hsl(217,90%,40%)]/20 p-5">
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/15 rounded-lg flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
-                      <CreditCard className="w-5 h-5 text-[hsl(217,90%,50%)]" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white">Nedbank Rekening</h3>
-                      <p className="text-xs text-gray-500">Vir Storm POS diensfooi betalings</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-0">
-                    {[
-                      { label: 'Rekeninghouer', value: 'Storm', mono: false },
-                      { label: 'Rekeningnommer', value: '1229368612', mono: true },
-                      { label: 'Rekeningtipe', value: 'Lopende Rekening', mono: false },
-                      { label: 'Banknaam', value: 'Nedbank', mono: false },
-                      { label: 'Takkode', value: '198765', mono: true },
-                    ].map((item, i) => (
-                      <div key={i} className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-0 py-3.5 ${i < 4 ? 'border-b border-white/5' : ''}`}>
-                        <span className="text-sm text-gray-400">{item.label}</span>
-                        <span className={`font-semibold text-white ${item.mono ? 'font-mono bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-md border border-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : ''}`}>{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-500/20">
-                      <AlertTriangle className="w-4 h-4 text-amber-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-amber-300 text-sm mb-2">Betalingsinstruksies</h4>
-                      <ul className="text-sm text-amber-200/70 space-y-1.5">
-                        <li className="flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                          Gebruik jou geregistreerde besigheidsnaam as betalingsverwysing
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                          Betaal maandelikse diensfooie teen die laaste dag van elke maand
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                          Hou bewys van betaling vir jou rekords
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-900/50 rounded-xl border border-white/5 p-4 text-center">
-                  <p className="text-sm text-gray-400">Vrae oor fakturering of betalings?</p>
-                  <p className="font-medium text-[hsl(217,90%,50%)] mt-1 text-sm">
-                    softwarebystorm@gmail.com
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Receipt Customizer Dialog */}
+      <ReceiptCustomizerDialog 
+        isOpen={isReceiptCustomizerOpen}
+        onClose={() => setIsReceiptCustomizerOpen(false)}
+        currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
+        toast={toast}
+        labels={{
+          title: "Personaliseer Jou Kwitansie",
+          description: "Personaliseer jou kwitansie met jou besigheidsinligting en pas die uitleg aan.",
+          
+          // Section labels
+          sections: {
+            logo: "Logo",
+            businessInfo: "Besigheidsinligting",
+            dateTime: "Datum & Tyd",
+            staffInfo: "Personeellid Inligting",
+            customerInfo: "Kliënt Inligting",
+            items: "Items Lys",
+            totals: "Totale",
+            paymentInfo: "Betalingsinligting",
+            messages: "Pasgemaakte Boodskappe",
+          },
+          
+          // Card titles
+          sectionOrderTitle: "Kwitansie Afdeling Volgorde",
+          logoTitle: "Kwitansie Logo",
+          businessInfoTitle: "Besigheidsinligting",
+          displayOptionsTitle: "Vertoon Opsies",
+          customMessagesTitle: "Pasgemaakte Boodskappe",
+          
+          // Logo section
+          currentLogo: "Huidige Logo:",
+          uploadLogoLabel: "Laai Pasgemaakte Logo Op (Opsioneel)",
+          logoHelp: "Laai 'n pasgemaakte logo op vir kwitansies. Aanbeveel: Vierkant beelde werk beste (PNG, JPG, maks 2MB)",
+          newLogoPreview: "Nuwe Logo Voorskou:",
+          removeButton: "Verwyder",
+          
+          // Business info fields
+          businessName: "Besigheidsnaam",
+          phoneNumber: "Telefoonnommer",
+          addressLine1: "Adreslyn 1",
+          addressLine2: "Adreslyn 2",
+          email: "E-pos",
+          website: "Webwerf",
+          registrationNumber: "Registrasienommer",
+          vatNumber: "BTW Nommer",
+          
+          // Placeholders
+          businessNamePlaceholder: "Jou Besigheidsnaam",
+          phonePlaceholder: "+27 123 456 7890",
+          addressLine1Placeholder: "123 Hoofstraat",
+          addressLine2Placeholder: "Stad, Poskode",
+          emailPlaceholder: "info@besigheid.com",
+          websitePlaceholder: "www.besigheid.com",
+          regNumberPlaceholder: "REG123456",
+          vatNumberPlaceholder: "BTW123456",
+          
+          // Display options
+          showLogo: "Wys Logo",
+          showDateTime: "Wys Datum & Tyd",
+          showStaffInfo: "Wys Personeellid Inligting",
+          showCustomerInfo: "Wys Kliënt Inligting",
+          showPaymentMethod: "Wys Betaalmetode",
+          
+          // Custom messages
+          headerMessage: "Kopskrif Boodskap",
+          headerPlaceholder: "Welkom! Spesiale aanbiedinge vandag...",
+          thankYouMessage: "Dankie Boodskap",
+          thankYouPlaceholder: "Dankie vir jou besigheid!",
+          footerMessage: "Voetskrif Boodskap",
+          footerPlaceholder: "Besoek ons weer! Terugsendings aanvaar binne 30 dae...",
+          
+          // Buttons and messages
+          save: "Stoor Instellings",
+          cancel: "Kanselleer",
+          saving: "Stoor...",
+          saveSuccess: "Kwitansie instellings suksesvol gestoor!",
+          saveError: "Kon nie kwitansie instellings stoor nie",
+        }}
+      />
+      {/* Void Sale Dialog */}
+      <Dialog open={voidSaleDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setVoidSaleDialog({ open: false, sale: null });
+          setVoidReason("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Kanselleer Verkoop</DialogTitle>
+            <DialogDescription>
+              Voer die rede in vir die kansellasie van hierdie verkoop. Hierdie aksie kan nie ongedaan gemaak word nie.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {voidSaleDialog.sale && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="font-medium">Verkoop #{voidSaleDialog.sale.id}</p>
+                <p className="text-sm text-gray-600">Bedrag: R{voidSaleDialog.sale.total}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(voidSaleDialog.sale.createdAt).toLocaleString('af-ZA')}
+                </p>
+              </div>
+            )}
+            <div>
+              <Label htmlFor="voidReason">Rede vir kansellasie</Label>
+              <Textarea
+                id="voidReason"
+                value={voidReason}
+                onChange={(e) => setVoidReason(e.target.value)}
+                placeholder="Voer die rede in vir die kansellasie van hierdie verkoop..."
+                className="mt-1"
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setVoidSaleDialog({ open: false, sale: null });
+                  setVoidReason("");
+                }}
+              >
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={handleVoidSaleSubmit}
+                disabled={!voidReason.trim() || voidSaleMutation.isPending}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {voidSaleMutation.isPending ? "Kanselleer..." : "Kanselleer Verkoop"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* View Void Reason Dialog */}
+      <Dialog open={viewVoidDialog.open} onOpenChange={(open) => {
+        if (!open) {
+          setViewVoidDialog({ open: false, sale: null });
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Gekanselleerde Verkoop Besonderhede</DialogTitle>
+          </DialogHeader>
+          {viewVoidDialog.sale && (
+            <div className="space-y-4">
+              <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                <p className="font-medium text-red-800">Verkoop #{viewVoidDialog.sale.id}</p>
+                <p className="text-sm text-red-600">Bedrag: R{viewVoidDialog.sale.total}</p>
+                <p className="text-xs text-red-500">
+                  Oorspronklik: {new Date(viewVoidDialog.sale.createdAt).toLocaleString('af-ZA')}
+                </p>
+                {viewVoidDialog.sale.voidedAt && (
+                  <p className="text-xs text-red-500">
+                    Gekanselleer: {new Date(viewVoidDialog.sale.voidedAt).toLocaleString('af-ZA')}
                   </p>
+                )}
+              </div>
+              <div>
+                <Label>Rede vir kansellasie:</Label>
+                <div className="mt-1 p-3 bg-gray-50 rounded border">
+                  <p className="text-sm">{viewVoidDialog.sale.voidReason || 'Geen rede verskaf nie'}</p>
                 </div>
-
-                <Button onClick={() => setIsBankDetailsOpen(false)} className="w-full h-11 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 rounded-lg">
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={() => setViewVoidDialog({ open: false, sale: null })}>
                   Sluit
                 </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Invoice Creation/Edit Dialog */}
-        <Dialog 
-          open={isInvoiceDialogOpen} 
-          onOpenChange={(open) => {
-            setIsInvoiceDialogOpen(open);
-            if (!open) {
-              setEditingInvoice(null);
-              setInvoiceItems([]);
-              setInvoiceClientId(null);
-              setInvoiceCustomClient("");
-              setInvoiceClientEmail("");
-              setInvoiceClientPhone("");
-              setIsCustomClient(false);
-              setInvoiceDueDate("");
-              setInvoiceNotes("");
-              setInvoicePoNumber("");
-              setInvoiceDueTerms("7 dae");
-              setInvoiceDiscountPercent("0");
-              setInvoiceShippingAmount("0");
-              setInvoicePaymentMethod("");
-              setInvoicePaymentDetails("");
-              setInvoiceTerms("");
-              setInvoiceTaxEnabled(true);
-              setInvoiceType('invoice');
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Staff Password Verification Dialog */}
+      <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {
+        setIsStaffPasswordDialogOpen(open);
+        if (!open) {
+          setStaffPassword("");
+          setSelectedStaffForAuth(null);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Voer Wagwoord In</DialogTitle>
+            <DialogDescription>
+              Voer die wagwoord in vir {selectedStaffForAuth?.username}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (selectedStaffForAuth && staffPassword) {
+              authenticateStaffMutation.mutate({ 
+                username: selectedStaffForAuth.username, 
+                password: staffPassword, 
+                userId: currentUser?.id 
+              });
             }
-          }}
-        >
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
-              </DialogTitle>
-            </DialogHeader>
+          }}>
             <div className="space-y-4">
-              {/* Document Type Selection */}
               <div>
-                <Label>Dokumenttipe</Label>
-                <Select 
-                  value={invoiceType} 
-                  onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
-                  disabled={!!editingInvoice}
+                <Label htmlFor="staff-password-input">Wagwoord</Label>
+                <Input
+                  id="staff-password-input"
+                  type="password"
+                  required
+                  value={staffPassword}
+                  onChange={(e) => setStaffPassword(e.target.value)}
+                  placeholder="Voer wagwoord in"
+                  autoFocus
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => {
+                    setIsStaffPasswordDialogOpen(false);
+                    setStaffPassword("");
+                    setSelectedStaffForAuth(null);
+                  }}
                 >
-                  <SelectTrigger disabled={!!editingInvoice}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="invoice">Faktuur</SelectItem>
-                    <SelectItem value="quote">Kwotasie</SelectItem>
-                  </SelectContent>
-                </Select>
-                {editingInvoice && (
-                  <p className="text-xs text-gray-500 mt-1">Dokumenttipe kan nie verander word wanneer jy wysig nie</p>
-                )}
+                  Kanselleer
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={authenticateStaffMutation.isPending}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                >
+                  {authenticateStaffMutation.isPending ? "Verifieer..." : "Meld aan"}
+                </Button>
               </div>
-
-              {/* Client Selection */}
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {/* Simplified Staff Creation Dialog */}
+      <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Skep Nuwe Gebruiker</DialogTitle>
+            <DialogDescription>
+              Voeg 'n nuwe personeel of bestuurder by jou POS-stelsel.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const username = formData.get('username') as string;
+            const password = formData.get('password') as string;
+            const userType = formData.get('user-type') as 'staff' | 'management';
+            
+            if (username && password && userType) {
+              createStaffAccountMutation.mutate({
+                username,
+                password,
+                userType,
+                userId: currentUser?.id
+              });
+            }
+          }}>
+            <div className="space-y-4">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label>Kliënt</Label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsCustomClient(!isCustomClient);
-                      if (!isCustomClient) {
-                        setInvoiceClientId(null);
-                      } else {
-                        setInvoiceCustomClient("");
-                      }
-                    }}
-                    className="text-xs text-blue-600 hover:text-blue-700 underline"
-                    data-testid="button-toggle-custom-client"
-                  >
-                    {isCustomClient ? "Kies uit lys" : "Voer pasgemaakte kliënt in"}
-                  </button>
-                </div>
-                {isCustomClient ? (
-                  <Input
-                    type="text"
-                    value={invoiceCustomClient}
-                    onChange={(e) => setInvoiceCustomClient(e.target.value)}
-                    placeholder="Voer kliëntnaam in"
-                    className="w-full"
-                    data-testid="input-custom-client"
-                  />
-                ) : (
-                  <Select 
-                    value={invoiceClientId?.toString() || ""} 
-                    onValueChange={(value) => setInvoiceClientId(parseInt(value))}
-                    data-testid="select-client"
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Kies kliënt" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id.toString()}>
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Kliënt E-pos */}
-              <div>
-                <Label>Kliënt E-pos (Opsioneel)</Label>
-                <input
-                  type="email"
-                  value={invoiceClientEmail}
-                  onChange={(e) => setInvoiceClientEmail(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="klient@voorbeeld.com"
-                />
-              </div>
-
-              {/* Kliënt Telefoon */}
-              <div>
-                <Label>Kliënt Telefoon (Opsioneel)</Label>
-                <input
-                  type="tel"
-                  value={invoiceClientPhone}
-                  onChange={(e) => setInvoiceClientPhone(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="+27 12 345 6789"
-                />
-              </div>
-
-              {/* PO Number */}
-              <div>
-                <Label>PO Nommer (Opsioneel)</Label>
-                <input
+                <Label htmlFor="create-username">Naam</Label>
+                <Input
+                  id="create-username"
+                  name="username"
                   type="text"
-                  value={invoicePoNumber}
-                  onChange={(e) => setInvoicePoNumber(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  placeholder="Aankooporder nommer"
+                  required
+                  placeholder="Voer gebruikersnaam in"
                 />
               </div>
-
-              {/* Payment Terms */}
               <div>
-                <Label>Betalingsvoorwaardes</Label>
-                <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
-                  <SelectTrigger>
-                    <SelectValue />
+                <Label htmlFor="create-user-type">Rol</Label>
+                <Select name="user-type" required defaultValue="staff">
+                  <SelectTrigger id="create-user-type">
+                    <SelectValue placeholder="Kies rol" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Geen</SelectItem>
-                    <SelectItem value="7 dae">7 Dae</SelectItem>
-                    <SelectItem value="14 dae">14 Dae</SelectItem>
-                    <SelectItem value="30 dae">30 Dae</SelectItem>
-                    <SelectItem value="60 dae">60 Dae</SelectItem>
-                    <SelectItem value="90 dae">90 Dae</SelectItem>
+                    <SelectItem value="staff">Personeel</SelectItem>
+                    <SelectItem value="management">Bestuur</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Due Date */}
               <div>
-                <Label>Vervaldatum (Opsioneel)</Label>
-                <input
-                  type="date"
-                  value={invoiceDueDate}
-                  onChange={(e) => setInvoiceDueDate(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
+                <Label htmlFor="create-password">Wagwoord</Label>
+                <Input
+                  id="create-password"
+                  name="password"
+                  type="password"
+                  required
+                  placeholder="Voer wagwoord in"
                 />
               </div>
-
-              {/* Add Products */}
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => setIsStaffDialogOpen(false)}
+                >
+                  Kanselleer
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={createStaffAccountMutation.isPending}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                >
+                  {createStaffAccountMutation.isPending ? "Skep..." : "Skep Gebruiker"}
+                </Button>
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {/* User Management Dialog - Enterprise Design */}
+      <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
+        <DialogContent className="sm:max-w-2xl p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                <Users className="h-6 w-6 text-white" />
+              </div>
               <div>
-                <Label>Voeg Produkte By</Label>
-                <div className="space-y-2 mt-2">
-                  {invoiceItems.map((item, index) => {
-                    const product = item.productId ? products.find(p => p.id === item.productId) : null;
-                    const itemName = item.customName || product?.name || 'Onbekende Produk';
+                <DialogTitle className="text-xl font-bold text-white">
+                  {staffAccounts.length === 0 ? "Skep Jou Eerste Gebruiker" : "Gebruikersbestuur"}
+                </DialogTitle>
+                <DialogDescription className="text-gray-400 text-sm mt-0.5">
+                  {staffAccounts.length === 0 
+                    ? "Stel jou eerste rekening op om te begin."
+                    : `${staffAccounts.length} gebruiker${staffAccounts.length === 1 ? '' : 's'} geregistreer`
+                  }
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+            {/* Existing Staff Accounts */}
+            {staffAccounts.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Span Lede</h3>
+                  <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                </div>
+                <div className="space-y-3">
+                  {staffAccounts.map((staff) => {
+                    const isCurrentLoggedIn = currentStaff?.id === staff.id;
                     return (
-                      <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                      <motion.div 
+                        key={staff.id} 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
+                          isCurrentLoggedIn 
+                            ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
+                            : 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50'
+                        }`}
+                      >
+                        {/* User Avatar */}
+                        <div className={`relative flex items-center justify-center w-12 h-12 rounded-xl ${
+                          staff.userType === 'management'
+                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
+                            : 'bg-gradient-to-br from-gray-600 to-gray-700'
+                        } shadow-lg`}>
+                          <User className="h-6 w-6 text-white" />
+                          {isCurrentLoggedIn && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg" />
+                          )}
+                        </div>
+                        
+                        {/* User Info */}
                         <div className="flex-1 min-w-0">
-                          <input
-                            type="text"
-                            value={itemName}
-                            onChange={(e) => {
-                              const updated = [...invoiceItems];
-                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
-                              setInvoiceItems(updated);
-                            }}
-                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
-                          />
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const updated = [...invoiceItems];
-                              updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
-                              setInvoiceItems(updated);
-                            }}
-                            className="w-14 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
-                          />
-                          <span className="text-xs text-gray-400">x</span>
-                          <div className="flex items-center">
-                            <span className="text-xs text-gray-400 mr-0.5">R</span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              value={item.price}
-                              onChange={(e) => {
-                                const updated = [...invoiceItems];
-                                updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
-                                setInvoiceItems(updated);
-                              }}
-                              className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
-                            />
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-white truncate">
+                              {staff.displayName || staff.username}
+                            </span>
+                            {isCurrentLoggedIn && (
+                              <Badge className="text-[10px] px-1.5 py-0 h-4 bg-green-500/20 text-green-400 border border-green-500/30">
+                                Aanlyn
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              className={`text-[10px] px-1.5 py-0 h-4 ${
+                                staff.userType === 'management' 
+                                  ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)] border border-[hsl(217,90%,40%)]/30' 
+                                  : 'bg-gray-700 text-gray-300 border border-gray-600'
+                              }`}
+                            >
+                              {staff.userType === 'management' ? 'Bestuur' : 'Personeel'}
+                            </Badge>
+                            <span className="text-xs text-gray-500">
+                              {staff.isActive ? 'Aktief' : 'Onaktief'}
+                            </span>
                           </div>
                         </div>
-                        <div className="text-right font-medium text-sm min-w-[70px]">
-                          R{(item.price * item.quantity).toFixed(2)}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                  
-                  {/* Add Line Item from Product List */}
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      const product = products.find(p => p.id === parseInt(value));
-                      if (product) {
-                        setInvoiceItems([...invoiceItems, {
-                          productId: product.id,
-                          quantity: 1,
-                          price: parseFloat(product.retailPrice)
-                        }]);
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Kies produk van lys" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id.toString()}>
-                          {product.name} - R{product.retailPrice}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  {/* Quick Add Custom Product */}
-                  <div className="border-t pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,95%)]"
-                      onClick={() => setShowQuickAddProduct(!showQuickAddProduct)}
-                      data-testid="button-toggle-quick-add-af"
-                    >
-                      <PlusCircle className="w-4 h-4 mr-2" />
-                      {showQuickAddProduct ? 'Versteek Vinnige Byvoeging' : 'Voeg Produk/Diens Vinnig By'}
-                    </Button>
-                    
-                    {showQuickAddProduct && (
-                      <div className="mt-2 p-3 border rounded-lg bg-gray-50 space-y-2">
-                        <p className="text-xs text-gray-500">Voeg 'n tydelike item by (word nie gestoor in produklys nie)</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div>
-                            <Label className="text-xs">Produk/Diens Naam</Label>
-                            <input
-                              type="text"
-                              value={quickAddName}
-                              onChange={(e) => setQuickAddName(e.target.value)}
-                              placeholder="bv. Aangepaste Diens"
-                              className="w-full px-2 py-1.5 text-sm border rounded"
-                              data-testid="input-quick-add-name-af"
-                            />
-                          </div>
-                          <div>
-                            <Label className="text-xs">Prys (R)</Label>
-                            <input
-                              type="number"
-                              value={quickAddPrice}
-                              onChange={(e) => setQuickAddPrice(e.target.value)}
-                              placeholder="0.00"
-                              min="0"
-                              step="0.01"
-                              className="w-full px-2 py-1.5 text-sm border rounded"
-                              data-testid="input-quick-add-price-af"
-                            />
-                          </div>
-                        </div>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                          disabled={!quickAddName.trim() || !quickAddPrice || parseFloat(quickAddPrice) <= 0}
-                          onClick={() => {
-                            if (quickAddName.trim() && quickAddPrice && parseFloat(quickAddPrice) > 0) {
-                              setInvoiceItems([...invoiceItems, {
-                                customName: quickAddName.trim(),
-                                quantity: 1,
-                                price: parseFloat(quickAddPrice)
-                              }]);
-                              setQuickAddName("");
-                              setQuickAddPrice("");
-                              toast({
-                                title: "Item Bygevoeg",
-                                description: `"${quickAddName.trim()}" bygevoeg tot ${invoiceType === 'invoice' ? 'faktuur' : 'kwotasie'}`,
-                              });
-                            }
-                          }}
-                          data-testid="button-add-quick-product-af"
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Voeg by {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Totals */}
-                  {invoiceItems.length > 0 && (
-                    <div className="border-t pt-2 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Subtotaal:</span>
-                        <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
-                      </div>
-                      
-                      {/* Discount Input */}
-                      <div className="flex justify-between items-center text-sm">
+                        
+                        {/* Actions */}
                         <div className="flex items-center gap-2">
-                          <span>Afslag:</span>
-                          <select
-                            value={invoiceDiscountType}
-                            onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')}
-                            className="px-2 py-1 border rounded text-xs"
-                          >
-                            <option value="percent">%</option>
-                            <option value="amount">R</option>
-                          </select>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {invoiceDiscountType === 'amount' && <span>R</span>}
-                          <input
-                            type="number"
-                            value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount}
-                            onChange={(e) => {
-                              if (invoiceDiscountType === 'percent') {
-                                setInvoiceDiscountPercent(e.target.value);
-                              } else {
-                                setInvoiceDiscountAmount(e.target.value);
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (window.confirm(`Is jy seker jy wil ${staff.username} verwyder? Hierdie aksie kan nie ontdoen word nie.`)) {
+                                deleteStaffAccountMutation.mutate(staff.id);
                               }
                             }}
-                            className="w-20 px-2 py-1 border rounded text-right"
-                            min="0"
-                            max={invoiceDiscountType === 'percent' ? "100" : undefined}
-                            step="0.01"
-                          />
-                          {invoiceDiscountType === 'percent' && <span>%</span>}
+                            disabled={deleteStaffAccountMutation.isPending || isCurrentLoggedIn}
+                            className={`p-2 h-9 w-9 rounded-lg transition-all ${
+                              isCurrentLoggedIn 
+                                ? 'opacity-30 cursor-not-allowed' 
+                                : 'hover:bg-red-500/20 hover:text-red-400 text-gray-400'
+                            }`}
+                            title={isCurrentLoggedIn ? "Kan nie jouself verwyder nie" : "Verwyder gebruiker"}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                      </div>
-                      {((invoiceDiscountType === 'percent' && parseFloat(invoiceDiscountPercent) > 0) || 
-                        (invoiceDiscountType === 'amount' && parseFloat(invoiceDiscountAmount) > 0)) && (
-                        <div className="flex justify-between text-sm text-red-600">
-                          <span>Afslag Bedrag:</span>
-                          <span>-R{invoiceDiscountType === 'percent' 
-                            ? (invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)
-                            : parseFloat(invoiceDiscountAmount).toFixed(2)
-                          }</span>
-                        </div>
-                      )}
-                      
-                      {/* Tax Toggle */}
-                      <div className="flex justify-between items-center text-sm">
-                        <span>Voeg BTW by (15%):</span>
-                        <Switch
-                          checked={invoiceTaxEnabled}
-                          onCheckedChange={setInvoiceTaxEnabled}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Create New Staff Account */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Voeg Nuwe Gebruiker By</h3>
+                <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+              </div>
+              <div className="bg-gray-800/30 rounded-xl border border-gray-700/50 p-5">
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const username = formData.get('new-username') as string;
+                  const password = formData.get('new-password') as string;
+                  const userType = formData.get('user-type') as 'staff' | 'management';
+                  
+                  if (username && password && userType) {
+                    createStaffAccountMutation.mutate({
+                      username,
+                      password,
+                      userType,
+                      userId: currentUser?.id
+                    });
+                    (e.target as HTMLFormElement).reset();
+                  }
+                }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Gebruikersnaam</Label>
+                      <Input
+                        id="new-username"
+                        name="new-username"
+                        type="text"
+                        required
+                        placeholder="Voer naam in"
+                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Wagwoord</Label>
+                      <Input
+                        id="new-password"
+                        name="new-password"
+                        type="password"
+                        required
+                        placeholder="Voer wagwoord in"
+                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-5">
+                    <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
+                    <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
+                      <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                        <SelectValue placeholder="Kies rol" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-800 border-gray-700">
+                        <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
+                        <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={createStaffAccountMutation.isPending}
+                    className="w-full bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-blue-500/25 transition-all"
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    {createStaffAccountMutation.isPending ? "Skep tans..." : "Skep Gebruiker"}
+                  </Button>
+                </form>
+              </div>
+            </div>
+
+            {/* Empty State */}
+            {staffAccounts.length === 0 && (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+                  <Users className="h-8 w-8 text-gray-600" />
+                </div>
+                <p className="text-gray-500 text-sm">Nog geen gebruikers geskep nie.</p>
+                <p className="text-gray-600 text-xs mt-1">Gebruik die vorm hierbo om jou eerste gebruiker te skep.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="bg-gray-900/50 border-t border-gray-700/50 px-6 py-4 flex justify-end">
+            <Button 
+              onClick={() => setIsUserManagementOpen(false)}
+              variant="ghost"
+              className="text-gray-400 hover:text-white hover:bg-gray-700/50"
+            >
+              Sluit
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Bank Details Dialog - Afrikaans */}
+      <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
+        <DialogContent className="sm:max-w-[560px] max-w-[95vw] max-h-[90vh] overflow-y-auto bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-2xl shadow-blue-900/30 p-0">
+          <div className="relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(217,90%,50%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]"></div>
+            
+            <DialogHeader className="px-6 pt-6 pb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <CreditCard className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold text-white">Betalingsbesonderhede</DialogTitle>
+                  <DialogDescription className="text-gray-400 mt-0.5">
+                    Bankrekeningbesonderhede vir Storm POS diensfooi betalings
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+          
+            <div className="px-6 pb-6 space-y-5">
+              <div className="bg-gray-900/80 rounded-xl border border-[hsl(217,90%,40%)]/20 p-5">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/15 rounded-lg flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
+                    <CreditCard className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Nedbank Rekening</h3>
+                    <p className="text-xs text-gray-500">Vir Storm POS diensfooi betalings</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-0">
+                  {[
+                    { label: 'Rekeninghouer', value: 'Storm', mono: false },
+                    { label: 'Rekeningnommer', value: '1229368612', mono: true },
+                    { label: 'Rekeningtipe', value: 'Lopende Rekening', mono: false },
+                    { label: 'Banknaam', value: 'Nedbank', mono: false },
+                    { label: 'Takkode', value: '198765', mono: true },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-0 py-3.5 ${i < 4 ? 'border-b border-white/5' : ''}`}>
+                      <span className="text-sm text-gray-400">{item.label}</span>
+                      <span className={`font-semibold text-white ${item.mono ? 'font-mono bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-md border border-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : ''}`}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-500/20">
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-amber-300 text-sm mb-2">Betalingsinstruksies</h4>
+                    <ul className="text-sm text-amber-200/70 space-y-1.5">
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Gebruik jou geregistreerde besigheidsnaam as betalingsverwysing
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Betaal maandelikse diensfooie teen die laaste dag van elke maand
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Hou bewys van betaling vir jou rekords
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-900/50 rounded-xl border border-white/5 p-4 text-center">
+                <p className="text-sm text-gray-400">Vrae oor fakturering of betalings?</p>
+                <p className="font-medium text-[hsl(217,90%,50%)] mt-1 text-sm">
+                  softwarebystorm@gmail.com
+                </p>
+              </div>
+
+              <Button onClick={() => setIsBankDetailsOpen(false)} className="w-full h-11 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 rounded-lg">
+                Sluit
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Invoice Creation/Edit Dialog */}
+      <Dialog 
+        open={isInvoiceDialogOpen} 
+        onOpenChange={(open) => {
+          setIsInvoiceDialogOpen(open);
+          if (!open) {
+            setEditingInvoice(null);
+            setInvoiceItems([]);
+            setInvoiceClientId(null);
+            setInvoiceCustomClient("");
+            setInvoiceClientEmail("");
+            setInvoiceClientPhone("");
+            setIsCustomClient(false);
+            setInvoiceDueDate("");
+            setInvoiceNotes("");
+            setInvoicePoNumber("");
+            setInvoiceDueTerms("7 dae");
+            setInvoiceDiscountPercent("0");
+            setInvoiceShippingAmount("0");
+            setInvoicePaymentMethod("");
+            setInvoicePaymentDetails("");
+            setInvoiceTerms("");
+            setInvoiceTaxEnabled(true);
+            setInvoiceType('invoice');
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Document Type Selection */}
+            <div>
+              <Label>Dokumenttipe</Label>
+              <Select 
+                value={invoiceType} 
+                onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
+                disabled={!!editingInvoice}
+              >
+                <SelectTrigger disabled={!!editingInvoice}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="invoice">Faktuur</SelectItem>
+                  <SelectItem value="quote">Kwotasie</SelectItem>
+                </SelectContent>
+              </Select>
+              {editingInvoice && (
+                <p className="text-xs text-gray-500 mt-1">Dokumenttipe kan nie verander word wanneer jy wysig nie</p>
+              )}
+            </div>
+
+            {/* Client Selection */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Kliënt</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCustomClient(!isCustomClient);
+                    if (!isCustomClient) {
+                      setInvoiceClientId(null);
+                    } else {
+                      setInvoiceCustomClient("");
+                    }
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-700 underline"
+                  data-testid="button-toggle-custom-client"
+                >
+                  {isCustomClient ? "Kies uit lys" : "Voer pasgemaakte kliënt in"}
+                </button>
+              </div>
+              {isCustomClient ? (
+                <Input
+                  type="text"
+                  value={invoiceCustomClient}
+                  onChange={(e) => setInvoiceCustomClient(e.target.value)}
+                  placeholder="Voer kliëntnaam in"
+                  className="w-full"
+                  data-testid="input-custom-client"
+                />
+              ) : (
+                <Select 
+                  value={invoiceClientId?.toString() || ""} 
+                  onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+                  data-testid="select-client"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies kliënt" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+
+            {/* Kliënt E-pos */}
+            <div>
+              <Label>Kliënt E-pos (Opsioneel)</Label>
+              <input
+                type="email"
+                value={invoiceClientEmail}
+                onChange={(e) => setInvoiceClientEmail(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="klient@voorbeeld.com"
+              />
+            </div>
+
+            {/* Kliënt Telefoon */}
+            <div>
+              <Label>Kliënt Telefoon (Opsioneel)</Label>
+              <input
+                type="tel"
+                value={invoiceClientPhone}
+                onChange={(e) => setInvoiceClientPhone(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="+27 12 345 6789"
+              />
+            </div>
+
+            {/* PO Number */}
+            <div>
+              <Label>PO Nommer (Opsioneel)</Label>
+              <input
+                type="text"
+                value={invoicePoNumber}
+                onChange={(e) => setInvoicePoNumber(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="Aankooporder nommer"
+              />
+            </div>
+
+            {/* Payment Terms */}
+            <div>
+              <Label>Betalingsvoorwaardes</Label>
+              <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Geen</SelectItem>
+                  <SelectItem value="7 dae">7 Dae</SelectItem>
+                  <SelectItem value="14 dae">14 Dae</SelectItem>
+                  <SelectItem value="30 dae">30 Dae</SelectItem>
+                  <SelectItem value="60 dae">60 Dae</SelectItem>
+                  <SelectItem value="90 dae">90 Dae</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <Label>Vervaldatum (Opsioneel)</Label>
+              <input
+                type="date"
+                value={invoiceDueDate}
+                onChange={(e) => setInvoiceDueDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+
+            {/* Add Products */}
+            <div>
+              <Label>Voeg Produkte By</Label>
+              <div className="space-y-2 mt-2">
+                {invoiceItems.map((item, index) => {
+                  const product = item.productId ? products.find(p => p.id === item.productId) : null;
+                  const itemName = item.customName || product?.name || 'Onbekende Produk';
+                  return (
+                    <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                      <div className="flex-1 min-w-0">
+                        <input
+                          type="text"
+                          value={itemName}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
                         />
                       </div>
-                      
-                      {invoiceTaxEnabled && (
-                        <div className="flex justify-between text-sm">
-                          <span>BTW (15%):</span>
-                          <span>R{(() => {
-                            const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                            const discount = invoiceDiscountType === 'percent' 
-                              ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
-                              : parseFloat(invoiceDiscountAmount) || 0;
-                            return ((subtotal - discount) * 0.15).toFixed(2);
-                          })()}</span>
-                        </div>
-                      )}
-                      
-                      {/* Shipping Input */}
-                      <div className="flex justify-between items-center text-sm">
-                        <span>Versending:</span>
-                        <div className="flex items-center gap-1">
-                          <span>R</span>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-14 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
+                        />
+                        <span className="text-xs text-gray-400">x</span>
+                        <div className="flex items-center">
+                          <span className="text-xs text-gray-400 mr-0.5">R</span>
                           <input
                             type="number"
-                            value={invoiceShippingAmount}
-                            onChange={(e) => setInvoiceShippingAmount(e.target.value)}
-                            className="w-20 px-2 py-1 border rounded text-right"
-                            min="0"
                             step="0.01"
+                            min="0"
+                            value={item.price}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
                           />
                         </div>
                       </div>
-                      
-                      <div className="flex justify-between font-bold text-base border-t pt-2">
-                        <span>Totaal:</span>
+                      <div className="text-right font-medium text-sm min-w-[70px]">
+                        R{(item.price * item.quantity).toFixed(2)}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
+                
+                {/* Add Line Item from Product List */}
+                <Select
+                  value=""
+                  onValueChange={(value) => {
+                    const product = products.find(p => p.id === parseInt(value));
+                    if (product) {
+                      setInvoiceItems([...invoiceItems, {
+                        productId: product.id,
+                        quantity: 1,
+                        price: parseFloat(product.retailPrice)
+                      }]);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies produk van lys" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id.toString()}>
+                        {product.name} - R{product.retailPrice}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                {/* Quick Add Custom Product */}
+                <div className="border-t pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,95%)]"
+                    onClick={() => setShowQuickAddProduct(!showQuickAddProduct)}
+                    data-testid="button-toggle-quick-add-af"
+                  >
+                    <PlusCircle className="w-4 h-4 mr-2" />
+                    {showQuickAddProduct ? 'Versteek Vinnige Byvoeging' : 'Voeg Produk/Diens Vinnig By'}
+                  </Button>
+                  
+                  {showQuickAddProduct && (
+                    <div className="mt-2 p-3 border rounded-lg bg-gray-50 space-y-2">
+                      <p className="text-xs text-gray-500">Voeg 'n tydelike item by (word nie gestoor in produklys nie)</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <Label className="text-xs">Produk/Diens Naam</Label>
+                          <input
+                            type="text"
+                            value={quickAddName}
+                            onChange={(e) => setQuickAddName(e.target.value)}
+                            placeholder="bv. Aangepaste Diens"
+                            className="w-full px-2 py-1.5 text-sm border rounded"
+                            data-testid="input-quick-add-name-af"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Prys (R)</Label>
+                          <input
+                            type="number"
+                            value={quickAddPrice}
+                            onChange={(e) => setQuickAddPrice(e.target.value)}
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            className="w-full px-2 py-1.5 text-sm border rounded"
+                            data-testid="input-quick-add-price-af"
+                          />
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                        disabled={!quickAddName.trim() || !quickAddPrice || parseFloat(quickAddPrice) <= 0}
+                        onClick={() => {
+                          if (quickAddName.trim() && quickAddPrice && parseFloat(quickAddPrice) > 0) {
+                            setInvoiceItems([...invoiceItems, {
+                              customName: quickAddName.trim(),
+                              quantity: 1,
+                              price: parseFloat(quickAddPrice)
+                            }]);
+                            setQuickAddName("");
+                            setQuickAddPrice("");
+                            toast({
+                              title: "Item Bygevoeg",
+                              description: `"${quickAddName.trim()}" bygevoeg tot ${invoiceType === 'invoice' ? 'faktuur' : 'kwotasie'}`,
+                            });
+                          }
+                        }}
+                        data-testid="button-add-quick-product-af"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Voeg by {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Totals */}
+                {invoiceItems.length > 0 && (
+                  <div className="border-t pt-2 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotaal:</span>
+                      <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
+                    </div>
+                    
+                    {/* Discount Input */}
+                    <div className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-2">
+                        <span>Afslag:</span>
+                        <select
+                          value={invoiceDiscountType}
+                          onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')}
+                          className="px-2 py-1 border rounded text-xs"
+                        >
+                          <option value="percent">%</option>
+                          <option value="amount">R</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {invoiceDiscountType === 'amount' && <span>R</span>}
+                        <input
+                          type="number"
+                          value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount}
+                          onChange={(e) => {
+                            if (invoiceDiscountType === 'percent') {
+                              setInvoiceDiscountPercent(e.target.value);
+                            } else {
+                              setInvoiceDiscountAmount(e.target.value);
+                            }
+                          }}
+                          className="w-20 px-2 py-1 border rounded text-right"
+                          min="0"
+                          max={invoiceDiscountType === 'percent' ? "100" : undefined}
+                          step="0.01"
+                        />
+                        {invoiceDiscountType === 'percent' && <span>%</span>}
+                      </div>
+                    </div>
+                    {((invoiceDiscountType === 'percent' && parseFloat(invoiceDiscountPercent) > 0) || 
+                      (invoiceDiscountType === 'amount' && parseFloat(invoiceDiscountAmount) > 0)) && (
+                      <div className="flex justify-between text-sm text-red-600">
+                        <span>Afslag Bedrag:</span>
+                        <span>-R{invoiceDiscountType === 'percent' 
+                          ? (invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)
+                          : parseFloat(invoiceDiscountAmount).toFixed(2)
+                        }</span>
+                      </div>
+                    )}
+                    
+                    {/* Tax Toggle */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Voeg BTW by (15%):</span>
+                      <Switch
+                        checked={invoiceTaxEnabled}
+                        onCheckedChange={setInvoiceTaxEnabled}
+                      />
+                    </div>
+                    
+                    {invoiceTaxEnabled && (
+                      <div className="flex justify-between text-sm">
+                        <span>BTW (15%):</span>
                         <span>R{(() => {
                           const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                           const discount = invoiceDiscountType === 'percent' 
                             ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
                             : parseFloat(invoiceDiscountAmount) || 0;
-                          const afterDiscount = subtotal - discount;
-                          const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
-                          const shipping = parseFloat(invoiceShippingAmount) || 0;
-                          return (afterDiscount + tax + shipping).toFixed(2);
+                          return ((subtotal - discount) * 0.15).toFixed(2);
                         })()}</span>
                       </div>
+                    )}
+                    
+                    {/* Shipping Input */}
+                    <div className="flex justify-between items-center text-sm">
+                      <span>Versending:</span>
+                      <div className="flex items-center gap-1">
+                        <span>R</span>
+                        <input
+                          type="number"
+                          value={invoiceShippingAmount}
+                          onChange={(e) => setInvoiceShippingAmount(e.target.value)}
+                          className="w-20 px-2 py-1 border rounded text-right"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div>
-                <Label>Betaalmetode (Opsioneel)</Label>
-                <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies betaalmetode" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Kontant">Kontant</SelectItem>
-                    <SelectItem value="Kaart">Kaart</SelectItem>
-                    <SelectItem value="EFT">EFT</SelectItem>
-                    <SelectItem value="Ander">Ander</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Payment Details */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label>Betalingsbesonderhede (Opsioneel)</Label>
-                  {savedPaymentDetails.length > 0 && (
-                    <Select 
-                      value="" 
-                      onValueChange={(id) => {
-                        const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
-                        if (saved) {
-                          setInvoicePaymentDetails(saved.details);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment-af">
-                        <SelectValue placeholder="Gestoorde Besonderhede" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {savedPaymentDetails.map((saved: any) => (
-                          <SelectItem key={saved.id} value={saved.id.toString()}>
-                            <div className="flex items-center justify-between w-full">
-                              <span>{saved.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-                <textarea
-                  value={invoicePaymentDetails}
-                  onChange={(e) => setInvoicePaymentDetails(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={2}
-                  placeholder="Bankbesonderhede, betalingsinstruksies, ens..."
-                />
-                {invoicePaymentDetails.trim() && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 text-xs"
-                    onClick={() => setIsSavePaymentDialogOpen(true)}
-                    data-testid="button-save-payment-details-af"
-                  >
-                    <PlusCircle className="w-3 h-3 mr-1" />
-                    Stoor
-                  </Button>
+                    
+                    <div className="flex justify-between font-bold text-base border-t pt-2">
+                      <span>Totaal:</span>
+                      <span>R{(() => {
+                        const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const discount = invoiceDiscountType === 'percent' 
+                          ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
+                          : parseFloat(invoiceDiscountAmount) || 0;
+                        const afterDiscount = subtotal - discount;
+                        const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
+                        const shipping = parseFloat(invoiceShippingAmount) || 0;
+                        return (afterDiscount + tax + shipping).toFixed(2);
+                      })()}</span>
+                    </div>
+                  </div>
                 )}
               </div>
+            </div>
 
-              {/* Notes & Terms - Side by Side */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
-                  <textarea
-                    value={invoiceNotes}
-                    onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
-                    maxLength={300}
-                    className="w-full px-3 py-2 border rounded-lg"
-                    rows={3}
-                    placeholder="Addisionele notas..."
-                  />
-                </div>
-                <div>
-                  <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
-                  <textarea
-                    value={invoiceTerms}
-                    onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
-                    maxLength={500}
-                    className="w-full px-3 py-2 border rounded-lg"
-                    rows={3}
-                    placeholder="Voer betalingsvoorwaardes en -terme in..."
-                  />
-                </div>
+            {/* Payment Method */}
+            <div>
+              <Label>Betaalmetode (Opsioneel)</Label>
+              <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Kies betaalmetode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Kontant">Kontant</SelectItem>
+                  <SelectItem value="Kaart">Kaart</SelectItem>
+                  <SelectItem value="EFT">EFT</SelectItem>
+                  <SelectItem value="Ander">Ander</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Payment Details */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                {savedPaymentDetails.length > 0 && (
+                  <Select 
+                    value="" 
+                    onValueChange={(id) => {
+                      const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
+                      if (saved) {
+                        setInvoicePaymentDetails(saved.details);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment-af">
+                      <SelectValue placeholder="Gestoorde Besonderhede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {savedPaymentDetails.map((saved: any) => (
+                        <SelectItem key={saved.id} value={saved.id.toString()}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{saved.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
-                  Kanselleer
+              <textarea
+                value={invoicePaymentDetails}
+                onChange={(e) => setInvoicePaymentDetails(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                rows={2}
+                placeholder="Bankbesonderhede, betalingsinstruksies, ens..."
+              />
+              {invoicePaymentDetails.trim() && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 text-xs"
+                  onClick={() => setIsSavePaymentDialogOpen(true)}
+                  data-testid="button-save-payment-details-af"
+                >
+                  <PlusCircle className="w-3 h-3 mr-1" />
+                  Stoor
                 </Button>
-                <Button 
-                  onClick={() => {
-                    const trimmedCustomClient = invoiceCustomClient.trim();
-                    
-                    if (isCustomClient) {
-                      if (!trimmedCustomClient) {
-                        toast({
-                          title: "Ontbrekende Inligting",
-                          description: "Voer asseblief 'n kliëntnaam in",
-                          variant: "destructive"
-                        });
-                        return;
-                      }
-                    } else {
-                      if (!invoiceClientId) {
-                        toast({
-                          title: "Ontbrekende Inligting",
-                          description: "Kies asseblief 'n kliënt",
-                          variant: "destructive"
-                        });
-                        return;
-                      }
-                    }
-                    
-                    if (invoiceItems.length === 0) {
+              )}
+            </div>
+
+            {/* Notes & Terms - Side by Side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
+                <textarea
+                  value={invoiceNotes}
+                  onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
+                  maxLength={300}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Addisionele notas..."
+                />
+              </div>
+              <div>
+                <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
+                <textarea
+                  value={invoiceTerms}
+                  onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
+                  maxLength={500}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Voer betalingsvoorwaardes en -terme in..."
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
+                Kanselleer
+              </Button>
+              <Button 
+                onClick={() => {
+                  const trimmedCustomClient = invoiceCustomClient.trim();
+                  
+                  if (isCustomClient) {
+                    if (!trimmedCustomClient) {
                       toast({
-                        title: "Geen Lynitemme",
-                        description: "Voeg asseblief ten minste een produk by die faktuur",
+                        title: "Ontbrekende Inligting",
+                        description: "Voer asseblief 'n kliëntnaam in",
                         variant: "destructive"
                       });
                       return;
                     }
-                    
-                    const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                    const discountPercent = invoiceDiscountType === 'percent' ? (parseFloat(invoiceDiscountPercent) || 0) : 0;
-                    const discountAmountValue = invoiceDiscountType === 'amount' 
-                      ? (parseFloat(invoiceDiscountAmount) || 0)
-                      : subtotal * (discountPercent / 100);
-                    const afterDiscount = subtotal - discountAmountValue;
-                    const taxAmount = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
-                    const shipping = parseFloat(invoiceShippingAmount) || 0;
-                    const total = afterDiscount + taxAmount + shipping;
-                    
-                    let clientName: string;
-                    if (isCustomClient) {
-                      clientName = trimmedCustomClient;
-                    } else {
-                      const selectedCustomer = customers.find(c => c.id === invoiceClientId);
-                      if (!selectedCustomer) {
-                        toast({
-                          title: "Fout",
-                          description: "Geselekteerde kliënt nie gevind nie. Kies asseblief 'n geldige kliënt.",
-                          variant: "destructive"
-                        });
-                        return;
-                      }
-                      clientName = selectedCustomer.name;
-                    }
-                    
-                    const invoiceData = {
-                      documentType: invoiceType,
-                      status: editingInvoice ? editingInvoice.status : 'draft',
-                      clientId: isCustomClient ? undefined : invoiceClientId,
-                      clientName: isCustomClient ? trimmedCustomClient : undefined,
-                      clientEmail: invoiceClientEmail || null,
-                      clientPhone: invoiceClientPhone || null,
-                      title: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${clientName}`,
-                      poNumber: invoicePoNumber || undefined,
-                      dueTerms: invoiceDueTerms === 'none' ? undefined : invoiceDueTerms,
-                      dueDate: invoiceDueDate || undefined,
-                      items: invoiceItems.map(item => ({
-                        productId: item.productId,
-                        name: item.customName || products.find(p => p.id === item.productId)?.name || '',
-                        quantity: item.quantity,
-                        price: parseFloat(item.price.toFixed(2)),
-                        lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
-                      })),
-                      subtotal: subtotal.toFixed(2),
-                      discountPercent: discountPercent.toFixed(2),
-                      discountAmount: discountAmountValue.toFixed(2),
-                      taxPercent: invoiceTaxEnabled ? "15.00" : "0.00",
-                      tax: taxAmount.toFixed(2),
-                      shippingAmount: shipping.toFixed(2),
-                      total: total.toFixed(2),
-                      paymentMethod: invoicePaymentMethod || null,
-                      paymentDetails: invoicePaymentDetails || null,
-                      notes: invoiceNotes || null,
-                      terms: invoiceTerms || null
-                    };
-                    
-                    if (editingInvoice) {
-                      updateInvoiceMutation.mutate({
-                        invoiceId: editingInvoice.id,
-                        invoiceData
+                  } else {
+                    if (!invoiceClientId) {
+                      toast({
+                        title: "Ontbrekende Inligting",
+                        description: "Kies asseblief 'n kliënt",
+                        variant: "destructive"
                       });
-                    } else {
-                      createInvoiceMutation.mutate(invoiceData);
+                      return;
                     }
-                  }}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                  disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
-                >
-                  {createInvoiceMutation.isPending || updateInvoiceMutation.isPending 
-                    ? (editingInvoice ? 'Werk By...' : 'Skep...') 
-                    : editingInvoice 
-                      ? `Werk ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} By` 
-                      : `Skep ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}`
                   }
-                </Button>
-              </div>
+                  
+                  if (invoiceItems.length === 0) {
+                    toast({
+                      title: "Geen Lynitemme",
+                      description: "Voeg asseblief ten minste een produk by die faktuur",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
+                  
+                  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                  const discountPercent = invoiceDiscountType === 'percent' ? (parseFloat(invoiceDiscountPercent) || 0) : 0;
+                  const discountAmountValue = invoiceDiscountType === 'amount' 
+                    ? (parseFloat(invoiceDiscountAmount) || 0)
+                    : subtotal * (discountPercent / 100);
+                  const afterDiscount = subtotal - discountAmountValue;
+                  const taxAmount = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
+                  const shipping = parseFloat(invoiceShippingAmount) || 0;
+                  const total = afterDiscount + taxAmount + shipping;
+                  
+                  let clientName: string;
+                  if (isCustomClient) {
+                    clientName = trimmedCustomClient;
+                  } else {
+                    const selectedCustomer = customers.find(c => c.id === invoiceClientId);
+                    if (!selectedCustomer) {
+                      toast({
+                        title: "Fout",
+                        description: "Geselekteerde kliënt nie gevind nie. Kies asseblief 'n geldige kliënt.",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+                    clientName = selectedCustomer.name;
+                  }
+                  
+                  const invoiceData = {
+                    documentType: invoiceType,
+                    status: editingInvoice ? editingInvoice.status : 'draft',
+                    clientId: isCustomClient ? undefined : invoiceClientId,
+                    clientName: isCustomClient ? trimmedCustomClient : undefined,
+                    clientEmail: invoiceClientEmail || null,
+                    clientPhone: invoiceClientPhone || null,
+                    title: `${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} vir ${clientName}`,
+                    poNumber: invoicePoNumber || undefined,
+                    dueTerms: invoiceDueTerms === 'none' ? undefined : invoiceDueTerms,
+                    dueDate: invoiceDueDate || undefined,
+                    items: invoiceItems.map(item => ({
+                      productId: item.productId,
+                      name: item.customName || products.find(p => p.id === item.productId)?.name || '',
+                      quantity: item.quantity,
+                      price: parseFloat(item.price.toFixed(2)),
+                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
+                    })),
+                    subtotal: subtotal.toFixed(2),
+                    discountPercent: discountPercent.toFixed(2),
+                    discountAmount: discountAmountValue.toFixed(2),
+                    taxPercent: invoiceTaxEnabled ? "15.00" : "0.00",
+                    tax: taxAmount.toFixed(2),
+                    shippingAmount: shipping.toFixed(2),
+                    total: total.toFixed(2),
+                    paymentMethod: invoicePaymentMethod || null,
+                    paymentDetails: invoicePaymentDetails || null,
+                    notes: invoiceNotes || null,
+                    terms: invoiceTerms || null
+                  };
+                  
+                  if (editingInvoice) {
+                    updateInvoiceMutation.mutate({
+                      invoiceId: editingInvoice.id,
+                      invoiceData
+                    });
+                  } else {
+                    createInvoiceMutation.mutate(invoiceData);
+                  }
+                }}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
+              >
+                {createInvoiceMutation.isPending || updateInvoiceMutation.isPending 
+                  ? (editingInvoice ? 'Werk By...' : 'Skep...') 
+                  : editingInvoice 
+                    ? `Werk ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'} By` 
+                    : `Skep ${invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}`
+                }
+              </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Invoice Detail/View Modal */}
-        <Dialog open={isInvoiceViewOpen} onOpenChange={setIsInvoiceViewOpen}>
-          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
-            {selectedInvoice && (
-              <>
-                <DialogHeader className="border-b border-gray-200 pb-3 sm:pb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                      <DialogTitle className="text-lg sm:text-2xl text-[hsl(217,90%,40%)]">
-                        {selectedInvoice.documentNumber}
-                      </DialogTitle>
-                      <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{selectedInvoice.title}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge 
-                        variant={selectedInvoice.documentType === 'invoice' ? 'default' : 'outline'}
-                        className={`text-xs ${selectedInvoice.documentType === 'invoice' 
-                          ? 'bg-[hsl(217,90%,40%)] text-white' 
-                          : 'text-purple-600 border-purple-300'
-                        }`}
-                      >
-                        {selectedInvoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE'}
-                      </Badge>
-                      <Badge 
-                        variant="outline"
-                        className={`text-xs ${
-                          selectedInvoice.status === 'paid' ? 'bg-green-100 text-green-700 border-green-300' :
-                          selectedInvoice.status === 'sent' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
-                          selectedInvoice.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-300' :
-                          'bg-gray-100 text-gray-700 border-gray-300'
-                        }`}
-                      >
-                        {selectedInvoice.status === 'draft' ? 'KONSEP' : 
-                         selectedInvoice.status === 'sent' ? 'GESTUUR' : 
-                         selectedInvoice.status === 'paid' ? 'BETAAL' : 
-                         selectedInvoice.status === 'cancelled' ? 'GEKANSELLEER' : selectedInvoice.status.toUpperCase()}
-                      </Badge>
-                    </div>
-                  </div>
-                </DialogHeader>
-                
-                <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
-                  {/* Document Info Grid */}
-                  <div className="grid grid-cols-2 gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg text-sm">
-                    <div>
-                      <Label className="text-xs text-gray-500">Kliënt</Label>
-                      <p className="font-medium text-sm truncate">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
-                      {(selectedInvoice.clientEmail || selectedInvoice.clientPhone) && (
-                        <div className="mt-0.5 space-y-0.5">
-                          {selectedInvoice.clientPhone && <p className="text-xs text-gray-500">Tel: {selectedInvoice.clientPhone}</p>}
-                          {selectedInvoice.clientEmail && <p className="text-xs text-gray-500">E-pos: {selectedInvoice.clientEmail}</p>}
-                        </div>
-                      )}
-                    </div>
-                    {selectedInvoice.poNumber && (
-                      <div>
-                        <Label className="text-xs text-gray-500">PO Nommer</Label>
-                        <p className="font-medium text-sm">{selectedInvoice.poNumber}</p>
-                      </div>
-                    )}
-                    <div>
-                      <Label className="text-xs text-gray-500">Datum</Label>
-                      <p className="font-medium text-sm">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-gray-500">Vervaldatum</Label>
-                      <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
-                    </div>
-                    {selectedInvoice.dueTerms && (
-                      <div>
-                        <Label className="text-xs text-gray-500">Terme</Label>
-                        <p className="font-medium text-sm">{selectedInvoice.dueTerms}</p>
-                      </div>
-                    )}
-                    {selectedInvoice.paymentMethod && (
-                      <div>
-                        <Label className="text-xs text-gray-500">Betaalmetode</Label>
-                        <p className="font-medium text-sm">{selectedInvoice.paymentMethod}</p>
-                      </div>
-                    )}
-                    {selectedInvoice.paymentDetails && (
-                      <div className="col-span-2">
-                        <Label className="text-xs text-gray-500">Betalingsbesonderhede</Label>
-                        <p className="font-medium text-sm whitespace-pre-wrap">{selectedInvoice.paymentDetails}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Line Items - Mobile Cards / Desktop Table */}
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Invoice Detail/View Modal */}
+      <Dialog open={isInvoiceViewOpen} onOpenChange={setIsInvoiceViewOpen}>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+          {selectedInvoice && (
+            <>
+              <DialogHeader className="border-b border-gray-200 pb-3 sm:pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
-                    <Label className="text-sm font-semibold mb-2 block">Lynitemme</Label>
-                    {/* Mobile: Card layout */}
-                    <div className="sm:hidden space-y-2">
-                      {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-3 border">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className="font-medium text-sm">{item.name}</span>
-                            <span className="font-bold text-sm">R{parseFloat(item.lineTotal).toFixed(2)}</span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {item.quantity} x R{parseFloat(item.price).toFixed(2)}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {/* Desktop: Table layout */}
-                    <div className="hidden sm:block border rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="text-left p-3 text-xs font-semibold text-gray-600">Produk</th>
-                            <th className="text-center p-3 text-xs font-semibold text-gray-600">Hoev</th>
-                            <th className="text-right p-3 text-xs font-semibold text-gray-600">Eenheidsprys</th>
-                            <th className="text-right p-3 text-xs font-semibold text-gray-600">Totaal</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
-                            <tr key={index} className="hover:bg-gray-50">
-                              <td className="p-3">{item.name}</td>
-                              <td className="p-3 text-center">{item.quantity}</td>
-                              <td className="p-3 text-right">R{parseFloat(item.price).toFixed(2)}</td>
-                              <td className="p-3 text-right font-medium">R{parseFloat(item.lineTotal).toFixed(2)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    <DialogTitle className="text-lg sm:text-2xl text-[hsl(217,90%,40%)]">
+                      {selectedInvoice.documentNumber}
+                    </DialogTitle>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">{selectedInvoice.title}</p>
                   </div>
-
-                  {/* Financial Summary */}
-                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
-                    <div className="sm:max-w-xs sm:ml-auto space-y-1 sm:space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Subtotaal:</span>
-                        <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
-                      </div>
-                      {(parseFloat(selectedInvoice.discountPercent || '0') > 0 || parseFloat(selectedInvoice.discountAmount || '0') > 0) && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Afslag{parseFloat(selectedInvoice.discountPercent || '0') > 0 ? ` (${selectedInvoice.discountPercent}%)` : ''}:</span>
-                          <span>-R{parseFloat(selectedInvoice.discountAmount || '0').toFixed(2)}</span>
-                        </div>
-                      )}
-                      {parseFloat(selectedInvoice.taxPercent || '0') > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">BTW (15%):</span>
-                          <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
-                        </div>
-                      )}
-                      {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Versending:</span>
-                          <span className="font-medium">R{typeof selectedInvoice.shippingAmount === 'number' ? selectedInvoice.shippingAmount.toFixed(2) : selectedInvoice.shippingAmount}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between text-base sm:text-lg font-bold border-t pt-2 mt-2">
-                        <span>Totaal:</span>
-                        <span className="text-[hsl(217,90%,40%)]">R{typeof selectedInvoice.total === 'number' ? selectedInvoice.total.toFixed(2) : selectedInvoice.total}</span>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge 
+                      variant={selectedInvoice.documentType === 'invoice' ? 'default' : 'outline'}
+                      className={`text-xs ${selectedInvoice.documentType === 'invoice' 
+                        ? 'bg-[hsl(217,90%,40%)] text-white' 
+                        : 'text-purple-600 border-purple-300'
+                      }`}
+                    >
+                      {selectedInvoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE'}
+                    </Badge>
+                    <Badge 
+                      variant="outline"
+                      className={`text-xs ${
+                        selectedInvoice.status === 'paid' ? 'bg-green-100 text-green-700 border-green-300' :
+                        selectedInvoice.status === 'sent' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
+                        selectedInvoice.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-300' :
+                        'bg-gray-100 text-gray-700 border-gray-300'
+                      }`}
+                    >
+                      {selectedInvoice.status === 'draft' ? 'KONSEP' : 
+                       selectedInvoice.status === 'sent' ? 'GESTUUR' : 
+                       selectedInvoice.status === 'paid' ? 'BETAAL' : 
+                       selectedInvoice.status === 'cancelled' ? 'GEKANSELLEER' : selectedInvoice.status.toUpperCase()}
+                    </Badge>
                   </div>
-
-                  {/* Notes & Terms - Side by Side on Desktop */}
-                  {(selectedInvoice.notes || selectedInvoice.terms) && (
-                    <div className="border-t border-gray-200 pt-3 sm:pt-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        {selectedInvoice.notes && (
-                          <div className="sm:order-1">
-                            <Label className="text-sm font-semibold mb-2 block">Notas</Label>
-                            <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.notes}</p>
-                          </div>
-                        )}
-                        {selectedInvoice.terms && (
-                          <div className="sm:order-2">
-                            <Label className="text-sm font-semibold mb-2 block">Terme & Voorwaardes</Label>
-                            <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.terms}</p>
-                          </div>
-                        )}
+                </div>
+              </DialogHeader>
+              
+              <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
+                {/* Document Info Grid */}
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg text-sm">
+                  <div>
+                    <Label className="text-xs text-gray-500">Kliënt</Label>
+                    <p className="font-medium text-sm truncate">{customers.find(c => c.id === selectedInvoice.clientId)?.name || selectedInvoice.clientName || 'N/A'}</p>
+                    {(selectedInvoice.clientEmail || selectedInvoice.clientPhone) && (
+                      <div className="mt-0.5 space-y-0.5">
+                        {selectedInvoice.clientPhone && <p className="text-xs text-gray-500">Tel: {selectedInvoice.clientPhone}</p>}
+                        {selectedInvoice.clientEmail && <p className="text-xs text-gray-500">E-pos: {selectedInvoice.clientEmail}</p>}
                       </div>
+                    )}
+                  </div>
+                  {selectedInvoice.poNumber && (
+                    <div>
+                      <Label className="text-xs text-gray-500">PO Nommer</Label>
+                      <p className="font-medium text-sm">{selectedInvoice.poNumber}</p>
+                    </div>
+                  )}
+                  <div>
+                    <Label className="text-xs text-gray-500">Datum</Label>
+                    <p className="font-medium text-sm">{new Date(selectedInvoice.createdDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500">Vervaldatum</Label>
+                    <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
+                  </div>
+                  {selectedInvoice.dueTerms && (
+                    <div>
+                      <Label className="text-xs text-gray-500">Terme</Label>
+                      <p className="font-medium text-sm">{selectedInvoice.dueTerms}</p>
+                    </div>
+                  )}
+                  {selectedInvoice.paymentMethod && (
+                    <div>
+                      <Label className="text-xs text-gray-500">Betaalmetode</Label>
+                      <p className="font-medium text-sm">{selectedInvoice.paymentMethod}</p>
+                    </div>
+                  )}
+                  {selectedInvoice.paymentDetails && (
+                    <div className="col-span-2">
+                      <Label className="text-xs text-gray-500">Betalingsbesonderhede</Label>
+                      <p className="font-medium text-sm whitespace-pre-wrap">{selectedInvoice.paymentDetails}</p>
                     </div>
                   )}
                 </div>
 
-                {/* Action Buttons - Mobile Stacked */}
-                <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2 sm:space-y-0">
-                  {/* Mobile: Stack all buttons */}
-                  <div className="grid grid-cols-2 gap-2 sm:hidden">
+                {/* Line Items - Mobile Cards / Desktop Table */}
+                <div>
+                  <Label className="text-sm font-semibold mb-2 block">Lynitemme</Label>
+                  {/* Mobile: Card layout */}
+                  <div className="sm:hidden space-y-2">
+                    {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-3 border">
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="font-medium text-sm">{item.name}</span>
+                          <span className="font-bold text-sm">R{parseFloat(item.lineTotal).toFixed(2)}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {item.quantity} x R{parseFloat(item.price).toFixed(2)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Desktop: Table layout */}
+                  <div className="hidden sm:block border rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="text-left p-3 text-xs font-semibold text-gray-600">Produk</th>
+                          <th className="text-center p-3 text-xs font-semibold text-gray-600">Hoev</th>
+                          <th className="text-right p-3 text-xs font-semibold text-gray-600">Eenheidsprys</th>
+                          <th className="text-right p-3 text-xs font-semibold text-gray-600">Totaal</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {Array.isArray(selectedInvoice.items) && selectedInvoice.items.map((item: any, index: number) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="p-3">{item.name}</td>
+                            <td className="p-3 text-center">{item.quantity}</td>
+                            <td className="p-3 text-right">R{parseFloat(item.price).toFixed(2)}</td>
+                            <td className="p-3 text-right font-medium">R{parseFloat(item.lineTotal).toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Financial Summary */}
+                <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                  <div className="sm:max-w-xs sm:ml-auto space-y-1 sm:space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotaal:</span>
+                      <span className="font-medium">R{typeof selectedInvoice.subtotal === 'number' ? selectedInvoice.subtotal.toFixed(2) : selectedInvoice.subtotal}</span>
+                    </div>
+                    {(parseFloat(selectedInvoice.discountPercent || '0') > 0 || parseFloat(selectedInvoice.discountAmount || '0') > 0) && (
+                      <div className="flex justify-between text-red-600">
+                        <span>Afslag{parseFloat(selectedInvoice.discountPercent || '0') > 0 ? ` (${selectedInvoice.discountPercent}%)` : ''}:</span>
+                        <span>-R{parseFloat(selectedInvoice.discountAmount || '0').toFixed(2)}</span>
+                      </div>
+                    )}
+                    {parseFloat(selectedInvoice.taxPercent || '0') > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">BTW (15%):</span>
+                        <span className="font-medium">R{typeof selectedInvoice.tax === 'number' ? selectedInvoice.tax.toFixed(2) : selectedInvoice.tax}</span>
+                      </div>
+                    )}
+                    {parseFloat(selectedInvoice.shippingAmount || '0') > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Versending:</span>
+                        <span className="font-medium">R{typeof selectedInvoice.shippingAmount === 'number' ? selectedInvoice.shippingAmount.toFixed(2) : selectedInvoice.shippingAmount}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-base sm:text-lg font-bold border-t pt-2 mt-2">
+                      <span>Totaal:</span>
+                      <span className="text-[hsl(217,90%,40%)]">R{typeof selectedInvoice.total === 'number' ? selectedInvoice.total.toFixed(2) : selectedInvoice.total}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes & Terms - Side by Side on Desktop */}
+                {(selectedInvoice.notes || selectedInvoice.terms) && (
+                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      {selectedInvoice.notes && (
+                        <div className="sm:order-1">
+                          <Label className="text-sm font-semibold mb-2 block">Notas</Label>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.notes}</p>
+                        </div>
+                      )}
+                      {selectedInvoice.terms && (
+                        <div className="sm:order-2">
+                          <Label className="text-sm font-semibold mb-2 block">Terme & Voorwaardes</Label>
+                          <p className="text-xs sm:text-sm text-gray-700 bg-gray-50 p-2 sm:p-3 rounded break-words overflow-hidden whitespace-pre-wrap">{selectedInvoice.terms}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons - Mobile Stacked */}
+              <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2 sm:space-y-0">
+                {/* Mobile: Stack all buttons */}
+                <div className="grid grid-cols-2 gap-2 sm:hidden">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs"
+                    data-testid="button-edit-invoice"
+                    onClick={() => {
+                      if (selectedInvoice) {
+                        setEditingInvoice(selectedInvoice);
+                        setInvoiceType(selectedInvoice.documentType);
+                        
+                        if (selectedInvoice.clientId) {
+                          setIsCustomClient(false);
+                          setInvoiceClientId(selectedInvoice.clientId);
+                          setInvoiceCustomClient("");
+                        } else if (selectedInvoice.clientName) {
+                          setIsCustomClient(true);
+                          setInvoiceCustomClient(selectedInvoice.clientName);
+                          setInvoiceClientId(null);
+                        }
+                        
+                        setInvoiceClientEmail(selectedInvoice.clientEmail || '');
+                        setInvoiceClientPhone(selectedInvoice.clientPhone || '');
+                        setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
+                        setInvoiceNotes(selectedInvoice.notes || '');
+                        setInvoicePoNumber(selectedInvoice.poNumber || '');
+                        setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
+                        const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
+                        setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
+                        setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
+                        setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
+                        setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
+                        setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                        setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
+                        setInvoiceTerms(selectedInvoice.terms || '');
+                        setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
+                        
+                        const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
+                        setInvoiceItems(items.map((item: any) => ({
+                          productId: item.productId,
+                          customName: item.productId ? undefined : (item.name || item.customName),
+                          quantity: parseFloat(item.quantity) || item.quantity,
+                          price: parseFloat(item.price)
+                        })));
+                        
+                        setIsInvoiceViewOpen(false);
+                        setIsInvoiceDialogOpen(true);
+                      }
+                    }}
+                  >
+                    <Edit className="w-3 h-3 mr-1" />
+                    Wysig
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700 text-xs" 
+                    data-testid="button-delete-invoice"
+                    onClick={() => setIsDeleteInvoiceDialogOpen(true)}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Verwyder
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                    data-testid="button-change-status"
+                    onClick={() => {
+                      setNewStatus(selectedInvoice?.status || 'draft');
+                      setIsStatusChangeDialogOpen(true);
+                    }}
+                  >
+                    Status
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs"
+                    data-testid="button-export-pdf"
+                    onClick={() => generateInvoicePDF(selectedInvoice)}
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    PDF
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700 text-xs col-span-2"
+                    data-testid="button-share-whatsapp"
+                    onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
+                  >
+                    <SiWhatsapp className="w-3 h-3 mr-1" />
+                    Deel via WhatsApp
+                  </Button>
+                </div>
+                <div className="sm:hidden">
+                  <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setIsInvoiceViewOpen(false)}>
+                    Sluit
+                  </Button>
+                </div>
+                
+                {/* Desktop: Original layout */}
+                <div className="hidden sm:flex sm:justify-between sm:items-center">
+                  <div className="flex gap-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-xs"
-                      data-testid="button-edit-invoice"
+                      data-testid="button-edit-invoice-desktop"
                       onClick={() => {
                         if (selectedInvoice) {
                           setEditingInvoice(selectedInvoice);
@@ -7841,7 +7925,6 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
-                          setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
                           setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                           
@@ -7858,569 +7941,462 @@ ${dateFilteredSales.map(sale =>
                         }
                       }}
                     >
-                      <Edit className="w-3 h-3 mr-1" />
+                      <Edit className="w-4 h-4 mr-2" />
                       Wysig
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="text-red-600 hover:text-red-700 text-xs" 
-                      data-testid="button-delete-invoice"
+                      className="text-red-600 hover:text-red-700" 
+                      data-testid="button-delete-invoice-desktop"
                       onClick={() => setIsDeleteInvoiceDialogOpen(true)}
                     >
-                      <Trash2 className="w-3 h-3 mr-1" />
+                      <Trash2 className="w-4 h-4 mr-2" />
                       Verwyder
                     </Button>
+                  </div>
+                  <div className="flex gap-2">
                     <Button 
                       variant="outline" 
-                      size="sm"
-                      className="text-xs"
-                      data-testid="button-change-status"
+                      size="sm" 
+                      data-testid="button-change-status-desktop"
                       onClick={() => {
                         setNewStatus(selectedInvoice?.status || 'draft');
                         setIsStatusChangeDialogOpen(true);
                       }}
                     >
-                      Status
+                      Verander Status
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs"
-                      data-testid="button-export-pdf"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      data-testid="button-export-pdf-desktop"
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      <Download className="w-3 h-3 mr-1" />
-                      PDF
+                      <Download className="w-4 h-4 mr-2" />
+                      Eksporteer PDF
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-green-600 hover:bg-green-700 text-xs col-span-2"
-                      data-testid="button-share-whatsapp"
+                      className="bg-green-600 hover:bg-green-700"
+                      data-testid="button-share-whatsapp-desktop"
                       onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
                     >
-                      <SiWhatsapp className="w-3 h-3 mr-1" />
-                      Deel via WhatsApp
+                      <SiWhatsapp className="w-4 h-4 mr-2" />
+                      WhatsApp
                     </Button>
-                  </div>
-                  <div className="sm:hidden">
-                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setIsInvoiceViewOpen(false)}>
+                    <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
                     </Button>
                   </div>
-                  
-                  {/* Desktop: Original layout */}
-                  <div className="hidden sm:flex sm:justify-between sm:items-center">
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        data-testid="button-edit-invoice-desktop"
-                        onClick={() => {
-                          if (selectedInvoice) {
-                            setEditingInvoice(selectedInvoice);
-                            setInvoiceType(selectedInvoice.documentType);
-                            
-                            if (selectedInvoice.clientId) {
-                              setIsCustomClient(false);
-                              setInvoiceClientId(selectedInvoice.clientId);
-                              setInvoiceCustomClient("");
-                            } else if (selectedInvoice.clientName) {
-                              setIsCustomClient(true);
-                              setInvoiceCustomClient(selectedInvoice.clientName);
-                              setInvoiceClientId(null);
-                            }
-                            
-                            setInvoiceClientEmail(selectedInvoice.clientEmail || '');
-                            setInvoiceClientPhone(selectedInvoice.clientPhone || '');
-                            setInvoiceDueDate(selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toISOString().split('T')[0] : '');
-                            setInvoiceNotes(selectedInvoice.notes || '');
-                            setInvoicePoNumber(selectedInvoice.poNumber || '');
-                            setInvoiceDueTerms(selectedInvoice.dueTerms || 'none');
-                            const hasPercentDiscount = parseFloat(selectedInvoice.discountPercent || '0') > 0;
-                            setInvoiceDiscountType(hasPercentDiscount ? 'percent' : 'amount');
-                            setInvoiceDiscountPercent(parseFloat(selectedInvoice.discountPercent || '0').toString());
-                            setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
-                            setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
-                            setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
-                            setInvoiceTerms(selectedInvoice.terms || '');
-                            setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
-                            
-                            const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
-                            setInvoiceItems(items.map((item: any) => ({
-                              productId: item.productId,
-                              customName: item.productId ? undefined : (item.name || item.customName),
-                              quantity: parseFloat(item.quantity) || item.quantity,
-                              price: parseFloat(item.price)
-                            })));
-                            
-                            setIsInvoiceViewOpen(false);
-                            setIsInvoiceDialogOpen(true);
-                          }
-                        }}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Wysig
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-600 hover:text-red-700" 
-                        data-testid="button-delete-invoice-desktop"
-                        onClick={() => setIsDeleteInvoiceDialogOpen(true)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Verwyder
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        data-testid="button-change-status-desktop"
-                        onClick={() => {
-                          setNewStatus(selectedInvoice?.status || 'draft');
-                          setIsStatusChangeDialogOpen(true);
-                        }}
-                      >
-                        Verander Status
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                        data-testid="button-export-pdf-desktop"
-                        onClick={() => generateInvoicePDF(selectedInvoice)}
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Eksporteer PDF
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-green-600 hover:bg-green-700"
-                        data-testid="button-share-whatsapp-desktop"
-                        onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
-                      >
-                        <SiWhatsapp className="w-4 h-4 mr-2" />
-                        WhatsApp
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
-                        Sluit
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
-
-        {/* Delete Invoice Confirmation Dialog */}
-        <AlertDialog open={isDeleteInvoiceDialogOpen} onOpenChange={setIsDeleteInvoiceDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Verwyder Faktuur?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Is jy seker jy wil{' '}
-                <span className="font-semibold text-[hsl(217,90%,40%)]">
-                  {selectedInvoice?.documentNumber}
-                </span>
-                {' '}verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Kanselleer</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-600 hover:bg-red-700"
-                onClick={() => {
-                  if (selectedInvoice) {
-                    deleteInvoiceMutation.mutate(selectedInvoice.id);
-                  }
-                }}
-                disabled={deleteInvoiceMutation.isPending}
-              >
-                {deleteInvoiceMutation.isPending ? 'Verwyder...' : 'Verwyder'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Change Status Dialog */}
-        <Dialog open={isStatusChangeDialogOpen} onOpenChange={setIsStatusChangeDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Verander Faktuur Status</DialogTitle>
-              <DialogDescription>
-                Werk die status van {selectedInvoice?.documentNumber} by
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Kies Nuwe Status</Label>
-                <Select value={newStatus} onValueChange={(value: any) => setNewStatus(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Konsep</SelectItem>
-                    <SelectItem value="sent">Gestuur</SelectItem>
-                    <SelectItem value="paid">Betaal</SelectItem>
-                    <SelectItem value="cancelled">Gekanselleer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsStatusChangeDialogOpen(false)}>
-                Kanselleer
-              </Button>
-              <Button
-                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                onClick={() => {
-                  if (selectedInvoice) {
-                    updateInvoiceStatusMutation.mutate({
-                      invoiceId: selectedInvoice.id,
-                      status: newStatus
-                    });
-                  }
-                }}
-                disabled={updateInvoiceStatusMutation.isPending}
-              >
-                {updateInvoiceStatusMutation.isPending ? 'Werk By...' : 'Werk Status By'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit Document Number Dialog */}
-        <Dialog open={isEditDocNumberDialogOpen} onOpenChange={setIsEditDocNumberDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Wysig Dokumentnommer</DialogTitle>
-              <DialogDescription>
-                Verander die dokumentnommer vir hierdie {editingDocNumberInvoice?.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Dokumentnommer</Label>
-                <Input
-                  value={newDocumentNumber}
-                  onChange={(e) => setNewDocumentNumber(e.target.value)}
-                  placeholder="bv. INV-0001"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => {
-                setIsEditDocNumberDialogOpen(false);
-                setEditingDocNumberInvoice(null);
-                setNewDocumentNumber("");
-              }}>
-                Kanselleer
-              </Button>
-              <Button
-                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                onClick={() => {
-                  if (editingDocNumberInvoice && newDocumentNumber.trim()) {
-                    updateDocumentNumberMutation.mutate({
-                      invoiceId: editingDocNumberInvoice.id,
-                      documentNumber: newDocumentNumber.trim()
-                    });
-                  }
-                }}
-                disabled={updateDocumentNumberMutation.isPending || !newDocumentNumber.trim()}
-              >
-                {updateDocumentNumberMutation.isPending ? 'Stoor...' : 'Stoor'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Save Payment Details Dialog */}
-        <Dialog open={isSavePaymentDialogOpen} onOpenChange={setIsSavePaymentDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Stoor Betalingsbesonderhede</DialogTitle>
-              <DialogDescription>
-                Stoor hierdie betalingsbesonderhede vir vinnige toegang wanneer fakturen geskep word
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Sjabloonnaam</Label>
-                <Input
-                  value={savePaymentName}
-                  onChange={(e) => setSavePaymentName(e.target.value)}
-                  placeholder="bv. FNB Besigheidsrekening"
-                  data-testid="input-payment-template-name-af"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Besonderhede Voorskou</Label>
-                <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
-                  {invoicePaymentDetails}
                 </div>
               </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Delete Invoice Confirmation Dialog */}
+      <AlertDialog open={isDeleteInvoiceDialogOpen} onOpenChange={setIsDeleteInvoiceDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Verwyder Faktuur?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Is jy seker jy wil{' '}
+              <span className="font-semibold text-[hsl(217,90%,40%)]">
+                {selectedInvoice?.documentNumber}
+              </span>
+              {' '}verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Kanselleer</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (selectedInvoice) {
+                  deleteInvoiceMutation.mutate(selectedInvoice.id);
+                }
+              }}
+              disabled={deleteInvoiceMutation.isPending}
+            >
+              {deleteInvoiceMutation.isPending ? 'Verwyder...' : 'Verwyder'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* Change Status Dialog */}
+      <Dialog open={isStatusChangeDialogOpen} onOpenChange={setIsStatusChangeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Verander Faktuur Status</DialogTitle>
+            <DialogDescription>
+              Werk die status van {selectedInvoice?.documentNumber} by
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Kies Nuwe Status</Label>
+              <Select value={newStatus} onValueChange={(value: any) => setNewStatus(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Konsep</SelectItem>
+                  <SelectItem value="sent">Gestuur</SelectItem>
+                  <SelectItem value="paid">Betaal</SelectItem>
+                  <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => {
-                setIsSavePaymentDialogOpen(false);
-                setSavePaymentName("");
-              }}>
-                Kanselleer
-              </Button>
-              <Button
-                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                onClick={() => {
-                  if (savePaymentName.trim() && invoicePaymentDetails.trim()) {
-                    savePaymentDetailsMutation.mutate({
-                      name: savePaymentName.trim(),
-                      details: invoicePaymentDetails.trim()
-                    });
-                  }
-                }}
-                disabled={savePaymentDetailsMutation.isPending || !savePaymentName.trim()}
-                data-testid="button-confirm-save-payment-af"
-              >
-                {savePaymentDetailsMutation.isPending ? 'Stoor...' : 'Stoor Sjabloon'}
-              </Button>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsStatusChangeDialogOpen(false)}>
+              Kanselleer
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (selectedInvoice) {
+                  updateInvoiceStatusMutation.mutate({
+                    invoiceId: selectedInvoice.id,
+                    status: newStatus
+                  });
+                }
+              }}
+              disabled={updateInvoiceStatusMutation.isPending}
+            >
+              {updateInvoiceStatusMutation.isPending ? 'Werk By...' : 'Werk Status By'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Edit Document Number Dialog */}
+      <Dialog open={isEditDocNumberDialogOpen} onOpenChange={setIsEditDocNumberDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Wysig Dokumentnommer</DialogTitle>
+            <DialogDescription>
+              Verander die dokumentnommer vir hierdie {editingDocNumberInvoice?.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Dokumentnommer</Label>
+              <Input
+                value={newDocumentNumber}
+                onChange={(e) => setNewDocumentNumber(e.target.value)}
+                placeholder="bv. INV-0001"
+              />
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Logout Confirmation Dialog */}
-        <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Teken Uit?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Is jy seker jy wil uitteken uit Storm POS?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setIsLogoutDialogOpen(false)}>
-                Nee, Bly Aangeteken
-              </AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                onClick={() => {
-                  localStorage.removeItem('posUser');
-                  localStorage.removeItem('posLoginTimestamp');
-                  window.location.href = '/pos/login';
-                }}
-              >
-                Ja, Teken Uit
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Import Preview Dialog */}
-        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-            <DialogHeader className="border-b border-gray-200 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center shadow-lg">
-                  <FileSpreadsheet className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => {
+              setIsEditDocNumberDialogOpen(false);
+              setEditingDocNumberInvoice(null);
+              setNewDocumentNumber("");
+            }}>
+              Kanselleer
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (editingDocNumberInvoice && newDocumentNumber.trim()) {
+                  updateDocumentNumberMutation.mutate({
+                    invoiceId: editingDocNumberInvoice.id,
+                    documentNumber: newDocumentNumber.trim()
+                  });
+                }
+              }}
+              disabled={updateDocumentNumberMutation.isPending || !newDocumentNumber.trim()}
+            >
+              {updateDocumentNumberMutation.isPending ? 'Stoor...' : 'Stoor'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Save Payment Details Dialog */}
+      <Dialog open={isSavePaymentDialogOpen} onOpenChange={setIsSavePaymentDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Stoor Betalingsbesonderhede</DialogTitle>
+            <DialogDescription>
+              Stoor hierdie betalingsbesonderhede vir vinnige toegang wanneer fakturen geskep word
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Sjabloonnaam</Label>
+              <Input
+                value={savePaymentName}
+                onChange={(e) => setSavePaymentName(e.target.value)}
+                placeholder="bv. FNB Besigheidsrekening"
+                data-testid="input-payment-template-name-af"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Besonderhede Voorskou</Label>
+              <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 whitespace-pre-wrap">
+                {invoicePaymentDetails}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => {
+              setIsSavePaymentDialogOpen(false);
+              setSavePaymentName("");
+            }}>
+              Kanselleer
+            </Button>
+            <Button
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                if (savePaymentName.trim() && invoicePaymentDetails.trim()) {
+                  savePaymentDetailsMutation.mutate({
+                    name: savePaymentName.trim(),
+                    details: invoicePaymentDetails.trim()
+                  });
+                }
+              }}
+              disabled={savePaymentDetailsMutation.isPending || !savePaymentName.trim()}
+              data-testid="button-confirm-save-payment-af"
+            >
+              {savePaymentDetailsMutation.isPending ? 'Stoor...' : 'Stoor Sjabloon'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Teken Uit?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Is jy seker jy wil uitteken uit Storm POS?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsLogoutDialogOpen(false)}>
+              Nee, Bly Aangeteken
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+              onClick={() => {
+                localStorage.removeItem('posUser');
+                localStorage.removeItem('posLoginTimestamp');
+                window.location.href = '/pos/login';
+              }}
+            >
+              Ja, Teken Uit
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* Import Preview Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="border-b border-gray-200 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center shadow-lg">
+                <FileSpreadsheet className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-gray-900">
+                  Voer {importType === 'products' ? 'Produkte' : 'Kliënte'} In
+                </DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Hersien die data voor invoer. Bestaande rekords sal opgedateer word.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto py-4 space-y-4">
+            <div className="bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl p-4 border border-[hsl(217,90%,40%)]/20">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
+                  <Package className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-bold text-gray-900">
-                    Voer {importType === 'products' ? 'Produkte' : 'Kliënte'} In
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Hersien die data voor invoer. Bestaande rekords sal opgedateer word.
-                  </DialogDescription>
+                  <p className="text-sm font-medium text-gray-700">Rekords Gevind</p>
+                  <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">{importData.length}</p>
                 </div>
               </div>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
-              <div className="bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl p-4 border border-[hsl(217,90%,40%)]/20">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
-                    <Package className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Rekords Gevind</p>
-                    <p className="text-2xl font-bold text-[hsl(217,90%,40%)]">{importData.length}</p>
-                  </div>
+            </div>
+            {importPreview.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                  <p className="text-sm font-medium text-gray-700">Voorskou (Eerste 5 rye)</p>
                 </div>
-              </div>
-              {importPreview.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                    <p className="text-sm font-medium text-gray-700">Voorskou (Eerste 5 rye)</p>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          {Object.keys(importPreview[0]).slice(0, 5).map((key) => (
-                            <th key={key} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              {key}
-                            </th>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {Object.keys(importPreview[0]).slice(0, 5).map((key) => (
+                          <th key={key} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            {key}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {importPreview.map((row, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                          {Object.values(row).slice(0, 5).map((val: any, i) => (
+                            <td key={i} className="px-4 py-3 text-gray-700 truncate max-w-[150px]">
+                              {String(val || '-')}
+                            </td>
                           ))}
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {importPreview.map((row, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                            {Object.values(row).slice(0, 5).map((val: any, i) => (
-                              <td key={i} className="px-4 py-3 text-gray-700 truncate max-w-[150px]">
-                                {String(val || '-')}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {importData.length > 5 && (
-                    <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 text-center">
-                      <p className="text-sm text-gray-500">...en {importData.length - 5} meer rye</p>
-                    </div>
-                  )}
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+                {importData.length > 5 && (
+                  <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 text-center">
+                    <p className="text-sm text-gray-500">...en {importData.length - 5} meer rye</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsImportDialogOpen(false);
+                setImportData([]);
+                setImportPreview([]);
+              }}
+              className="w-full sm:w-auto"
+            >
+              Kanselleer
+            </Button>
+            <Button 
+              onClick={handleImportConfirm}
+              disabled={isImporting || importData.length === 0}
+              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg"
+            >
+              {isImporting ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Voer in...
+                </span>
+              ) : (
+                `Voer ${importData.length} Rekords In`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Change Password Dialog */}
+      <Dialog open={isChangePasswordDialogOpen} onOpenChange={(open) => {
+        setIsChangePasswordDialogOpen(open);
+        if (!open) {
+          setCurrentPassword("");
+          setNewPassword("");
+          setConfirmNewPassword("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-[hsl(217,90%,40%)]" />
+              Verander Wagwoord
+            </DialogTitle>
+            <DialogDescription>
+              Voer jou huidige wagwoord en 'n nuwe wagwoord in om jou aanmeldbesonderhede op te dateer.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (!currentUser?.id) return;
+            
+            if (newPassword !== confirmNewPassword) {
+              toast({ title: "Fout", description: "Nuwe wagwoorde stem nie ooreen nie", variant: "destructive" });
+              return;
+            }
+            
+            if (newPassword.length < 6) {
+              toast({ title: "Fout", description: "Nuwe wagwoord moet minstens 6 karakters wees", variant: "destructive" });
+              return;
+            }
+            
+            setIsChangingPassword(true);
+            try {
+              const response = await fetch(`/api/pos/user/${currentUser.id}/change-password`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+              });
+              
+              const data = await response.json();
+              
+              if (response.ok) {
+                toast({ title: "Sukses", description: "Wagwoord suksesvol verander" });
+                setIsChangePasswordDialogOpen(false);
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmNewPassword("");
+              } else {
+                toast({ title: "Fout", description: data.message || "Kon nie wagwoord verander nie", variant: "destructive" });
+              }
+            } catch (error) {
+              toast({ title: "Fout", description: "Kon nie wagwoord verander nie", variant: "destructive" });
+            } finally {
+              setIsChangingPassword(false);
+            }
+          }} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Huidige Wagwoord</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Voer jou huidige wagwoord in"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Nuwe Wagwoord</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Voer nuwe wagwoord in (min. 6 karakters)"
+                required
+                minLength={6}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Bevestig Nuwe Wagwoord</Label>
+              <Input
+                id="confirmNewPassword"
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Bevestig nuwe wagwoord"
+                required
+              />
+              {newPassword && confirmNewPassword && newPassword !== confirmNewPassword && (
+                <p className="text-sm text-red-500">Wagwoorde stem nie ooreen nie</p>
               )}
             </div>
-            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsImportDialogOpen(false);
-                  setImportData([]);
-                  setImportPreview([]);
-                }}
-                className="w-full sm:w-auto"
-              >
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)}>
                 Kanselleer
               </Button>
               <Button 
-                onClick={handleImportConfirm}
-                disabled={isImporting || importData.length === 0}
-                className="w-full sm:w-auto bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg"
+                type="submit" 
+                disabled={isChangingPassword || !currentPassword || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword}
+                className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
               >
-                {isImporting ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Voer in...
-                  </span>
-                ) : (
-                  `Voer ${importData.length} Rekords In`
-                )}
+                {isChangingPassword ? "Besig..." : "Verander Wagwoord"}
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Change Password Dialog */}
-        <Dialog open={isChangePasswordDialogOpen} onOpenChange={(open) => {
-          setIsChangePasswordDialogOpen(open);
-          if (!open) {
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmNewPassword("");
-          }
-        }}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-                Verander Wagwoord
-              </DialogTitle>
-              <DialogDescription>
-                Voer jou huidige wagwoord en 'n nuwe wagwoord in om jou aanmeldbesonderhede op te dateer.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              if (!currentUser?.id) return;
-              
-              if (newPassword !== confirmNewPassword) {
-                toast({ title: "Fout", description: "Nuwe wagwoorde stem nie ooreen nie", variant: "destructive" });
-                return;
-              }
-              
-              if (newPassword.length < 6) {
-                toast({ title: "Fout", description: "Nuwe wagwoord moet minstens 6 karakters wees", variant: "destructive" });
-                return;
-              }
-              
-              setIsChangingPassword(true);
-              try {
-                const response = await fetch(`/api/pos/user/${currentUser.id}/change-password`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ currentPassword, newPassword })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                  toast({ title: "Sukses", description: "Wagwoord suksesvol verander" });
-                  setIsChangePasswordDialogOpen(false);
-                  setCurrentPassword("");
-                  setNewPassword("");
-                  setConfirmNewPassword("");
-                } else {
-                  toast({ title: "Fout", description: data.message || "Kon nie wagwoord verander nie", variant: "destructive" });
-                }
-              } catch (error) {
-                toast({ title: "Fout", description: "Kon nie wagwoord verander nie", variant: "destructive" });
-              } finally {
-                setIsChangingPassword(false);
-              }
-            }} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Huidige Wagwoord</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Voer jou huidige wagwoord in"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">Nuwe Wagwoord</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Voer nuwe wagwoord in (min. 6 karakters)"
-                  required
-                  minLength={6}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmNewPassword">Bevestig Nuwe Wagwoord</Label>
-                <Input
-                  id="confirmNewPassword"
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  placeholder="Bevestig nuwe wagwoord"
-                  required
-                />
-                {newPassword && confirmNewPassword && newPassword !== confirmNewPassword && (
-                  <p className="text-sm text-red-500">Wagwoorde stem nie ooreen nie</p>
-                )}
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)}>
-                  Kanselleer
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isChangingPassword || !currentPassword || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                >
-                  {isChangingPassword ? "Besig..." : "Verander Wagwoord"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
