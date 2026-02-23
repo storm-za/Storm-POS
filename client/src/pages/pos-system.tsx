@@ -5880,6 +5880,14 @@ export default function PosSystem() {
                               <span className="text-xl font-bold text-blue-400">R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
+
+                          <Button
+                            onClick={() => setIsBankDetailsOpen(true)}
+                            className="w-full mt-4 h-12 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold text-base shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 rounded-lg"
+                          >
+                            <CreditCard className="w-5 h-5 mr-2" />
+                            Pay Now
+                          </Button>
                         </div>
                         
                         <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
@@ -5963,46 +5971,69 @@ export default function PosSystem() {
                     </Card>
                   </div>
                   {/* Payment Information */}
-                  <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <Card className="bg-gray-900/60 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 shadow-2xl shadow-blue-900/10">
                     <CardHeader className="border-b border-white/10 pb-4">
                       <CardTitle className="flex items-center gap-2 text-white">
-                        <Receipt className="w-5 h-5" />
+                        <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/15 flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
+                          <Receipt className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                        </div>
                         Payment Information
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
-                      <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
-                        <div className="grid md:grid-cols-2 gap-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-gray-900/80 rounded-xl border border-white/5 p-5">
+                          <h4 className="font-semibold mb-4 text-white flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                            How Billing Works
+                          </h4>
+                          <ul className="space-y-3 text-sm text-gray-300">
+                            <li className="flex items-start gap-3">
+                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
+                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">1</span>
+                              </div>
+                              Monthly billing cycle: 1st to last day of month
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
+                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">2</span>
+                              </div>
+                              Service fee: 0.5% of gross monthly revenue
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
+                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">3</span>
+                              </div>
+                              Payment due: End of each month
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
+                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">4</span>
+                              </div>
+                              No setup fees or hidden charges
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="bg-gray-900/80 rounded-xl border border-white/5 p-5 flex flex-col justify-between">
                           <div>
-                            <h4 className="font-semibold mb-3 text-white">How Billing Works</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
-                              <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                                Monthly billing cycle: 1st to last day of month
-                              </li>
-                              <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                                Service fee: 0.5% of gross monthly revenue
-                              </li>
-                              <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                                Payment due: End of each month
-                              </li>
-                              <li className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2"></div>
-                                No setup fees or hidden charges
-                              </li>
-                            </ul>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold mb-3 text-white">Contact & Support</h4>
+                            <h4 className="font-semibold mb-4 text-white flex items-center gap-2">
+                              <HelpCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                              Contact & Support
+                            </h4>
                             <div className="space-y-2 text-sm text-gray-300">
                               <p>Questions about your billing?</p>
-                              <p className="font-medium text-blue-400">
-                                Email: softwarebystorm@gmail.com
+                              <p className="font-medium text-[hsl(217,90%,50%)]">
+                                softwarebystorm@gmail.com
                               </p>
                             </div>
                           </div>
+                          <Button
+                            onClick={() => setIsBankDetailsOpen(true)}
+                            className="mt-5 h-10 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300"
+                          >
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            View Payment Details
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -7462,86 +7493,88 @@ export default function PosSystem() {
       </Dialog>
       {/* Bank Details Dialog */}
       <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
-        <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-              Payment Details
-            </DialogTitle>
-            <DialogDescription>
-              Bank account details for Storm POS service fee payments
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[560px] max-w-[95vw] max-h-[90vh] overflow-y-auto bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-2xl shadow-blue-900/30 p-0">
+          <div className="relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(217,90%,50%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]"></div>
+            
+            <DialogHeader className="px-6 pt-6 pb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <CreditCard className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold text-white">Payment Details</DialogTitle>
+                  <DialogDescription className="text-gray-400 mt-0.5">
+                    Bank account details for Storm POS service fee payments
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
           
-          <div className="space-y-6">
-            {/* Bank Details Card */}
-            <div className="bg-gradient-to-br from-blue-50 to-gray-50 rounded-lg border p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-white" />
+            <div className="px-6 pb-6 space-y-5">
+              <div className="bg-gray-900/80 rounded-xl border border-[hsl(217,90%,40%)]/20 p-5">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/15 rounded-lg flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
+                    <CreditCard className="w-5 h-5 text-[hsl(217,90%,50%)]" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Nedbank Account</h3>
+                    <p className="text-xs text-gray-500">For Storm POS service fee payments</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Nedbank Account</h3>
-                  <p className="text-sm text-gray-600">For Storm POS service fee payments</p>
-                </div>
-              </div>
-              
-              <div className="grid gap-3 sm:gap-4">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
-                  <span className="text-sm font-medium text-gray-600">Account Holder</span>
-                  <span className="font-semibold text-gray-900">Storm</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
-                  <span className="text-sm font-medium text-gray-600">Account Number</span>
-                  <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">1229368612</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
-                  <span className="text-sm font-medium text-gray-600">Account Type</span>
-                  <span className="font-semibold text-gray-900">Current Account</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3 border-b border-gray-200 last:border-0">
-                  <span className="text-sm font-medium text-gray-600">Bank Name</span>
-                  <span className="font-semibold text-gray-900">Nedbank</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 py-3">
-                  <span className="text-sm font-medium text-gray-600">Branch Code</span>
-                  <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded">198765</span>
+                
+                <div className="space-y-0">
+                  {[
+                    { label: 'Account Holder', value: 'Storm', mono: false },
+                    { label: 'Account Number', value: '1229368612', mono: true },
+                    { label: 'Account Type', value: 'Current Account', mono: false },
+                    { label: 'Bank Name', value: 'Nedbank', mono: false },
+                    { label: 'Branch Code', value: '198765', mono: true },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-0 py-3.5 ${i < 4 ? 'border-b border-white/5' : ''}`}>
+                      <span className="text-sm text-gray-400">{item.label}</span>
+                      <span className={`font-semibold text-white ${item.mono ? 'font-mono bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-md border border-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : ''}`}>{item.value}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
 
-            {/* Payment Instructions */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 text-amber-600 mt-0.5">
-                  <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-amber-900 mb-2">Payment Instructions</h4>
-                  <ul className="text-sm text-amber-800 space-y-1">
-                    <li>• Use your registered business name as payment reference</li>
-                    <li>• Pay monthly service fees by the last day of each month</li>
-                    <li>• Keep proof of payment for your records</li>
-                  </ul>
+              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-500/20">
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-amber-300 text-sm mb-2">Payment Instructions</h4>
+                    <ul className="text-sm text-amber-200/70 space-y-1.5">
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Use your registered business name as payment reference
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Pay monthly service fees by the last day of each month
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
+                        Keep proof of payment for your records
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Contact Information */}
-            <div className="text-center text-sm text-gray-600">
-              <p>Questions about billing or payments?</p>
-              <p className="font-medium text-[hsl(217,90%,40%)] mt-1">
-                Email: softwarebystorm@gmail.com
-              </p>
-            </div>
-          </div>
+              <div className="bg-gray-900/50 rounded-xl border border-white/5 p-4 text-center">
+                <p className="text-sm text-gray-400">Questions about billing or payments?</p>
+                <p className="font-medium text-[hsl(217,90%,50%)] mt-1 text-sm">
+                  softwarebystorm@gmail.com
+                </p>
+              </div>
 
-          <div className="flex justify-end pt-4">
-            <Button onClick={() => setIsBankDetailsOpen(false)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
-              Close
-            </Button>
+              <Button onClick={() => setIsBankDetailsOpen(false)} className="w-full h-11 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 rounded-lg">
+                Close
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
