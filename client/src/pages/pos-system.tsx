@@ -1050,7 +1050,7 @@ export default function PosSystem() {
   const filteredPurchaseOrders = useMemo(() => {
     return (purchaseOrders || []).filter((po: any) => {
       const matchesSearch = poSearchTerm === "" || po.poNumber?.toLowerCase().includes(poSearchTerm.toLowerCase()) || po.supplierName?.toLowerCase().includes(poSearchTerm.toLowerCase());
-      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter;
+      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter || (poStatusFilter === "paid" && po.isPaid) || (poStatusFilter === "not_paid" && !po.isPaid);
       return matchesSearch && matchesStatus;
     }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [purchaseOrders, poSearchTerm, poStatusFilter]);
@@ -5483,13 +5483,15 @@ export default function PosSystem() {
                   <SelectTrigger className="w-full sm:w-48 bg-gray-900 border-gray-700 text-white">
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-700">
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="partial">Partially Received</SelectItem>
-                    <SelectItem value="received">Received</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectContent className="bg-gray-900 border-gray-700 text-white">
+                    <SelectItem value="all" className="text-white">All Statuses</SelectItem>
+                    <SelectItem value="draft" className="text-white">Draft</SelectItem>
+                    <SelectItem value="sent" className="text-white">Sent</SelectItem>
+                    <SelectItem value="partial" className="text-white">Partially Received</SelectItem>
+                    <SelectItem value="received" className="text-white">Received</SelectItem>
+                    <SelectItem value="cancelled" className="text-white">Cancelled</SelectItem>
+                    <SelectItem value="paid" className="text-green-400">Paid</SelectItem>
+                    <SelectItem value="not_paid" className="text-red-400">Not Paid</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

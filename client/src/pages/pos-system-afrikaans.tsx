@@ -1682,7 +1682,7 @@ export default function PosSystemAfrikaans() {
   const filteredPurchaseOrders = useMemo(() => {
     return (purchaseOrders || []).filter((po: any) => {
       const matchesSearch = poSearchTerm === "" || po.poNumber?.toLowerCase().includes(poSearchTerm.toLowerCase()) || po.supplierName?.toLowerCase().includes(poSearchTerm.toLowerCase());
-      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter;
+      const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter || (poStatusFilter === "paid" && po.isPaid) || (poStatusFilter === "not_paid" && !po.isPaid);
       return matchesSearch && matchesStatus;
     }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [purchaseOrders, poSearchTerm, poStatusFilter]);
@@ -4617,13 +4617,15 @@ ${dateFilteredSales.map(sale =>
                       <SelectTrigger className="w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white">
                         <SelectValue placeholder="Filter Status" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-900 border-gray-700">
-                        <SelectItem value="all">Alle Status</SelectItem>
-                        <SelectItem value="draft">Konsep</SelectItem>
-                        <SelectItem value="sent">Gestuur</SelectItem>
-                        <SelectItem value="partial">Gedeeltelik</SelectItem>
-                        <SelectItem value="received">Ontvang</SelectItem>
-                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                      <SelectContent className="bg-gray-900 border-gray-700 text-white">
+                        <SelectItem value="all" className="text-white">Alle Status</SelectItem>
+                        <SelectItem value="draft" className="text-white">Konsep</SelectItem>
+                        <SelectItem value="sent" className="text-white">Gestuur</SelectItem>
+                        <SelectItem value="partial" className="text-white">Gedeeltelik</SelectItem>
+                        <SelectItem value="received" className="text-white">Ontvang</SelectItem>
+                        <SelectItem value="cancelled" className="text-white">Gekanselleer</SelectItem>
+                        <SelectItem value="paid" className="text-green-400">Betaal</SelectItem>
+                        <SelectItem value="not_paid" className="text-red-400">Nie Betaal</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
