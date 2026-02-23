@@ -2285,221 +2285,259 @@ export default function PosSystem() {
   // PDF Receipt Generation
   const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false, customSettings?: any) => {
     const doc = new jsPDF();
-    let yPosition = 20;
+    const pageWidth = 210;
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 15;
     
-    // Merge settings with defaults
     const settings = mergeReceiptSettings(customSettings || currentUser?.receiptSettings);
     
-    // Section renderers
-    const renderLogo = () => {
-      if (settings.toggles.showLogo) {
-        // Use custom logo from settings if available, otherwise use company logo
-        const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
-        if (logoToUse) {
-          try {
-            // Logo is 2x bigger (60x60) and centered on the page
-            const logoWidth = 60;
-            const pageWidth = 210; // A4 width in mm
-            const xPosition = (pageWidth - logoWidth) / 2;
-            doc.addImage(logoToUse, 'JPEG', xPosition, yPosition, 60, 60);
-            yPosition += 65;
-          } catch (error) {
-            console.error('Error adding logo to PDF:', error);
-          }
+    const brandBlue = [24, 82, 163] as const;
+    const darkBlue = [15, 52, 110] as const;
+    const lightBlue = [230, 240, 255] as const;
+    const darkGray = [51, 51, 51] as const;
+    const medGray = [120, 120, 120] as const;
+    const lineGray = [200, 210, 225] as const;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.rect(0, 0, pageWidth, 50, 'F');
+    
+    doc.setFillColor(darkBlue[0], darkBlue[1], darkBlue[2]);
+    doc.rect(0, 46, pageWidth, 4, 'F');
+
+    if (settings.toggles.showLogo) {
+      const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
+      if (logoToUse) {
+        try {
+          doc.addImage(logoToUse, 'JPEG', margin, 8, 34, 34);
+        } catch (error) {
+          console.error('Error adding logo to PDF:', error);
         }
       }
-    };
+    }
+
+    doc.setTextColor(255, 255, 255);
+    const titleX = (settings.toggles.showLogo && (settings.logoDataUrl || currentUser?.companyLogo)) ? 60 : margin;
     
-    const renderBusinessInfo = () => {
-      doc.setFontSize(16);
+    if (settings.toggles.showBusinessName && settings.businessInfo.name) {
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', 20, yPosition);
-      yPosition += 10;
-      
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      
-      if (settings.toggles.showBusinessName && settings.businessInfo.name) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(settings.businessInfo.name, 20, yPosition);
-        doc.setFont('helvetica', 'normal');
-        yPosition += 6;
-      }
-      
-      if (settings.toggles.showBusinessAddress) {
-        if (settings.businessInfo.addressLine1) {
-          doc.text(settings.businessInfo.addressLine1, 20, yPosition);
-          yPosition += 5;
-        }
-        if (settings.businessInfo.addressLine2) {
-          doc.text(settings.businessInfo.addressLine2, 20, yPosition);
-          yPosition += 5;
-        }
-      }
-      
-      if (settings.toggles.showBusinessPhone && settings.businessInfo.phone) {
-        doc.text(`Tel: ${settings.businessInfo.phone}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showBusinessEmail && settings.businessInfo.email) {
-        doc.text(`Email: ${settings.businessInfo.email}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showBusinessWebsite && settings.businessInfo.website) {
-        doc.text(`Web: ${settings.businessInfo.website}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showRegistrationNumber && settings.businessInfo.registrationNumber) {
-        doc.text(`Reg: ${settings.businessInfo.registrationNumber}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showVATNumber && settings.businessInfo.vatNumber) {
-        doc.text(`VAT: ${settings.businessInfo.vatNumber}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      yPosition += 5;
-    };
+      doc.text(settings.businessInfo.name, titleX, 22);
+    }
     
-    const renderDateTime = () => {
-      if (settings.toggles.showDateTime) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, yPosition);
-        doc.text(`Time: ${new Date().toLocaleTimeString()}`, 120, yPosition);
-        yPosition += 10;
-      }
-    };
-    
-    const renderStaffInfo = () => {
-      if (settings.toggles.showStaffInfo && staffName) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Served by: ${staffName}`, 20, yPosition);
-        yPosition += 8;
-      }
-    };
-    
-    const renderCustomerInfo = () => {
-      if (settings.toggles.showCustomerInfo) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        if (customerName) {
-          doc.text(`Customer: ${customerName}`, 20, yPosition);
-          yPosition += 8;
-        }
-        if (accountName) {
-          doc.text(`Account: ${accountName}`, 20, yPosition);
-          yPosition += 8;
-        }
-      }
-    };
-    
-    const renderItems = () => {
-      yPosition += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text('Item', 20, yPosition);
-      doc.text('Qty', 120, yPosition);
-      doc.text('Price', 150, yPosition);
-      doc.text('Total', 175, yPosition);
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 8;
-      
-      doc.setFont('helvetica', 'normal');
-      items.forEach(item => {
-        const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
-        let itemName = item.name.length > 25 ? item.name.substring(0, 22) + '...' : item.name;
-        doc.text(itemName, 20, yPosition);
-        doc.text(item.quantity.toString(), 120, yPosition);
-        doc.text(`R${item.price}`, 150, yPosition);
-        doc.text(`R${itemTotal}`, 175, yPosition);
-        yPosition += 6;
-      });
-    };
-    
-    const renderTotals = () => {
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 8;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text(`TOTAL: R${total}`, 150, yPosition);
-      yPosition += 15;
-      
-      if (includeTipLines) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        yPosition += 5;
-        doc.text('Tip: ', 20, yPosition);
-        doc.line(35, yPosition, 100, yPosition);
-        yPosition += 10;
-        doc.text('New Total: ', 20, yPosition);
-        doc.line(50, yPosition, 100, yPosition);
-        yPosition += 15;
-      }
-    };
-    
-    const renderPaymentInfo = () => {
-      if (settings.toggles.showPaymentMethod && paymentType) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(`Payment: ${paymentType.toUpperCase()}`, 20, yPosition);
-        yPosition += 8;
-      }
-      if (notes) {
-        doc.setFontSize(10);
-        doc.text(`Notes: ${notes}`, 20, yPosition);
-        yPosition += 8;
-      }
-    };
-    
-    const renderMessages = () => {
-      yPosition += 10;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(isOpenAccount ? 'ACCOUNT STATEMENT' : 'SALES RECEIPT', titleX, 32);
+
+    const contactParts: string[] = [];
+    if (settings.toggles.showBusinessPhone && settings.businessInfo.phone) contactParts.push(settings.businessInfo.phone);
+    if (settings.toggles.showBusinessEmail && settings.businessInfo.email) contactParts.push(settings.businessInfo.email);
+    if (settings.toggles.showBusinessWebsite && settings.businessInfo.website) contactParts.push(settings.businessInfo.website);
+    if (contactParts.length > 0) {
       doc.setFontSize(8);
-      
-      if (settings.toggles.showCustomHeader && settings.customMessages.header) {
-        doc.text(settings.customMessages.header, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showThankYouMessage) {
-        doc.text(settings.customMessages.thankYou || 'Thank you for your business!', 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showCustomFooter && settings.customMessages.footer) {
-        doc.text(settings.customMessages.footer, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      doc.text('Powered by Storm POS - stormsoftware.co.za', 20, yPosition);
-    };
+      doc.text(contactParts.join('  |  '), titleX, 40);
+    }
+
+    y = 58;
+
+    doc.setFillColor(lightBlue[0], lightBlue[1], lightBlue[2]);
+    doc.roundedRect(margin, y, contentWidth, 28, 2, 2, 'F');
     
-    // Render sections in order
-    const sectionRenderers: Record<string, () => void> = {
-      logo: renderLogo,
-      businessInfo: renderBusinessInfo,
-      dateTime: renderDateTime,
-      staffInfo: renderStaffInfo,
-      customerInfo: renderCustomerInfo,
-      items: renderItems,
-      totals: renderTotals,
-      paymentInfo: renderPaymentInfo,
-      messages: renderMessages,
-    };
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
     
-    settings.sections.forEach((section: string) => {
-      const renderer = sectionRenderers[section];
-      if (renderer) renderer();
+    if (settings.toggles.showDateTime) {
+      doc.text('DATE', margin + 4, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' }), margin + 4, y + 14);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('TIME', margin + 60, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' }), margin + 60, y + 14);
+    }
+    
+    if (settings.toggles.showPaymentMethod && paymentType) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('PAYMENT', margin + 110, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(paymentType.charAt(0).toUpperCase() + paymentType.slice(1), margin + 110, y + 14);
+    }
+
+    if (settings.toggles.showStaffInfo && staffName) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('SERVED BY', margin + 4, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(staffName, margin + 30, y + 22);
+    }
+    
+    if (settings.toggles.showCustomerInfo && customerName) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('CUSTOMER', margin + 80, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(customerName, margin + 106, y + 22);
+    }
+    
+    if (isOpenAccount && accountName) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('ACCOUNT', margin + 80, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(accountName, margin + 106, y + 22);
+    }
+
+    if (settings.toggles.showBusinessAddress || settings.toggles.showRegistrationNumber || settings.toggles.showVATNumber) {
+      const regParts: string[] = [];
+      if (settings.toggles.showBusinessAddress && settings.businessInfo.addressLine1) regParts.push(settings.businessInfo.addressLine1);
+      if (settings.toggles.showBusinessAddress && settings.businessInfo.addressLine2) regParts.push(settings.businessInfo.addressLine2);
+      if (settings.toggles.showRegistrationNumber && settings.businessInfo.registrationNumber) regParts.push(`Reg: ${settings.businessInfo.registrationNumber}`);
+      if (settings.toggles.showVATNumber && settings.businessInfo.vatNumber) regParts.push(`VAT: ${settings.businessInfo.vatNumber}`);
+      if (regParts.length > 0) {
+        doc.setFontSize(7);
+        doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+        doc.text(regParts.join('  |  '), margin + 4, y + 27);
+      }
+    }
+
+    y += 36;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.roundedRect(margin, y, contentWidth, 9, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ITEM', margin + 4, y + 6);
+    doc.text('QTY', margin + 105, y + 6);
+    doc.text('PRICE', margin + 125, y + 6);
+    doc.text('TOTAL', margin + 150, y + 6);
+    y += 12;
+    
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    
+    items.forEach((item, index) => {
+      const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+      const itemName = item.name.length > 40 ? item.name.substring(0, 37) + '...' : item.name;
+      
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 250, 255);
+        doc.rect(margin, y - 4, contentWidth, 7, 'F');
+      }
+      
+      doc.text(itemName, margin + 4, y);
+      doc.text(item.quantity.toString(), margin + 108, y);
+      doc.text(`R${parseFloat(item.price).toFixed(2)}`, margin + 125, y);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`R${itemTotal}`, margin + 150, y);
+      doc.setFont('helvetica', 'normal');
+      y += 7;
     });
 
-    // Download the PDF
+    y += 2;
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.line(margin + 100, y, margin + contentWidth, y);
+    y += 6;
+
+    const subtotal = parseFloat(total);
+    doc.setFontSize(9);
+    doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Subtotal', margin + 110, y);
+    doc.text(`R${subtotal.toFixed(2)}`, margin + 150, y);
+    y += 7;
+
+    doc.setDrawColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.setLineWidth(0.8);
+    doc.line(margin + 100, y, margin + contentWidth, y);
+    doc.setLineWidth(0.2);
+    y += 8;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.roundedRect(margin + 95, y - 6, contentWidth - 95, 14, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL', margin + 100, y + 3);
+    doc.text(`R${subtotal.toFixed(2)}`, margin + 150, y + 3);
+    y += 16;
+
+    if (includeTipLines) {
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+      doc.text('Tip:', margin + 4, y);
+      doc.line(margin + 16, y, margin + 70, y);
+      y += 8;
+      doc.text('New Total:', margin + 4, y);
+      doc.line(margin + 28, y, margin + 70, y);
+      y += 12;
+    }
+
+    if (notes) {
+      doc.setFillColor(255, 253, 240);
+      doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'F');
+      doc.setDrawColor(230, 220, 180);
+      doc.roundedRect(margin, y, contentWidth, 14, 2, 2, 'S');
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Notes:', margin + 4, y + 6);
+      doc.setFont('helvetica', 'normal');
+      doc.text(notes.substring(0, 80), margin + 20, y + 6);
+      if (notes.length > 80) doc.text(notes.substring(80, 160), margin + 4, y + 11);
+      y += 18;
+    }
+
+    y += 5;
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.line(margin, y, margin + contentWidth, y);
+    y += 8;
+
+    doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    
+    if (settings.toggles.showCustomHeader && settings.customMessages.header) {
+      doc.text(settings.customMessages.header, pageWidth / 2, y, { align: 'center' });
+      y += 5;
+    }
+    
+    if (settings.toggles.showThankYouMessage) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+      doc.text(settings.customMessages.thankYou || 'Thank you for your business!', pageWidth / 2, y, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      y += 6;
+    }
+    
+    if (settings.toggles.showCustomFooter && settings.customMessages.footer) {
+      doc.setFontSize(8);
+      doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+      doc.text(settings.customMessages.footer, pageWidth / 2, y, { align: 'center' });
+      y += 5;
+    }
+
+    y += 4;
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.rect(0, 282, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.text('Powered by Storm POS  |  stormsoftware.co.za', pageWidth / 2, 289, { align: 'center' });
+
     const fileName = isOpenAccount 
       ? `account-statement-${accountName?.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`
       : `receipt-${Date.now()}.pdf`;

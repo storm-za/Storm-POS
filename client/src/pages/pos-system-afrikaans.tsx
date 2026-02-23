@@ -2311,215 +2311,243 @@ export default function PosSystemAfrikaans() {
   // Generate Afrikaans receipt
   const generateAfrikaansReceipt = (sale: any, customer: any, tipEnabled = false, customSettings?: any) => {
     const doc = new jsPDF();
-    let yPosition = 20;
+    const pageWidth = 210;
+    const margin = 20;
+    const contentWidth = pageWidth - margin * 2;
+    let y = 15;
     
-    // Merge settings with defaults
     const settings = mergeReceiptSettingsAfrikaans(customSettings || currentUser?.receiptSettings);
     const items = Array.isArray(sale.items) ? sale.items : JSON.parse(sale.items);
     
-    // Section renderers - Afrikaans
-    const renderLogo = () => {
-      if (settings.toggles.showLogo) {
-        // Use custom logo from settings if available, otherwise use company logo
-        const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
-        if (logoToUse) {
-          try {
-            // Logo is 2x bigger (60x60) and centered on the page
-            const logoWidth = 60;
-            const pageWidth = 210; // A4 width in mm
-            const xPosition = (pageWidth - logoWidth) / 2;
-            doc.addImage(logoToUse, 'JPEG', xPosition, yPosition, 60, 60);
-            yPosition += 65;
-          } catch (error) {
-            console.error('Error adding logo to PDF:', error);
-          }
+    const brandBlue = [24, 82, 163] as const;
+    const darkBlue = [15, 52, 110] as const;
+    const lightBlue = [230, 240, 255] as const;
+    const darkGray = [51, 51, 51] as const;
+    const medGray = [120, 120, 120] as const;
+    const lineGray = [200, 210, 225] as const;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.rect(0, 0, pageWidth, 50, 'F');
+    
+    doc.setFillColor(darkBlue[0], darkBlue[1], darkBlue[2]);
+    doc.rect(0, 46, pageWidth, 4, 'F');
+
+    if (settings.toggles.showLogo) {
+      const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
+      if (logoToUse) {
+        try {
+          doc.addImage(logoToUse, 'JPEG', margin, 8, 34, 34);
+        } catch (error) {
+          console.error('Error adding logo to PDF:', error);
         }
       }
-    };
+    }
+
+    doc.setTextColor(255, 255, 255);
+    const titleX = (settings.toggles.showLogo && (settings.logoDataUrl || currentUser?.companyLogo)) ? 60 : margin;
     
-    const renderBusinessInfo = () => {
-      doc.setFontSize(16);
+    if (settings.toggles.showBusinessName && settings.businessInfo.name) {
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('KWITANSIE', 20, yPosition);
-      yPosition += 10;
-      
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      
-      if (settings.toggles.showBusinessName && settings.businessInfo.name) {
-        doc.setFont('helvetica', 'bold');
-        doc.text(settings.businessInfo.name, 20, yPosition);
-        doc.setFont('helvetica', 'normal');
-        yPosition += 6;
-      }
-      
-      if (settings.toggles.showBusinessAddress) {
-        if (settings.businessInfo.addressLine1) {
-          doc.text(settings.businessInfo.addressLine1, 20, yPosition);
-          yPosition += 5;
-        }
-        if (settings.businessInfo.addressLine2) {
-          doc.text(settings.businessInfo.addressLine2, 20, yPosition);
-          yPosition += 5;
-        }
-      }
-      
-      if (settings.toggles.showBusinessPhone && settings.businessInfo.phone) {
-        doc.text(`Tel: ${settings.businessInfo.phone}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showBusinessEmail && settings.businessInfo.email) {
-        doc.text(`E-pos: ${settings.businessInfo.email}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showBusinessWebsite && settings.businessInfo.website) {
-        doc.text(`Web: ${settings.businessInfo.website}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showRegistrationNumber && settings.businessInfo.registrationNumber) {
-        doc.text(`Reg: ${settings.businessInfo.registrationNumber}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showVATNumber && settings.businessInfo.vatNumber) {
-        doc.text(`BTW: ${settings.businessInfo.vatNumber}`, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      yPosition += 5;
-    };
+      doc.text(settings.businessInfo.name, titleX, 22);
+    }
     
-    const renderDateTime = () => {
-      if (settings.toggles.showDateTime) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Verkoop #: ${sale.id}`, 20, yPosition);
-        yPosition += 6;
-        doc.text(`Datum: ${new Date(sale.createdAt).toLocaleDateString('af-ZA')}`, 20, yPosition);
-        doc.text(`Tyd: ${new Date(sale.createdAt).toLocaleTimeString('af-ZA')}`, 120, yPosition);
-        yPosition += 10;
-      }
-    };
-    
-    const renderStaffInfo = () => {
-      if (settings.toggles.showStaffInfo && currentStaff) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Bedien deur: ${currentStaff.username}`, 20, yPosition);
-        yPosition += 8;
-      }
-    };
-    
-    const renderCustomerInfo = () => {
-      if (settings.toggles.showCustomerInfo && customer) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Klient: ${customer.name}`, 20, yPosition);
-        if (customer.phone) {
-          doc.text(`Telefoon: ${customer.phone}`, 120, yPosition);
-        }
-        yPosition += 8;
-      }
-    };
-    
-    const renderItems = () => {
-      yPosition += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text('Item', 20, yPosition);
-      doc.text('Hv.', 120, yPosition);
-      doc.text('Prys', 150, yPosition);
-      doc.text('Totaal', 175, yPosition);
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 8;
-      
-      doc.setFont('helvetica', 'normal');
-      items.forEach((item: any) => {
-        const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
-        let itemName = item.name.length > 25 ? item.name.substring(0, 22) + '...' : item.name;
-        doc.text(itemName, 20, yPosition);
-        doc.text(item.quantity.toString(), 120, yPosition);
-        doc.text(`R${item.price}`, 150, yPosition);
-        doc.text(`R${itemTotal}`, 175, yPosition);
-        yPosition += 6;
-      });
-    };
-    
-    const renderTotals = () => {
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 8;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text(`TOTAAL: R${sale.total}`, 150, yPosition);
-      yPosition += 15;
-      
-      if (tipEnabled) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        yPosition += 5;
-        doc.text('Fooi: ', 20, yPosition);
-        doc.line(35, yPosition, 100, yPosition);
-        yPosition += 10;
-        doc.text('Nuwe Totaal: ', 20, yPosition);
-        doc.line(50, yPosition, 100, yPosition);
-        yPosition += 15;
-      }
-    };
-    
-    const renderPaymentInfo = () => {
-      if (settings.toggles.showPaymentMethod && sale.paymentType) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        const paymentText = sale.paymentType === 'cash' ? 'Kontant' : sale.paymentType === 'card' ? 'Kaart' : 'EFT';
-        doc.text(`Betaling: ${paymentText}`, 20, yPosition);
-        yPosition += 8;
-      }
-    };
-    
-    const renderMessages = () => {
-      yPosition += 10;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('VERKOOPKWITANSIE', titleX, 32);
+
+    const contactParts: string[] = [];
+    if (settings.toggles.showBusinessPhone && settings.businessInfo.phone) contactParts.push(settings.businessInfo.phone);
+    if (settings.toggles.showBusinessEmail && settings.businessInfo.email) contactParts.push(settings.businessInfo.email);
+    if (settings.toggles.showBusinessWebsite && settings.businessInfo.website) contactParts.push(settings.businessInfo.website);
+    if (contactParts.length > 0) {
       doc.setFontSize(8);
-      
-      if (settings.toggles.showCustomHeader && settings.customMessages.header) {
-        doc.text(settings.customMessages.header, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showThankYouMessage) {
-        doc.text(settings.customMessages.thankYou || 'Baie dankie vir u besigheid!', 20, yPosition);
-        yPosition += 5;
-      }
-      
-      if (settings.toggles.showCustomFooter && settings.customMessages.footer) {
-        doc.text(settings.customMessages.footer, 20, yPosition);
-        yPosition += 5;
-      }
-      
-      doc.text('Aangedryf deur Storm POS - stormsoftware.co.za', 20, yPosition);
-    };
+      doc.text(contactParts.join('  |  '), titleX, 40);
+    }
+
+    y = 58;
+
+    doc.setFillColor(lightBlue[0], lightBlue[1], lightBlue[2]);
+    doc.roundedRect(margin, y, contentWidth, 28, 2, 2, 'F');
     
-    // Render sections in order
-    const sectionRenderers: Record<string, () => void> = {
-      logo: renderLogo,
-      businessInfo: renderBusinessInfo,
-      dateTime: renderDateTime,
-      staffInfo: renderStaffInfo,
-      customerInfo: renderCustomerInfo,
-      items: renderItems,
-      totals: renderTotals,
-      paymentInfo: renderPaymentInfo,
-      messages: renderMessages,
-    };
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
     
-    settings.sections.forEach((section: string) => {
-      const renderer = sectionRenderers[section];
-      if (renderer) renderer();
+    if (settings.toggles.showDateTime) {
+      doc.text('DATUM', margin + 4, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date(sale.createdAt).toLocaleDateString('af-ZA', { year: 'numeric', month: 'long', day: 'numeric' }), margin + 4, y + 14);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('TYD', margin + 60, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(new Date(sale.createdAt).toLocaleTimeString('af-ZA', { hour: '2-digit', minute: '2-digit' }), margin + 60, y + 14);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('VERKOOP #', margin + 4, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(`${sale.id}`, margin + 30, y + 22);
+    }
+    
+    if (settings.toggles.showPaymentMethod && sale.paymentType) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('BETALING', margin + 110, y + 8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      const paymentText = sale.paymentType === 'cash' ? 'Kontant' : sale.paymentType === 'card' ? 'Kaart' : 'EFT';
+      doc.text(paymentText, margin + 110, y + 14);
+    }
+
+    if (settings.toggles.showStaffInfo && currentStaff) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('BEDIEN DEUR', margin + 60, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(currentStaff.username, margin + 90, y + 22);
+    }
+    
+    if (settings.toggles.showCustomerInfo && customer) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('KLIENT', margin + 110, y + 22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text(customer.name, margin + 130, y + 22);
+    }
+
+    if (settings.toggles.showBusinessAddress || settings.toggles.showRegistrationNumber || settings.toggles.showVATNumber) {
+      const regParts: string[] = [];
+      if (settings.toggles.showBusinessAddress && settings.businessInfo.addressLine1) regParts.push(settings.businessInfo.addressLine1);
+      if (settings.toggles.showBusinessAddress && settings.businessInfo.addressLine2) regParts.push(settings.businessInfo.addressLine2);
+      if (settings.toggles.showRegistrationNumber && settings.businessInfo.registrationNumber) regParts.push(`Reg: ${settings.businessInfo.registrationNumber}`);
+      if (settings.toggles.showVATNumber && settings.businessInfo.vatNumber) regParts.push(`BTW: ${settings.businessInfo.vatNumber}`);
+      if (regParts.length > 0) {
+        doc.setFontSize(7);
+        doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+        doc.text(regParts.join('  |  '), margin + 4, y + 27);
+      }
+    }
+
+    y += 36;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.roundedRect(margin, y, contentWidth, 9, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ITEM', margin + 4, y + 6);
+    doc.text('HV.', margin + 105, y + 6);
+    doc.text('PRYS', margin + 125, y + 6);
+    doc.text('TOTAAL', margin + 148, y + 6);
+    y += 12;
+    
+    doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    
+    items.forEach((item: any, index: number) => {
+      const itemTotal = (parseFloat(item.price) * item.quantity).toFixed(2);
+      const itemName = item.name.length > 40 ? item.name.substring(0, 37) + '...' : item.name;
+      
+      if (index % 2 === 0) {
+        doc.setFillColor(248, 250, 255);
+        doc.rect(margin, y - 4, contentWidth, 7, 'F');
+      }
+      
+      doc.text(itemName, margin + 4, y);
+      doc.text(item.quantity.toString(), margin + 108, y);
+      doc.text(`R${parseFloat(item.price).toFixed(2)}`, margin + 125, y);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`R${itemTotal}`, margin + 150, y);
+      doc.setFont('helvetica', 'normal');
+      y += 7;
     });
+
+    y += 2;
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.line(margin + 100, y, margin + contentWidth, y);
+    y += 6;
+
+    const subtotal = parseFloat(sale.total);
+    doc.setFontSize(9);
+    doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Subtotaal', margin + 110, y);
+    doc.text(`R${subtotal.toFixed(2)}`, margin + 150, y);
+    y += 7;
+
+    doc.setDrawColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.setLineWidth(0.8);
+    doc.line(margin + 100, y, margin + contentWidth, y);
+    doc.setLineWidth(0.2);
+    y += 8;
+
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.roundedRect(margin + 95, y - 6, contentWidth - 95, 14, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAAL', margin + 100, y + 3);
+    doc.text(`R${subtotal.toFixed(2)}`, margin + 150, y + 3);
+    y += 16;
+
+    if (tipEnabled) {
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+      doc.text('Fooi:', margin + 4, y);
+      doc.line(margin + 16, y, margin + 70, y);
+      y += 8;
+      doc.text('Nuwe Totaal:', margin + 4, y);
+      doc.line(margin + 32, y, margin + 70, y);
+      y += 12;
+    }
+
+    y += 5;
+    doc.setDrawColor(lineGray[0], lineGray[1], lineGray[2]);
+    doc.line(margin, y, margin + contentWidth, y);
+    y += 8;
+
+    doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    
+    if (settings.toggles.showCustomHeader && settings.customMessages.header) {
+      doc.text(settings.customMessages.header, pageWidth / 2, y, { align: 'center' });
+      y += 5;
+    }
+    
+    if (settings.toggles.showThankYouMessage) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+      doc.text(settings.customMessages.thankYou || 'Baie dankie vir u besigheid!', pageWidth / 2, y, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      y += 6;
+    }
+    
+    if (settings.toggles.showCustomFooter && settings.customMessages.footer) {
+      doc.setFontSize(8);
+      doc.setTextColor(medGray[0], medGray[1], medGray[2]);
+      doc.text(settings.customMessages.footer, pageWidth / 2, y, { align: 'center' });
+      y += 5;
+    }
+
+    y += 4;
+    doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+    doc.rect(0, 282, pageWidth, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.text('Aangedryf deur Storm POS  |  stormsoftware.co.za', pageWidth / 2, 289, { align: 'center' });
 
     doc.save(`kwitansie-${sale.id}.pdf`);
   };
