@@ -5173,7 +5173,7 @@ export default function PosSystem() {
                               size="sm"
                               variant="outline"
                               onClick={() => setSelectedOpenAccount(account)}
-                              className="flex-1 border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
+                              className="flex-1 bg-transparent border-blue-500/30 text-white hover:bg-blue-500/20 hover:text-blue-200"
                             >
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
