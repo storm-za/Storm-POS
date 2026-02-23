@@ -3274,7 +3274,7 @@ ${dateFilteredSales.map(sale =>
                           <h3 className="text-lg font-semibold text-white mb-2">Voeg jou eerste produk by</h3>
                           <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Gaan na die Produkvoorraad-oortjie om produkte by te voeg wat jy wil verkoop</p>
                           <Button
-                            onClick={() => { const tabsTrigger = document.querySelector('[value="produkte"]') as HTMLElement; if (tabsTrigger) tabsTrigger.click(); }}
+                            onClick={() => setCurrentTab('produkte')}
                             className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
                           >
                             <PlusCircle className="w-4 h-4 mr-2" />
