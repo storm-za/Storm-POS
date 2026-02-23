@@ -3892,25 +3892,25 @@ ${dateFilteredSales.map(sale =>
                   <div className="flex flex-wrap items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20">
-                          <FileSpreadsheet className="h-4 w-4 mr-1" />
-                          Excel
-                          <ChevronDown className="h-3 w-3 ml-1" />
+                        <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                          <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                          Invoer / Uitvoer
+                          <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={handleExportCustomers}>
-                          <Download className="h-4 w-4 mr-2" />
-                          Voer Kliënte Uit
+                      <DropdownMenuContent className="w-52 bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-xl shadow-black/50 p-1" align="start">
+                        <DropdownMenuItem onClick={handleExportCustomers} className="text-gray-200 hover:bg-[hsl(217,90%,40%)]/10 hover:text-white rounded-md">
+                          <Download className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                          Uitvoer na Excel
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-[hsl(217,90%,40%)]/20 my-1" />
                         <DropdownMenuItem 
-                          className="cursor-pointer"
+                          className="text-gray-200 hover:bg-[hsl(217,90%,40%)]/10 hover:text-white cursor-pointer rounded-md"
                           onSelect={(e) => e.preventDefault()}
                         >
                           <label className="cursor-pointer flex items-center w-full">
-                            <Upload className="h-4 w-4 mr-2" />
-                            Voer Kliënte In
+                            <Upload className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                            Invoer met Excel
                             <input
                               type="file"
                               accept=".xlsx,.xls,.csv"
@@ -3921,7 +3921,7 @@ ${dateFilteredSales.map(sale =>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button onClick={() => openCustomerDialog()} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]">
+                    <Button onClick={() => openCustomerDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
                       <PlusCircle className="w-4 h-4 mr-2" />
                       Voeg Klient By
                     </Button>
@@ -3980,10 +3980,10 @@ ${dateFilteredSales.map(sale =>
                     variant="outline"
                     size="sm"
                     onClick={handleExportInvoices}
-                    className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
+                    className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200"
                   >
-                    <FileSpreadsheet className="h-4 w-4 mr-1" />
-                    Voer Excel Uit
+                    <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
+                    Uitvoer na Excel
                   </Button>
                   <Button 
                     onClick={() => setIsInvoiceDialogOpen(true)}
