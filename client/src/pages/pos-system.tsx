@@ -3812,7 +3812,22 @@ export default function PosSystem() {
                       <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
                     <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-320px)] overflow-y-auto">
-                      {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
+                      {products.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16">
+                          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
+                            <PlusCircle className="w-10 h-10 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-white mb-2">Add your first product</h3>
+                          <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Go to the Product Inventory tab to add products you want to sell</p>
+                          <Button
+                            onClick={() => { const tabsTrigger = document.querySelector('[value="products"]') as HTMLElement; if (tabsTrigger) tabsTrigger.click(); }}
+                            className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                          >
+                            <PlusCircle className="w-4 h-4 mr-2" />
+                            Add Product
+                          </Button>
+                        </div>
+                      ) : salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           <div onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group">
                             <div className="flex flex-col items-center gap-2">
