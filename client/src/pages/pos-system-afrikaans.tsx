@@ -178,6 +178,7 @@ export default function PosSystemAfrikaans() {
   const [invoiceTypeFilter, setInvoiceTypeFilter] = useState<'all' | 'invoice' | 'quote'>('all');
   const [invoiceDateFrom, setInvoiceDateFrom] = useState("");
   const [invoiceDateTo, setInvoiceDateTo] = useState("");
+  const [invoiceSortOrder, setInvoiceSortOrder] = useState<'date-desc' | 'date-asc' | 'name-asc' | 'name-desc' | 'amount-desc' | 'amount-asc' | 'number-asc' | 'number-desc'>('date-desc');
   const [isEditDocNumberDialogOpen, setIsEditDocNumberDialogOpen] = useState(false);
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
@@ -563,7 +564,7 @@ export default function PosSystemAfrikaans() {
 
   // Filter invoices based on search and filter criteria
   const filteredInvoices = useMemo(() => {
-    return invoices.filter((invoice) => {
+    const filtered = invoices.filter((invoice) => {
       // Search filter (document number or client name)
       if (invoiceSearchQuery) {
         const query = invoiceSearchQuery.toLowerCase();
@@ -608,7 +609,31 @@ export default function PosSystemAfrikaans() {
       
       return true;
     });
-  }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers]);
+
+    filtered.sort((a, b) => {
+      switch (invoiceSortOrder) {
+        case 'date-desc': return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
+        case 'date-asc': return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
+        case 'name-asc': {
+          const nameA = (customers.find(c => c.id === a.clientId)?.name || a.clientName || '').toLowerCase();
+          const nameB = (customers.find(c => c.id === b.clientId)?.name || b.clientName || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        }
+        case 'name-desc': {
+          const nameA = (customers.find(c => c.id === a.clientId)?.name || a.clientName || '').toLowerCase();
+          const nameB = (customers.find(c => c.id === b.clientId)?.name || b.clientName || '').toLowerCase();
+          return nameB.localeCompare(nameA);
+        }
+        case 'amount-desc': return (typeof b.total === 'number' ? b.total : parseFloat(b.total)) - (typeof a.total === 'number' ? a.total : parseFloat(a.total));
+        case 'amount-asc': return (typeof a.total === 'number' ? a.total : parseFloat(a.total)) - (typeof b.total === 'number' ? b.total : parseFloat(b.total));
+        case 'number-asc': return (a.documentNumber || '').localeCompare(b.documentNumber || '', undefined, { numeric: true });
+        case 'number-desc': return (b.documentNumber || '').localeCompare(a.documentNumber || '', undefined, { numeric: true });
+        default: return 0;
+      }
+    });
+
+    return filtered;
+  }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers, invoiceSortOrder]);
 
   // PDF Export Funksie - Professionele Faktuur/Kwotasie met Besigheidsbesonderhede
   const generateInvoicePDF = (invoice: any) => {
@@ -4066,6 +4091,21 @@ ${dateFilteredSales.map(sale =>
                         </SelectContent>
                       </Select>
                     </div>
+                    <Select value={invoiceSortOrder} onValueChange={(value: any) => setInvoiceSortOrder(value)}>
+                      <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm">
+                        <SelectValue placeholder="Sorteer Volgens" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="date-desc">Datum: Nuutste Eerste</SelectItem>
+                        <SelectItem value="date-asc">Datum: Oudste Eerste</SelectItem>
+                        <SelectItem value="name-asc">Klient: A-Z</SelectItem>
+                        <SelectItem value="name-desc">Klient: Z-A</SelectItem>
+                        <SelectItem value="amount-desc">Bedrag: Hoog-Laag</SelectItem>
+                        <SelectItem value="amount-asc">Bedrag: Laag-Hoog</SelectItem>
+                        <SelectItem value="number-asc">Dok Nommer: A-Z</SelectItem>
+                        <SelectItem value="number-desc">Dok Nommer: Z-A</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-2 gap-3">
@@ -4090,7 +4130,7 @@ ${dateFilteredSales.map(sale =>
                         />
                       </div>
                     </div>
-                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo) && (
+                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo || invoiceSortOrder !== 'date-desc') && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -4100,6 +4140,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceTypeFilter('all');
                           setInvoiceDateFrom("");
                           setInvoiceDateTo("");
+                          setInvoiceSortOrder('date-desc');
                         }}
                         className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 w-full"
                         data-testid="button-clear-filters"
