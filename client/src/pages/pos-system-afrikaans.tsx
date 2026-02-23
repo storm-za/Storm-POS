@@ -3250,559 +3250,253 @@ ${dateFilteredSales.map(sale =>
 
           {/* Sales Tab */}
           <TabsContent value="verkope">
-            <motion.div 
-              className="grid lg:grid-cols-2 gap-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Product Selection */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <Card data-testid="product-selection-card" className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                  <CardHeader className="space-y-3">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                      <CardTitle className="flex items-center space-x-2 text-white">
-                        <Package className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-                        <span>Produkte</span>
-                      </CardTitle>
-                      {/* Display Mode & Sort Dropdowns */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {categories.length > 0 && (
-                          <Select
-                            value={salesDisplayMode}
-                            onValueChange={(value: 'grid' | 'tabs') => {
-                              setSalesDisplayMode(value);
-                              if (value === 'grid') setSelectedSalesCategory(null);
-                              if (value === 'tabs') setSalesCategoryFilter('all');
-                            }}
-                          >
-                            <SelectTrigger className="w-[120px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="grid">
-                                <span className="flex items-center gap-1.5">
-                                  <Grid3X3 className="w-3 h-3" /> Rooster
-                                </span>
-                              </SelectItem>
-                              <SelectItem value="tabs">
-                                <span className="flex items-center gap-1.5">
-                                  <LayoutList className="w-3 h-3" /> Oortjies
-                                </span>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                        <Select
-                          value={productSortOrder}
-                          onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}
-                        >
-                          <SelectTrigger className="w-[140px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="name-asc">Naam A-Z</SelectItem>
-                            <SelectItem value="name-desc">Naam Z-A</SelectItem>
-                            <SelectItem value="sku-asc">SKU A-Z</SelectItem>
-                            <SelectItem value="sku-desc">SKU Z-A</SelectItem>
-                            <SelectItem value="price-asc">Prys Laag-Hoog</SelectItem>
-                            <SelectItem value="price-desc">Prys Hoog-Laag</SelectItem>
-                            <SelectItem value="stock-asc">Voorraad Laag-Hoog</SelectItem>
-                            <SelectItem value="stock-desc">Voorraad Hoog-Laag</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    {/* Search Bar */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        placeholder="Soek produkte..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-
-                    {/* Category Tabs (when in tabs mode) */}
-                    {salesDisplayMode === 'tabs' && categories.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          onClick={() => setSalesCategoryFilter('all')}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                            salesCategoryFilter === 'all'
-                              ? 'bg-[hsl(217,90%,40%)] text-white'
-                              : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
-                          }`}
-                        >
-                          Alles
-                        </button>
-                        {categories.map((cat) => (
-                          <button
-                            key={cat.id}
-                            onClick={() => setSalesCategoryFilter(cat.id)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                              salesCategoryFilter === cat.id
-                                ? 'text-white shadow-lg'
-                                : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'
-                            }`}
-                            style={salesCategoryFilter === cat.id ? { backgroundColor: cat.color || '#3b82f6' } : {}}
-                          >
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                            {cat.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="max-h-96 overflow-y-auto">
-                    {/* Grid Mode: Category Cards */}
-                    {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* All Products Card */}
-                        <div
-                          onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
-                          className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
-                        >
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="w-12 h-12 rounded-xl bg-gray-600/50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                              <Package className="w-6 h-6 text-gray-300" />
-                            </div>
-                            <span className="font-medium text-white text-sm">Alle Produkte</span>
-                            <span className="text-xs text-gray-400">{products.length} items</span>
-                          </div>
-                        </div>
-                        {/* Category Cards */}
-                        {categories.map((cat) => (
-                          <div
-                            key={cat.id}
-                            onClick={() => { setSelectedSalesCategory(cat.id); }}
-                            className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/50 to-gray-800/50 hover:border-gray-500 cursor-pointer transition-all group"
-                            style={{ borderColor: `${cat.color}30` }}
-                          >
-                            <div className="flex flex-col items-center gap-2">
-                              <div 
-                                className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
-                                style={{ backgroundColor: `${cat.color}30` }}
-                              >
-                                <Folder className="w-6 h-6" style={{ color: cat.color || '#3b82f6' }} />
-                              </div>
-                              <span className="font-medium text-white text-sm">{cat.name}</span>
-                              <span className="text-xs text-gray-400">{products.filter(p => p.categoryId === cat.id).length} items</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
-                      /* Grid Mode: Products in selected category */
-                      (<div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <button
-                            onClick={() => setSelectedSalesCategory(null)}
-                            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                            Terug na Kategoriee
-                          </button>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProductsForCategory(
-                                products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)
-                              );
-                              setIsAddProductsToCategoryOpen(true);
-                            }}
-                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white text-xs"
-                          >
-                            <Plus className="w-3 h-3 mr-1" />
-                            Voeg Produkte By
-                          </Button>
-                        </div>
-                        {/* Category Title */}
-                        <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
-                          <div 
-                            className="w-8 h-8 rounded-lg flex items-center justify-center"
-                            style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}
-                          >
-                            <Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+                <div className="flex flex-col lg:flex-row">
+                  <div className="flex-1 lg:border-r border-gray-700/30">
+                    <div className="px-5 py-4 border-b border-gray-700/30 bg-gray-800/30">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15">
+                            <Package className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                           </div>
                           <div>
-                            <h3 className="text-lg font-semibold text-white">
-                              {categories.find(c => c.id === selectedSalesCategory)?.name || 'Kategorie'}
-                            </h3>
-                            <p className="text-xs text-gray-400">
-                              {products.filter(p => p.categoryId === selectedSalesCategory).length} produkte
-                            </p>
+                            <h3 className="text-sm font-semibold text-white">Produkte</h3>
+                            <p className="text-xs text-gray-500">{products.length} beskikbaar</p>
                           </div>
                         </div>
-                        <div className="grid gap-2">
-                          {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
-                            <div
-                              key={product.id}
-                              className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
-                              onClick={() => addToSale(product)}
-                            >
-                              <div>
-                                <p className="font-medium text-white">{product.name}</p>
-                                <p className="text-sm text-gray-400">SKU: {product.sku}</p>
-                                <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-bold text-blue-400">
-                                  R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
-                                </p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {categories.length > 0 && (
+                            <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
+                              <SelectTrigger className="w-[120px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Rooster</span></SelectItem>
+                                <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Oortjies</span></SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                          <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
+                            <SelectTrigger className="w-[140px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="name-asc">Naam A-Z</SelectItem>
+                              <SelectItem value="name-desc">Naam Z-A</SelectItem>
+                              <SelectItem value="sku-asc">SKU A-Z</SelectItem>
+                              <SelectItem value="sku-desc">SKU Z-A</SelectItem>
+                              <SelectItem value="price-asc">Prys Laag-Hoog</SelectItem>
+                              <SelectItem value="price-desc">Prys Hoog-Laag</SelectItem>
+                              <SelectItem value="stock-asc">Voorraad Laag-Hoog</SelectItem>
+                              <SelectItem value="stock-desc">Voorraad Hoog-Laag</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="relative mt-3">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input placeholder="Soek produkte..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500 h-9" />
+                      </div>
+                      {salesDisplayMode === 'tabs' && categories.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <button onClick={() => setSalesCategoryFilter('all')} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${salesCategoryFilter === 'all' ? 'bg-[hsl(217,90%,40%)] text-white' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'}`}>Alles</button>
+                          {categories.map((cat) => (
+                            <button key={cat.id} onClick={() => setSalesCategoryFilter(cat.id)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${salesCategoryFilter === cat.id ? 'text-white shadow-lg' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700 hover:text-white'}`} style={salesCategoryFilter === cat.id ? { backgroundColor: cat.color || '#3b82f6' } : {}}>
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
+                              {cat.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-280px)] overflow-y-auto">
+                      {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          <div onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group">
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="w-11 h-11 rounded-xl bg-gray-600/40 flex items-center justify-center group-hover:scale-110 transition-transform"><Package className="w-5 h-5 text-gray-300" /></div>
+                              <span className="font-medium text-white text-sm">Alle Produkte</span>
+                              <span className="text-xs text-gray-400">{products.length} items</span>
+                            </div>
+                          </div>
+                          {categories.map((cat) => (
+                            <div key={cat.id} onClick={() => { setSelectedSalesCategory(cat.id); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group" style={{ borderColor: `${cat.color}30` }}>
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: `${cat.color}30` }}><Folder className="w-5 h-5" style={{ color: cat.color || '#3b82f6' }} /></div>
+                                <span className="font-medium text-white text-sm">{cat.name}</span>
+                                <span className="text-xs text-gray-400">{products.filter(p => p.categoryId === cat.id).length} items</span>
                               </div>
                             </div>
                           ))}
                         </div>
-                      </div>)
-                    ) : (
-                      /* Tabs Mode or No Categories: Regular product list */
-                      (<div className="grid gap-2">
-                        {filteredSalesProducts.map((product) => (
-                          <div
-                            key={product.id}
-                            className="flex items-center justify-between p-3 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all duration-200"
-                            onClick={() => addToSale(product)}
-                          >
+                      ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <button onClick={() => setSelectedSalesCategory(null)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4" />Terug na Kategoriee</button>
+                            <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white text-xs"><Plus className="w-3 h-3 mr-1" />Voeg Produkte By</Button>
+                          </div>
+                          <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}><Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} /></div>
                             <div>
-                              <p className="font-medium text-white">{product.name}</p>
-                              <p className="text-sm text-gray-400">SKU: {product.sku}</p>
-                              <p className="text-sm text-gray-400">Voorraad: {product.quantity}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-blue-400">
-                                R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}
-                              </p>
-                              {product.tradePrice && (
-                                <p className="text-xs text-gray-400">
-                                  {selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' 
-                                    ? `Kleinhandel: R${product.retailPrice}` 
-                                    : `Groothandel: R${product.tradePrice}`}
-                                </p>
-                              )}
+                              <h3 className="text-lg font-semibold text-white">{categories.find(c => c.id === selectedSalesCategory)?.name || 'Kategorie'}</h3>
+                              <p className="text-xs text-gray-400">{products.filter(p => p.categoryId === selectedSalesCategory).length} produkte</p>
                             </div>
                           </div>
-                        ))}
-                      </div>)
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              {/* Huidige Verkoop - Subtle distinct background */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Card data-testid="current-sale-card" className="bg-[hsl(217,30%,12%)]/80 backdrop-blur-xl border-[hsl(217,40%,25%)]/50 shadow-2xl shadow-blue-900/20">
-                  <CardHeader className="border-b border-[hsl(217,40%,25%)]/30 pb-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-3 text-white">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                          <ShoppingCart className="h-5 w-5 text-white" />
+                          <div className="grid gap-1">
+                            {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
+                              <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                                <div>
+                                  <p className="font-medium text-white text-sm">{product.name}</p>
+                                  <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                                </div>
+                                <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-lg font-bold">Huidige Verkoop</span>
-                          <p className="text-xs text-gray-400 font-normal">Finaliseer jou transaksie</p>
-                        </div>
-                      </CardTitle>
-                      {currentSale.length > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[hsl(217,90%,40%)]/20 border border-[hsl(217,90%,40%)]/30">
-                          <span className="text-sm font-medium text-[hsl(217,90%,60%)]">{currentSale.reduce((acc, item) => acc + item.quantity, 0)} items</span>
+                      ) : (
+                        <div className="grid gap-1">
+                          {filteredSalesProducts.map((product) => (
+                            <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                              <div>
+                                <p className="font-medium text-white text-sm">{product.name}</p>
+                                <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
+                                {product.tradePrice && (
+                                  <p className="text-xs text-gray-500">{selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' ? `Kleinhandel: R${product.retailPrice}` : `Groothandel: R${product.tradePrice}`}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <div className="space-y-4">
-                      {/* Sale Items */}
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {currentSale.map((item) => (
-                          <div key={item.productId} className="flex items-center justify-between p-2 border rounded">
-                            <div className="flex-1">
-                              <p className="font-medium text-[#ffffff]">{item.name}</p>
-                              <p className="text-sm text-gray-500">R{item.price} elk</p>
+                  </div>
+                  <div data-testid="current-sale-card" className="lg:w-[420px] xl:w-[460px] flex-shrink-0 bg-[hsl(217,20%,11%)]/60 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
+                    <div className="px-5 py-4 border-b border-gray-700/30 bg-[hsl(217,25%,13%)]/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-white">Huidige Verkoop</h3>
+                            <p className="text-xs text-gray-500">{currentSale.length === 0 ? 'Geen items nog nie' : `${currentSale.reduce((acc, item) => acc + item.quantity, 0)} items`}</p>
+                          </div>
+                        </div>
+                        {currentSale.length > 0 && <span className="text-lg font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>}
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-4">
+                      <div className="space-y-2 max-h-52 overflow-y-auto">
+                        {currentSale.length === 0 ? (
+                          <div className="text-center py-8 text-gray-500"><ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Tik op 'n produk om te begin</p></div>
+                        ) : currentSale.map((item) => (
+                          <div key={item.productId} className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-white text-sm truncate">{item.name}</p>
+                              <p className="text-xs text-gray-500">R{item.price} × {item.quantity} = R{(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                              >
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-8 text-center text-[#ffffff]">{item.quantity}</span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                              >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => updateQuantity(item.productId, 0)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+                            <div className="flex items-center gap-1">
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
+                              <span className="w-7 text-center text-white text-sm font-medium">{item.quantity}</span>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 ml-1" onClick={() => updateQuantity(item.productId, 0)}><Trash2 className="h-3 w-3" /></Button>
                             </div>
                           </div>
                         ))}
                       </div>
-
-                      {/* Sale Details */}
-                      <div className="space-y-3 pt-4 border-t">
-                        <div>
-                          <Label htmlFor="customer" className="text-white">Klient (Opsioneel)</Label>
-                          <Select 
-                            value={selectedCustomerId?.toString() || "none"} 
-                            onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Kies 'n klient" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Geen klient</SelectItem>
-                              {customers.map((customer) => (
-                                <SelectItem key={customer.id} value={customer.id.toString()}>
-                                  <div className="flex flex-col">
+                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-gray-400 mb-1 block">Klient</Label>
+                            <Select value={selectedCustomerId?.toString() || "none"} onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}>
+                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="Geen klient" /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Geen klient</SelectItem>
+                                {customers.map((customer) => (
+                                  <SelectItem key={customer.id} value={customer.id.toString()}>
                                     <div className="flex items-center gap-1">
                                       <span className="font-medium">{customer.name}</span>
-                                      <span className={`text-xs px-1 rounded ${customer.customerType === 'trade' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}>
-                                        {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
-                                      </span>
+                                      <span className={`text-xs px-1 rounded ${customer.customerType === 'trade' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}>{customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}</span>
                                     </div>
-                                    {customer.phone && (
-                                      <span className="text-xs text-gray-500">{customer.phone}</span>
-                                    )}
-                                    {customer.notes && (
-                                      <span className="text-xs text-gray-400 italic">{customer.notes}</span>
-                                    )}
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="payment" className="text-white">Betaalmetode</Label>
-                          <Select value={paymentType} onValueChange={setPaymentType}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="kontant">Kontant</SelectItem>
-                              <SelectItem value="kaart">Kaart</SelectItem>
-                              <SelectItem value="eft">EFT</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="notes" className="text-white">Notas (Opsioneel)</Label>
-                          <Textarea
-                            id="notes"
-                            value={saleNotes}
-                            onChange={(e) => setSaleNotes(e.target.value)}
-                            placeholder="Verkoop notas"
-                            rows={2}
-                          />
-                        </div>
-
-                        {/* Discount Section */}
-                        <div>
-                          <Label className="text-white">Afslag</Label>
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {[0, 5, 10, 20, 50].map((percentage) => (
-                              <Button
-                                key={percentage}
-                                type="button"
-                                size="sm"
-                                variant={discountPercentage === percentage ? "default" : "outline"}
-                                onClick={() => setDiscountPercentage(percentage)}
-                                className={discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
-                              >
-                                {percentage === 0 ? "Geen Afslag" : `${percentage}%`}
-                              </Button>
-                            ))}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
-                          <div className="flex items-center gap-2 mt-3">
-                            <span className="text-sm text-gray-400">Eie:</span>
-                            <Input
-                              type="number"
-                              min="0"
-                              max="100"
-                              step="1"
-                              placeholder="0"
-                              value={discountPercentage || ""}
-                              onChange={(e) => {
-                                const inputVal = e.target.value;
-                                if (inputVal === "") {
-                                  setDiscountPercentage(0);
-                                } else {
-                                  const value = Math.min(100, Math.max(0, parseInt(inputVal) || 0));
-                                  setDiscountPercentage(value);
-                                }
-                              }}
-                              className="w-20 h-8 text-center bg-gray-800/50 border-gray-600 text-white"
-                            />
-                            <span className="text-sm text-gray-400">%</span>
-                          </div>
-                        </div>
-
-                        {/* Tip Option Section */}
-                        <div>
-                          <Label className="text-white">Fooiopsie</Label>
-                          <div className="flex items-center gap-2 mt-2">
-                            <button
-                              type="button"
-                              onClick={() => setTipOptionEnabled(!tipOptionEnabled)}
-                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                tipOptionEnabled 
-                                  ? 'bg-[hsl(217,90%,40%)]' 
-                                  : 'bg-gray-200'
-                              }`}
-                            >
-                              <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                  tipOptionEnabled ? 'translate-x-6' : 'translate-x-1'
-                                }`}
-                              />
-                            </button>
-                            <span className="text-sm text-[#ffffff]">
-                              {tipOptionEnabled ? 'Fooilyne geaktiveer op kwitansie' : 'Voeg fooiopsie by kwitansie'}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Total Section */}
-                        <div className="pt-4 border-t space-y-2">
-                          <div className="flex justify-between items-center text-lg text-white">
-                            <span>Subtotaal:</span>
-                            <span>R{calculateSubtotal().toFixed(2)}</span>
-                          </div>
-                          {discountPercentage > 0 && (
-                            <div className="flex justify-between items-center text-lg text-green-400">
-                              <span>Afslag ({discountPercentage}%):</span>
-                              <span>-R{calculateDiscount().toFixed(2)}</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between items-center text-xl font-bold border-t pt-2 text-white">
-                            <span>Totaal:</span>
-                            <span className="text-blue-400">R{calculateTotal()}</span>
-                          </div>
-                        </div>
-
-                        {/* Checkout Options */}
-                        <div className="space-y-3">
                           <div>
-                            <Label className="text-white">Betaalopsie</Label>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant={checkoutOption === 'complete' ? "default" : "outline"}
-                                onClick={() => setCheckoutOption('complete')}
-                                className={checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
-                              >
-                                <Receipt className="h-4 w-4 mr-2" />
-                                Voltooi Verkoop
-                              </Button>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant={checkoutOption === 'open-account' ? "default" : "outline"}
-                                onClick={() => setCheckoutOption('open-account')}
-                                className={checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                Maak Rekening Oop
-                              </Button>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant={checkoutOption === 'add-to-account' ? "default" : "outline"}
-                                onClick={() => setCheckoutOption('add-to-account')}
-                                disabled={openAccounts.length === 0}
-                                className={checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]" : ""}
-                              >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Voeg by Rekening
-                              </Button>
+                            <Label className="text-xs text-gray-400 mb-1 block">Betaling</Label>
+                            <Select value={paymentType} onValueChange={setPaymentType}>
+                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="kontant">Kontant</SelectItem>
+                                <SelectItem value="kaart">Kaart</SelectItem>
+                                <SelectItem value="eft">EFT</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-400 mb-1 block">Notas</Label>
+                          <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Verkoop notas..." rows={1} className="bg-gray-900/40 border-gray-700/50 text-white text-xs placeholder:text-gray-600 resize-none" />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-400 mb-1.5 block">Afslag</Label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {[0, 5, 10, 20, 50].map((percentage) => (
+                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className={`h-7 text-xs px-2.5 ${discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400 hover:text-white"}`}>{percentage === 0 ? "Geen" : `${percentage}%`}</Button>
+                            ))}
+                            <div className="flex items-center gap-1 ml-1">
+                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
+                              <span className="text-xs text-gray-500">%</span>
                             </div>
                           </div>
-
-                          {/* Open Account Selection */}
-                          {checkoutOption === 'add-to-account' && (
-                            <div>
-                              <Label className="text-white">Kies Oop Rekening</Label>
-                              <Select 
-                                value={selectedOpenAccountId?.toString() || ""} 
-                                onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Kies 'n oop rekening" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {openAccounts.map((account) => (
-                                    <SelectItem key={account.id} value={account.id.toString()}>
-                                      <div className="flex flex-col">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-medium">{account.accountName}</span>
-                                          <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="text-xs">
-                                            {account.accountType === 'table' ? 'Tafel' : 'Klient'}
-                                          </Badge>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                                          <span>Huidig: R{account.total}</span>
-                                          <span>•</span>
-                                          <span>{Array.isArray(account.items) ? account.items.length : 0} items</span>
-                                        </div>
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          )}
-                          {/* Checkout Button */}
-                          <Button
-                            className="w-full h-12 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold"
-                            onClick={() => checkoutMutation.mutate()}
-                            disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}
-                          >
-                            {checkoutOption === 'complete' ? (
-                              <>
-                                <Receipt className="h-4 w-4 mr-2" />
-                                {checkoutMutation.isPending ? "Verwerk..." : "Voltooi Verkoop"}
-                              </>
-                            ) : checkoutOption === 'open-account' ? (
-                              <>
-                                <FileText className="h-4 w-4 mr-2" />
-                                {checkoutMutation.isPending ? "Verwerk..." : "Skep Oop Rekening"}
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="h-4 w-4 mr-2" />
-                                {checkoutMutation.isPending ? "Verwerk..." : "Voeg by Rekening"}
-                              </>
-                            )}
-                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-gray-400">Fooi op kwitansie</Label>
+                          <button type="button" onClick={() => setTipOptionEnabled(!tipOptionEnabled)} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${tipOptionEnabled ? 'bg-[hsl(217,90%,40%)]' : 'bg-gray-600'}`}>
+                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${tipOptionEnabled ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+                          </button>
                         </div>
                       </div>
+                      <div className="pt-3 border-t border-gray-700/30 space-y-1.5">
+                        <div className="flex justify-between text-sm"><span className="text-gray-400">Subtotaal</span><span className="text-white">R{calculateSubtotal().toFixed(2)}</span></div>
+                        {discountPercentage > 0 && <div className="flex justify-between text-sm text-green-400"><span>Afslag ({discountPercentage}%)</span><span>-R{calculateDiscount().toFixed(2)}</span></div>}
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-600/30">
+                          <span className="text-base font-bold text-white">Totaal</span>
+                          <span className="text-xl font-bold text-[hsl(217,90%,50%)]">R{calculateTotal()}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                        <div className="flex gap-1.5">
+                          <Button type="button" size="sm" variant={checkoutOption === 'complete' ? "default" : "outline"} onClick={() => setCheckoutOption('complete')} className={`flex-1 h-8 text-xs ${checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400"}`}><Receipt className="h-3.5 w-3.5 mr-1.5" />Voltooi</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption('open-account')} className={`flex-1 h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400"}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Oop Rek</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption('add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400"}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Voeg By</Button>
+                        </div>
+                        {checkoutOption === 'add-to-account' && (
+                          <div>
+                            <Label className="text-xs text-gray-400 mb-1 block">Kies Oop Rekening</Label>
+                            <Select value={selectedOpenAccountId?.toString() || ""} onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}>
+                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="Kies 'n oop rekening" /></SelectTrigger>
+                              <SelectContent>
+                                {openAccounts.map((account) => (
+                                  <SelectItem key={account.id} value={account.id.toString()}>
+                                    <div className="flex flex-col">
+                                      <div className="flex items-center gap-2"><span className="font-medium">{account.accountName}</span><Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="text-xs">{account.accountType === 'table' ? 'Tafel' : 'Klient'}</Badge></div>
+                                      <div className="flex items-center gap-2 text-xs text-gray-500"><span>Huidig: R{account.total}</span><span>·</span><span>{Array.isArray(account.items) ? account.items.length : 0} items</span></div>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                        <Button className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-lg shadow-blue-900/30" onClick={() => checkoutMutation.mutate()} disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}>
+                          {checkoutOption === 'complete' ? (<><Receipt className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Voltooi Verkoop"}</>) : checkoutOption === 'open-account' ? (<><FileText className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Skep Oop Rekening"}</>) : (<><Plus className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Voeg by Rekening"}</>)}
+                        </Button>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </TabsContent>
 
