@@ -3809,7 +3809,10 @@ export default function PosSystem() {
                         </div>
                       )}
                     </div>
-                    <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-280px)] overflow-y-auto">
+                    <div className="px-5 py-3 border-b border-gray-700/20">
+                      <p className="text-sm font-medium text-gray-400">Choose a product to start selling</p>
+                    </div>
+                    <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-320px)] overflow-y-auto">
                       {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                           <div onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group">
