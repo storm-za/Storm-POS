@@ -1550,7 +1550,7 @@ export default function PosSystemAfrikaans() {
 
   const handleSaveSupplier = () => {
     if (!poSupplierName) { toast({ title: "Fout", description: "Verskaffer naam is verpligtend om te stoor", variant: "destructive" }); return; }
-    saveSupplierMutation.mutate({ userId: posUser?.id, name: poSupplierName, email: poSupplierEmail || null, phone: poSupplierPhone || null, address: poSupplierAddress || null });
+    saveSupplierMutation.mutate({ userId: currentUser?.id, name: poSupplierName, email: poSupplierEmail || null, phone: poSupplierPhone || null, address: poSupplierAddress || null });
   };
 
   const loadSupplier = (supplier: any) => {
@@ -1592,7 +1592,7 @@ export default function PosSystemAfrikaans() {
     const taxAmount = subtotal * (poTaxPercent / 100);
     const total = subtotal + taxAmount + poShippingAmount;
     const poData = {
-      userId: posUser?.id, supplierName: poSupplierName, supplierEmail: poSupplierEmail || null,
+      userId: currentUser?.id, supplierName: poSupplierName, supplierEmail: poSupplierEmail || null,
       supplierPhone: poSupplierPhone || null, supplierAddress: poSupplierAddress || null,
       items: poItems.map((item: any) => ({ ...item, lineTotal: item.costPrice * item.quantity, receivedQty: item.receivedQty || 0 })),
       subtotal, taxPercent: poTaxPercent, shippingAmount: poShippingAmount, total,
@@ -1632,9 +1632,9 @@ export default function PosSystemAfrikaans() {
     doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, 150, 30);
     doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 37);
     if (po.expectedDate) doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 44);
-    if (posUser?.companyName) {
+    if (currentUser?.companyName) {
       doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text("VAN:", 20, 60); doc.setFont("helvetica", "normal"); doc.text(posUser.companyName, 20, 67);
+      doc.text("VAN:", 20, 60); doc.setFont("helvetica", "normal"); doc.text(currentUser.companyName, 20, 67);
     }
     doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont("helvetica", "bold");
     doc.text("VERSKAFFER:", 120, 60); doc.setFont("helvetica", "normal"); doc.setTextColor(200, 200, 200);
