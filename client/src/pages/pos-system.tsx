@@ -3632,7 +3632,7 @@ export default function PosSystem() {
       <div className="flex min-h-screen relative z-10">
         <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-64 flex-col bg-gradient-to-b from-gray-900 to-[hsl(217,30%,8%)] border-r border-gray-700/50 z-40">
           <div className="p-5 border-b border-gray-700/30">
-            <img src={stormLogo} alt="Storm POS" className="h-12 w-auto" />
+            <img src={stormLogo} alt="Storm POS" className="h-36 w-auto" />
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {[
