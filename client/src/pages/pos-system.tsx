@@ -5121,7 +5121,7 @@ export default function PosSystem() {
                     Open Accounts
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent className="pt-6 bg-black">
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
                       <div className="text-center py-8 text-gray-400">
