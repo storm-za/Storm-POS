@@ -3809,8 +3809,9 @@ export default function PosSystem() {
                         </div>
                       )}
                     </div>
-                    <div className="px-5 py-3 border-b border-gray-700/20">
-                      <p className="text-sm font-medium text-gray-400">Choose a product to start selling</p>
+                    <div className="px-5 py-4 border-b border-[hsl(217,90%,40%)]/20 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 to-transparent">
+                      <h2 className="text-2xl font-bold text-white tracking-tight" style={{ fontSize: '35px', lineHeight: '1.2' }}>Choose a product to start selling</h2>
+                      <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
                     <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-320px)] overflow-y-auto">
                       {salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
