@@ -4743,7 +4743,7 @@ export default function PosSystem() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 bg-black">
                 <div className="space-y-4">
                   {customers.map((customer) => (
                     <motion.div 
