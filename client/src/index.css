@@ -53,6 +53,29 @@
   --radius: 0.5rem;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(217, 90%, 40%) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: hsl(217, 90%, 40%);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(217, 90%, 50%);
+}
+
 @layer base {
   * {
     @apply border-border;
