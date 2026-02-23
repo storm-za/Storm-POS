@@ -4566,6 +4566,15 @@ export default function PosSystem() {
                               <Package className="w-8 h-8 text-gray-500" />
                             </div>
                             <p className="text-gray-400">{productSearchTerm ? 'No products found matching your search.' : 'No products available.'}</p>
+                            {!productSearchTerm && (
+                              <Button
+                                onClick={() => openProductDialog()}
+                                className="mt-2 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                              >
+                                <PlusCircle className="w-4 h-4 mr-2" />
+                                Add Product
+                              </Button>
+                            )}
                           </div>
                         </motion.div>
                       ) : (
