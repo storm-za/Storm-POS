@@ -4028,7 +4028,7 @@ ${dateFilteredSales.map(sale =>
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6 px-3 sm:px-6">
+              <CardContent className="pt-6 px-3 sm:px-6 bg-[#000000]">
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
                   <div className="flex flex-col gap-3">
