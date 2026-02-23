@@ -4971,7 +4971,7 @@ export default function PosSystem() {
                           setInvoiceDateTo("");
                           setInvoiceSortOrder('date-desc');
                         }}
-                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 w-full"
+                        className="border-blue-500/30 hover:bg-blue-500/20 hover:text-blue-200 w-full bg-[#00000033] text-[#ffffff]"
                         data-testid="button-clear-filters"
                       >
                         <X className="w-4 h-4 mr-1" />
