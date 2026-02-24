@@ -137,7 +137,7 @@ export default function PosSystem() {
   useEffect(() => {
     const frame = requestAnimationFrame(handleProductScroll);
     return () => cancelAnimationFrame(frame);
-  }, [handleProductScroll, products]);
+  }, [handleProductScroll]);
   const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
