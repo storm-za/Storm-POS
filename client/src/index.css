@@ -183,4 +183,24 @@
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Hide custom scrollbars on mobile — browser native overlay indicators
+     (shown only while scrolling) will take over automatically */
+  * {
+    scrollbar-width: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  *::-webkit-scrollbar-track {
+    display: none !important;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
 }
