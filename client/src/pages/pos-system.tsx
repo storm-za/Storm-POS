@@ -3629,7 +3629,7 @@ export default function PosSystem() {
           </motion.div>
         </>
       )}
-      <div className="flex min-h-screen relative z-10">
+      <div className="flex min-h-screen relative z-10 pos-mobile-safe">
         <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
           <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
             <img src={stormLogo} alt="Storm POS" className={`transition-all duration-300 ${sidebarCollapsed ? 'h-8 w-auto' : 'h-12 w-auto'}`} />
@@ -3813,13 +3813,14 @@ export default function PosSystem() {
 
         <main className={`flex-1 min-h-screen transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <div className="md:hidden flex items-center gap-3 p-4 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50 sticky top-0 z-30">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10">
-              <Menu className="h-5 w-5" />
+            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 touch-action-manipulation">
+              <Menu className="h-6 w-6" />
             </button>
-            <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
+            <img src={stormLogo} alt="Storm POS" className="h-7 w-auto" />
+            <span className="text-white text-sm font-semibold ml-auto capitalize">{currentTab === 'sales' ? 'Sales' : currentTab === 'products' ? 'Products' : currentTab === 'customers' ? 'Customers' : currentTab === 'invoices' ? 'Invoices' : currentTab === 'purchase-orders' ? 'Purchase Orders' : currentTab === 'open-accounts' ? 'Open Accounts' : currentTab === 'reports' ? 'Reports' : currentTab === 'usage' ? 'Usage' : 'Settings'}</span>
           </div>
 
-          <div className="px-4 sm:px-6 lg:px-8 py-6">
+          <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
 
           {/* Sales Tab */}
@@ -3828,7 +3829,7 @@ export default function PosSystem() {
               <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
                 <div className="flex flex-col lg:flex-row">
                   <div className="flex-1 lg:border-r border-gray-700/30">
-                    <div className="px-5 py-4 border-b border-gray-700/30 bg-gray-800/30">
+                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-gray-800/30">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15">
@@ -3842,7 +3843,7 @@ export default function PosSystem() {
                         <div className="flex items-center gap-2 flex-wrap">
                           {categories.length > 0 && (
                             <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
-                              <SelectTrigger className="w-[110px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="w-[100px] sm:w-[110px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Grid</span></SelectItem>
                                 <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Tabs</span></SelectItem>
@@ -3850,7 +3851,7 @@ export default function PosSystem() {
                             </Select>
                           )}
                           <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
-                            <SelectTrigger className="w-[130px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="w-[115px] sm:w-[130px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="name-asc">Name A-Z</SelectItem>
                               <SelectItem value="name-desc">Name Z-A</SelectItem>
@@ -3880,11 +3881,11 @@ export default function PosSystem() {
                         </div>
                       )}
                     </div>
-                    <div className="px-5 py-4 border-b border-[hsl(217,90%,40%)]/20 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 to-transparent">
-                      <h2 className="text-2xl font-bold text-white tracking-tight" style={{ fontSize: '35px', lineHeight: '1.2' }}>Choose a product to start selling</h2>
+                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-[hsl(217,90%,40%)]/20 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 to-transparent">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight md:text-[35px] md:leading-[1.2]">Choose a product to start selling</h2>
                       <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
-                    <div data-testid="product-selection-card" className="p-4 max-h-[calc(100vh-320px)] overflow-y-auto">
+                    <div data-testid="product-selection-card" className="p-2 sm:p-4 max-h-[50vh] lg:max-h-[calc(100vh-320px)] overflow-y-auto">
                       {products.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
                           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
@@ -3973,8 +3974,8 @@ export default function PosSystem() {
                       )}
                     </div>
                   </div>
-                  <div data-testid="current-sale-card" className="lg:w-[420px] xl:w-[460px] flex-shrink-0 bg-[hsl(217,20%,11%)]/60 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
-                    <div className="px-5 py-4 border-b border-gray-700/30 bg-[hsl(217,25%,13%)]/50">
+                  <div data-testid="current-sale-card" className="w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 bg-[hsl(217,20%,11%)]/60 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
+                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-[hsl(217,25%,13%)]/50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
@@ -3986,8 +3987,8 @@ export default function PosSystem() {
                         {currentSale.length > 0 && <span className="text-lg font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>}
                       </div>
                     </div>
-                    <div className="p-4 space-y-4">
-                      <div className="space-y-2 max-h-52 overflow-y-auto">
+                    <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+                      <div className="space-y-2 max-h-40 sm:max-h-52 overflow-y-auto">
                         {currentSale.length === 0 ? (
                           <div className="text-center py-8 text-gray-500"><ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Tap a product to start</p></div>
                         ) : currentSale.map((item) => (
@@ -3997,10 +3998,10 @@ export default function PosSystem() {
                               <p className="text-xs text-gray-500">R{item.price} × {item.quantity} = R{(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
                             </div>
                             <div className="flex items-center gap-1">
-                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
                               <span className="w-7 text-center text-white text-sm font-medium">{item.quantity}</span>
-                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
-                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 ml-1" onClick={() => updateQuantity(item.productId, 0)}><Trash2 className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 ml-1" onClick={() => updateQuantity(item.productId, 0)}><Trash2 className="h-3 w-3" /></Button>
                             </div>
                           </div>
                         ))}
@@ -4055,12 +4056,12 @@ export default function PosSystem() {
                         </div>
                         <div>
                           <Label className="text-xs text-gray-400 mb-1.5 block">Discount</Label>
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-1.5 touch-action-manipulation">
                             {[0, 5, 10, 20, 50].map((percentage) => (
-                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent rounded-md h-7 text-xs px-2.5 border-gray-700/50 hover:text-white text-[#000000]">{percentage === 0 ? "None" : `${percentage}%`}</Button>
+                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent rounded-md h-9 sm:h-7 text-xs px-3 sm:px-2.5 border-gray-700/50 hover:text-white text-[#000000]">{percentage === 0 ? "None" : `${percentage}%`}</Button>
                             ))}
                             <div className="flex items-center gap-1 ml-1">
-                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
+                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-9 sm:h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
                               <span className="text-xs text-gray-500">%</span>
                             </div>
                           </div>
@@ -4082,9 +4083,9 @@ export default function PosSystem() {
                       </div>
                       <div className="space-y-3 pt-3 border-t border-gray-700/30">
                         <div className="flex gap-1.5">
-                          <Button type="button" size="sm" variant={checkoutOption === 'complete' ? "default" : "outline"} onClick={() => setCheckoutOption('complete')} className={`flex-1 h-8 text-xs ${checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400"}`}><Receipt className="h-3.5 w-3.5 mr-1.5" />Complete</Button>
-                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption('open-account')} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md px-3 flex-1 h-8 text-xs border-gray-700/50 text-[#000000]"><FileText className="h-3.5 w-3.5 mr-1.5" />Open Acc</Button>
-                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption('add-to-account')} disabled={openAccounts.length === 0} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md px-3 flex-1 h-8 text-xs border-gray-700/50 text-[#000000]"><Plus className="h-3.5 w-3.5 mr-1.5" />Add to Acc</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'complete' ? "default" : "outline"} onClick={() => setCheckoutOption('complete')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'complete' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400"}`}><Receipt className="h-3.5 w-3.5 mr-1.5" />Complete</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption('open-account')} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md px-3 flex-1 h-10 sm:h-8 text-xs border-gray-700/50 text-[#000000]"><FileText className="h-3.5 w-3.5 mr-1.5" />Open Acc</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption('add-to-account')} disabled={openAccounts.length === 0} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md px-3 flex-1 h-10 sm:h-8 text-xs border-gray-700/50 text-[#000000]"><Plus className="h-3.5 w-3.5 mr-1.5" />Add to Acc</Button>
                         </div>
                         {checkoutOption === 'add-to-account' && (
                           <div>
@@ -4104,7 +4105,7 @@ export default function PosSystem() {
                             </Select>
                           </div>
                         )}
-                        <Button className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-lg shadow-blue-900/30" onClick={() => checkoutMutation.mutate()} disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}>
+                        <Button className="w-full h-12 sm:h-10 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-lg shadow-blue-900/30" onClick={() => checkoutMutation.mutate()} disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}>
                           {checkoutOption === 'complete' ? (<><Receipt className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Processing..." : "Complete Sale"}</>) : checkoutOption === 'open-account' ? (<><FileText className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Processing..." : "Create Open Account"}</>) : (<><Plus className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Processing..." : "Add to Account"}</>)}
                         </Button>
                       </div>
@@ -4124,7 +4125,7 @@ export default function PosSystem() {
               className="space-y-6"
             >
               {/* Summary Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -4220,7 +4221,7 @@ export default function PosSystem() {
                         <p className="text-gray-400 text-sm">Manage your product catalog</p>
                       </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
@@ -4392,7 +4393,7 @@ export default function PosSystem() {
                             }} 
                             className="px-6 py-5 space-y-5"
                           >
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <FormField
                                 control={productForm.control}
                                 name="sku"
@@ -4463,7 +4464,7 @@ export default function PosSystem() {
                                 <span className="text-sm font-medium text-gray-300">Pricing</span>
                                 <div className="flex-1 h-px bg-gray-700/50"></div>
                               </div>
-                              <div className="grid grid-cols-3 gap-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <FormField
                                   control={productForm.control}
                                   name="costPrice"
