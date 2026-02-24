@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -123,6 +123,21 @@ export default function PosSystem() {
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("sales");
+  const productListRef = useRef<HTMLDivElement>(null);
+  const [productScrollThumb, setProductScrollThumb] = useState({ top: 0, height: 100 });
+  const handleProductScroll = useCallback(() => {
+    const el = productListRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const maxScroll = scrollHeight - clientHeight;
+    const thumbH = Math.max(16, (clientHeight / scrollHeight) * clientHeight);
+    const thumbTop = maxScroll > 0 ? (scrollTop / maxScroll) * (clientHeight - thumbH) : 0;
+    setProductScrollThumb({ top: thumbTop, height: thumbH });
+  }, []);
+  useEffect(() => {
+    const frame = requestAnimationFrame(handleProductScroll);
+    return () => cancelAnimationFrame(frame);
+  }, [handleProductScroll, products]);
   const [voidSaleDialog, setVoidSaleDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [voidReason, setVoidReason] = useState("");
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
@@ -3885,7 +3900,14 @@ export default function PosSystem() {
                       <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight md:text-[35px] md:leading-[1.2]">Choose a product to start selling</h2>
                       <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
-                    <div data-testid="product-selection-card" className="p-2 sm:p-4 max-h-[50vh] lg:max-h-[calc(100vh-320px)] overflow-y-auto mobile-product-scroll">
+                    <div className="relative">
+                    <div
+                      data-testid="product-selection-card"
+                      ref={productListRef}
+                      onScroll={handleProductScroll}
+                      className="p-2 sm:p-4 max-h-[50vh] lg:max-h-[calc(100vh-320px)] overflow-y-auto pr-4 sm:pr-5"
+                    >
+
                       {products.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
                           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
@@ -3972,6 +3994,16 @@ export default function PosSystem() {
                           ))}
                         </div>
                       )}
+                    </div>
+                    <div
+                      className="md:hidden absolute right-1 top-1 bottom-1 w-[5px] rounded-full overflow-hidden"
+                      style={{ pointerEvents: 'none', background: 'rgba(255,255,255,0.07)' }}
+                    >
+                      <div
+                        className="absolute w-full bg-[hsl(217,90%,40%)] rounded-full"
+                        style={{ top: `${productScrollThumb.top}px`, height: `${productScrollThumb.height}px` }}
+                      />
+                    </div>
                     </div>
                   </div>
                   <div data-testid="current-sale-card" className="w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 bg-[hsl(217,20%,11%)]/60 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
