@@ -3000,13 +3000,13 @@ ${dateFilteredSales.map(sale =>
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-gray-900 to-[hsl(217,30%,8%)] border-r border-gray-700/50 z-50 shadow-2xl flex flex-col"
+            className="fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-gray-200 z-50 shadow-2xl flex flex-col"
           >
-            <div className="flex items-center justify-between p-4 border-b border-gray-700/30">
-              <img src={stormLogo} alt="Storm POS" className="h-10 w-auto" />
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <img src={stormLogo} alt="Storm POS" className="h-12 w-auto" />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10"
+                className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
                 data-testid="button-close-mobile-menu-af"
               >
                 <X className="h-5 w-5" />
@@ -3032,8 +3032,8 @@ ${dateFilteredSales.map(sale =>
                   }}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all duration-200 ${
                     currentTab === item.id
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/50"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                   data-testid={`menu-item-${item.id}-af`}
                 >
@@ -3043,7 +3043,7 @@ ${dateFilteredSales.map(sale =>
                 </button>
               ))}
             </nav>
-            <div className="p-3 border-t border-gray-700/30 space-y-2">
+            <div className="p-3 border-t border-gray-100 space-y-2">
               <div className="flex items-center gap-3 px-3 py-2.5">
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
                   {currentUser?.companyLogo ? (
@@ -3053,8 +3053,8 @@ ${dateFilteredSales.map(sale =>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <span className="text-xs text-gray-500 leading-tight block">Aangemeld as</span>
-                  <span className="text-sm font-semibold text-white leading-tight truncate block">{currentStaff ? currentStaff.username : 'Kies Gebruiker'}</span>
+                  <span className="text-xs text-gray-400 leading-tight block">Aangemeld as</span>
+                  <span className="text-sm font-semibold text-gray-900 leading-tight truncate block">{currentStaff ? currentStaff.username : 'Kies Gebruiker'}</span>
                 </div>
               </div>
               <button
@@ -3062,7 +3062,7 @@ ${dateFilteredSales.map(sale =>
                   setIsMobileMenuOpen(false);
                   setIsLogoutDialogOpen(true);
                 }}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-all"
                 data-testid="menu-item-logout-af"
               >
                 <LogOut className="h-5 w-5" />
@@ -3255,12 +3255,12 @@ ${dateFilteredSales.map(sale =>
         </aside>
 
         <main className={`flex-1 min-h-screen transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
-          <div className="md:hidden flex items-center gap-3 p-4 bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50 sticky top-0 z-30">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 touch-action-manipulation">
+          <div className="md:hidden flex items-center gap-3 px-3 py-3 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation">
               <Menu className="h-6 w-6" />
             </button>
-            <img src={stormLogo} alt="Storm POS" className="h-7 w-auto" />
-            <span className="text-white text-sm font-semibold ml-auto capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
+            <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
+            <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
           </div>
 
           <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6">
