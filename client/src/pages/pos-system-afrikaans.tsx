@@ -3254,7 +3254,7 @@ ${dateFilteredSales.map(sale =>
           </button>
         </aside>
 
-        <main className={`flex-1 min-h-screen transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
+        <main className={`flex-1 min-h-screen min-w-0 overflow-x-hidden w-full transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
           <div className="md:hidden flex items-center gap-3 px-3 py-3 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation">
               <Menu className="h-6 w-6" />
@@ -3263,30 +3263,30 @@ ${dateFilteredSales.map(sale =>
             <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
           </div>
 
-          <div className="px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6">
+          <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
 
           {/* Sales Tab */}
           <TabsContent value="verkope">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-              <div className="bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
-                <div className="flex flex-col lg:flex-row">
-                  <div className="flex-1 lg:border-r border-gray-700/30">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="w-full">
+              <div className="w-full bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+                <div className="flex flex-col lg:flex-row w-full">
+                  <div className="flex-1 min-w-0 lg:border-r border-gray-700/30">
                     <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-gray-800/30">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15">
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 flex-shrink-0">
                             <Package className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <h3 className="text-sm font-semibold text-white">Produkte</h3>
                             <p className="text-xs text-gray-500">{products.length} beskikbaar</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           {categories.length > 0 && (
                             <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
-                              <SelectTrigger className="w-[100px] sm:w-[120px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="w-[90px] sm:w-[120px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Rooster</span></SelectItem>
                                 <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Oortjies</span></SelectItem>
@@ -3294,7 +3294,7 @@ ${dateFilteredSales.map(sale =>
                             </Select>
                           )}
                           <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
-                            <SelectTrigger className="w-[115px] sm:w-[140px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="w-[100px] sm:w-[140px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="name-asc">Naam A-Z</SelectItem>
                               <SelectItem value="name-desc">Naam Z-A</SelectItem>
