@@ -3328,7 +3328,7 @@ ${dateFilteredSales.map(sale =>
                       <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
                       <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
-                    <div data-testid="product-selection-card" className="p-2 sm:p-4 max-h-[50vh] lg:max-h-[calc(100vh-320px)] overflow-y-auto">
+                    <div data-testid="product-selection-card" className="p-2 sm:p-4 max-h-[50vh] lg:max-h-[calc(100vh-320px)] overflow-y-auto mobile-product-scroll">
                       {products.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
                           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">

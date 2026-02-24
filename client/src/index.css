@@ -203,4 +203,34 @@
   *::-webkit-scrollbar-thumb {
     display: none !important;
   }
+
+  /* Exception: product list in sales tab — always show a visible blue scrollbar
+     so users know they can scroll to see more products */
+  .mobile-product-scroll {
+    scrollbar-width: thin !important;
+    scrollbar-color: hsl(217, 90%, 40%) rgba(255,255,255,0.08) !important;
+  }
+
+  .mobile-product-scroll::-webkit-scrollbar {
+    display: block !important;
+    width: 5px !important;
+    height: 5px !important;
+  }
+
+  .mobile-product-scroll::-webkit-scrollbar-track {
+    display: block !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-radius: 10px !important;
+  }
+
+  .mobile-product-scroll::-webkit-scrollbar-thumb {
+    display: block !important;
+    background: hsl(217, 90%, 40%) !important;
+    border-radius: 10px !important;
+    min-height: 40px !important;
+  }
+
+  .mobile-product-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(217, 90%, 50%) !important;
+  }
 }
