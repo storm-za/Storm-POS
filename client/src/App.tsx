@@ -10,8 +10,6 @@ import POS from "@/pages/pos";
 import PosLogin from "@/pages/pos-login";
 import PosSignup from "@/pages/pos-signup";
 import PosSignupSuccess from "@/pages/pos-signup-success";
-import PosSystem from "@/pages/pos-system";
-import PosSystemAfrikaans from "@/pages/pos-system-afrikaans";
 import PosInactive from "@/pages/pos-inactive";
 import { HelpCenter } from "@/pages/HelpCenter";
 import { HelpCenterAfrikaans } from "@/pages/HelpCenterAfrikaans";
@@ -19,13 +17,15 @@ import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Contact from "@/pages/contact";
 import Navigation from "@/components/navigation";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
+
+const PosSystem = lazy(() => import("@/pages/pos-system"));
+const PosSystemAfrikaans = lazy(() => import("@/pages/pos-system-afrikaans"));
 
 function Router() {
   const [location] = useLocation();
   
   useEffect(() => {
-    // Scroll to top when location changes
     window.scrollTo(0, 0);
   }, [location]);
 
@@ -41,8 +41,20 @@ function Router() {
         <Route path="/pos/login" component={PosLogin} />
         <Route path="/pos/signup" component={PosSignup} />
         <Route path="/pos/signup/success" component={PosSignupSuccess} />
-        <Route path="/pos/system" component={PosSystem} />
-        <Route path="/pos/system/afrikaans" component={PosSystemAfrikaans} />
+        <Route path="/pos/system">
+          {() => (
+            <Suspense fallback={<div className="flex items-center justify-center h-screen bg-gray-950 text-white">Loading...</div>}>
+              <PosSystem />
+            </Suspense>
+          )}
+        </Route>
+        <Route path="/pos/system/afrikaans">
+          {() => (
+            <Suspense fallback={<div className="flex items-center justify-center h-screen bg-gray-950 text-white">Loading...</div>}>
+              <PosSystemAfrikaans />
+            </Suspense>
+          )}
+        </Route>
         <Route path="/pos/inactive" component={PosInactive} />
         <Route path="/pos/help" component={HelpCenter} />
         <Route path="/pos/help/afrikaans" component={HelpCenterAfrikaans} />

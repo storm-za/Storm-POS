@@ -2,21 +2,6 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Capture exit reason for debugging
-const _origExit = process.exit.bind(process);
-(process as any).exit = (code?: number) => {
-  console.error(`[EXIT] process.exit(${code}) called`);
-  const stack = new Error("exit stack trace").stack;
-  console.error(stack);
-  _origExit(code as never);
-};
-process.on("uncaughtException", (err) => {
-  console.error("[UNCAUGHT EXCEPTION]", err);
-});
-process.on("unhandledRejection", (reason) => {
-  console.error("[UNHANDLED REJECTION]", reason);
-});
-
 const app = express();
 app.use(express.json({ limit: '10mb' })); // Increase limit for logo uploads
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
