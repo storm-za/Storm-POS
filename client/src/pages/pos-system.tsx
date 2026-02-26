@@ -5966,22 +5966,22 @@ export default function PosSystem() {
                   )}
                   
                   {/* Header */}
-                  <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-6 text-white">
-                    <div className="flex items-center justify-between">
+                  <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-5 text-white">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <h2 className="text-2xl font-bold">Usage & Billing</h2>
-                        <p className="text-blue-100 mt-1">{formatMonthYear(now)} billing period</p>
+                        <h2 className="text-xl sm:text-2xl font-bold">Usage & Billing</h2>
+                        <p className="text-blue-100 mt-1 text-sm">{formatMonthYear(now)} billing period</p>
                       </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-bold">R{stormFee.toFixed(2)}</div>
+                      <div className="sm:text-right">
+                        <div className="text-2xl sm:text-3xl font-bold">R{stormFee.toFixed(2)}</div>
                         <div className="text-blue-100 text-sm">Amount due to Storm</div>
                         <Button
                           onClick={() => setIsBankDetailsOpen(true)}
                           variant="outline"
                           size="sm"
-                          className="mt-3 bg-blue-500/20 border-blue-300 text-white hover:bg-blue-600 hover:border-blue-400 shadow-sm backdrop-blur-sm"
+                          className="mt-3 bg-blue-500/20 border-blue-300 text-white hover:bg-blue-600 hover:border-blue-400 shadow-sm backdrop-blur-sm w-full sm:w-auto"
                         >
-                          <CreditCard className="w-4 h-4 mr-2" />
+                          <CreditCard className="w-4 h-4 mr-2 shrink-0" />
                           View Payment Details
                         </Button>
                       </div>
