@@ -95,6 +95,7 @@ export const posSales = pgTable("pos_sales", {
   staffAccountId: integer("staff_account_id").references(() => posStaffAccounts.id),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   items: jsonb("items").notNull(), // Array of {productId, name, price, quantity}
+  customerId: integer("customer_id").references(() => posCustomers.id),
   customerName: text("customer_name"),
   notes: text("notes"),
   paymentType: text("payment_type").notNull(), // 'cash', 'card', 'eft'

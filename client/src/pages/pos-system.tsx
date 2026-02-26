@@ -64,6 +64,7 @@ interface Sale {
   id: number;
   total: string;
   items: SaleItem[];
+  customerId?: number;
   customerName?: string;
   notes?: string;
   paymentType: string;
@@ -123,6 +124,8 @@ export default function PosSystem() {
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("sales");
+  const [customerSpendFrom, setCustomerSpendFrom] = useState("");
+  const [customerSpendTo, setCustomerSpendTo] = useState("");
   const productListRef = useRef<HTMLDivElement>(null);
   const [productScrollThumb, setProductScrollThumb] = useState({ top: 0, height: 100 });
   const handleProductScroll = useCallback(() => {
@@ -1760,6 +1763,21 @@ export default function PosSystem() {
       }
     });
 
+  // Calculate total spend per customer within selected date range
+  const customerSpendMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    const from = customerSpendFrom ? new Date(customerSpendFrom) : null;
+    const to = customerSpendTo ? new Date(customerSpendTo + 'T23:59:59') : null;
+    for (const sale of sales) {
+      if (sale.isVoided || !sale.customerId) continue;
+      const saleDate = new Date(sale.createdAt);
+      if (from && saleDate < from) continue;
+      if (to && saleDate > to) continue;
+      map[sale.customerId] = (map[sale.customerId] || 0) + parseFloat(sale.total as string);
+    }
+    return map;
+  }, [sales, customerSpendFrom, customerSpendTo]);
+
   // Get price for product based on customer type
   const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
     if (customerType === 'trade' && product.tradePrice) {
@@ -1859,6 +1877,7 @@ export default function PosSystem() {
         const saleData = {
           total: calculateTotal(),
           items: currentSale,
+          customerId: selectedCustomerId || null,
           customerName: selectedCustomer?.name || null,
           notes: saleNotes || null,
           paymentType,
@@ -4874,8 +4893,43 @@ export default function PosSystem() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6 bg-black">
+                <div className="mb-5 p-4 bg-white/5 border border-white/10 rounded-lg">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Filter Spend by Date Range</p>
+                  <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-xs text-gray-400 w-8 shrink-0">From</label>
+                      <input
+                        type="date"
+                        value={customerSpendFrom}
+                        onChange={(e) => setCustomerSpendFrom(e.target.value)}
+                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-xs text-gray-400 w-8 shrink-0">To</label>
+                      <input
+                        type="date"
+                        value={customerSpendTo}
+                        onChange={(e) => setCustomerSpendTo(e.target.value)}
+                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                      />
+                    </div>
+                    {(customerSpendFrom || customerSpendTo) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { setCustomerSpendFrom(""); setCustomerSpendTo(""); }}
+                        className="h-8 px-2 text-gray-400 hover:text-white"
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-4">
-                  {customers.map((customer) => (
+                  {customers.map((customer) => {
+                    const spend = customerSpendMap[customer.id];
+                    return (
                     <motion.div 
                       key={customer.id} 
                       className="p-4 bg-white/5 border border-white/10 rounded-lg flex items-center justify-between hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
@@ -4883,11 +4937,16 @@ export default function PosSystem() {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-medium text-white">{customer.name}</h3>
                           <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="bg-blue-600/20 text-blue-300 border-blue-500/30">
                             {customer.customerType === 'trade' ? 'Trade' : 'Retail'}
                           </Badge>
+                          {spend !== undefined && (
+                            <Badge className="bg-green-600/20 text-green-300 border border-green-500/30 text-xs">
+                              Total Spend: R{spend.toFixed(2)}
+                            </Badge>
+                          )}
                         </div>
                         {customer.phone && <p className="text-sm text-gray-300">Phone: {customer.phone}</p>}
                         {customer.notes && <p className="text-sm text-gray-300">Notes: {customer.notes}</p>}
@@ -4911,7 +4970,7 @@ export default function PosSystem() {
                         </Button>
                       </div>
                     </motion.div>
-                  ))}
+                  ); })}
                   {customers.length === 0 && (
                     <div className="text-center py-8 text-gray-400">
                       No customers found. Add your first customer to get started.

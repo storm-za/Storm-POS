@@ -64,6 +64,7 @@ interface Sale {
   id: number;
   total: string;
   items: SaleItem[];
+  customerId?: number;
   customerName?: string;
   notes?: string;
   paymentType: string;
@@ -133,6 +134,8 @@ export default function PosSystemAfrikaans() {
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
   const [currentTab, setCurrentTab] = useState("verkope");
+  const [customerSpendFrom, setCustomerSpendFrom] = useState("");
+  const [customerSpendTo, setCustomerSpendTo] = useState("");
   const productListRef = useRef<HTMLDivElement>(null);
   const [productScrollThumb, setProductScrollThumb] = useState({ top: 0, height: 100 });
   const handleProductScroll = useCallback(() => {
@@ -2187,6 +2190,7 @@ export default function PosSystemAfrikaans() {
         const saleData = {
           total: calculateTotal(),
           items: currentSale,
+          customerId: selectedCustomerId || null,
           customerName: selectedCustomer?.name || null,
           notes: saleNotes || null,
           paymentType,
@@ -2935,6 +2939,21 @@ ${dateFilteredSales.map(sale =>
         default: return 0;
       }
     });
+
+  // Calculate total spend per customer within selected date range
+  const customerSpendMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    const from = customerSpendFrom ? new Date(customerSpendFrom) : null;
+    const to = customerSpendTo ? new Date(customerSpendTo + 'T23:59:59') : null;
+    for (const sale of sales) {
+      if (sale.isVoided || !sale.customerId) continue;
+      const saleDate = new Date(sale.createdAt);
+      if (from && saleDate < from) continue;
+      if (to && saleDate > to) continue;
+      map[sale.customerId] = (map[sale.customerId] || 0) + parseFloat(sale.total as string);
+    }
+    return map;
+  }, [sales, customerSpendFrom, customerSpendTo]);
 
   // Calculate monthly usage
   const currentDate = new Date();
@@ -4047,15 +4066,55 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-5 p-4 bg-white/5 border border-white/10 rounded-lg">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Filter Besteding op Datumreeks</p>
+                  <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-xs text-gray-400 w-8 shrink-0">Van</label>
+                      <input
+                        type="date"
+                        value={customerSpendFrom}
+                        onChange={(e) => setCustomerSpendFrom(e.target.value)}
+                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <label className="text-xs text-gray-400 w-8 shrink-0">Tot</label>
+                      <input
+                        type="date"
+                        value={customerSpendTo}
+                        onChange={(e) => setCustomerSpendTo(e.target.value)}
+                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                      />
+                    </div>
+                    {(customerSpendFrom || customerSpendTo) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { setCustomerSpendFrom(""); setCustomerSpendTo(""); }}
+                        className="h-8 px-2 text-gray-400 hover:text-white"
+                      >
+                        Vee Uit
+                      </Button>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-4">
-                  {customers.map((customer) => (
+                  {customers.map((customer) => {
+                    const spend = customerSpendMap[customer.id];
+                    return (
                     <div key={customer.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-gray-700/30">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-white">{customer.name}</h3>
                           <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs text-[#ffffff]">
                             {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
                           </Badge>
+                          {spend !== undefined && (
+                            <Badge className="bg-green-600/20 text-green-300 border border-green-500/30 text-xs">
+                              Totale Besteding: R{spend.toFixed(2)}
+                            </Badge>
+                          )}
                         </div>
                         {customer.phone && <p className="text-sm text-gray-400">Telefoon: {customer.phone}</p>}
                         {customer.notes && <p className="text-sm text-gray-400 italic">{customer.notes}</p>}
@@ -4077,7 +4136,7 @@ ${dateFilteredSales.map(sale =>
                         </Button>
                       </div>
                     </div>
-                  ))}
+                  ); })}
                 </div>
               </CardContent>
             </Card>
