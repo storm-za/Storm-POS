@@ -4075,7 +4075,8 @@ ${dateFilteredSales.map(sale =>
                         type="date"
                         value={customerSpendFrom}
                         onChange={(e) => setCustomerSpendFrom(e.target.value)}
-                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                        style={{ colorScheme: 'dark' }}
+                        className="flex-1 h-8 rounded-md bg-gray-900 border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
                       />
                     </div>
                     <div className="flex items-center gap-2 flex-1">
@@ -4084,7 +4085,8 @@ ${dateFilteredSales.map(sale =>
                         type="date"
                         value={customerSpendTo}
                         onChange={(e) => setCustomerSpendTo(e.target.value)}
-                        className="flex-1 h-8 rounded-md bg-black border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                        style={{ colorScheme: 'dark' }}
+                        className="flex-1 h-8 rounded-md bg-gray-900 border border-white/20 text-white text-xs px-2 focus:outline-none focus:border-[hsl(217,90%,40%)]"
                       />
                     </div>
                     {(customerSpendFrom || customerSpendTo) && (
