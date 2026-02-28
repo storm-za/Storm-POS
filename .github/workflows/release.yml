@@ -1,0 +1,54 @@
+name: Release Storm POS Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build and publish Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Storm POS ${{ github.ref_name }}'
+          releaseBody: |
+            ## Storm POS Desktop App ${{ github.ref_name }}
+
+            Download the Windows installer below and run it to install Storm POS as a native desktop application.
+
+            **Requirements:** Windows 10/11 · Internet connection required
+
+            **After installing:** Launch Storm POS from your Start Menu or desktop shortcut. Log in with your existing Storm POS account.
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: false
