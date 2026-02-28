@@ -25,86 +25,16 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
-      - name: Install tauri-cli
-        run: cargo binstall tauri-cli --no-confirm
-
-      - name: Build Tauri app
-        run: cargo tauri build
+      - name: Build and release with Tauri Action
+        uses: tauri-apps/tauri-action@v0
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
-
-      - name: List bundle output
-        shell: pwsh
-        run: |
-          Write-Host "=== NSIS directory ==="
-          if (Test-Path "src-tauri\target\release\bundle\nsis") {
-            Get-ChildItem "src-tauri\target\release\bundle\nsis" | ForEach-Object { Write-Host $_.Name }
-          } else { Write-Host "NSIS dir not found" }
-          Write-Host "=== MSI directory ==="
-          if (Test-Path "src-tauri\target\release\bundle\msi") {
-            Get-ChildItem "src-tauri\target\release\bundle\msi" | ForEach-Object { Write-Host $_.Name }
-          } else { Write-Host "MSI dir not found" }
-
-      - name: Generate latest.json
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}"
-          $version = $tag.TrimStart('v')
-          $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-
-          $nsisDir = "src-tauri\target\release\bundle\nsis"
-          $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-
-          if (-not $exeFile) {
-            $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          }
-
-          if (-not $exeFile) {
-            Write-Host "ERROR: No installer found in $nsisDir"
-            exit 0
-          }
-
-          $exeName = $exeFile.Name
-          Write-Host "Found installer: $exeName"
-
-          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
-
-          # Try to find signature file
-          $sigFile = Get-ChildItem $nsisDir -Filter "*.sig" -ErrorAction SilentlyContinue | Select-Object -First 1
-          $signature = ""
-          if ($sigFile) {
-            $signature = (Get-Content $sigFile.FullName -Raw).Trim()
-            Write-Host "Found signature file: $($sigFile.Name)"
-          } else {
-            Write-Host "WARNING: No .sig file found — building unsigned latest.json"
-          }
-
-          $platformEntry = @{ url = $downloadUrl }
-          if ($signature -ne "") { $platformEntry.signature = $signature }
-
-          $json = @{
-            version  = $version
-            notes    = "Improvements and bug fixes."
-            pub_date = $date
-            platforms = @{
-              "windows-x86_64" = $platformEntry
-            }
-          } | ConvertTo-Json -Depth 5
-
-          $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
-          Write-Host "Generated latest.json:"
-          Get-Content "latest.json"
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Storm POS ${{ github.ref_name }}
-          body: |
+          tagName: ${{ github.ref_name }}
+          releaseName: "Storm POS ${{ github.ref_name }}"
+          releaseBody: |
             ## Storm POS Desktop App ${{ github.ref_name }}
 
             Download the Windows installer below and install Storm POS as a native desktop app — no browser needed.
@@ -114,8 +44,56 @@ jobs:
             **Already installed?** The app will notify you automatically on next launch.
 
             **First install:** Download the `.msi` or `-setup.exe` below.
-          files: |
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/nsis/*.exe
-            latest.json
-          fail_on_unmatched_files: false
+          releaseDraft: false
+          prerelease: false
+
+      - name: Generate and upload latest.json
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag.TrimStart('v')
+          $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+
+          $nsisDir = "src-tauri\target\release\bundle\nsis"
+          $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $exeFile) {
+            $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          }
+
+          if (-not $exeFile) {
+            Write-Host "No installer found — skipping latest.json"
+            exit 0
+          }
+
+          Write-Host "Found installer: $($exeFile.Name)"
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$($exeFile.Name)"
+
+          $sigFile = Get-ChildItem $nsisDir -Filter "*.sig" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $signature = ""
+          if ($sigFile) {
+            $signature = (Get-Content $sigFile.FullName -Raw).Trim()
+            Write-Host "Found signature"
+          } else {
+            Write-Host "No .sig file — unsigned latest.json"
+          }
+
+          $platformEntry = @{ url = $downloadUrl }
+          if ($signature -ne "") { $platformEntry.signature = $signature }
+
+          $json = @{
+            version  = $version
+            notes    = "Improvements and bug fixes."
+            pub_date = $date
+            platforms = @{ "windows-x86_64" = $platformEntry }
+          } | ConvertTo-Json -Depth 5
+
+          $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
+          Write-Host "Generated latest.json"
+          Get-Content "latest.json"
+
+          # Upload latest.json to the release
+          $releaseInfo = gh release view $tag --json id --jq '.id' 2>/dev/null
+          gh release upload $tag latest.json --clobber
+          Write-Host "Uploaded latest.json to release $tag"
