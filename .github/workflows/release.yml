@@ -37,46 +37,48 @@ jobs:
           releaseBody: |
             ## Storm POS Desktop App ${{ github.ref_name }}
 
-            Download the Windows installer below and install Storm POS as a native desktop app — no browser needed.
+            Download the Windows installer below — no browser needed.
 
             **Requirements:** Windows 10/11 · Internet connection required
 
-            **Already installed?** The app will notify you automatically on next launch.
-
-            **First install:** Download the `.msi` or `-setup.exe` below.
+            **Already installed?** The app will notify you on next launch if an update is available.
           releaseDraft: false
           prerelease: false
 
-      - name: Generate and upload latest.json
+      - name: Find sig files and generate latest.json
         shell: pwsh
+        continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
           $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
 
+          Write-Host "=== Searching for bundle files ==="
+          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | Select-Object FullName | ForEach-Object { Write-Host $_.FullName }
+
           $nsisDir = "src-tauri\target\release\bundle\nsis"
+
           $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exeFile) {
-            $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          }
+          if (-not $exeFile) { $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 }
 
           if (-not $exeFile) {
-            Write-Host "No installer found — skipping latest.json"
+            Write-Host "No installer found — cannot generate latest.json"
             exit 0
           }
 
-          Write-Host "Found installer: $($exeFile.Name)"
+          Write-Host "Installer: $($exeFile.Name)"
           $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$($exeFile.Name)"
 
-          $sigFile = Get-ChildItem $nsisDir -Filter "*.sig" -ErrorAction SilentlyContinue | Select-Object -First 1
+          # Search for .sig file anywhere in bundle directory
+          $sigFile = Get-ChildItem "src-tauri\target\release\bundle" -Filter "*.sig" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           $signature = ""
           if ($sigFile) {
             $signature = (Get-Content $sigFile.FullName -Raw).Trim()
-            Write-Host "Found signature"
+            Write-Host "Signature found: $($sigFile.FullName)"
           } else {
-            Write-Host "No .sig file — unsigned latest.json"
+            Write-Host "No .sig file found anywhere in bundle"
           }
 
           $platformEntry = @{ url = $downloadUrl }
@@ -90,10 +92,8 @@ jobs:
           } | ConvertTo-Json -Depth 5
 
           $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
-          Write-Host "Generated latest.json"
+          Write-Host "=== latest.json ==="
           Get-Content "latest.json"
 
-          # Upload latest.json to the release
-          $releaseInfo = gh release view $tag --json id --jq '.id' 2>/dev/null
           gh release upload $tag latest.json --clobber
-          Write-Host "Uploaded latest.json to release $tag"
+          Write-Host "Uploaded latest.json"
