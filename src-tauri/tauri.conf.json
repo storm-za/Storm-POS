@@ -4,7 +4,7 @@
   "identifier": "za.storm.pos",
   "build": {
     "frontendDist": "../dist/public",
-    "devUrl": "https://storm-pos.replit.app/pos/login",
+    "devUrl": "https://stormsoftware.co.za/pos/login",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
   },
@@ -12,7 +12,7 @@
     "windows": [
       {
         "title": "Storm POS",
-        "url": "https://storm-pos.replit.app/pos/login",
+        "url": "https://stormsoftware.co.za/pos/login",
         "width": 1280,
         "height": 800,
         "minWidth": 900,

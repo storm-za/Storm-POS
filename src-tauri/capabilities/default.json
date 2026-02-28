@@ -12,5 +12,11 @@
     "core:menu:default",
     "core:tray:default",
     "shell:allow-open"
-  ]
+  ],
+  "remote": {
+    "urls": [
+      "https://stormsoftware.co.za/**",
+      "https://storm-software.replit.app/**"
+    ]
+  }
 }
