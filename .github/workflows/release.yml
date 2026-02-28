@@ -10,7 +10,6 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
-      actions: write
 
     steps:
       - name: Checkout code
@@ -32,74 +31,73 @@ jobs:
       - name: Install tauri-cli
         run: cargo binstall tauri-cli --no-confirm
 
-      - name: Bootstrap signing key if missing
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ -z "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" ]; then
-            echo "No signing key found — generating one now..."
-            cargo binstall tauri-cli --no-confirm 2>/dev/null || true
-            cargo tauri signer generate -w /tmp/tauri.key --ci
-            PRIVATE_KEY=$(cat /tmp/tauri.key)
-            PUBLIC_KEY=$(cat /tmp/tauri.key.pub)
-            echo "Generated public key: $PUBLIC_KEY"
-            echo "Store the private key (/tmp/tauri.key content) as TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets"
-            echo "PRIVATE_KEY=$PRIVATE_KEY" >> $GITHUB_ENV
-          else
-            echo "Signing key found in secrets."
-          fi
-
       - name: Build Tauri app
         run: cargo tauri build
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
 
-      - name: Generate latest.json for auto-updater
+      - name: List bundle output
+        shell: pwsh
+        run: |
+          Write-Host "=== NSIS directory ==="
+          if (Test-Path "src-tauri\target\release\bundle\nsis") {
+            Get-ChildItem "src-tauri\target\release\bundle\nsis" | ForEach-Object { Write-Host $_.Name }
+          } else { Write-Host "NSIS dir not found" }
+          Write-Host "=== MSI directory ==="
+          if (Test-Path "src-tauri\target\release\bundle\msi") {
+            Get-ChildItem "src-tauri\target\release\bundle\msi" | ForEach-Object { Write-Host $_.Name }
+          } else { Write-Host "MSI dir not found" }
+
+      - name: Generate latest.json
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
           $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
 
-          # Find the NSIS installer and its signature
           $nsisDir = "src-tauri\target\release\bundle\nsis"
-          $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" | Where-Object { $_.Name -notlike "*setup.nsis*" } | Select-Object -First 1
-          
+          $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+
           if (-not $exeFile) {
-            Write-Host "Looking for any exe in nsis dir..."
-            $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" | Select-Object -First 1
+            $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
           }
-          
-          $sigFile = Get-ChildItem $nsisDir -Filter "*.sig" | Select-Object -First 1
 
-          if ($exeFile -and $sigFile) {
-            $exeName = $exeFile.Name
-            $signature = Get-Content $sigFile.FullName -Raw
-            $signature = $signature.Trim()
-            $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
-            
-            $json = @{
-              version = $version
-              notes = "Bug fixes and improvements."
-              pub_date = $date
-              platforms = @{
-                "windows-x86_64" = @{
-                  signature = $signature
-                  url = $downloadUrl
-                }
-              }
-            } | ConvertTo-Json -Depth 5
+          if (-not $exeFile) {
+            Write-Host "ERROR: No installer found in $nsisDir"
+            exit 0
+          }
 
-            $json | Out-File -FilePath "latest.json" -Encoding utf8
-            Write-Host "Generated latest.json:"
-            Get-Content latest.json
+          $exeName = $exeFile.Name
+          Write-Host "Found installer: $exeName"
+
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
+
+          # Try to find signature file
+          $sigFile = Get-ChildItem $nsisDir -Filter "*.sig" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $signature = ""
+          if ($sigFile) {
+            $signature = (Get-Content $sigFile.FullName -Raw).Trim()
+            Write-Host "Found signature file: $($sigFile.Name)"
           } else {
-            Write-Host "Warning: Could not find installer or signature file. Skipping latest.json."
-            Write-Host "Files in nsis dir:"
-            Get-ChildItem $nsisDir | Select-Object Name
+            Write-Host "WARNING: No .sig file found — building unsigned latest.json"
           }
+
+          $platformEntry = @{ url = $downloadUrl }
+          if ($signature -ne "") { $platformEntry.signature = $signature }
+
+          $json = @{
+            version  = $version
+            notes    = "Improvements and bug fixes."
+            pub_date = $date
+            platforms = @{
+              "windows-x86_64" = $platformEntry
+            }
+          } | ConvertTo-Json -Depth 5
+
+          $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
+          Write-Host "Generated latest.json:"
+          Get-Content "latest.json"
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
