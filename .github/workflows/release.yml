@@ -15,12 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -31,24 +25,32 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Install Node dependencies
-        run: npm ci
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
-      - name: Build and publish Tauri app
-        uses: tauri-apps/tauri-action@v0
+      - name: Install tauri-cli
+        run: cargo binstall tauri-cli --no-confirm
+
+      - name: Build Tauri app
+        run: cargo tauri build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ""
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+
+      - name: Upload installers to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'Storm POS ${{ github.ref_name }}'
-          releaseBody: |
+          tag_name: ${{ github.ref_name }}
+          name: Storm POS ${{ github.ref_name }}
+          body: |
             ## Storm POS Desktop App ${{ github.ref_name }}
 
-            Download the Windows installer below and run it to install Storm POS as a native desktop application.
+            Download the Windows installer below and install Storm POS as a native desktop application — no browser needed.
 
             **Requirements:** Windows 10/11 · Internet connection required
 
-            **After installing:** Launch Storm POS from your Start Menu or desktop shortcut. Log in with your existing Storm POS account.
-          releaseDraft: false
-          prerelease: false
-          includeUpdaterJson: false
+            **After installing:** Launch Storm POS from your Start Menu or desktop shortcut and log in with your existing account.
+          files: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
+          fail_on_unmatched_files: false
