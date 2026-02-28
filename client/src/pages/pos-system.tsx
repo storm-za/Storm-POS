@@ -3567,7 +3567,14 @@ export default function PosSystem() {
             className="bg-[#080d1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
           >
             <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
-            <div className="p-7">
+            <div className="relative p-7">
+              <button
+                onClick={() => setSaleCompleteData(null)}
+                className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-full bg-red-500/15 hover:bg-red-500/30 text-red-400 hover:text-red-300 transition-all"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
               {/* Animated checkmark */}
               <div className="flex justify-center mb-5">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 12, stiffness: 220, delay: 0.08 }} className="relative">
@@ -3612,9 +3619,6 @@ export default function PosSystem() {
                   Share
                 </Button>
               </motion.div>
-              <Button onClick={() => setSaleCompleteData(null)} variant="ghost" className="w-full h-9 text-gray-500 hover:text-gray-200 text-sm rounded-xl">
-                Close
-              </Button>
             </div>
           </motion.div>
         </motion.div>
