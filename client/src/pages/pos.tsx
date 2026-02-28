@@ -298,27 +298,26 @@ export default function POS() {
                   </Link>
                 </Button>
 
-                <Button
-                  size="lg"
-                  onClick={() => window.open('https://github.com/storm-za/Storm-POS/releases/latest', '_blank')}
-                  className="group bg-gray-900 text-white hover:bg-gray-800 border-2 border-gray-700 hover:border-gray-600 transform hover:scale-105 transition-all duration-300 px-8 py-7 text-lg font-semibold shadow-lg"
-                  data-testid="button-download-desktop"
-                >
-                  <Monitor className="w-5 h-5 mr-2 shrink-0" />
-                  Download for Windows
-                </Button>
               </motion.div>
 
-              {/* Desktop app note */}
-              <motion.p
+              {/* Desktop download — secondary link below main CTAs */}
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.85 }}
-                className="text-xs text-gray-400 flex items-center gap-1.5"
+                className="flex items-center gap-2 text-sm text-gray-500"
               >
-                <Monitor className="w-3.5 h-3.5" />
-                Desktop app · Windows 10/11 · Requires internet connection
-              </motion.p>
+                <Monitor className="w-4 h-4 shrink-0" />
+                <span>Prefer a desktop app?</span>
+                <a
+                  href="https://github.com/storm-za/Storm-POS/releases/latest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[hsl(217,90%,40%)] hover:underline"
+                >
+                  Download for Windows →
+                </a>
+              </motion.div>
 
               {/* Trust Indicators */}
               <motion.div
