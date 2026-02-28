@@ -11,7 +11,10 @@
     "core:resources:default",
     "core:menu:default",
     "core:tray:default",
-    "shell:allow-open"
+    "shell:allow-open",
+    "updater:allow-check",
+    "updater:allow-download-and-install",
+    "dialog:allow-message"
   ],
   "remote": {
     "urls": [
