@@ -43,6 +43,15 @@ Preferred communication style: Simple, everyday language.
 - **Deployment**: Vite for frontend assets, esbuild for backend, PostgreSQL for production database, Replit autoscale deployment.
 - **Sitemap**: Enterprise-grade sitemap index (`/sitemap_index.xml`) with child sitemaps for different content types (main, services, POS, blog) and `robots.txt` for SEO.
 
+## Desktop App (Tauri)
+- **Framework**: Tauri v2 — wraps the web app in a native Windows window (no browser needed)
+- **GitHub Repo**: `https://github.com/storm-za/Storm-POS`
+- **Build**: GitHub Actions (`/.github/workflows/release.yml`) — triggered by pushing a `v*` tag
+- **Config**: `src-tauri/tauri.conf.json` — loads `https://storm-pos.replit.app/pos/login`, identifier `za.storm.pos`
+- **Publishing a new version**: `git tag v1.0.1 && git push origin v1.0.1` → Actions builds `.msi` + `.exe` → auto-published to GitHub Releases
+- **Download page**: `/pos` landing page has a "Download for Windows" button pointing to `https://github.com/storm-za/Storm-POS/releases/latest`
+- **Icons**: Generate with `npx @tauri-apps/cli icon <logo.png>` and place in `src-tauri/icons/`
+
 ## External Dependencies
 
 - **Database**: `@neondatabase/serverless` (PostgreSQL), `drizzle-orm`.

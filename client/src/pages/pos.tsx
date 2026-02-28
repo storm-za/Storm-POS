@@ -7,7 +7,7 @@ import {
   Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft,
   FileSpreadsheet, FileText, Receipt, BarChart3, Package, CreditCard, 
   Globe, RefreshCw, Calculator, PieChart, UserCheck, Lock, Languages,
-  Wallet, BookOpen, MessageSquare, Share2, ArrowRight
+  Wallet, BookOpen, MessageSquare, Share2, ArrowRight, Monitor, Download
 } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
@@ -297,7 +297,28 @@ export default function POS() {
                     </motion.span>
                   </Link>
                 </Button>
+
+                <Button
+                  size="lg"
+                  onClick={() => window.open('https://github.com/storm-za/Storm-POS/releases/latest', '_blank')}
+                  className="group bg-gray-900 text-white hover:bg-gray-800 border-2 border-gray-700 hover:border-gray-600 transform hover:scale-105 transition-all duration-300 px-8 py-7 text-lg font-semibold shadow-lg"
+                  data-testid="button-download-desktop"
+                >
+                  <Monitor className="w-5 h-5 mr-2 shrink-0" />
+                  Download for Windows
+                </Button>
               </motion.div>
+
+              {/* Desktop app note */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.85 }}
+                className="text-xs text-gray-400 flex items-center gap-1.5"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                Desktop app · Windows 10/11 · Requires internet connection
+              </motion.p>
 
               {/* Trust Indicators */}
               <motion.div
@@ -2087,6 +2108,86 @@ export default function POS() {
           </motion.div>
         </div>
       </section>
+      {/* Desktop App Download Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-950 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            {/* Left: icon + text */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex-1 text-center lg:text-left"
+            >
+              <div className="inline-flex items-center gap-2 bg-[hsl(217,90%,40%)]/20 border border-[hsl(217,90%,40%)]/30 text-[hsl(217,90%,60%)] text-sm font-semibold px-4 py-2 rounded-full mb-6">
+                <Monitor className="w-4 h-4" />
+                Native Desktop App
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                No Browser Needed
+              </h2>
+              <p className="text-lg text-gray-400 mb-8 max-w-lg">
+                Run Storm POS as a native Windows application — just like any other software on your PC. Download once, launch from your taskbar, and you're ready to sell.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 items-center lg:items-start justify-center lg:justify-start">
+                <Button
+                  size="lg"
+                  onClick={() => window.open('https://github.com/storm-za/Storm-POS/releases/latest', '_blank')}
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white px-8 py-6 text-lg font-bold shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105"
+                >
+                  <Download className="w-5 h-5 mr-2 shrink-0" />
+                  Download Storm POS
+                </Button>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-4 items-center justify-center lg:justify-start text-sm text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-green-500" />
+                  Windows 10/11
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-green-500" />
+                  Free download
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-green-500" />
+                  Internet connection required
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Right: feature list */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="flex-1 grid grid-cols-1 gap-4"
+            >
+              {[
+                { icon: Monitor, title: "Native window", desc: "Opens straight to your taskbar — no browser tabs, no URL bar" },
+                { icon: Zap, title: "One click to launch", desc: "Double-click the desktop icon and you're in your POS immediately" },
+                { icon: Shield, title: "Same account, same data", desc: "Log in with your existing Storm POS credentials — nothing changes" },
+                { icon: RefreshCw, title: "Always up to date", desc: "New features reach you automatically — no manual updates needed" },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="shrink-0 w-10 h-10 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white text-sm">{title}</p>
+                    <p className="text-gray-400 text-sm mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
         <div className="max-w-4xl mx-auto text-center">
