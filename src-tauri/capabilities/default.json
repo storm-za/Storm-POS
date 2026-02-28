@@ -1,0 +1,22 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capability for Storm POS desktop app",
+  "windows": ["main"],
+  "permissions": [
+    "core:path:default",
+    "core:event:default",
+    "core:window:default",
+    "core:app:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
+    "shell:allow-open"
+  ],
+  "remote": {
+    "urls": [
+      "https://stormsoftware.co.za/**",
+      "https://storm-software.replit.app/**"
+    ]
+  }
+}
