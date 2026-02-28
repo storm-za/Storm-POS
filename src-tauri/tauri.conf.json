@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "identifier": "za.storm.pos",
   "build": {
-    "frontendDist": "../dist/public",
+    "frontendDist": "https://stormsoftware.co.za/pos/login",
     "devUrl": "https://stormsoftware.co.za/pos/login",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
@@ -34,7 +34,6 @@
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
     "windows": {
