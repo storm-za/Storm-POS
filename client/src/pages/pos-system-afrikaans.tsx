@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal
+  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -156,6 +156,7 @@ export default function PosSystemAfrikaans() {
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
+  const [saleCompleteData, setSaleCompleteData] = useState<null | { sale: any; customer: any; tipEnabled: boolean; }>(null);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
   
@@ -2225,22 +2226,23 @@ export default function PosSystemAfrikaans() {
     onSuccess: (result) => {
       if (result.type === 'sale') {
         const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
-        generateAfrikaansReceipt(result.data, selectedCustomer, tipOptionEnabled);
-        
+
+        // Capture before clearing state — used by success dialog print/share
+        setSaleCompleteData({
+          sale: result.data,
+          customer: selectedCustomer,
+          tipEnabled: tipOptionEnabled,
+        });
+
         // Clear sale
         setCurrentSale([]);
         setSaleNotes("");
         setSelectedCustomerId(null);
         setDiscountPercentage(0);
         setTipOptionEnabled(false);
-        
+
         queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
         queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
-        
-        toast({
-          title: "Verkoop voltooi",
-          description: `Verkoop van R${result.data.total} suksesvol verwerk`,
-        });
       } else if (result.type === 'add-to-account') {
         setCurrentSale([]);
         setSaleNotes("");
@@ -2328,7 +2330,7 @@ export default function PosSystemAfrikaans() {
   };
 
   // Generate Afrikaans receipt
-  const generateAfrikaansReceipt = (sale: any, customer: any, tipEnabled = false, customSettings?: any) => {
+  const generateAfrikaansReceipt = (sale: any, customer: any, tipEnabled = false, customSettings?: any, returnDoc = false): any => {
     const doc = new jsPDF();
     const pageWidth = 210;
     const margin = 20;
@@ -2568,6 +2570,7 @@ export default function PosSystemAfrikaans() {
     doc.setFontSize(7);
     doc.text('Aangedryf deur Storm POS  |  stormsoftware.co.za', pageWidth / 2, 289, { align: 'center' });
 
+    if (returnDoc) return doc;
     doc.save(`kwitansie-${sale.id}.pdf`);
   };
 
@@ -2974,8 +2977,104 @@ ${dateFilteredSales.map(sale =>
 
   const stormFee = monthlyRevenue * 0.005;
 
+  const handlePrintSaleReceiptAfr = () => {
+    if (!saleCompleteData) return;
+    generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled);
+  };
+
+  const handleShareSaleReceiptAfr = async () => {
+    if (!saleCompleteData) return;
+    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) return;
+    const pdfBlob = doc.output('blob');
+    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    const companyName = currentUser?.companyName || 'Storm POS';
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: `Kwitansie – R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
+      } catch (e: any) {
+        if (e.name !== 'AbortError') doc.save(fileName);
+      }
+    } else {
+      doc.save(fileName);
+      toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om via e-pos of boodskappe te deel" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black relative">
+
+      {/* ── Verkoop Sukses Dialoog ── */}
+      {saleCompleteData && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(10px)' }}
+        >
+          <motion.div
+            initial={{ scale: 0.88, y: 24, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+            className="bg-[#080d1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
+          >
+            <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
+            <div className="p-7">
+              <div className="flex justify-center mb-5">
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 12, stiffness: 220, delay: 0.08 }} className="relative">
+                  <div className="w-[72px] h-[72px] rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center">
+                    <CheckCircle2 className="w-9 h-9 text-green-400" />
+                  </div>
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.32, type: 'spring', stiffness: 260, damping: 16 }} className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+                <h2 className="text-xl font-bold text-white text-center mb-0.5">Verkoop Voltooi</h2>
+                <p className="text-gray-500 text-sm text-center mb-5">Transaksie suksesvol verwerk</p>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="bg-[hsl(217,90%,40%)]/10 border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 mb-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Totale Bedrag</p>
+                    <p className="text-3xl font-bold text-white">R{saleCompleteData.sale.total}</p>
+                    {saleCompleteData.customer?.name && <p className="text-gray-400 text-xs mt-0.5">{saleCompleteData.customer.name}</p>}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Metode</p>
+                    <p className="text-white text-sm font-semibold capitalize">{saleCompleteData.sale.paymentType || 'Kontant'}</p>
+                    {(() => {
+                      try {
+                        const items = Array.isArray(saleCompleteData.sale.items) ? saleCompleteData.sale.items : JSON.parse(saleCompleteData.sale.items);
+                        return <p className="text-gray-500 text-[11px] mt-1">{items.length} item{items.length !== 1 ? 's' : ''}</p>;
+                      } catch { return null; }
+                    })()}
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
+                <Button onClick={handlePrintSaleReceiptAfr} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
+                  <Printer className="w-4 h-4 mr-2 shrink-0" />
+                  Druk
+                </Button>
+                <Button onClick={handleShareSaleReceiptAfr} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all">
+                  <Share2 className="w-4 h-4 mr-2 shrink-0" />
+                  Deel
+                </Button>
+              </motion.div>
+              <Button onClick={() => setSaleCompleteData(null)} variant="ghost" className="w-full h-9 text-gray-500 hover:text-gray-200 text-sm rounded-xl">
+                Sluit
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* Welcome Toast Popup */}
       {showWelcomeToast && (
         <motion.div

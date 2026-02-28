@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal
+  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal, CheckCircle2
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -146,6 +146,7 @@ export default function PosSystem() {
   const [viewVoidDialog, setViewVoidDialog] = useState<{ open: boolean; sale: Sale | null }>({ open: false, sale: null });
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
+  const [saleCompleteData, setSaleCompleteData] = useState<null | { total: string; items: any[]; customerName?: string; notes?: string; paymentType?: string; staffName?: string; tipEnabled: boolean; saleId: number; }>(null);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
@@ -1913,27 +1914,20 @@ export default function PosSystem() {
     },
     onSuccess: (result) => {
       if (result.type === 'sale') {
-        console.log("Sale completed successfully:", result.data);
-        
-        // Generate PDF receipt
         const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
-        generateReceipt(
-          currentSale,
-          calculateTotal(),
-          selectedCustomer?.name,
-          saleNotes,
+
+        // Capture state before clearing — needed for print/share in success dialog
+        setSaleCompleteData({
+          total: calculateTotal(),
+          items: [...currentSale],
+          customerName: selectedCustomer?.name,
+          notes: saleNotes,
           paymentType,
-          false,
-          undefined,
-          currentStaff?.username,
-          tipOptionEnabled
-        );
-        
-        toast({
-          title: "Sale completed",
-          description: `Sale of R${calculateTotal()} processed successfully. Receipt downloaded.`,
+          staffName: currentStaff?.username,
+          tipEnabled: tipOptionEnabled,
+          saleId: result.data.id,
         });
-        
+
         // Clear current sale
         setCurrentSale([]);
         setSelectedCustomerId(null);
@@ -1942,7 +1936,7 @@ export default function PosSystem() {
         setDiscountPercentage(0);
         setTipOptionEnabled(false);
         setSelectedOpenAccountId(null);
-        
+
         // Refresh data
         queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
         queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
@@ -2317,7 +2311,7 @@ export default function PosSystem() {
   };
 
   // PDF Receipt Generation
-  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false, customSettings?: any) => {
+  const generateReceipt = (items: SaleItem[], total: string, customerName?: string, notes?: string, paymentType?: string, isOpenAccount = false, accountName?: string, staffName?: string, includeTipLines = false, customSettings?: any, returnDoc = false): any => {
     const doc = new jsPDF();
     const pageWidth = 210;
     const margin = 20;
@@ -2575,6 +2569,7 @@ export default function PosSystem() {
     const fileName = isOpenAccount 
       ? `account-statement-${accountName?.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`
       : `receipt-${Date.now()}.pdf`;
+    if (returnDoc) return doc;
     doc.save(fileName);
   };
 
@@ -3529,8 +3524,102 @@ export default function PosSystem() {
     }
   };
 
+  const handlePrintSaleReceipt = () => {
+    if (!saleCompleteData) return;
+    generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled);
+  };
+
+  const handleShareSaleReceipt = async () => {
+    if (!saleCompleteData) return;
+    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) return;
+    const pdfBlob = doc.output('blob');
+    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    const companyName = currentUser?.companyName || 'Storm POS';
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: `Receipt – R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
+      } catch (e: any) {
+        if (e.name !== 'AbortError') doc.save(fileName);
+      }
+    } else {
+      doc.save(fileName);
+      toast({ title: "Receipt saved", description: "Attach the PDF to share via email or messaging" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black relative">
+
+      {/* ── Enterprise Sale Success Dialog ── */}
+      {saleCompleteData && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(10px)' }}
+        >
+          <motion.div
+            initial={{ scale: 0.88, y: 24, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+            className="bg-[#080d1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
+          >
+            <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
+            <div className="p-7">
+              {/* Animated checkmark */}
+              <div className="flex justify-center mb-5">
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 12, stiffness: 220, delay: 0.08 }} className="relative">
+                  <div className="w-[72px] h-[72px] rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center">
+                    <CheckCircle2 className="w-9 h-9 text-green-400" />
+                  </div>
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.32, type: 'spring', stiffness: 260, damping: 16 }} className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+                <h2 className="text-xl font-bold text-white text-center mb-0.5">Sale Complete</h2>
+                <p className="text-gray-500 text-sm text-center mb-5">Transaction processed successfully</p>
+              </motion.div>
+
+              {/* Amount summary card */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="bg-[hsl(217,90%,40%)]/10 border border-[hsl(217,90%,40%)]/20 rounded-xl p-4 mb-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Total Charged</p>
+                    <p className="text-3xl font-bold text-white">R{saleCompleteData.total}</p>
+                    {saleCompleteData.customerName && <p className="text-gray-400 text-xs mt-0.5">{saleCompleteData.customerName}</p>}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Method</p>
+                    <p className="text-white text-sm font-semibold capitalize">{saleCompleteData.paymentType || 'Cash'}</p>
+                    <p className="text-gray-500 text-[11px] mt-1">{saleCompleteData.items.length} item{saleCompleteData.items.length !== 1 ? 's' : ''}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Action buttons */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
+                <Button onClick={handlePrintSaleReceipt} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
+                  <Printer className="w-4 h-4 mr-2 shrink-0" />
+                  Print
+                </Button>
+                <Button onClick={handleShareSaleReceipt} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all">
+                  <Share2 className="w-4 h-4 mr-2 shrink-0" />
+                  Share
+                </Button>
+              </motion.div>
+              <Button onClick={() => setSaleCompleteData(null)} variant="ghost" className="w-full h-9 text-gray-500 hover:text-gray-200 text-sm rounded-xl">
+                Close
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
       {/* Welcome Toast Popup */}
       {showWelcomeToast && (
         <motion.div
