@@ -31,9 +31,7 @@ async fn check_for_updates(app: tauri::AppHandle) {
     match updater.check().await {
         Ok(Some(update)) => {
             let version = update.version.clone();
-            let download_url = update.download_url.clone().map(|u| u.to_string()).unwrap_or_else(|| {
-                "https://github.com/storm-za/Storm-POS/releases/latest".to_string()
-            });
+            let download_url = update.download_url.to_string();
 
             let confirmed = app
                 .dialog()
@@ -49,6 +47,7 @@ async fn check_for_updates(app: tauri::AppHandle) {
                 .blocking_show();
 
             if confirmed {
+                #[allow(deprecated)]
                 if let Err(e) = app.shell().open(&download_url, None) {
                     eprintln!("Failed to open browser: {}", e);
                 }
