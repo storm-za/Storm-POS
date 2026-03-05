@@ -1143,6 +1143,8 @@ export default function PosSystem() {
       setShowQuickAddProduct(false);
       setQuickAddName("");
       setQuickAddPrice("");
+      setInvoiceShowBusinessInfo(true);
+      setInvoiceCustomFieldValues({});
       toast({
         title: "Success",
         description: `${invoiceType === 'invoice' ? 'Invoice' : 'Quote'} created successfully`,
@@ -1190,6 +1192,8 @@ export default function PosSystem() {
       setShowQuickAddProduct(false);
       setQuickAddName("");
       setQuickAddPrice("");
+      setInvoiceShowBusinessInfo(true);
+      setInvoiceCustomFieldValues({});
       toast({
         title: "Success",
         description: `${updatedInvoice.documentType === 'invoice' ? 'Invoice' : 'Quote'} updated successfully`,
@@ -2306,6 +2310,10 @@ export default function PosSystem() {
         businessInfo: { ...defaults.businessInfo, ...parsed.businessInfo },
         customMessages: { ...defaults.customMessages, ...parsed.customMessages },
         logoDataUrl: parsed.logoDataUrl,
+        lastBusinessInfoUpdate: parsed.lastBusinessInfoUpdate,
+        invoiceSettings: {
+          customFields: parsed?.invoiceSettings?.customFields || [],
+        },
       };
     } catch {
       return defaults;
@@ -8044,6 +8052,8 @@ export default function PosSystem() {
             setInvoiceTerms("");
             setInvoiceTaxEnabled(true);
             setInvoiceType('invoice');
+            setInvoiceShowBusinessInfo(true);
+            setInvoiceCustomFieldValues({});
           }
         }}
       >
@@ -8554,6 +8564,73 @@ export default function PosSystem() {
               </div>
             </div>
 
+            {/* Document Options */}
+            {(() => {
+              const invoiceCfSettings = mergeReceiptSettings(currentUser?.receiptSettings);
+              const invoiceCfs = (invoiceCfSettings as any).invoiceSettings?.customFields || [];
+              return (
+                <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Show Business Information</p>
+                      <p className="text-xs text-gray-500">Display your company details in the top-right of the PDF</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setInvoiceShowBusinessInfo(!invoiceShowBusinessInfo)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                        invoiceShowBusinessInfo
+                          ? 'bg-[hsl(217,90%,40%)] text-white border-[hsl(217,90%,40%)]'
+                          : 'bg-white text-gray-500 border-gray-300'
+                      }`}
+                    >
+                      {invoiceShowBusinessInfo ? (
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      ) : (
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                      )}
+                      {invoiceShowBusinessInfo ? 'Visible' : 'Hidden'}
+                    </button>
+                  </div>
+
+                  {invoiceCfs.length > 0 && (
+                    <div className="space-y-3 pt-2 border-t">
+                      <p className="text-xs font-medium text-gray-600">Custom Fields</p>
+                      {invoiceCfs.map((field: any) => (
+                        <div key={field.id} className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <Label className="text-xs text-gray-600">{field.label}</Label>
+                            <input
+                              type="text"
+                              value={invoiceCustomFieldValues[`cf_${field.id}`] || ''}
+                              onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))}
+                              placeholder={field.placeholder || field.label}
+                              className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setInvoiceCustomFieldValues((prev: any) => ({
+                              ...prev,
+                              [`vis_${field.id}`]: prev[`vis_${field.id}`] === false ? true : false
+                            }))}
+                            className="mt-5 p-1.5 rounded border text-gray-400 hover:text-gray-600"
+                            title={invoiceCustomFieldValues[`vis_${field.id}`] === false ? 'Show on PDF' : 'Hide from PDF'}
+                          >
+                            {invoiceCustomFieldValues[`vis_${field.id}`] === false ? (
+                              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                            ) : (
+                              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Submit Button */}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
@@ -8653,7 +8730,9 @@ export default function PosSystem() {
                     paymentMethod: invoicePaymentMethod || null,
                     paymentDetails: invoicePaymentDetails || null,
                     notes: invoiceNotes || null,
-                    terms: invoiceTerms || null
+                    terms: invoiceTerms || null,
+                    showBusinessInfo: invoiceShowBusinessInfo,
+                    customFieldValues: invoiceCustomFieldValues,
                   };
                   
                   if (editingInvoice) {
@@ -8898,6 +8977,8 @@ export default function PosSystem() {
                         setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                         setInvoiceTerms(selectedInvoice.terms || '');
                         setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
+                        setInvoiceShowBusinessInfo(selectedInvoice.showBusinessInfo !== false);
+                        setInvoiceCustomFieldValues((selectedInvoice.customFieldValues as any) || {});
                         
                         const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
                         setInvoiceItems(items.map((item: any) => ({
@@ -8998,6 +9079,8 @@ export default function PosSystem() {
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
                           setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
+                          setInvoiceShowBusinessInfo(selectedInvoice.showBusinessInfo !== false);
+                          setInvoiceCustomFieldValues((selectedInvoice.customFieldValues as any) || {});
                           
                           const items = Array.isArray(selectedInvoice.items) ? selectedInvoice.items : [];
                           setInvoiceItems(items.map((item: any) => ({
