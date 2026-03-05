@@ -55,35 +55,33 @@ jobs:
           Write-Host "=== Bundle files ==="
           Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-          $exe     = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe"  -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
-          $msi     = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"        -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
-          $nsisZip = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*.nsis.zip"   -and $_.Name -notlike "*.sig"  } | Select-Object -First 1
+          $exe    = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe" -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $msi    = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"       -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $exeSig = if ($exe) { Get-Item ($exe.FullName + ".sig") -ErrorAction SilentlyContinue } else { $null }
 
-          if (-not $exe) { Write-Host "ERROR: No installer"; exit 1 }
-          Write-Host "Installer  : $($exe.Name)"
-          Write-Host "MSI        : $($msi.Name)"
-          Write-Host "NSIS zip   : $($nsisZip.Name)"
+          if (-not $exe) { Write-Host "ERROR: No installer found"; exit 1 }
+          Write-Host "Installer : $($exe.Name)"
+          Write-Host "MSI       : $($msi.Name)"
+          Write-Host "Sig file  : $($exeSig.Name)"
 
-          $notes = "Storm POS $tag - Download the Windows installer. Existing installs update automatically on next launch."
+          $notes = "Storm POS $tag - Download the Windows installer below. Existing installs update automatically on next launch."
           gh release create $tag --title "Storm POS $tag" --notes $notes
 
           gh release upload $tag $exe.FullName
-          if ($msi)     { gh release upload $tag $msi.FullName }
-          if ($nsisZip) { gh release upload $tag $nsisZip.FullName }
+          if ($msi) { gh release upload $tag $msi.FullName }
+          if ($exeSig) { gh release upload $tag $exeSig.FullName }
 
           $sig = ""
-          if ($nsisZip) {
-            $sigPath = $nsisZip.FullName + ".sig"
-            if (Test-Path $sigPath) {
-              $sig = (Get-Content $sigPath -Raw).Trim()
-              Write-Host "Signature OK (length $($sig.Length))"
-            } else {
-              Write-Host "WARNING: .nsis.zip.sig not found at $sigPath"
-            }
+          if ($exeSig -and (Test-Path $exeSig.FullName)) {
+            $sig = (Get-Content $exeSig.FullName -Raw).Trim()
+            Write-Host "Signature OK (length $($sig.Length))"
+          } else {
+            Write-Host "WARNING: No .exe.sig file found — updater will not work"
           }
 
-          $zipName     = if ($nsisZip) { $nsisZip.Name -replace ' ', '.' } else { $exe.Name -replace ' ', '.' }
-          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$zipName"
+          $exeName     = $exe.Name -replace ' ', '.'
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
+          Write-Host "Download URL: $downloadUrl"
 
           $latestJson = [ordered]@{
             version   = $version
