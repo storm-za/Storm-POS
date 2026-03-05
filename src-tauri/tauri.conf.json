@@ -1,6 +1,6 @@
 {
   "productName": "Storm POS",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "identifier": "za.storm.pos",
   "build": {
     "frontendDist": "https://stormsoftware.co.za/pos/login",
