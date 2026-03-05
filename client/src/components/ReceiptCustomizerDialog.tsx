@@ -123,9 +123,10 @@ export function ReceiptCustomizerDialog({
   };
 
   const businessInfoChanged = () => {
-    const bi = settings.businessInfo;
-    const ob = originalBusinessInfo;
-    return JSON.stringify(bi) !== JSON.stringify(ob);
+    const bi = settings.businessInfo as Record<string, any>;
+    const ob = originalBusinessInfo as Record<string, any>;
+    const keys = Array.from(new Set([...Object.keys(bi), ...Object.keys(ob)]));
+    return keys.some(k => (bi[k] ?? '') !== (ob[k] ?? ''));
   };
 
   const addField = () => {
