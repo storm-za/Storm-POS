@@ -1,4 +1,5 @@
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+use tauri_plugin_shell::ShellExt;
 use tauri_plugin_updater::UpdaterExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -30,10 +31,14 @@ async fn check_for_updates(app: tauri::AppHandle) {
     match updater.check().await {
         Ok(Some(update)) => {
             let version = update.version.clone();
+            let download_url = update.download_url.clone().map(|u| u.to_string()).unwrap_or_else(|| {
+                "https://github.com/storm-za/Storm-POS/releases/latest".to_string()
+            });
+
             let confirmed = app
                 .dialog()
                 .message(format!(
-                    "Storm POS {} is available.\n\nWould you like to install it now?",
+                    "Storm POS {} is available.\n\nClick Install Now to download the new installer.",
                     version
                 ))
                 .title("Update Available")
@@ -44,10 +49,8 @@ async fn check_for_updates(app: tauri::AppHandle) {
                 .blocking_show();
 
             if confirmed {
-                if let Err(e) = update.download_and_install(|_, _| {}, || {}).await {
-                    eprintln!("Update install failed: {}", e);
-                } else {
-                    app.restart();
+                if let Err(e) = app.shell().open(&download_url, None) {
+                    eprintln!("Failed to open browser: {}", e);
                 }
             }
         }
