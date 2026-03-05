@@ -37,83 +37,63 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: |
           npm install -g @tauri-apps/cli@latest 2>&1 | Select-Object -Last 5
-          Write-Host "Tauri CLI installed. Building..."
+          Write-Host "Building Tauri app..."
           tauri build
           Write-Host "Build complete."
 
-      - name: Create release, upload files, generate latest.json
+      - name: Release and upload signed artifacts
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = "${{ github.ref_name }}"
+          $tag     = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
-          $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-          $bundleDir = "src-tauri\target\release\bundle"
-          $nsisDir = "$bundleDir\nsis"
-          $msiDir  = "$bundleDir\msi"
+          $date    = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+          $nsisDir = "src-tauri\target\release\bundle\nsis"
+          $msiDir  = "src-tauri\target\release\bundle\msi"
 
-          Write-Host "=== All bundle files ==="
-          Get-ChildItem $bundleDir -Recurse | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "=== Bundle files ==="
+          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-          # Locate the NSIS installer (.exe), NSIS zip bundle (.nsis.zip) and its signature
-          $exe     = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe" -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
-          $msi     = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"       -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
-          $nsisZip = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*.nsis.zip"  -and $_.Name -notlike "*.sig"  } | Select-Object -First 1
-          $zipSig  = if ($nsisZip) { $nsisZip.FullName + ".sig" } else { $null }
+          $exe     = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe"  -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
+          $msi     = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"        -and $_.Name -notlike "*.zip*" } | Select-Object -First 1
+          $nsisZip = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*.nsis.zip"   -and $_.Name -notlike "*.sig"  } | Select-Object -First 1
 
-          if (-not $exe) {
-            Write-Host "ERROR: No installer found in $nsisDir"
-            exit 1
-          }
+          if (-not $exe) { Write-Host "ERROR: No installer"; exit 1 }
+          Write-Host "Installer  : $($exe.Name)"
+          Write-Host "MSI        : $($msi.Name)"
+          Write-Host "NSIS zip   : $($nsisZip.Name)"
 
-          Write-Host "Installer : $($exe.Name)"
-          Write-Host "MSI       : $($msi.Name)"
-          Write-Host "NSIS zip  : $($nsisZip.Name)"
-          Write-Host "Sig path  : $zipSig"
+          $notes = "Storm POS $tag - Download the Windows installer. Existing installs update automatically on next launch."
+          gh release create $tag --title "Storm POS $tag" --notes $notes
 
-          # Create the GitHub release
-          gh release create $tag `
-            --title "Storm POS $tag" `
-            --notes "## Storm POS Desktop App $tag
-
-Download the Windows installer below — no browser needed.
-
-**Requirements:** Windows 10/11 · Internet connection required
-
-**Already installed?** The app will notify you automatically on next launch."
-
-          # Upload installers
           gh release upload $tag $exe.FullName
           if ($msi)     { gh release upload $tag $msi.FullName }
           if ($nsisZip) { gh release upload $tag $nsisZip.FullName }
 
-          # Read the zip.sig signature
           $sig = ""
-          if ($zipSig -and (Test-Path $zipSig)) {
-            $sig = (Get-Content $zipSig -Raw).Trim()
-            Write-Host "Signature (first 40): $($sig.Substring(0, [Math]::Min(40,$sig.Length)))..."
-          } else {
-            Write-Host "WARNING: No .nsis.zip.sig found. Updater will not work without signature."
+          if ($nsisZip) {
+            $sigPath = $nsisZip.FullName + ".sig"
+            if (Test-Path $sigPath) {
+              $sig = (Get-Content $sigPath -Raw).Trim()
+              Write-Host "Signature OK (length $($sig.Length))"
+            } else {
+              Write-Host "WARNING: .nsis.zip.sig not found at $sigPath"
+            }
           }
 
-          # Construct download URL (GitHub replaces spaces with dots in asset names)
-          $zipName = if ($nsisZip) { $nsisZip.Name -replace ' ', '.' } else { $exe.Name -replace ' ', '.' }
+          $zipName     = if ($nsisZip) { $nsisZip.Name -replace ' ', '.' } else { $exe.Name -replace ' ', '.' }
           $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$zipName"
-          Write-Host "Download URL: $downloadUrl"
 
-          # Generate latest.json
-          $platformEntry = [ordered]@{ url = $downloadUrl; signature = $sig }
           $latestJson = [ordered]@{
             version   = $version
             notes     = "Improvements and bug fixes."
             pub_date  = $date
-            platforms = @{ "windows-x86_64" = $platformEntry }
+            platforms = @{ "windows-x86_64" = [ordered]@{ url = $downloadUrl; signature = $sig } }
           } | ConvertTo-Json -Depth 5
 
           $latestJson | Out-File "latest.json" -Encoding utf8NoBOM
-          Write-Host "=== latest.json ==="
-          Get-Content "latest.json"
+          Write-Host "=== latest.json ===" ; Get-Content "latest.json"
 
           gh release upload $tag latest.json
-          Write-Host "Done — release $tag created successfully."
+          Write-Host "Done - release $tag complete."
