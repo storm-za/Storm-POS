@@ -187,7 +187,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tutorialCompleted: newUser.tutorialCompleted,
           trialStartDate: newUser.trialStartDate,
           preferredLanguage: newUser.preferredLanguage,
-          selectedStaffAccountId: newUser.selectedStaffAccountId
+          selectedStaffAccountId: newUser.selectedStaffAccountId,
+          receiptSettings: newUser.receiptSettings
         }
       });
     } catch (error) {
@@ -231,7 +232,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tutorialCompleted: user.tutorialCompleted,
           trialStartDate: user.trialStartDate,
           preferredLanguage: user.preferredLanguage,
-          selectedStaffAccountId: user.selectedStaffAccountId
+          selectedStaffAccountId: user.selectedStaffAccountId,
+          receiptSettings: user.receiptSettings
         }
       });
     } catch (error) {

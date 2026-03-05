@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal, CheckCircle2
+  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2
 } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
@@ -119,7 +119,7 @@ export default function PosSystem() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; receiptSettings?: any} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
@@ -150,6 +150,16 @@ export default function PosSystem() {
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
+  const [isInvoiceSetupOpen, setIsInvoiceSetupOpen] = useState(false);
+  const [bizInfoName, setBizInfoName] = useState("");
+  const [bizInfoPhone, setBizInfoPhone] = useState("");
+  const [bizInfoEmail, setBizInfoEmail] = useState("");
+  const [bizInfoAddress1, setBizInfoAddress1] = useState("");
+  const [bizInfoAddress2, setBizInfoAddress2] = useState("");
+  const [bizInfoWebsite, setBizInfoWebsite] = useState("");
+  const [bizInfoVat, setBizInfoVat] = useState("");
+  const [bizInfoReg, setBizInfoReg] = useState("");
+  const [isSavingBizInfo, setIsSavingBizInfo] = useState(false);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [isInvoiceViewOpen, setIsInvoiceViewOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
@@ -328,6 +338,24 @@ export default function PosSystem() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!currentUser?.receiptSettings) return;
+    try {
+      const s = typeof currentUser.receiptSettings === 'string'
+        ? JSON.parse(currentUser.receiptSettings)
+        : currentUser.receiptSettings;
+      const bi = s?.businessInfo || {};
+      setBizInfoName(bi.name || currentUser.companyName || '');
+      setBizInfoPhone(bi.phone || '');
+      setBizInfoEmail(bi.email || '');
+      setBizInfoAddress1(bi.addressLine1 || '');
+      setBizInfoAddress2(bi.addressLine2 || '');
+      setBizInfoWebsite(bi.website || '');
+      setBizInfoVat(bi.vatNumber || '');
+      setBizInfoReg(bi.registrationNumber || '');
+    } catch {}
+  }, [currentUser?.receiptSettings]);
+
   // Mobile back button handling
   useEffect(() => {
     // Push initial state to history
@@ -353,6 +381,7 @@ export default function PosSystem() {
         { isOpen: isBankDetailsOpen, close: () => setIsBankDetailsOpen(false) },
         { isOpen: isLogoDialogOpen, close: () => setIsLogoDialogOpen(false) },
         { isOpen: isReceiptCustomizerOpen, close: () => setIsReceiptCustomizerOpen(false) },
+        { isOpen: isInvoiceSetupOpen, close: () => setIsInvoiceSetupOpen(false) },
         { isOpen: managementPasswordDialog, close: () => setManagementPasswordDialog(false) },
         { isOpen: voidSaleDialog.open, close: () => setVoidSaleDialog({ open: false, sale: null }) },
         { isOpen: viewVoidDialog.open, close: () => setViewVoidDialog({ open: false, sale: null }) },
@@ -6469,6 +6498,28 @@ export default function PosSystem() {
                       </div>
                     </motion.div>
 
+                    {/* Invoice/Quote Setup */}
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setIsInvoiceSetupOpen(true)}
+                      className="cursor-pointer group"
+                    >
+                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative flex items-center gap-4">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                            <FileText className="w-7 h-7 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-semibold text-lg group-hover:text-[hsl(217,90%,60%)] transition-colors">Invoice &amp; Quote Setup</h3>
+                            <p className="text-gray-400 text-sm">Add custom fields and variables to your invoices and quotes</p>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[hsl(217,90%,50%)] group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+                      </div>
+                    </motion.div>
+
                     {/* Change Password Setting */}
                     <motion.div
                       whileHover={{ scale: 1.02, y: -2 }}
@@ -6555,6 +6606,118 @@ export default function PosSystem() {
                       </div>
                     </motion.div>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Business Information Section */}
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                <CardHeader className="border-b border-white/10 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                    Business Information
+                  </CardTitle>
+                  <p className="text-gray-400 text-sm mt-1">This information appears on your invoices and quotes. Updates are limited to once per day.</p>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {(() => {
+                    const rs = mergeReceiptSettings(currentUser?.receiptSettings);
+                    const today = new Date().toISOString().split('T')[0];
+                    const lastUpdate = (rs as any).lastBusinessInfoUpdate;
+                    const updatedToday = lastUpdate === today;
+                    return (
+                      <div className="space-y-4">
+                        {updatedToday && (
+                          <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3">
+                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                            <p className="text-amber-300 text-sm">Business info was already updated today. You can update again tomorrow.</p>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-gray-300 text-sm">Company Name</Label>
+                            <input disabled={updatedToday} value={bizInfoName} onChange={e => setBizInfoName(e.target.value)} placeholder="Your company name" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Phone Number</Label>
+                            <input disabled={updatedToday} value={bizInfoPhone} onChange={e => setBizInfoPhone(e.target.value)} placeholder="+27 12 345 6789" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Email Address</Label>
+                            <input disabled={updatedToday} value={bizInfoEmail} onChange={e => setBizInfoEmail(e.target.value)} placeholder="info@yourbusiness.co.za" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Website</Label>
+                            <input disabled={updatedToday} value={bizInfoWebsite} onChange={e => setBizInfoWebsite(e.target.value)} placeholder="www.yourbusiness.co.za" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Address Line 1</Label>
+                            <input disabled={updatedToday} value={bizInfoAddress1} onChange={e => setBizInfoAddress1(e.target.value)} placeholder="123 Main Street" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Address Line 2</Label>
+                            <input disabled={updatedToday} value={bizInfoAddress2} onChange={e => setBizInfoAddress2(e.target.value)} placeholder="Suburb, City, 0001" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">VAT Number</Label>
+                            <input disabled={updatedToday} value={bizInfoVat} onChange={e => setBizInfoVat(e.target.value)} placeholder="4123456789" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                          <div>
+                            <Label className="text-gray-300 text-sm">Registration Number</Label>
+                            <input disabled={updatedToday} value={bizInfoReg} onChange={e => setBizInfoReg(e.target.value)} placeholder="2023/123456/07" className="mt-1 w-full px-3 py-2 bg-gray-900/60 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] disabled:opacity-50 disabled:cursor-not-allowed" />
+                          </div>
+                        </div>
+                        <div className="flex justify-end pt-2">
+                          <Button
+                            disabled={updatedToday || isSavingBizInfo}
+                            onClick={async () => {
+                              if (!currentUser?.id) return;
+                              setIsSavingBizInfo(true);
+                              try {
+                                const existingSettings = mergeReceiptSettings(currentUser.receiptSettings);
+                                const today = new Date().toISOString().split('T')[0];
+                                const newSettings = {
+                                  ...existingSettings,
+                                  businessInfo: {
+                                    ...(existingSettings as any).businessInfo,
+                                    name: bizInfoName,
+                                    phone: bizInfoPhone,
+                                    email: bizInfoEmail,
+                                    addressLine1: bizInfoAddress1,
+                                    addressLine2: bizInfoAddress2,
+                                    website: bizInfoWebsite,
+                                    vatNumber: bizInfoVat,
+                                    registrationNumber: bizInfoReg,
+                                  },
+                                  lastBusinessInfoUpdate: today,
+                                };
+                                const res = await fetch(`/api/pos/user/${currentUser.id}/receipt-settings`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ settings: newSettings }),
+                                });
+                                if (res.ok) {
+                                  const data = await res.json();
+                                  const updatedUser = { ...currentUser, receiptSettings: newSettings, companyName: bizInfoName };
+                                  setCurrentUser(updatedUser);
+                                  localStorage.setItem('posUser', JSON.stringify(updatedUser));
+                                  toast({ title: 'Business Info Saved', description: 'Your business information has been updated and will appear on all future invoices.' });
+                                } else {
+                                  toast({ title: 'Error', description: 'Failed to save business information.', variant: 'destructive' });
+                                }
+                              } catch {
+                                toast({ title: 'Error', description: 'Failed to save business information.', variant: 'destructive' });
+                              } finally {
+                                setIsSavingBizInfo(false);
+                              }
+                            }}
+                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"
+                          >
+                            {isSavingBizInfo ? 'Saving...' : 'Save Business Info'}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
 
@@ -7386,8 +7549,16 @@ export default function PosSystem() {
         isOpen={isReceiptCustomizerOpen}
         onClose={() => setIsReceiptCustomizerOpen(false)}
         currentUser={currentUser}
-        setCurrentUser={setCurrentUser}
+        setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
         toast={toast}
+      />
+      <ReceiptCustomizerDialog
+        isOpen={isInvoiceSetupOpen}
+        onClose={() => setIsInvoiceSetupOpen(false)}
+        currentUser={currentUser}
+        setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
+        toast={toast}
+        invoiceSetupOnly={true}
       />
       {/* Staff Password Verification Dialog */}
       <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {

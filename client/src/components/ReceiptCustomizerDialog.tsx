@@ -20,6 +20,7 @@ interface ReceiptCustomizerDialogProps {
   setCurrentUser: (user: any) => void;
   toast: any;
   labels?: Record<string, any>;
+  invoiceSetupOnly?: boolean;
 }
 
 const TODAY = () => new Date().toISOString().slice(0, 10);
@@ -31,6 +32,7 @@ export function ReceiptCustomizerDialog({
   setCurrentUser,
   toast,
   labels = {},
+  invoiceSetupOnly = false,
 }: ReceiptCustomizerDialogProps) {
   const [settings, setSettings] = useState<ReceiptSettings>(defaultReceiptSettings());
   const [isSaving, setIsSaving] = useState(false);
@@ -233,14 +235,17 @@ export function ReceiptCustomizerDialog({
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
             <FileText className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-            {labels.title || "Customize Your Receipt"}
+            {invoiceSetupOnly ? (labels.invoiceSetupTitle || "Invoice & Quote Setup") : (labels.title || "Customize Your Receipt")}
           </DialogTitle>
           <DialogDescription className="text-gray-300">
-            {labels.description || "Personalize your receipt with your business information and customize the layout."}
+            {invoiceSetupOnly
+              ? (labels.invoiceSetupDesc || "Create custom fields that appear on your invoices and quotes.")
+              : (labels.description || "Personalize your receipt with your business information and customize the layout.")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
+          {!invoiceSetupOnly && (<>
           {/* Section Ordering */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
@@ -389,6 +394,7 @@ export function ReceiptCustomizerDialog({
               )}
             </CardContent>
           </Card>
+          </>)}
 
           {/* Invoice / Quote Custom Fields */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
@@ -495,6 +501,7 @@ export function ReceiptCustomizerDialog({
             </CardContent>
           </Card>
 
+          {!invoiceSetupOnly && (<>
           {/* Display Options */}
           <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700">
             <CardHeader>
@@ -549,6 +556,7 @@ export function ReceiptCustomizerDialog({
               </div>
             </CardContent>
           </Card>
+          </>)}
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
