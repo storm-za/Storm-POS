@@ -45,7 +45,7 @@ jobs:
           releaseDraft: false
           prerelease: false
 
-      - name: Find sig files and generate latest.json
+      - name: Generate latest.json for auto-updater
         shell: pwsh
         continue-on-error: true
         env:
@@ -54,46 +54,65 @@ jobs:
           $tag = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
           $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-
-          Write-Host "=== Searching for bundle files ==="
-          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | Select-Object FullName | ForEach-Object { Write-Host $_.FullName }
-
           $nsisDir = "src-tauri\target\release\bundle\nsis"
 
-          $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exeFile) { $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 }
+          Write-Host "=== All files in bundle directory ==="
+          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-          if (-not $exeFile) {
-            Write-Host "No installer found — cannot generate latest.json"
+          # Locate the NSIS zip updater bundle (.nsis.zip) — this is what Tauri v2 updater downloads
+          $zipFile = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*.nsis.zip" -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          if (-not $zipFile) {
+            Write-Host "ERROR: No .nsis.zip found — cannot generate latest.json"
             exit 0
           }
+          Write-Host "Updater bundle: $($zipFile.Name)"
 
-          Write-Host "Installer: $($exeFile.Name)"
-          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$($exeFile.Name)"
+          # GitHub replaces spaces with dots in download URLs for binary assets
+          $encodedName = $zipFile.Name -replace ' ', '.'
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$encodedName"
+          Write-Host "Download URL: $downloadUrl"
 
-          # Search for .sig file anywhere in bundle directory
-          $sigFile = Get-ChildItem "src-tauri\target\release\bundle" -Filter "*.sig" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          # Locate the matching .nsis.zip.sig signature file
+          $sigPath = $zipFile.FullName + ".sig"
           $signature = ""
-          if ($sigFile) {
-            $signature = (Get-Content $sigFile.FullName -Raw).Trim()
-            Write-Host "Signature found: $($sigFile.FullName)"
+          if (Test-Path $sigPath) {
+            $signature = (Get-Content $sigPath -Raw).Trim()
+            Write-Host "Signature found: $sigPath"
+            Write-Host "Signature (first 40 chars): $($signature.Substring(0, [Math]::Min(40, $signature.Length)))"
           } else {
-            Write-Host "No .sig file found anywhere in bundle"
+            Write-Host "WARNING: No .nsis.zip.sig file found at: $sigPath"
+            # Try alternate location: look for any .zip.sig
+            $altSig = Get-ChildItem "src-tauri\target\release\bundle" -Recurse | Where-Object { $_.Name -like "*.zip.sig" } | Select-Object -First 1
+            if ($altSig) {
+              $signature = (Get-Content $altSig.FullName -Raw).Trim()
+              Write-Host "Found alternate sig: $($altSig.FullName)"
+            }
           }
 
-          $platformEntry = @{ url = $downloadUrl }
-          if ($signature -ne "") { $platformEntry.signature = $signature }
+          if ($signature -eq "") {
+            Write-Host "ERROR: No signature found — latest.json will lack signature (updater will reject it)"
+          }
 
-          $json = @{
-            version  = $version
-            notes    = "Improvements and bug fixes."
-            pub_date = $date
+          $platformEntry = [ordered]@{
+            url       = $downloadUrl
+            signature = $signature
+          }
+
+          $latestJson = [ordered]@{
+            version   = $version
+            notes     = "Improvements and bug fixes."
+            pub_date  = $date
             platforms = @{ "windows-x86_64" = $platformEntry }
           } | ConvertTo-Json -Depth 5
 
-          $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
+          $latestJson | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
           Write-Host "=== latest.json ==="
           Get-Content "latest.json"
 
+          # Upload the .nsis.zip and .nsis.zip.sig files to the release as well
+          gh release upload $tag $zipFile.FullName --clobber
+          if (Test-Path $sigPath) { gh release upload $tag $sigPath --clobber }
+
+          # Upload latest.json
           gh release upload $tag latest.json --clobber
-          Write-Host "Uploaded latest.json"
+          Write-Host "Done — latest.json and updater bundles uploaded to release $tag"
