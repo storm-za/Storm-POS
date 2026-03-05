@@ -1,6 +1,6 @@
 {
   "productName": "Storm POS",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "identifier": "za.storm.pos",
   "build": {
     "frontendDist": "https://stormsoftware.co.za/pos/login",
@@ -29,6 +29,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
