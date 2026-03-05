@@ -15,6 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -25,75 +30,68 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Build and release with Tauri Action
-        uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri app (signed)
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Storm POS ${{ github.ref_name }}"
-          releaseBody: |
-            ## Storm POS Desktop App ${{ github.ref_name }}
+        run: |
+          npm install -g @tauri-apps/cli@latest 2>&1 | Select-Object -Last 5
+          Write-Host "Building Tauri app..."
+          tauri build
+          Write-Host "Build complete."
 
-            Download the Windows installer below — no browser needed.
-
-            **Requirements:** Windows 10/11 · Internet connection required
-
-            **Already installed?** The app will notify you on next launch if an update is available.
-          releaseDraft: false
-          prerelease: false
-
-      - name: Find sig files and generate latest.json
+      - name: Release and upload signed artifacts
         shell: pwsh
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = "${{ github.ref_name }}"
+          $tag     = "${{ github.ref_name }}"
           $version = $tag.TrimStart('v')
-          $date = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-
-          Write-Host "=== Searching for bundle files ==="
-          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | Select-Object FullName | ForEach-Object { Write-Host $_.FullName }
-
+          $date    = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
           $nsisDir = "src-tauri\target\release\bundle\nsis"
+          $msiDir  = "src-tauri\target\release\bundle\msi"
 
-          $exeFile = Get-ChildItem $nsisDir -Filter "*-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exeFile) { $exeFile = Get-ChildItem $nsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 }
+          Write-Host "=== Bundle files ==="
+          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-          if (-not $exeFile) {
-            Write-Host "No installer found — cannot generate latest.json"
-            exit 0
-          }
+          $exe    = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe" -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $msi    = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"       -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $exeSig = if ($exe) { Get-Item ($exe.FullName + ".sig") -ErrorAction SilentlyContinue } else { $null }
 
-          Write-Host "Installer: $($exeFile.Name)"
-          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$($exeFile.Name)"
+          if (-not $exe) { Write-Host "ERROR: No installer found"; exit 1 }
+          Write-Host "Installer : $($exe.Name)"
+          Write-Host "MSI       : $($msi.Name)"
+          Write-Host "Sig file  : $($exeSig.Name)"
 
-          # Search for .sig file anywhere in bundle directory
-          $sigFile = Get-ChildItem "src-tauri\target\release\bundle" -Filter "*.sig" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-          $signature = ""
-          if ($sigFile) {
-            $signature = (Get-Content $sigFile.FullName -Raw).Trim()
-            Write-Host "Signature found: $($sigFile.FullName)"
+          $notes = "Storm POS $tag - Download the Windows installer below. Existing installs update automatically on next launch."
+          gh release create $tag --title "Storm POS $tag" --notes $notes
+
+          gh release upload $tag $exe.FullName
+          if ($msi) { gh release upload $tag $msi.FullName }
+          if ($exeSig) { gh release upload $tag $exeSig.FullName }
+
+          $sig = ""
+          if ($exeSig -and (Test-Path $exeSig.FullName)) {
+            $sig = (Get-Content $exeSig.FullName -Raw).Trim()
+            Write-Host "Signature OK (length $($sig.Length))"
           } else {
-            Write-Host "No .sig file found anywhere in bundle"
+            Write-Host "WARNING: No .exe.sig file found — updater will not work"
           }
 
-          $platformEntry = @{ url = $downloadUrl }
-          if ($signature -ne "") { $platformEntry.signature = $signature }
+          $exeName     = $exe.Name -replace ' ', '.'
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
+          Write-Host "Download URL: $downloadUrl"
 
-          $json = @{
-            version  = $version
-            notes    = "Improvements and bug fixes."
-            pub_date = $date
-            platforms = @{ "windows-x86_64" = $platformEntry }
+          $latestJson = [ordered]@{
+            version   = $version
+            notes     = "Improvements and bug fixes."
+            pub_date  = $date
+            platforms = @{ "windows-x86_64" = [ordered]@{ url = $downloadUrl; signature = $sig } }
           } | ConvertTo-Json -Depth 5
 
-          $json | Out-File -FilePath "latest.json" -Encoding utf8NoBOM
-          Write-Host "=== latest.json ==="
-          Get-Content "latest.json"
+          $latestJson | Out-File "latest.json" -Encoding utf8NoBOM
+          Write-Host "=== latest.json ===" ; Get-Content "latest.json"
 
-          gh release upload $tag latest.json --clobber
-          Write-Host "Uploaded latest.json"
+          gh release upload $tag latest.json
+          Write-Host "Done - release $tag complete."

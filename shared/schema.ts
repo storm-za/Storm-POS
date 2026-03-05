@@ -144,6 +144,8 @@ export const posInvoices = pgTable("pos_invoices", {
   paymentDetails: text("payment_details"), // Bank details, payment instructions, etc.
   notes: text("notes"), // Additional notes
   terms: text("terms"), // Terms & conditions
+  showBusinessInfo: boolean("show_business_info").notNull().default(true),
+  customFieldValues: jsonb("custom_field_values"), // { cf_id: value, vis_fieldName: boolean }
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -279,6 +281,17 @@ export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit
   lastUpdated: true,
 });
 
+// Invoice custom field definition
+export const invoiceCustomFieldSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  placeholder: z.string().default(''),
+  section: z.enum(['billTo', 'details', 'footer']),
+  visible: z.boolean().default(true),
+});
+
+export type InvoiceCustomField = z.infer<typeof invoiceCustomFieldSchema>;
+
 // Receipt Settings Schema
 export const receiptSettingsSchema = z.object({
   sections: z.array(z.enum(['logo', 'businessInfo', 'dateTime', 'staffInfo', 'customerInfo', 'items', 'totals', 'paymentInfo', 'messages'])).default(['logo', 'businessInfo', 'dateTime', 'staffInfo', 'customerInfo', 'items', 'totals', 'paymentInfo', 'messages']),
@@ -315,6 +328,10 @@ export const receiptSettingsSchema = z.object({
     thankYou: z.string().default('Thank you for your business!'),
   }).default({}),
   logoDataUrl: z.string().optional(),
+  lastBusinessInfoUpdate: z.string().optional(), // ISO date YYYY-MM-DD
+  invoiceSettings: z.object({
+    customFields: z.array(invoiceCustomFieldSchema).default([]),
+  }).default({ customFields: [] }),
 });
 
 export const defaultReceiptSettings = (): z.infer<typeof receiptSettingsSchema> => ({
@@ -340,6 +357,7 @@ export const defaultReceiptSettings = (): z.infer<typeof receiptSettingsSchema> 
   customMessages: {
     thankYou: 'Thank you for your business!',
   },
+  invoiceSettings: { customFields: [] },
 });
 
 // Types

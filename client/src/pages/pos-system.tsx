@@ -179,6 +179,8 @@ export default function PosSystem() {
   const [invoicePaymentDetails, setInvoicePaymentDetails] = useState("");
   const [invoiceTerms, setInvoiceTerms] = useState("");
   const [invoiceTaxEnabled, setInvoiceTaxEnabled] = useState(true);
+  const [invoiceShowBusinessInfo, setInvoiceShowBusinessInfo] = useState(true);
+  const [invoiceCustomFieldValues, setInvoiceCustomFieldValues] = useState<Record<string, any>>({});
   const [isSavePaymentDialogOpen, setIsSavePaymentDialogOpen] = useState(false);
   const [savePaymentName, setSavePaymentName] = useState("");
   
@@ -2908,39 +2910,51 @@ export default function PosSystem() {
       }
     }
     
-    // Business Details - Right side header (no company name)
+    // Business Details - Right side header
     const headerRightX = pageWidth - margin;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(80, 80, 80);
     let headerY = y + 5;
-    
-    if (businessAddress1) {
-      doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessAddress2) {
-      doc.text(businessAddress2, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessPhone) {
-      doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessEmail) {
-      doc.text(businessEmail, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessWebsite) {
-      doc.text(businessWebsite, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (vatNumber) {
-      doc.text(`VAT: ${vatNumber}`, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (regNumber) {
-      doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' });
+    const showBizInfo = invoice.showBusinessInfo !== false;
+
+    if (showBizInfo) {
+      // Company name — bold and prominent
+      if (companyName) {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+        doc.text(companyName, headerRightX, headerY, { align: 'right' });
+        headerY += 5;
+      }
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      if (businessAddress1) {
+        doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (businessAddress2) {
+        doc.text(businessAddress2, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (businessPhone) {
+        doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (businessEmail) {
+        doc.text(businessEmail, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (businessWebsite) {
+        doc.text(businessWebsite, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (vatNumber) {
+        doc.text(`VAT: ${vatNumber}`, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
+      if (regNumber) {
+        doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' });
+        headerY += 4;
+      }
     }
     
     // Document Type Label (positioned below company details)
@@ -3007,11 +3021,37 @@ export default function PosSystem() {
     
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0, 0, 0);
+    // Get custom field values and visibility from invoice
+    const cfValues: Record<string, any> = (invoice.customFieldValues as any) || {};
+
+    // Get invoice custom fields from user's settings
+    const invoiceSettings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const customFields: any[] = (invoiceSettings as any).invoiceSettings?.customFields || [];
+
+    const visOf = (key: string, defaultVal = true) =>
+      cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
+
+    // Bill To — custom fields for billTo section
+    const billToCustomFields = customFields.filter((f: any) => f.section === 'billTo' && f.visible !== false);
+    billToCustomFields.forEach((field: any) => {
+      const val = cfValues[`cf_${field.id}`];
+      if (val) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(`${field.label}: ${val}`, leftColX, clientY);
+        clientY += 5;
+      }
+    });
+
     const detailsData = [
       { label: 'Date:', value: formatDate(invoice.createdDate) },
-      { label: 'Due Date:', value: formatDate(invoice.dueDate) },
-      ...(invoice.dueTerms ? [{ label: 'Terms:', value: invoice.dueTerms }] : []),
-      ...(invoice.poNumber ? [{ label: 'PO #:', value: invoice.poNumber }] : [])
+      ...(invoice.dueDate ? [{ label: 'Due Date:', value: formatDate(invoice.dueDate) }] : []),
+      ...(invoice.dueTerms && invoice.dueTerms !== 'none' ? [{ label: 'Terms:', value: invoice.dueTerms }] : []),
+      ...(invoice.poNumber && visOf('poNumber') ? [{ label: 'PO #:', value: invoice.poNumber }] : []),
+      // Details section custom fields
+      ...customFields
+        .filter((f: any) => f.section === 'details' && f.visible !== false && cfValues[`cf_${f.id}`])
+        .map((f: any) => ({ label: `${f.label}:`, value: cfValues[`cf_${f.id}`] })),
     ];
     
     let detailY = y + 8;
@@ -3192,6 +3232,22 @@ export default function PosSystem() {
       doc.text(termsLines, margin, y + 6);
     }
     
+    // ===== FOOTER CUSTOM FIELDS =====
+    const footerCustomFields = customFields.filter((f: any) => f.section === 'footer' && f.visible !== false);
+    if (footerCustomFields.length > 0) {
+      y += 5;
+      footerCustomFields.forEach((field: any) => {
+        const val = cfValues[`cf_${field.id}`];
+        if (val) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(80, 80, 80);
+          doc.text(`${field.label}: ${val}`, margin, y);
+          y += 5;
+        }
+      });
+    }
+
     // ===== FOOTER =====
     const footerY = pageHeight - 20;
     doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
