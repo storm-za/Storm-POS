@@ -8282,7 +8282,9 @@ ${dateFilteredSales.map(sale =>
                     paymentMethod: invoicePaymentMethod || null,
                     paymentDetails: invoicePaymentDetails || null,
                     notes: invoiceNotes || null,
-                    terms: invoiceTerms || null
+                    terms: invoiceTerms || null,
+                    showBusinessInfo: invoiceShowBusinessInfo,
+                    customFieldValues: invoiceCustomFieldValues,
                   };
                   
                   if (editingInvoice) {
