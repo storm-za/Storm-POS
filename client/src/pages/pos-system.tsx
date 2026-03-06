@@ -3430,6 +3430,7 @@ export default function PosSystem() {
     doc.text(`Date: ${formatDate(invoice.createdAt)}`, rightColX, detailY);
     detailY += 6;
     if (invoice.dueDate && visOf('dueDate')) { doc.text(`Due: ${formatDate(invoice.dueDate)}`, rightColX, detailY); detailY += 6; }
+    if (invoice.dueTerms && invoice.dueTerms !== 'none' && visOf('dueTerms')) { doc.text(`Terms: ${invoice.dueTerms}`, rightColX, detailY); detailY += 6; }
     if (invoice.poNumber && visOf('poNumber')) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); }
     
     y = Math.max(clientY, detailY) + 15;
@@ -9137,7 +9138,7 @@ export default function PosSystem() {
                     <Label className="text-xs text-gray-500">Due Date</Label>
                     <p className="font-medium text-sm">{new Date(selectedInvoice.dueDate).toLocaleDateString()}</p>
                   </div>
-                  {selectedInvoice.dueTerms && (
+                  {selectedInvoice.dueTerms && (selectedInvoice.customFieldValues as any)?.vis_dueTerms !== false && (
                     <div>
                       <Label className="text-xs text-gray-500">Terms</Label>
                       <p className="font-medium text-sm">{selectedInvoice.dueTerms}</p>
