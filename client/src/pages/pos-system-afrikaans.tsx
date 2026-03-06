@@ -1819,6 +1819,8 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
+      setInvoiceCustomFieldValues({});
+      setInvoiceShowBusinessInfo(true);
       setShowQuickAddProduct(false);
       setQuickAddName("");
       setQuickAddPrice("");
@@ -1866,6 +1868,8 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
+      setInvoiceCustomFieldValues({});
+      setInvoiceShowBusinessInfo(true);
       setShowQuickAddProduct(false);
       setQuickAddName("");
       setQuickAddPrice("");
@@ -7482,6 +7486,8 @@ ${dateFilteredSales.map(sale =>
             setInvoiceTerms("");
             setInvoiceTaxEnabled(true);
             setInvoiceType('invoice');
+            setInvoiceCustomFieldValues({});
+            setInvoiceShowBusinessInfo(true);
           }
         }}
       >
@@ -8560,6 +8566,8 @@ ${dateFilteredSales.map(sale =>
                           price: parseFloat(item.price)
                         })));
                         
+                        setInvoiceCustomFieldValues((selectedInvoice.customFieldValues as any) || {});
+                        setInvoiceShowBusinessInfo(selectedInvoice.showBusinessInfo !== false);
                         setIsInvoiceViewOpen(false);
                         setIsInvoiceDialogOpen(true);
                       }
@@ -8660,6 +8668,8 @@ ${dateFilteredSales.map(sale =>
                             price: parseFloat(item.price)
                           })));
                           
+                          setInvoiceCustomFieldValues((selectedInvoice.customFieldValues as any) || {});
+                          setInvoiceShowBusinessInfo(selectedInvoice.showBusinessInfo !== false);
                           setIsInvoiceViewOpen(false);
                           setIsInvoiceDialogOpen(true);
                         }
