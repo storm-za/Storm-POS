@@ -840,7 +840,10 @@ export default function PosSystemAfrikaans() {
       { label: 'Datum:', value: formatDate(invoice.createdDate) },
       ...(invoice.dueDate && visOf('dueDate') ? [{ label: 'Vervaldatum:', value: formatDate(invoice.dueDate) }] : []),
       ...(invoice.dueTerms && visOf('dueTerms') ? [{ label: 'Terme:', value: invoice.dueTerms }] : []),
-      ...(invoice.poNumber && visOf('poNumber') ? [{ label: 'BO #:', value: invoice.poNumber }] : [])
+      ...(invoice.poNumber && visOf('poNumber') ? [{ label: 'BO #:', value: invoice.poNumber }] : []),
+      ...((settings as any).invoiceSettings?.customFields || [])
+        .filter((cf: any) => cfValues[`cf_${cf.id}`] && visOf(cf.id))
+        .map((cf: any) => ({ label: `${cf.label}:`, value: String(cfValues[`cf_${cf.id}`]) }))
     ];
     
     let detailY = y + 8;
@@ -1165,8 +1168,11 @@ export default function PosSystemAfrikaans() {
     detailY += 6;
     if (invoice.dueDate && visOf2('dueDate')) { doc.text(`Verskuldig: ${formatDate(invoice.dueDate)}`, rightColX, detailY); detailY += 6; }
     if (invoice.dueTerms && visOf2('dueTerms')) { doc.text(`Terme: ${invoice.dueTerms}`, rightColX, detailY); detailY += 6; }
-    if (invoice.poNumber && visOf2('poNumber')) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); }
-    
+    if (invoice.poNumber && visOf2('poNumber')) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); detailY += 6; }
+    ((settings as any).invoiceSettings?.customFields || [])
+      .filter((cf: any) => cfValues2[`cf_${cf.id}`] && visOf2(cf.id))
+      .forEach((cf: any) => { doc.text(`${cf.label}: ${String(cfValues2[`cf_${cf.id}`])}`, rightColX, detailY); detailY += 6; });
+
     y = Math.max(clientY, detailY) + 15;
     
     const tableHeaderY = y;
@@ -8396,6 +8402,19 @@ ${dateFilteredSales.map(sale =>
                       <p className="font-medium text-sm whitespace-pre-wrap">{selectedInvoice.paymentDetails}</p>
                     </div>
                   )}
+                  {(() => {
+                    const cfSetts = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
+                    const cfs = (cfSetts as any).invoiceSettings?.customFields || [];
+                    const cfVals: any = (selectedInvoice.customFieldValues as any) || {};
+                    return cfs
+                      .filter((cf: any) => cfVals[`cf_${cf.id}`] && cfVals[`vis_${cf.id}`] !== false)
+                      .map((cf: any) => (
+                        <div key={cf.id}>
+                          <Label className="text-xs text-gray-500">{cf.label}</Label>
+                          <p className="font-medium text-sm">{cfVals[`cf_${cf.id}`]}</p>
+                        </div>
+                      ));
+                  })()}
                 </div>
 
                 {/* Line Items - Mobile Cards / Desktop Table */}
