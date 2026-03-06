@@ -21,7 +21,7 @@ import { z } from "zod";
 import { 
   ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, Download, User, UserPlus, Settings, X, Printer,
+  Calendar, TrendingUp, FileText, Clock, Eye, EyeOff, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
   AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2
 } from "lucide-react";
@@ -807,11 +807,15 @@ export default function PosSystemAfrikaans() {
     let clientY = y + 15;
     const clientPhone = invoice.clientPhone || client?.phone;
     const clientEmail = invoice.clientEmail || client?.email;
-    if (clientPhone) {
+    const cfValues: Record<string, any> = (invoice.customFieldValues as any) || {};
+    const visOf = (key: string, defaultVal = true) =>
+      cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
+
+    if (clientPhone && visOf('clientPhone')) {
       doc.text(`Tel: ${clientPhone}`, leftColX, clientY);
       clientY += 5;
     }
-    if (clientEmail) {
+    if (clientEmail && visOf('clientEmail')) {
       doc.text(`E-pos: ${clientEmail}`, leftColX, clientY);
       clientY += 5;
     }
@@ -830,9 +834,9 @@ export default function PosSystemAfrikaans() {
     
     const detailsData = [
       { label: 'Datum:', value: formatDate(invoice.createdDate) },
-      { label: 'Vervaldatum:', value: formatDate(invoice.dueDate) },
-      ...(invoice.dueTerms ? [{ label: 'Terme:', value: invoice.dueTerms }] : []),
-      ...(invoice.poNumber ? [{ label: 'BO #:', value: invoice.poNumber }] : [])
+      ...(invoice.dueDate && visOf('dueDate') ? [{ label: 'Vervaldatum:', value: formatDate(invoice.dueDate) }] : []),
+      ...(invoice.dueTerms && visOf('dueTerms') ? [{ label: 'Terme:', value: invoice.dueTerms }] : []),
+      ...(invoice.poNumber && visOf('poNumber') ? [{ label: 'BO #:', value: invoice.poNumber }] : [])
     ];
     
     let detailY = y + 8;
@@ -951,7 +955,7 @@ export default function PosSystemAfrikaans() {
     y += 25;
     
     // ===== BETAALMETODE =====
-    if (invoice.paymentMethod) {
+    if (invoice.paymentMethod && visOf('paymentMethod')) {
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
@@ -962,7 +966,7 @@ export default function PosSystemAfrikaans() {
     }
     
     // ===== BETALINGSBESONDERHEDE =====
-    if (invoice.paymentDetails) {
+    if (invoice.paymentDetails && visOf('paymentDetails')) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -976,7 +980,7 @@ export default function PosSystemAfrikaans() {
     }
     
     // ===== NOTAS AFDELING =====
-    if (invoice.notes) {
+    if (invoice.notes && visOf('notes')) {
       // Only add page break for 10+ items when running out of space
       if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
@@ -995,7 +999,7 @@ export default function PosSystemAfrikaans() {
     }
     
     // ===== TERME & VOORWAARDES =====
-    if (invoice.terms) {
+    if (invoice.terms && visOf('terms')) {
       // Only add page break for 10+ items when running out of space
       if (needsSecondPage && y > pageHeight - 60) {
         doc.addPage();
@@ -1138,8 +1142,11 @@ export default function PosSystemAfrikaans() {
     let clientY = y + 15;
     const clientPhone2 = invoice.clientPhone || client?.phone;
     const clientEmail2 = invoice.clientEmail || client?.email;
-    if (clientPhone2) { doc.text(`Tel: ${clientPhone2}`, leftColX, clientY); clientY += 5; }
-    if (clientEmail2) { doc.text(`E-pos: ${clientEmail2}`, leftColX, clientY); clientY += 5; }
+    const cfValues2: Record<string, any> = (invoice.customFieldValues as any) || {};
+    const visOf2 = (key: string, defaultVal = true) =>
+      cfValues2[`vis_${key}`] !== undefined ? cfValues2[`vis_${key}`] : defaultVal;
+    if (clientPhone2 && visOf2('clientPhone')) { doc.text(`Tel: ${clientPhone2}`, leftColX, clientY); clientY += 5; }
+    if (clientEmail2 && visOf2('clientEmail')) { doc.text(`E-pos: ${clientEmail2}`, leftColX, clientY); clientY += 5; }
     if (client?.notes) { doc.text(client.notes, leftColX, clientY); }
     
     doc.setFont('helvetica', 'bold');
@@ -1152,8 +1159,8 @@ export default function PosSystemAfrikaans() {
     let detailY = y + 8;
     doc.text(`Datum: ${formatDate(invoice.createdAt)}`, rightColX, detailY);
     detailY += 6;
-    if (invoice.dueDate) { doc.text(`Verskuldig: ${formatDate(invoice.dueDate)}`, rightColX, detailY); detailY += 6; }
-    if (invoice.poNumber) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); }
+    if (invoice.dueDate && visOf2('dueDate')) { doc.text(`Verskuldig: ${formatDate(invoice.dueDate)}`, rightColX, detailY); detailY += 6; }
+    if (invoice.poNumber && visOf2('poNumber')) { doc.text(`PO: ${invoice.poNumber}`, rightColX, detailY); }
     
     y = Math.max(clientY, detailY) + 15;
     
@@ -1243,7 +1250,7 @@ export default function PosSystemAfrikaans() {
     
     y += 20;
     
-    if (invoice.paymentMethod) {
+    if (invoice.paymentMethod && visOf2('paymentMethod')) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -1255,7 +1262,7 @@ export default function PosSystemAfrikaans() {
       y += 15;
     }
     
-    if (invoice.notes) {
+    if (invoice.notes && visOf2('notes')) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -1268,7 +1275,7 @@ export default function PosSystemAfrikaans() {
       y += 6 + (notesLines.length * 5);
     }
     
-    if (invoice.terms) {
+    if (invoice.terms && visOf2('terms')) {
       y += 10;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
@@ -7558,7 +7565,12 @@ ${dateFilteredSales.map(sale =>
 
             {/* Kliënt Telefoon */}
             <div>
-              <Label>Kliënt Telefoon (Opsioneel)</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Kliënt Telefoon (Opsioneel)</Label>
+                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_clientPhone: prev.vis_clientPhone === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_clientPhone === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                  {invoiceCustomFieldValues.vis_clientPhone === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
               <input
                 type="tel"
                 value={invoiceClientPhone}
@@ -7570,7 +7582,12 @@ ${dateFilteredSales.map(sale =>
 
             {/* PO Number */}
             <div>
-              <Label>PO Nommer (Opsioneel)</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>PO Nommer (Opsioneel)</Label>
+                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_poNumber: prev.vis_poNumber === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_poNumber === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                  {invoiceCustomFieldValues.vis_poNumber === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
               <input
                 type="text"
                 value={invoicePoNumber}
@@ -7582,7 +7599,12 @@ ${dateFilteredSales.map(sale =>
 
             {/* Payment Terms */}
             <div>
-              <Label>Betalingsvoorwaardes</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Betalingsvoorwaardes</Label>
+                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueTerms: prev.vis_dueTerms === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_dueTerms === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                  {invoiceCustomFieldValues.vis_dueTerms === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
               <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
                 <SelectTrigger>
                   <SelectValue />
@@ -7600,7 +7622,12 @@ ${dateFilteredSales.map(sale =>
 
             {/* Due Date */}
             <div>
-              <Label>Vervaldatum (Opsioneel)</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Vervaldatum (Opsioneel)</Label>
+                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueDate: prev.vis_dueDate === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_dueDate === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                  {invoiceCustomFieldValues.vis_dueDate === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
               <input
                 type="date"
                 value={invoiceDueDate}
@@ -7883,7 +7910,12 @@ ${dateFilteredSales.map(sale =>
 
             {/* Payment Method */}
             <div>
-              <Label>Betaalmetode (Opsioneel)</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Betaalmetode (Opsioneel)</Label>
+                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentMethod: prev.vis_paymentMethod === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_paymentMethod === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                  {invoiceCustomFieldValues.vis_paymentMethod === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
               <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
                 <SelectTrigger>
                   <SelectValue placeholder="Kies betaalmetode" />
@@ -7900,7 +7932,12 @@ ${dateFilteredSales.map(sale =>
             {/* Payment Details */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                <div className="flex items-center gap-2">
+                  <Label>Betalingsbesonderhede (Opsioneel)</Label>
+                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentDetails: prev.vis_paymentDetails === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_paymentDetails === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                    {invoiceCustomFieldValues.vis_paymentDetails === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
                 {savedPaymentDetails.length > 0 && (
                   <Select 
                     value="" 
@@ -7951,7 +7988,12 @@ ${dateFilteredSales.map(sale =>
             {/* Notes & Terms - Side by Side */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
+                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_notes: prev.vis_notes === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_notes === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                    {invoiceCustomFieldValues.vis_notes === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
                 <textarea
                   value={invoiceNotes}
                   onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
@@ -7962,7 +8004,12 @@ ${dateFilteredSales.map(sale =>
                 />
               </div>
               <div>
-                <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
+                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_terms: prev.vis_terms === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_terms === false ? 'Wys op PDF' : 'Verberg van PDF'}>
+                    {invoiceCustomFieldValues.vis_terms === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
                 <textarea
                   value={invoiceTerms}
                   onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
