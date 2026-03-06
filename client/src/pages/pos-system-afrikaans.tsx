@@ -184,6 +184,10 @@ export default function PosSystemAfrikaans() {
   const [showQuickAddProduct, setShowQuickAddProduct] = useState(false);
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
+  const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
+  const [invoicePickerSearch, setInvoicePickerSearch] = useState("");
+  const [invoiceCategoryFilter, setInvoiceCategoryFilter] = useState<number | null>(null);
+  const [invoicePriceMode, setInvoicePriceMode] = useState<'retail' | 'trade'>('retail');
   const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
   const [invoiceClientEmail, setInvoiceClientEmail] = useState("");
   const [invoiceClientPhone, setInvoiceClientPhone] = useState("");
@@ -7702,31 +7706,130 @@ ${dateFilteredSales.map(sale =>
                   );
                 })}
                 
-                {/* Add Line Item from Product List */}
-                <Select
-                  value=""
-                  onValueChange={(value) => {
-                    const product = products.find(p => p.id === parseInt(value));
-                    if (product) {
-                      setInvoiceItems([...invoiceItems, {
-                        productId: product.id,
-                        quantity: 1,
-                        price: parseFloat(product.retailPrice)
-                      }]);
-                    }
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies produk van lys" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map((product) => (
-                      <SelectItem key={product.id} value={product.id.toString()}>
-                        {product.name} - R{product.retailPrice}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {/* Enterprise Product Picker */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
+                  >
+                    <span className="flex items-center gap-2 text-gray-500">
+                      <Package className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                      Kies produk van voorraad...
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${invoicePickerOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {invoicePickerOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                        {/* Search + Price Toggle */}
+                        <div className="p-3 border-b bg-gray-50 space-y-2">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                              type="text"
+                              autoFocus
+                              value={invoicePickerSearch}
+                              onChange={(e) => setInvoicePickerSearch(e.target.value)}
+                              placeholder="Soek op naam of SKU..."
+                              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
+                            />
+                          </div>
+                          {products.some(p => p.tradePrice && parseFloat(p.tradePrice) > 0) && (
+                            <div className="flex bg-white border rounded-lg p-0.5 gap-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setInvoicePriceMode('retail')}
+                                className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors ${invoicePriceMode === 'retail' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+                              >
+                                Kleinhandelprys
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setInvoicePriceMode('trade')}
+                                className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-md transition-colors ${invoicePriceMode === 'trade' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+                              >
+                                Handelsprys
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Category Pills */}
+                        {categories.length > 0 && (
+                          <div className="flex gap-1.5 px-3 py-2 border-b overflow-x-auto bg-white" style={{ scrollbarWidth: 'none' }}>
+                            <button
+                              type="button"
+                              onClick={() => setInvoiceCategoryFilter(null)}
+                              className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${invoiceCategoryFilter === null ? 'bg-[hsl(217,90%,40%)] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                            >
+                              Alles
+                            </button>
+                            {categories.map(cat => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => setInvoiceCategoryFilter(cat.id)}
+                                className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${invoiceCategoryFilter === cat.id ? 'bg-[hsl(217,90%,40%)] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                              >
+                                {cat.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Products */}
+                        <div className="max-h-64 overflow-y-auto">
+                          {(() => {
+                            const filtered = products.filter(p => {
+                              const matchesCat = invoiceCategoryFilter === null || p.categoryId === invoiceCategoryFilter;
+                              const q = invoicePickerSearch.toLowerCase();
+                              const matchesSearch = !q || p.name.toLowerCase().includes(q) || (p.sku || '').toLowerCase().includes(q);
+                              return matchesCat && matchesSearch;
+                            });
+                            if (filtered.length === 0) {
+                              return (
+                                <div className="py-10 text-center text-sm text-gray-400 flex flex-col items-center gap-2">
+                                  <Package className="w-8 h-8 text-gray-200" />
+                                  Geen produkte gevind nie
+                                </div>
+                              );
+                            }
+                            return filtered.map(product => {
+                              const price = invoicePriceMode === 'trade' && product.tradePrice && parseFloat(product.tradePrice) > 0
+                                ? parseFloat(product.tradePrice)
+                                : parseFloat(product.retailPrice);
+                              return (
+                                <button
+                                  key={product.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setInvoiceItems([...invoiceItems, { productId: product.id, quantity: 1, price }]);
+                                    setInvoicePickerOpen(false);
+                                    setInvoicePickerSearch("");
+                                  }}
+                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[hsl(217,90%,97%)] border-b last:border-b-0 text-left transition-colors group"
+                                >
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-medium text-gray-900 truncate">{product.name}</div>
+                                    {product.sku && <div className="text-xs text-gray-400 mt-0.5 font-mono">SKU: {product.sku}</div>}
+                                  </div>
+                                  <div className="shrink-0 text-right">
+                                    <div className="text-sm font-semibold text-[hsl(217,90%,40%)]">R{price.toFixed(2)}</div>
+                                    <div className="text-xs text-gray-400">{invoicePriceMode === 'retail' ? 'Kleinhandel' : 'Handel'}</div>
+                                  </div>
+                                  <Plus className="w-4 h-4 text-[hsl(217,90%,40%)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                                </button>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
                 
                 {/* Quick Add Custom Product */}
                 <div className="border-t pt-2">
