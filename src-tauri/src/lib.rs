@@ -1,23 +1,34 @@
+#[cfg(desktop)]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+#[cfg(desktop)]
 use tauri_plugin_updater::UpdaterExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    #[cfg(desktop)]
+    let builder = builder
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_dialog::init());
+
+    builder
         .setup(|app| {
-            let app_handle = app.handle().clone();
-            tauri::async_runtime::spawn(async move {
-                check_for_updates(app_handle).await;
-            });
+            #[cfg(desktop)]
+            {
+                let app_handle = app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    check_for_updates(app_handle).await;
+                });
+            }
             Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running Storm POS");
 }
 
+#[cfg(desktop)]
 async fn check_for_updates(app: tauri::AppHandle) {
     let updater = match app.updater() {
         Ok(u) => u,
