@@ -105,6 +105,8 @@ export default function PosSystemAfrikaans() {
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [showDeleteAllProductsConfirm, setShowDeleteAllProductsConfirm] = useState(false);
+  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
@@ -6062,6 +6064,34 @@ ${dateFilteredSales.map(sale =>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Gevaarzone */}
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-red-900/40 shadow-2xl shadow-red-900/10">
+                <CardHeader className="border-b border-red-900/30 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-red-400">
+                    <Trash2 className="w-5 h-5" />
+                    Gevaarzone
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-red-950/30 border border-red-900/30 rounded-lg">
+                    <div>
+                      <h4 className="text-white font-semibold mb-1">Skrap My Rekening &amp; Alle Data</h4>
+                      <p className="text-sm text-gray-400">
+                        Verwyder permanent jou rekening, alle verkope, produkte, kliënte, fakture en besigheidsdata. Dit kan nie ongedaan gemaak word nie.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500 shrink-0"
+                      onClick={() => setIsDeleteAccountDialogOpen(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Skrap Rekening
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </TabsContent>
         </Tabs>
@@ -8925,6 +8955,64 @@ ${dateFilteredSales.map(sale =>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Skrap Rekening Bevestigingsdialoog */}
+      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
+        <AlertDialogContent className="bg-gray-900 border border-red-900/40">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-400 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Skrap Rekening &amp; Alle Data?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
+              Dit sal jou rekening en alle geassosieerde data <strong className="text-red-400">permanent skrap</strong>, insluitende:
+              <ul className="mt-3 space-y-1 text-gray-400 text-sm list-disc pl-5">
+                <li>Alle verkoopsgeskiedenis en transaksies</li>
+                <li>Alle produkte en voorraad</li>
+                <li>Alle kliënte</li>
+                <li>Alle fakture en kwotasies</li>
+                <li>Alle personeelrekeninge</li>
+                <li>Alle besigheidsinstellings en data</li>
+              </ul>
+              <span className="block mt-3 font-semibold text-red-400">Hierdie aksie kan nie ongedaan gemaak word nie.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              onClick={() => setIsDeleteAccountDialogOpen(false)}
+            >
+              Kanselleer
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeletingAccount}
+              onClick={async () => {
+                if (!currentUser) return;
+                setIsDeletingAccount(true);
+                try {
+                  const res = await fetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  if (res.ok) {
+                    localStorage.removeItem('posUser');
+                    localStorage.removeItem('posToken');
+                    window.location.href = '/pos/login';
+                  } else {
+                    toast({ title: 'Fout', description: 'Kon nie rekening skrap nie. Probeer asseblief weer.', variant: 'destructive' });
+                    setIsDeletingAccount(false);
+                    setIsDeleteAccountDialogOpen(false);
+                  }
+                } catch {
+                  toast({ title: 'Fout', description: 'Kon nie rekening skrap nie. Probeer asseblief weer.', variant: 'destructive' });
+                  setIsDeletingAccount(false);
+                  setIsDeleteAccountDialogOpen(false);
+                }
+              }}
+            >
+              {isDeletingAccount ? 'Besig om te skrap...' : 'Ja, Skrap Alles'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Import Preview Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">

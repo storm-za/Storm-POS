@@ -594,6 +594,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete account and all associated data
+  app.delete("/api/pos/account/delete/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) return res.status(400).json({ message: "Invalid userId" });
+      await storage.deleteAccount(userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
   // Delete all products for a user
   app.delete("/api/pos/products/all/:userId", async (req, res) => {
     try {

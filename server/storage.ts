@@ -143,6 +143,7 @@ export interface IStorage {
   setSystemSetting(key: string, value: string): Promise<void>;
   getLastMonthlyResetDate(): Promise<string | null>;
   setLastMonthlyResetDate(date: string): Promise<void>;
+  deleteAccount(userId: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -693,6 +694,10 @@ export class MemStorage implements IStorage {
   async setLastMonthlyResetDate(date: string): Promise<void> {
     // No-op in MemStorage
   }
+
+  async deleteAccount(userId: number): Promise<void> {
+    // No-op in MemStorage
+  }
 }
 
 // DatabaseStorage implementation
@@ -1218,6 +1223,20 @@ export class DatabaseStorage implements IStorage {
 
   async setLastMonthlyResetDate(date: string): Promise<void> {
     return this.setSystemSetting('last_monthly_reset_date', date);
+  }
+
+  async deleteAccount(userId: number): Promise<void> {
+    await db.delete(posStaffAccounts).where(eq(posStaffAccounts.posUserId, userId));
+    await db.delete(posSales).where(eq(posSales.userId, userId));
+    await db.delete(posOpenAccounts).where(eq(posOpenAccounts.userId, userId));
+    await db.delete(posInvoices).where(eq(posInvoices.userId, userId));
+    await db.delete(posSavedPaymentDetails).where(eq(posSavedPaymentDetails.userId, userId));
+    await db.delete(posPurchaseOrders).where(eq(posPurchaseOrders.userId, userId));
+    await db.delete(posCustomers).where(eq(posCustomers.userId, userId));
+    await db.delete(posProducts).where(eq(posProducts.userId, userId));
+    await db.delete(posCategories).where(eq(posCategories.userId, userId));
+    await db.delete(posSuppliers).where(eq(posSuppliers.userId, userId));
+    await db.delete(posUsers).where(eq(posUsers.id, userId));
   }
 }
 

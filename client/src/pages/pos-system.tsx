@@ -95,6 +95,8 @@ export default function PosSystem() {
   const [editingProduct, setEditingProduct] = useState<PosProduct | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [showDeleteAllProductsConfirm, setShowDeleteAllProductsConfirm] = useState(false);
+  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<PosCustomer | null>(null);
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<StaffAccount | null>(null);
@@ -6874,6 +6876,34 @@ export default function PosSystem() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Danger Zone */}
+              <Card className="bg-gray-800/50 backdrop-blur-xl border-red-900/40 shadow-2xl shadow-red-900/10">
+                <CardHeader className="border-b border-red-900/30 pb-4">
+                  <CardTitle className="flex items-center gap-2 text-red-400">
+                    <Trash2 className="w-5 h-5" />
+                    Danger Zone
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-red-950/30 border border-red-900/30 rounded-lg">
+                    <div>
+                      <h4 className="text-white font-semibold mb-1">Delete My Account & All Data</h4>
+                      <p className="text-sm text-gray-400">
+                        Permanently deletes your account, all sales, products, customers, invoices, and business data. This cannot be undone.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500 shrink-0"
+                      onClick={() => setIsDeleteAccountDialogOpen(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Account
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </TabsContent>
         </Tabs>
@@ -9660,6 +9690,64 @@ export default function PosSystem() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
+        <AlertDialogContent className="bg-gray-900 border border-red-900/40">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-400 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Delete Account & All Data?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
+              This will <strong className="text-red-400">permanently delete</strong> your account and all associated data including:
+              <ul className="mt-3 space-y-1 text-gray-400 text-sm list-disc pl-5">
+                <li>All sales history and transactions</li>
+                <li>All products and inventory</li>
+                <li>All customers</li>
+                <li>All invoices and quotes</li>
+                <li>All staff accounts</li>
+                <li>All business settings and data</li>
+              </ul>
+              <span className="block mt-3 font-semibold text-red-400">This action cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              onClick={() => setIsDeleteAccountDialogOpen(false)}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeletingAccount}
+              onClick={async () => {
+                if (!currentUser) return;
+                setIsDeletingAccount(true);
+                try {
+                  const res = await fetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  if (res.ok) {
+                    localStorage.removeItem('posUser');
+                    localStorage.removeItem('posToken');
+                    window.location.href = '/pos/login';
+                  } else {
+                    toast({ title: 'Error', description: 'Failed to delete account. Please try again.', variant: 'destructive' });
+                    setIsDeletingAccount(false);
+                    setIsDeleteAccountDialogOpen(false);
+                  }
+                } catch {
+                  toast({ title: 'Error', description: 'Failed to delete account. Please try again.', variant: 'destructive' });
+                  setIsDeletingAccount(false);
+                  setIsDeleteAccountDialogOpen(false);
+                }
+              }}
+            >
+              {isDeletingAccount ? 'Deleting...' : 'Yes, Delete Everything'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Excel Import Preview Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
