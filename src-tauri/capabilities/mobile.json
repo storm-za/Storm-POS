@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/mobile-schema.json",
   "identifier": "mobile-default",
   "description": "Storm POS Android permissions",
-  "platforms": ["android", "ios"],
+  "platforms": ["android"],
   "windows": ["main"],
   "permissions": [
     "core:path:default",
