@@ -1,0 +1,20 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile-default",
+  "description": "Storm POS Android permissions",
+  "platforms": ["android", "ios"],
+  "windows": ["main"],
+  "permissions": [
+    "core:path:default",
+    "core:event:default",
+    "core:window:default",
+    "core:app:default",
+    "core:resources:default"
+  ],
+  "remote": {
+    "urls": [
+      "https://stormsoftware.co.za/**",
+      "https://storm-software.replit.app/**"
+    ]
+  }
+}
