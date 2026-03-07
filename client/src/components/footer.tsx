@@ -108,12 +108,14 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 text-sm">
-              &copy; 2025 Storm. All rights reserved.
+              &copy; {new Date().getFullYear()} Storm. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm">
               <span className="text-gray-500">Proudly South African</span>
               <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-              <span className="text-gray-500">Built with passion</span>
+              <Link href="/privacy" className="text-gray-500 hover:text-[hsl(217,90%,60%)] transition-colors duration-300">
+                Privacy Policy
+              </Link>
             </div>
           </div>
         </div>

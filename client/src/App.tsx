@@ -16,6 +16,7 @@ import { HelpCenterAfrikaans } from "@/pages/HelpCenterAfrikaans";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Contact from "@/pages/contact";
+import PrivacyPolicy from "@/pages/privacy-policy";
 import Navigation from "@/components/navigation";
 import { useEffect, lazy, Suspense } from "react";
 
@@ -58,6 +59,7 @@ function Router() {
         <Route path="/pos/inactive" component={PosInactive} />
         <Route path="/pos/help" component={HelpCenter} />
         <Route path="/pos/help/afrikaans" component={HelpCenterAfrikaans} />
+        <Route path="/privacy" component={PrivacyPolicy} />
         <Route component={NotFound} />
       </Switch>
     </>
