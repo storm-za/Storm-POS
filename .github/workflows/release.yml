@@ -137,7 +137,7 @@ jobs:
 
       - name: Install Tauri CLI and cargo-ndk
         run: |
-          npm init -y
+          echo '{"name":"storm-pos","version":"1.0.0","scripts":{"tauri":"tauri"}}' > package.json
           npm install --no-save @tauri-apps/cli@latest
           cargo install cargo-ndk
 
