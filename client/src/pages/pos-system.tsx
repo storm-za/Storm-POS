@@ -6914,14 +6914,14 @@ export default function PosSystem() {
   </div>
       {/* Purchase Order Create/Edit Dialog */}
       <Dialog open={isPODialogOpen} onOpenChange={(open) => { if (!open) { resetPOForm(); } setIsPODialogOpen(open); }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white">{editingPO ? `Edit ${editingPO.poNumber}` : "New Purchase Order"}</DialogTitle>
             <DialogDescription className="text-gray-400">{editingPO ? "Update purchase order details" : "Create a new purchase order for a supplier"}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Supplier Details</h3>
                 <div className="flex items-center gap-2">
                   {suppliers.length > 0 && (
@@ -6964,9 +6964,9 @@ export default function PosSystem() {
             </div>
 
             <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider">Order Items</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="border-gray-700 text-gray-300 hover:text-white bg-gray-800"><Package className="h-3 w-3 mr-1" />Add Product</Button></DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-60 overflow-y-auto">

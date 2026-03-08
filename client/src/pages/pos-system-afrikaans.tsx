@@ -4737,11 +4737,11 @@ ${dateFilteredSales.map(sale =>
 
           {/* PO Create/Edit Dialog */}
           <Dialog open={isPODialogOpen} onOpenChange={(open) => { if (!open) { resetPOForm(); } setIsPODialogOpen(open); }}>
-            <DialogContent className="max-w-3xl bg-black border-gray-700 text-white max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-3xl bg-black border-gray-700 text-white max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle className="text-white text-xl">{editingPO ? 'Wysig Aankoopbestelling' : 'Nuwe Aankoopbestelling'}</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <h4 className="text-sm text-gray-400 font-medium flex items-center gap-2"><User className="h-4 w-4" /> Verskaffer Besonderhede</h4>
                     <div className="flex items-center gap-2">
                       {suppliers.length > 0 && (
@@ -4782,9 +4782,9 @@ ${dateFilteredSales.map(sale =>
                   </div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <h4 className="text-sm text-gray-400 font-medium flex items-center gap-2"><Package className="h-4 w-4" /> Items</h4>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:text-white hover:bg-gray-800"><Plus className="h-3 w-3 mr-1" /> Voeg Produk By</Button></DropdownMenuTrigger>
                         <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-48 overflow-y-auto">
