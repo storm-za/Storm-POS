@@ -4918,7 +4918,7 @@ ${dateFilteredSales.map(sale =>
                                 <h3 className="font-semibold text-lg text-white">{account.accountName}</h3>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setEditingOpenAccount(account); setEditOpenAccountName(account.accountName); }}
-                                  className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-gray-500 hover:text-white hover:bg-white/10 transition-all"
+                                  className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-white/10 transition-all"
                                   title="Hernoem rekening"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
