@@ -137,19 +137,19 @@ jobs:
 
       - name: Install Tauri CLI and cargo-ndk
         run: |
-          npm install -g @tauri-apps/cli@latest
+          npm install --no-save @tauri-apps/cli@latest
           cargo install cargo-ndk
 
       - name: Initialize Tauri Android project
         run: |
           rm -rf src-tauri/gen/android
-          tauri android init
+          npx tauri android init
 
       - name: Build Android AAB (release)
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-        run: tauri android build
+        run: npx tauri android build
 
       - name: Sign AAB
         env:
