@@ -170,6 +170,8 @@ export default function PosSystemAfrikaans() {
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { sale: any; customer: any; tipEnabled: boolean; }>(null);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
+  const [editingOpenAccount, setEditingOpenAccount] = useState<PosOpenAccount | null>(null);
+  const [editOpenAccountName, setEditOpenAccountName] = useState("");
   const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
   
   // Invoice-related state
@@ -2418,6 +2420,23 @@ export default function PosSystemAfrikaans() {
     },
     onError: (error: Error) => {
       toast({ title: "Kon nie item verwyder nie", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const updateOpenAccountNameMutation = useMutation({
+    mutationFn: async ({ accountId, accountName }: { accountId: number; accountName: string }) => {
+      const response = await apiRequest("PUT", `/api/pos/open-accounts/${accountId}`, { accountName });
+      if (!response.ok) throw new Error("Kon nie rekeningnaam opdateer nie");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Rekening hernoem", description: "Rekeningnaam suksesvol opgedateer." });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
+      setEditingOpenAccount(null);
+      setEditOpenAccountName("");
+    },
+    onError: () => {
+      toast({ title: "Hernoem misluk", description: "Kon nie die rekeningnaam opdateer nie.", variant: "destructive" });
     },
   });
 
@@ -4874,6 +4893,13 @@ ${dateFilteredSales.map(sale =>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-white">{account.accountName}</h3>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditingOpenAccount(account); setEditOpenAccountName(account.accountName); }}
+                            className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-white/10 transition-all"
+                            title="Hernoem rekening"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
                           <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="text-xs">
                             {account.accountType === 'table' ? 'Tafel' : 'Klient'}
                           </Badge>
@@ -9446,6 +9472,46 @@ ${dateFilteredSales.map(sale =>
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Hernoem Oop Rekening Dialog */}
+      <Dialog open={!!editingOpenAccount} onOpenChange={(open) => { if (!open) { setEditingOpenAccount(null); setEditOpenAccountName(""); } }}>
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-700/60 shadow-2xl rounded-2xl p-0 overflow-hidden">
+          <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+                <Edit className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white font-bold text-base">Hernoem Rekening</DialogTitle>
+                <DialogDescription className="text-[hsl(217,90%,70%)] text-xs">Opdateer die rekening se vertoonnaam</DialogDescription>
+              </div>
+            </div>
+          </div>
+          <div className="px-5 py-4 space-y-4">
+            <div>
+              <label className="text-xs text-gray-400 font-medium uppercase tracking-wider block mb-1.5">Rekeningnaam</label>
+              <Input
+                value={editOpenAccountName}
+                onChange={(e) => setEditOpenAccountName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && editOpenAccountName.trim() && editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
+                className="bg-gray-800 border-gray-700/50 text-white focus:border-[hsl(217,90%,40%)]/60 h-10"
+                placeholder="Voer rekeningnaam in"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 border-gray-600/60 text-gray-300 hover:bg-gray-800 bg-transparent h-9" onClick={() => { setEditingOpenAccount(null); setEditOpenAccountName(""); }}>Kanselleer</Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white h-9 font-semibold"
+                disabled={!editOpenAccountName.trim() || updateOpenAccountNameMutation.isPending}
+                onClick={() => { if (editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
+              >
+                {updateOpenAccountNameMutation.isPending ? "Stoor..." : "Stoor"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

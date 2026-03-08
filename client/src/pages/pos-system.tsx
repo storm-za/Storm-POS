@@ -150,6 +150,8 @@ export default function PosSystem() {
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { total: string; items: any[]; customerName?: string; notes?: string; paymentType?: string; staffName?: string; tipEnabled: boolean; saleId: number; }>(null);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
+  const [editingOpenAccount, setEditingOpenAccount] = useState<PosOpenAccount | null>(null);
+  const [editOpenAccountName, setEditOpenAccountName] = useState("");
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
   const [isReceiptCustomizerOpen, setIsReceiptCustomizerOpen] = useState(false);
   const [isInvoiceSetupOpen, setIsInvoiceSetupOpen] = useState(false);
@@ -2148,6 +2150,23 @@ export default function PosSystem() {
         description: error.message || "An error occurred while removing the item",
         variant: "destructive",
       });
+    },
+  });
+
+  const updateOpenAccountNameMutation = useMutation({
+    mutationFn: async ({ accountId, accountName }: { accountId: number; accountName: string }) => {
+      const response = await apiRequest("PUT", `/api/pos/open-accounts/${accountId}`, { accountName });
+      if (!response.ok) throw new Error("Failed to update account name");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Account renamed", description: "Account name updated successfully." });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts"] });
+      setEditingOpenAccount(null);
+      setEditOpenAccountName("");
+    },
+    onError: () => {
+      toast({ title: "Failed to rename", description: "Could not update the account name.", variant: "destructive" });
     },
   });
 
@@ -5542,6 +5561,13 @@ export default function PosSystem() {
                                   <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
                                 )}
                                 <h3 className="font-semibold text-lg text-white">{account.accountName}</h3>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setEditingOpenAccount(account); setEditOpenAccountName(account.accountName); }}
+                                className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-gray-500 hover:text-white hover:bg-white/10 transition-all"
+                                title="Rename account"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
                               </div>
                               <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="bg-blue-600/20 text-blue-300 border-blue-500/30">
                                 {account.accountType === 'table' ? 'Table' : 'Customer'}
@@ -7426,6 +7452,45 @@ export default function PosSystem() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      {/* Rename Open Account Dialog */}
+      <Dialog open={!!editingOpenAccount} onOpenChange={(open) => { if (!open) { setEditingOpenAccount(null); setEditOpenAccountName(""); } }}>
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-700/60 shadow-2xl rounded-2xl p-0 overflow-hidden">
+          <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+                <Edit className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white font-bold text-base">Rename Account</DialogTitle>
+                <DialogDescription className="text-[hsl(217,90%,70%)] text-xs">Update the account display name</DialogDescription>
+              </div>
+            </div>
+          </div>
+          <div className="px-5 py-4 space-y-4">
+            <div>
+              <label className="text-xs text-gray-400 font-medium uppercase tracking-wider block mb-1.5">Account Name</label>
+              <Input
+                value={editOpenAccountName}
+                onChange={(e) => setEditOpenAccountName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && editOpenAccountName.trim() && editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
+                className="bg-gray-800 border-gray-700/50 text-white focus:border-[hsl(217,90%,40%)]/60 h-10"
+                placeholder="Enter account name"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 border-gray-600/60 text-gray-300 hover:bg-gray-800 bg-transparent h-9" onClick={() => { setEditingOpenAccount(null); setEditOpenAccountName(""); }}>Cancel</Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white h-9 font-semibold"
+                disabled={!editOpenAccountName.trim() || updateOpenAccountNameMutation.isPending}
+                onClick={() => { if (editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
+              >
+                {updateOpenAccountNameMutation.isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       {/* Add Products to Category Dialog */}
