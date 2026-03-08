@@ -2365,6 +2365,80 @@ export default function PosSystemAfrikaans() {
     },
   });
 
+  const closeOpenAccountMutation = useMutation({
+    mutationFn: async ({ accountId, paymentType, tipEnabled }: { accountId: number; paymentType: string; tipEnabled: boolean }) => {
+      const account = openAccounts.find((a: any) => a.id === accountId);
+      if (!account) throw new Error("Rekening nie gevind nie");
+      const saleData = {
+        total: account.total,
+        items: account.items,
+        customerName: account.accountName,
+        notes: account.notes,
+        paymentType,
+        staffAccountId: currentStaff?.id || null,
+      };
+      const saleResponse = await apiRequest("POST", "/api/pos/sales", saleData);
+      if (!saleResponse.ok) {
+        const errorData = await saleResponse.json();
+        throw new Error(errorData.message || "Kon nie verkoop verwerk nie");
+      }
+      const deleteResponse = await apiRequest("DELETE", `/api/pos/open-accounts/${accountId}`);
+      if (!deleteResponse.ok) {
+        const errorData = await deleteResponse.json();
+        throw new Error(errorData.message || "Kon nie rekening sluit nie");
+      }
+      return { ...(await saleResponse.json()), tipEnabled };
+    },
+    onSuccess: (data) => {
+      toast({ title: "Rekening gesluit", description: `Verkoop van R${data.total} suksesvol verwerk.` });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Kon nie rekening sluit nie", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const removeItemFromOpenAccountMutation = useMutation({
+    mutationFn: async ({ accountId, itemIndex }: { accountId: number; itemIndex: number }) => {
+      const response = await apiRequest("DELETE", `/api/pos/open-accounts/${accountId}/items/${itemIndex}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Kon nie item verwyder nie");
+      }
+      return response.json();
+    },
+    onSuccess: (updatedAccount) => {
+      toast({ title: "Item verwyder", description: "Item suksesvol van rekening verwyder" });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/open-accounts", currentUser?.id] });
+      if (selectedOpenAccount && updatedAccount.id === selectedOpenAccount.id) {
+        setSelectedOpenAccount(updatedAccount);
+      }
+    },
+    onError: (error: Error) => {
+      toast({ title: "Kon nie item verwyder nie", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleAfrikaansDeleteItemClick = (accountId: number, itemIndex: number) => {
+    if (currentStaff?.userType === 'management') {
+      if (window.confirm('Is jy seker jy wil hierdie item van die rekening verwyder?')) {
+        removeItemFromOpenAccountMutation.mutate({ accountId, itemIndex });
+      }
+    } else {
+      toast({ title: "Bestuurstoegang Benodig", description: "Slegs bestuurders kan items van oop rekeninge verwyder.", variant: "destructive" });
+    }
+  };
+
+  const handleAfrikaansItemCheckboxChange = (itemIndex: number, checked: boolean) => {
+    if (checked) {
+      setSelectedItemsForPrint((prev: number[]) => [...prev, itemIndex]);
+    } else {
+      setSelectedItemsForPrint((prev: number[]) => prev.filter((i: number) => i !== itemIndex));
+    }
+  };
+
   // Merge receipt settings with defaults - Afrikaans
   const mergeReceiptSettingsAfrikaans = (settings: any) => {
     const defaults = defaultReceiptSettings();
@@ -9219,6 +9293,159 @@ ${dateFilteredSales.map(sale =>
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rekening Besonderhede Dialog */}
+      <Dialog open={!!selectedOpenAccount} onOpenChange={() => {
+        setSelectedOpenAccount(null);
+        setSelectedItemsForPrint([]);
+        setOpenAccountTipEnabled(false);
+      }}>
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[680px] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 border border-gray-700/60 shadow-2xl shadow-black/60 p-0 overflow-hidden rounded-2xl">
+          <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10"></div>
+            <div className="relative flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-white font-bold text-base sm:text-lg leading-tight truncate">
+                  {selectedOpenAccount?.accountName}
+                </DialogTitle>
+                <DialogDescription className="text-[hsl(217,90%,70%)] text-xs mt-0.5">
+                  Rekening Besonderhede & Vereffening
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          {selectedOpenAccount && (
+            <div className="px-5 py-4 space-y-4 max-h-[75vh] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-800/60 border border-gray-700/40 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">Rekening Tipe</p>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${selectedOpenAccount.accountType === 'table' ? 'bg-[hsl(217,90%,50%)]' : 'bg-emerald-400'}`}></div>
+                    <span className="text-white font-semibold text-sm capitalize">{selectedOpenAccount.accountType === 'table' ? 'Tafel' : 'Klient'}</span>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/10 border border-[hsl(217,90%,40%)]/30 rounded-xl p-3">
+                  <p className="text-[10px] text-[hsl(217,90%,60%)] uppercase tracking-wider font-semibold mb-1">Totale Bedrag</p>
+                  <p className="text-2xl font-bold text-white tracking-tight">R{selectedOpenAccount.total}</p>
+                </div>
+              </div>
+
+              {selectedOpenAccount.notes && (
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2.5 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-amber-300 text-sm">{selectedOpenAccount.notes}</p>
+                </div>
+              )}
+
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-2">
+                    <ShoppingCart className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                    <p className="text-white font-semibold text-sm">Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})</p>
+                  </div>
+                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.length > 0 && (
+                    <button
+                      onClick={() => {
+                        const allIndices = selectedOpenAccount.items.map((_: any, index: number) => index);
+                        const allSelected = allIndices.every((index: number) => selectedItemsForPrint.includes(index));
+                        setSelectedItemsForPrint(allSelected ? [] : allIndices);
+                      }}
+                      className="text-[11px] font-medium text-[hsl(217,90%,60%)] hover:text-[hsl(217,90%,70%)] transition-colors px-2 py-1 rounded-lg hover:bg-[hsl(217,90%,40%)]/10"
+                    >
+                      {selectedItemsForPrint.length === selectedOpenAccount.items.length ? 'Deselecteer Alles' : 'Kies Alles'}
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.map((item: any, index: number) => (
+                    <div key={index} className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-150 ${selectedItemsForPrint.includes(index) ? 'bg-[hsl(217,90%,40%)]/15 border-[hsl(217,90%,40%)]/40' : 'bg-gray-800/40 border-gray-700/30 hover:border-gray-600/50'}`}>
+                      <input
+                        type="checkbox"
+                        checked={selectedItemsForPrint.includes(index)}
+                        onChange={(e) => handleAfrikaansItemCheckboxChange(index, e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,40%)] focus:ring-offset-0 flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium text-sm truncate">{item.name}</p>
+                        <p className="text-gray-400 text-xs">R{item.price} elk</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs font-semibold text-gray-300 bg-gray-700/60 px-2 py-0.5 rounded-lg">×{item.quantity}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleAfrikaansDeleteItemClick(selectedOpenAccount.id, index)}
+                          className="h-7 w-7 p-0 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg"
+                          disabled={removeItemFromOpenAccountMutation.isPending}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-800/40 border border-gray-700/40 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-white text-sm font-medium">Fooie Opsie</p>
+                  <p className="text-gray-400 text-xs mt-0.5">{openAccountTipEnabled ? 'Fooie lyne sal op kwitansie verskyn' : 'Voeg fooie opsie by kwitansie'}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenAccountTipEnabled(!openAccountTipEnabled)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${openAccountTipEnabled ? 'bg-[hsl(217,90%,40%)]' : 'bg-gray-600'}`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${openAccountTipEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                <Button
+                  variant="outline"
+                  disabled={selectedItemsForPrint.length === 0}
+                  className="flex-1 border-orange-500/40 text-orange-400 hover:bg-orange-500/10 hover:border-orange-500/60 bg-orange-500/5 h-10 disabled:opacity-40"
+                >
+                  <Printer className="w-4 h-4 mr-2" />
+                  Vinnig Druk ({selectedItemsForPrint.length})
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedOpenAccount(null);
+                    setSelectedItemsForPrint([]);
+                    setOpenAccountTipEnabled(false);
+                  }}
+                  className="flex-1 border-gray-600/60 text-gray-300 hover:bg-gray-700/50 bg-transparent h-10"
+                >
+                  Kanselleer
+                </Button>
+                <Button
+                  onClick={() => {
+                    closeOpenAccountMutation.mutate({
+                      accountId: selectedOpenAccount.id,
+                      paymentType: 'cash',
+                      tipEnabled: openAccountTipEnabled
+                    });
+                    setSelectedOpenAccount(null);
+                    setSelectedItemsForPrint([]);
+                    setOpenAccountTipEnabled(false);
+                  }}
+                  disabled={closeOpenAccountMutation.isPending}
+                  className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white shadow-lg shadow-emerald-900/30 h-10 font-semibold"
+                >
+                  <Receipt className="w-4 h-4 mr-2" />
+                  {closeOpenAccountMutation.isPending ? 'Sluit...' : 'Sluit & Betaal'}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
