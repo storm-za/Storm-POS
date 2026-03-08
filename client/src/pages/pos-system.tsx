@@ -4047,7 +4047,7 @@ export default function PosSystem() {
             <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'sales' ? 'Sales' : currentTab === 'products' ? 'Products' : currentTab === 'customers' ? 'Customers' : currentTab === 'invoices' ? 'Invoices' : currentTab === 'purchase-orders' ? 'Purchase Orders' : currentTab === 'open-accounts' ? 'Open Accounts' : currentTab === 'reports' ? 'Reports' : currentTab === 'usage' ? 'Usage' : 'Settings'}</span>
           </div>
 
-          <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6">
+          <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
 
           {/* Sales Tab */}
@@ -5616,35 +5616,39 @@ export default function PosSystem() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <Label htmlFor="date-filter" className="text-gray-300">Select Date:</Label>
-                      <Input
-                        id="date-filter"
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="w-auto bg-white/10 border-white/20 text-white"
-                      />
-                      <Label htmlFor="staff-filter" className="text-gray-300">Filter by Staff:</Label>
-                      <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                        <SelectTrigger className="w-48 bg-white/10 border-white/20 text-white">
-                          <SelectValue placeholder="All Staff" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Sales</SelectItem>
-                          <SelectItem value="0">Manager</SelectItem>
-                          {staffAccounts.map((staff) => (
-                            <SelectItem key={staff.id} value={staff.id.toString()}>
-                              {staff.displayName || staff.username || `Staff #${staff.id}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-4">
+                      <div className="flex flex-col gap-1">
+                        <Label htmlFor="date-filter" className="text-gray-300 text-xs sm:text-sm">Select Date:</Label>
+                        <Input
+                          id="date-filter"
+                          type="date"
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="w-full sm:w-auto bg-white/10 border-white/20 text-white"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Label htmlFor="staff-filter" className="text-gray-300 text-xs sm:text-sm">Filter by Staff:</Label>
+                        <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                          <SelectTrigger className="w-full sm:w-48 bg-white/10 border-white/20 text-white">
+                            <SelectValue placeholder="All Staff" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Sales</SelectItem>
+                            <SelectItem value="0">Manager</SelectItem>
+                            {staffAccounts.map((staff) => (
+                              <SelectItem key={staff.id} value={staff.id.toString()}>
+                                {staff.displayName || staff.username || `Staff #${staff.id}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <Button
                       onClick={() => handlePrintReport()}
-                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                      className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Print
