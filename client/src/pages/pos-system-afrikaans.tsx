@@ -3989,7 +3989,7 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-6 relative pt-6 bg-[#000000]">
+                <CardContent className="px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-6 relative bg-[#000000]">
                   <div className="space-y-4">
                     {/* Enhanced Search Bar */}
                     <div className="relative">
@@ -4006,7 +4006,7 @@ ${dateFilteredSales.map(sale =>
                     </div>
 
                     {/* Product Grid */}
-                    <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
+                    <div className="grid gap-3 sm:gap-4 max-h-[500px] overflow-y-auto overflow-x-hidden">
                       {filteredProducts.length === 0 ? (
                         <motion.div
                           initial={{ opacity: 0 }}
@@ -4036,10 +4036,9 @@ ${dateFilteredSales.map(sale =>
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.03 }}
-                            whileHover={{ scale: 1.01 }}
                             className="group"
                           >
-                            <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-4 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                            <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
                               <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
                               {/* Mobile Layout - shows on screens below 768px */}
