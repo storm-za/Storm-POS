@@ -50,7 +50,7 @@ Preferred communication style: Simple, everyday language.
 - **Config**: `src-tauri/tauri.conf.json` — loads `https://stormsoftware.co.za/pos/login`, identifier `za.storm.pos`
 - **Auto-updater (Windows)**: Tauri v2 updater plugin — on launch, silently checks `latest.json` at GitHub Releases. If a newer version exists, shows native dialog "Install Now / Later". If accepted, downloads, installs, and restarts automatically. Desktop-only (guarded with `#[cfg(desktop)]`).
 - **Android build**: Produces signed `.aab` for Google Play Store upload. Uses Play Store keystore stored in GitHub secrets.
-- **Current version**: v1.3.7 (in `src-tauri/tauri.conf.json`)
+- **Current version**: v1.3.8 (in `src-tauri/tauri.conf.json`)
 - **Signing keypair (Windows updater)**: Ed25519 (minisign format, no password). Public key in `tauri.conf.json`. Private key in GitHub secret `TAURI_SIGNING_PRIVATE_KEY`.
 - **Android signing**: RSA 2048 keystore stored as `ANDROID_KEYSTORE_BASE64` in GitHub secrets. Alias: `storm-pos`. Password in `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_PASSWORD`. **Must not lose these — Play Store updates require same keystore forever.**
 - **Publishing a new version**: Create tag via GitHub API → Actions builds Windows `.exe`/`.msi`/`latest.json` + Android `.aab` → uploaded to GitHub Release → Windows users notified automatically; `.aab` uploaded to Play Store manually
