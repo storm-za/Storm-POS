@@ -736,66 +736,52 @@ export default function PosSystemAfrikaans() {
       }
     }
     
-    // Besigheidsbesonderhede - Regter kant (geen maatskappy naam)
-    const headerRightX = pageWidth - margin;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(80, 80, 80);
-    let headerY = y + 5;
-    
-    if (businessAddress1) {
-      doc.text(businessAddress1, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessAddress2) {
-      doc.text(businessAddress2, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessPhone) {
-      doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessEmail) {
-      doc.text(businessEmail, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (businessWebsite) {
-      doc.text(businessWebsite, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (vatNumber) {
-      doc.text(`BTW: ${vatNumber}`, headerRightX, headerY, { align: 'right' });
-      headerY += 4;
-    }
-    if (regNumber) {
-      doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' });
-    }
-    
-    // Dokument Tipe Etiket (geposisioneer onder maatskappy besonderhede)
-    y = Math.max(companyLogo ? 55 : 45, headerY + 5);
+    // Dokumentopskrif (links, onder logo indien teenwoordig)
+    y = companyLogo ? 55 : 25;
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.text(invoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE', margin, y);
-    
-    // Dokument Nommer
+
+    // Dokument nommer (links, onder opskrif)
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y + 7);
-    
-    // Dekoratiewe lyn onder koptekst
-    y += 12;
+    doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y + 8);
+
+    // Besigheidsbesonderhede — regter kant, belyn met opskrif
+    const headerRightX = pageWidth - margin;
+    let headerY = y;
+    if (companyName) {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text(companyName, headerRightX, headerY, { align: 'right' });
+      headerY += 5;
+    }
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    if (businessAddress1) { doc.text(businessAddress1, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessAddress2) { doc.text(businessAddress2, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessEmail) { doc.text(businessEmail, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessWebsite) { doc.text(businessWebsite, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (vatNumber) { doc.text(`BTW: ${vatNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+
+    // Blou skeidslyn oor volle breedte
+    y = Math.max(y + 14, headerY + 4);
     doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.setLineWidth(1);
     doc.line(margin, y, pageWidth - margin, y);
-    
+
     y += 15;
-    
+
     // ===== DOKUMENT BESONDERHEDE AFDELING =====
     const leftColX = margin;
     const rightColX = pageWidth / 2 + 10;
-    
+
     // Linker kolom - Faktuur Aan
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
@@ -1100,41 +1086,49 @@ export default function PosSystemAfrikaans() {
       }
     }
     
+    // Dokumentopskrif (links, onder logo indien teenwoordig)
+    y = companyLogo ? 55 : 25;
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text(invoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE', margin, y);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y + 8);
+
+    // Besigheidsbesonderhede — regter kant, belyn met opskrif
     const headerRightX = pageWidth - margin;
+    let headerY = y;
+    if (companyName) {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text(companyName, headerRightX, headerY, { align: 'right' });
+      headerY += 5;
+    }
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    let headerY = y + 5;
-    
     if (businessAddress1) { doc.text(businessAddress1, headerRightX, headerY, { align: 'right' }); headerY += 4; }
     if (businessAddress2) { doc.text(businessAddress2, headerRightX, headerY, { align: 'right' }); headerY += 4; }
     if (businessPhone) { doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
     if (businessEmail) { doc.text(businessEmail, headerRightX, headerY, { align: 'right' }); headerY += 4; }
     if (businessWebsite) { doc.text(businessWebsite, headerRightX, headerY, { align: 'right' }); headerY += 4; }
     if (vatNumber) { doc.text(`BTW: ${vatNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); }
-    
-    y = Math.max(companyLogo ? 55 : 45, headerY + 5);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-    doc.text(invoice.documentType === 'invoice' ? 'FAKTUUR' : 'KWOTASIE', margin, y);
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(80, 80, 80);
-    doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y + 7);
-    
-    y += 12;
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+
+    y = Math.max(y + 14, headerY + 4);
     doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.setLineWidth(1);
     doc.line(margin, y, pageWidth - margin, y);
-    
+
     y += 15;
-    
+
     const leftColX = margin;
     const rightColX = pageWidth / 2 + 10;
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
