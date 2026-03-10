@@ -2972,46 +2972,45 @@ export default function PosSystem() {
       }
     }
     
-    // Document Type heading (left side, below logo if present)
+    // Document Type heading (left)
     y = companyLogo ? 55 : 25;
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.text(invoice.documentType === 'invoice' ? 'INVOICE' : 'QUOTE', margin, y);
+    y += 8;
 
     // Document Number (left, below heading)
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y + 8);
+    doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y);
+    y += 7;
 
-    // Business Details — right side, aligned with heading
-    const headerRightX = pageWidth - margin;
-    let headerY = y;
+    // Business Details — left side, below invoice number
     const showBizInfo = invoice.showBusinessInfo !== false;
-
     if (showBizInfo) {
       if (companyName) {
-        doc.setFontSize(12);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-        doc.text(companyName, headerRightX, headerY, { align: 'right' });
-        headerY += 5;
+        doc.text(companyName, margin, y);
+        y += 5;
       }
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(80, 80, 80);
-      if (businessAddress1) { doc.text(businessAddress1, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (businessAddress2) { doc.text(businessAddress2, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (businessPhone) { doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (businessEmail) { doc.text(businessEmail, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (businessWebsite) { doc.text(businessWebsite, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (vatNumber) { doc.text(`VAT: ${vatNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-      if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+      if (businessAddress1) { doc.text(businessAddress1, margin, y); y += 4; }
+      if (businessAddress2) { doc.text(businessAddress2, margin, y); y += 4; }
+      if (businessPhone) { doc.text(`Tel: ${businessPhone}`, margin, y); y += 4; }
+      if (businessEmail) { doc.text(businessEmail, margin, y); y += 4; }
+      if (businessWebsite) { doc.text(businessWebsite, margin, y); y += 4; }
+      if (vatNumber) { doc.text(`VAT: ${vatNumber}`, margin, y); y += 4; }
+      if (regNumber) { doc.text(`Reg: ${regNumber}`, margin, y); y += 4; }
     }
 
-    // Blue separator line spanning full width
-    y = Math.max(y + 14, headerY + 4);
+    // Blue separator line
+    y += 4;
     doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.setLineWidth(1);
     doc.line(margin, y, pageWidth - margin, y);
@@ -3361,40 +3360,40 @@ export default function PosSystem() {
       }
     }
 
-    // Document heading (left side, below logo if present)
+    // Document heading (left)
     y = companyLogo ? 55 : 25;
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.text(invoice.documentType === 'invoice' ? 'INVOICE' : 'QUOTE', margin, y);
+    y += 8;
 
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y + 8);
+    doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y);
+    y += 7;
 
-    // Business Details — right side, aligned with heading
-    const headerRightX = pageWidth - margin;
-    let headerY = y;
+    // Business Details — left side, below invoice number
     if (companyName) {
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
-      doc.text(companyName, headerRightX, headerY, { align: 'right' });
-      headerY += 5;
+      doc.text(companyName, margin, y);
+      y += 5;
     }
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    if (businessAddress1) { doc.text(businessAddress1, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (businessAddress2) { doc.text(businessAddress2, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (businessEmail) { doc.text(businessEmail, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (businessWebsite) { doc.text(businessWebsite, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (vatNumber) { doc.text(`VAT: ${vatNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
-    if (regNumber) { doc.text(`Reg: ${regNumber}`, headerRightX, headerY, { align: 'right' }); headerY += 4; }
+    if (businessAddress1) { doc.text(businessAddress1, margin, y); y += 4; }
+    if (businessAddress2) { doc.text(businessAddress2, margin, y); y += 4; }
+    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, margin, y); y += 4; }
+    if (businessEmail) { doc.text(businessEmail, margin, y); y += 4; }
+    if (businessWebsite) { doc.text(businessWebsite, margin, y); y += 4; }
+    if (vatNumber) { doc.text(`VAT: ${vatNumber}`, margin, y); y += 4; }
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, margin, y); y += 4; }
 
-    y = Math.max(y + 14, headerY + 4);
+    y += 4;
     doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
     doc.setLineWidth(1);
     doc.line(margin, y, pageWidth - margin, y);
