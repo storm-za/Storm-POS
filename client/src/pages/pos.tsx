@@ -23,8 +23,21 @@ export default function POS() {
     updatePageSEO({
       title: 'Storm POS - Cloud Point of Sale System | 7 Days Free, Pay Only 0.5% Per Sale',
       description: 'The smartest POS system for South African retailers. No monthly fees, no setup costs. Just 0.5% per sale. Try free for 7 days. Always online, works on any device.',
-      canonical: window.location.origin + '/pos'
+      canonical: 'https://stormsoftware.co.za/pos'
     });
+
+    const breadcrumbScript = document.createElement('script');
+    breadcrumbScript.type = 'application/ld+json';
+    breadcrumbScript.setAttribute('data-schema', 'breadcrumb');
+    breadcrumbScript.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Storm POS", "item": "https://stormsoftware.co.za/pos" }
+      ]
+    });
+    document.head.appendChild(breadcrumbScript);
     
     // Add FAQ Schema for rich snippets
     const faqSchema = {
@@ -134,6 +147,7 @@ export default function POS() {
       const productScript = document.querySelector('script[data-schema="product"]');
       if (faqScript) faqScript.remove();
       if (productScript) productScript.remove();
+      document.querySelector('script[data-schema="breadcrumb"]')?.remove();
     };
   }, []);
 

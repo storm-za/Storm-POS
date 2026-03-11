@@ -148,14 +148,63 @@ export default function WebDevelopment() {
       }
     });
 
+    const faqScript = document.createElement('script');
+    faqScript.type = 'application/ld+json';
+    faqScript.id = 'webdev-faq-schema';
+    faqScript.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does a website cost in South Africa?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Storm's professional website packages start from R799 per month. This includes custom design, mobile optimization, hosting, SSL certificate, and SEO setup. There is no large upfront cost." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I own my website?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, you own your website and all its content. Storm builds and hosts it on your behalf, but you retain full ownership of your domain and content." }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does it take to build a website?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Most websites are completed within 2–4 weeks, depending on the package and how quickly you provide your content. We follow a clear 4-step process: Discovery, Design, Development, and Launch." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is SEO included in the website packages?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, all Storm website packages include basic SEO setup — including meta tags, Google Search Console submission, sitemap generation, and mobile-first optimization to help your site rank on Google." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if I want to cancel?",
+          "acceptedAnswer": { "@type": "Answer", "text": "You can cancel your package at any time. Storm has no lock-in contracts. Simply give 30 days notice and we will handle the transition." }
+        }
+      ]
+    });
+
+    const breadcrumbScript = document.createElement('script');
+    breadcrumbScript.type = 'application/ld+json';
+    breadcrumbScript.id = 'webdev-breadcrumb-schema';
+    breadcrumbScript.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Web Development", "item": "https://stormsoftware.co.za/web-development" }
+      ]
+    });
+
     document.head.appendChild(serviceScript);
     document.head.appendChild(businessScript);
+    document.head.appendChild(faqScript);
+    document.head.appendChild(breadcrumbScript);
 
     return () => {
-      const existingServiceScript = document.getElementById('service-schema');
-      const existingBusinessScript = document.getElementById('business-schema');
-      if (existingServiceScript) document.head.removeChild(existingServiceScript);
-      if (existingBusinessScript) document.head.removeChild(existingBusinessScript);
+      document.getElementById('service-schema')?.remove();
+      document.getElementById('business-schema')?.remove();
+      document.getElementById('webdev-faq-schema')?.remove();
+      document.getElementById('webdev-breadcrumb-schema')?.remove();
     };
   }, []);
 

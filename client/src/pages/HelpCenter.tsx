@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,37 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 export function HelpCenter() {
+  useEffect(() => {
+    document.title = 'Storm POS Help Center | User Guide & Manual';
+    const enLink = document.createElement('link');
+    enLink.rel = 'alternate';
+    enLink.hreflang = 'en-za';
+    enLink.href = 'https://stormsoftware.co.za/pos/help';
+    enLink.id = 'hreflang-en';
+
+    const afLink = document.createElement('link');
+    afLink.rel = 'alternate';
+    afLink.hreflang = 'af';
+    afLink.href = 'https://stormsoftware.co.za/pos/help/afrikaans';
+    afLink.id = 'hreflang-af';
+
+    const xdefLink = document.createElement('link');
+    xdefLink.rel = 'alternate';
+    xdefLink.hreflang = 'x-default';
+    xdefLink.href = 'https://stormsoftware.co.za/pos/help';
+    xdefLink.id = 'hreflang-xdef';
+
+    document.head.appendChild(enLink);
+    document.head.appendChild(afLink);
+    document.head.appendChild(xdefLink);
+
+    return () => {
+      document.getElementById('hreflang-en')?.remove();
+      document.getElementById('hreflang-af')?.remove();
+      document.getElementById('hreflang-xdef')?.remove();
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] pointer-events-none"></div>

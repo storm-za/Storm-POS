@@ -1435,9 +1435,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 User-agent: *
 Allow: /
 
-# Disallow private/authenticated areas
+# Disallow private/authenticated areas and thin pages
 Disallow: /pos/system
 Disallow: /pos/system/*
+Disallow: /pos/inactive
+Disallow: /pos/signup/success
 Disallow: /api/
 
 # Sitemap Index Location
@@ -1570,10 +1572,31 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
     res.send(sitemap);
   });
 
-  // Blog pages sitemap
+  // Blog pages sitemap — dynamic, add new posts to BLOG_POSTS only
+  const BLOG_POSTS = [
+    { slug: 'why-south-african-retailers-switching-cloud-pos', date: '2025-12-15' },
+    { slug: 'real-cost-not-having-website-2025', date: '2025-12-12' },
+    { slug: 'how-choose-right-pos-system-business', date: '2025-12-08' },
+    { slug: 'best-pos-system-small-business-south-africa', date: '2026-01-05' },
+    { slug: 'free-pos-system-south-africa', date: '2026-01-08' },
+    { slug: 'cloud-pos-vs-traditional-pos-south-africa', date: '2026-01-10' },
+    { slug: 'afrikaanse-kassastelsel-pos-stelsel', date: '2026-01-12' },
+    { slug: 'inventory-management-small-business-south-africa', date: '2026-01-15' },
+    { slug: 'website-koste-suid-afrika-2025', date: '2026-01-18' },
+    { slug: 'load-shedding-pos-system-south-africa', date: '2026-01-20' },
+    { slug: 'invoicing-software-south-africa', date: '2026-01-22' },
+  ];
+
   app.get("/sitemap-blog.xml", (req, res) => {
     const currentDate = new Date().toISOString().split('T')[0];
-    
+
+    const postUrls = BLOG_POSTS.map(p => `  <url>
+    <loc>${PRODUCTION_DOMAIN}/blog/${p.slug}</loc>
+    <lastmod>${p.date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('\n');
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -1584,24 +1607,7 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>${PRODUCTION_DOMAIN}/blog/why-south-african-retailers-switching-cloud-pos</loc>
-    <lastmod>2025-12-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${PRODUCTION_DOMAIN}/blog/real-cost-not-having-website-2025</loc>
-    <lastmod>2025-12-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>${PRODUCTION_DOMAIN}/blog/how-choose-right-pos-system-business</loc>
-    <lastmod>2025-12-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+${postUrls}
 </urlset>`;
 
     res.set('Content-Type', 'application/xml');

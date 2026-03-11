@@ -52,8 +52,61 @@ export default function Home() {
     updatePageSEO({
       title: 'Storm - Smart Software. Built for Growth.',
       description: 'Professional websites and software solutions for South African businesses. Monthly packages starting from R799. Get a stunning website or powerful POS system today.',
-      canonical: window.location.origin + '/'
+      canonical: 'https://stormsoftware.co.za/'
     });
+
+    const faqSchema = document.createElement('script');
+    faqSchema.type = 'application/ld+json';
+    faqSchema.id = 'home-faq-schema';
+    faqSchema.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does Storm POS cost?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Storm POS has no monthly fees or setup costs. You only pay 0.5% per sale plus R0.50 per invoice generated. You only pay when you make money." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Storm POS work in Afrikaans?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, Storm POS has full Afrikaans language support. You can switch between English and Afrikaans at any time." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a free trial for Storm POS?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, Storm POS offers a 7-day free trial with full access to all features. No credit card required to get started." }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does a website cost in South Africa?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Storm offers professional website packages starting from R799 per month. This includes custom design, mobile optimization, hosting, and SEO setup — with no large upfront cost." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Storm Software serve South African businesses only?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Storm Software is based in South Africa and is specifically built for SA businesses, with Rand pricing, Afrikaans support, and an understanding of local market conditions like load shedding." }
+        }
+      ]
+    });
+    document.head.appendChild(faqSchema);
+
+    const breadcrumbSchema = document.createElement('script');
+    breadcrumbSchema.type = 'application/ld+json';
+    breadcrumbSchema.id = 'home-breadcrumb-schema';
+    breadcrumbSchema.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" }
+      ]
+    });
+    document.head.appendChild(breadcrumbSchema);
+
+    return () => {
+      document.getElementById('home-faq-schema')?.remove();
+      document.getElementById('home-breadcrumb-schema')?.remove();
+    };
   }, []);
 
   const fadeInUp = {

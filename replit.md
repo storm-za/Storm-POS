@@ -36,7 +36,8 @@ Preferred communication style: Simple, everyday language.
     - **Management**: Status workflow (Draft, Sent, Paid, Cancelled), search, filter by status, type, date range.
     - **Export**: PDF export with Storm branding and business details (logo, company info).
 - **Email System**: Automated welcome emails for new users.
-- **Blog**: SEO-optimized blog section with dynamic articles, internal linking, social sharing, and related posts.
+- **Blog**: SEO-optimized blog section with 11 long-form articles targeting SA-specific keywords, internal linking, social sharing, and related posts. Article JSON-LD and BreadcrumbList schema on every post.
+- **SEO**: Full technical SEO audit implemented — correct canonical URLs, absolute og:url, Article schema on blog posts, FAQPage schema on Home/Web Development/POS, BreadcrumbList on all key pages, hreflang for English/Afrikaans help pages, dynamic blog sitemap, robots.txt via server (no duplicate static file).
 
 ### System Design
 - **Data Flow**: Structured flows for website lead capture and comprehensive POS operations (sales, inventory, customers, reports).

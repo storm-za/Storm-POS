@@ -20,6 +20,86 @@ interface BlogPost {
 
 const blogPosts: BlogPost[] = [
   {
+    slug: "best-pos-system-small-business-south-africa",
+    title: "Best POS System for Small Business in South Africa (2025 Guide)",
+    excerpt: "Compare the top POS systems for SA small businesses — features, pricing, load shedding resilience, and Afrikaans support. Find the right fit for your business.",
+    readTime: "12 min read",
+    date: "January 5, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "load-shedding-pos-system-south-africa",
+    title: "Load Shedding Proof POS: How SA Retailers Stay Open During Outages",
+    excerpt: "Load shedding doesn't have to close your business. Learn the practical setup — tablet, power bank, mobile data — that keeps SA retailers trading through any outage.",
+    readTime: "9 min read",
+    date: "January 20, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "cloud-pos-vs-traditional-pos-south-africa",
+    title: "Cloud POS vs Traditional POS: What SA Retailers Need to Know in 2025",
+    excerpt: "Cloud or traditional? Compare total cost, load shedding impact, data security, and ease of use to choose the right POS for your South African business.",
+    readTime: "10 min read",
+    date: "January 10, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "invoicing-software-south-africa",
+    title: "Best Invoicing Software for South African Small Businesses (Free & Paid)",
+    excerpt: "Compare the best invoicing tools for SA businesses in 2025 — with Rand pricing, VAT support, and professional PDF invoices. Includes free and paid options.",
+    readTime: "10 min read",
+    date: "January 22, 2026",
+    author: "Storm Team",
+    category: "Business Tips",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "website-koste-suid-afrika-2025",
+    title: "How Much Does a Website Cost in South Africa? (2025 Pricing Guide)",
+    excerpt: "From R799/month packages to R50,000 custom builds — get a clear, honest breakdown of website costs for South African businesses and find the right option for your budget.",
+    readTime: "9 min read",
+    date: "January 18, 2026",
+    author: "Storm Team",
+    category: "Web Development",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "inventory-management-small-business-south-africa",
+    title: "Inventory Management for South African Small Businesses: A Complete Guide",
+    excerpt: "Poor inventory management kills cash flow. Learn practical techniques for stock control, reorder points, shrinkage prevention, and load shedding risks.",
+    readTime: "11 min read",
+    date: "January 15, 2026",
+    author: "Storm Team",
+    category: "Business Tips",
+    image: "https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "free-pos-system-south-africa",
+    title: "Is There a Free POS System in South Africa? What You Need to Know",
+    excerpt: "Searching for a free POS in South Africa? Understand what 'free' really means, the hidden costs to watch for, and which options offer the best value.",
+    readTime: "8 min read",
+    date: "January 8, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: "https://images.unsplash.com/photo-1556742111-a301076d9d18?w=800&h=400&fit=crop"
+  },
+  {
+    slug: "afrikaanse-kassastelsel-pos-stelsel",
+    title: "Beste Afrikaanse Kassastelsel vir Suid-Afrikaanse Besighede",
+    excerpt: "Storm POS is die enigste wolkgebaseerde kassastelsel met volle Afrikaanse ondersteuning. Wissel enige tyd tussen Engels en Afrikaans — fakture, verslae en alles.",
+    readTime: "7 min lees",
+    date: "January 12, 2026",
+    author: "Storm Span",
+    category: "POS Stelsels",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop"
+  },
+  {
     slug: "why-south-african-retailers-switching-cloud-pos",
     title: "Why South African Retailers Are Switching to Cloud POS in 2025",
     excerpt: "Load shedding, rising costs, and changing consumer habits are forcing SA retailers to rethink their point of sale systems. Here's why cloud-based solutions are winning.",
@@ -56,8 +136,25 @@ export default function Blog() {
     updatePageSEO({
       title: 'Blog - Storm Software | Tech Insights for SA Businesses',
       description: 'Expert insights on POS systems, web development, and digital transformation for South African businesses. Stay ahead with Storm Software.',
-      canonical: window.location.origin + '/blog'
+      canonical: 'https://stormsoftware.co.za/blog'
     });
+
+    const breadcrumbSchema = document.createElement('script');
+    breadcrumbSchema.type = 'application/ld+json';
+    breadcrumbSchema.id = 'blog-breadcrumb-schema';
+    breadcrumbSchema.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://stormsoftware.co.za/blog" }
+      ]
+    });
+    document.head.appendChild(breadcrumbSchema);
+
+    return () => {
+      document.getElementById('blog-breadcrumb-schema')?.remove();
+    };
   }, []);
 
   const fadeInUp = {
