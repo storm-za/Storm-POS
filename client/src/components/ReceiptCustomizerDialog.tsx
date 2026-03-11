@@ -306,7 +306,7 @@ export function ReceiptCustomizerDialog({
                 {updatedToday && (
                   <div className="flex items-center gap-1.5 text-amber-400 text-xs">
                     <AlertCircle className="h-3.5 w-3.5" />
-                    <span>{labels.updatedToday || "Updated today — next update available tomorrow"}</span>
+                    <span>{labels.updatedToday || "Updated today - next update available tomorrow"}</span>
                   </div>
                 )}
               </div>
@@ -440,9 +440,9 @@ export function ReceiptCustomizerDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="billTo">{labels.sectionBillTo || "Bill To"} — {labels.sectionBillToDesc || "Under client info"}</SelectItem>
-                          <SelectItem value="details">{labels.sectionDetails || "Details"} — {labels.sectionDetailsDesc || "Right column (date, PO, terms)"}</SelectItem>
-                          <SelectItem value="footer">{labels.sectionFooter || "Footer"} — {labels.sectionFooterDesc || "Bottom of document"}</SelectItem>
+                          <SelectItem value="billTo">{labels.sectionBillTo || "Bill To"} - {labels.sectionBillToDesc || "Under client info"}</SelectItem>
+                          <SelectItem value="details">{labels.sectionDetails || "Details"} - {labels.sectionDetailsDesc || "Right column (date, PO, terms)"}</SelectItem>
+                          <SelectItem value="footer">{labels.sectionFooter || "Footer"} - {labels.sectionFooterDesc || "Bottom of document"}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

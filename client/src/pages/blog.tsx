@@ -22,7 +22,7 @@ const blogPosts: BlogPost[] = [
   {
     slug: "best-pos-system-small-business-south-africa",
     title: "Best POS System for Small Business in South Africa (2025 Guide)",
-    excerpt: "Compare the top POS systems for SA small businesses — features, pricing, load shedding resilience, and Afrikaans support. Find the right fit for your business.",
+    excerpt: "Compare the top POS systems for SA small businesses - features, pricing, load shedding resilience, and Afrikaans support. Find the right fit for your business.",
     readTime: "12 min read",
     date: "January 5, 2026",
     author: "Storm Team",
@@ -32,7 +32,7 @@ const blogPosts: BlogPost[] = [
   {
     slug: "load-shedding-pos-system-south-africa",
     title: "Load Shedding Proof POS: How SA Retailers Stay Open During Outages",
-    excerpt: "Load shedding doesn't have to close your business. Learn the practical setup — tablet, power bank, mobile data — that keeps SA retailers trading through any outage.",
+    excerpt: "Load shedding doesn't have to close your business. Learn the practical setup - tablet, power bank, mobile data - that keeps SA retailers trading through any outage.",
     readTime: "9 min read",
     date: "January 20, 2026",
     author: "Storm Team",
@@ -52,7 +52,7 @@ const blogPosts: BlogPost[] = [
   {
     slug: "invoicing-software-south-africa",
     title: "Best Invoicing Software for South African Small Businesses (Free & Paid)",
-    excerpt: "Compare the best invoicing tools for SA businesses in 2025 — with Rand pricing, VAT support, and professional PDF invoices. Includes free and paid options.",
+    excerpt: "Compare the best invoicing tools for SA businesses in 2025 - with Rand pricing, VAT support, and professional PDF invoices. Includes free and paid options.",
     readTime: "10 min read",
     date: "January 22, 2026",
     author: "Storm Team",
@@ -62,7 +62,7 @@ const blogPosts: BlogPost[] = [
   {
     slug: "website-koste-suid-afrika-2025",
     title: "How Much Does a Website Cost in South Africa? (2025 Pricing Guide)",
-    excerpt: "From R799/month packages to R50,000 custom builds — get a clear, honest breakdown of website costs for South African businesses and find the right option for your budget.",
+    excerpt: "From R799/month packages to R50,000 custom builds - get a clear, honest breakdown of website costs for South African businesses and find the right option for your budget.",
     readTime: "9 min read",
     date: "January 18, 2026",
     author: "Storm Team",
@@ -90,9 +90,9 @@ const blogPosts: BlogPost[] = [
     image: "https://images.unsplash.com/photo-1556742111-a301076d9d18?w=800&h=400&fit=crop"
   },
   {
-    slug: "afrikaanse-kassastelsel-pos-stelsel",
-    title: "Beste Afrikaanse Kassastelsel vir Suid-Afrikaanse Besighede",
-    excerpt: "Storm POS is die enigste wolkgebaseerde kassastelsel met volle Afrikaanse ondersteuning. Wissel enige tyd tussen Engels en Afrikaans — fakture, verslae en alles.",
+    slug: "afrikaanse-verkoopstelsel-pos-stelsel",
+    title: "Beste Afrikaanse Verkoopstelsel vir Suid-Afrikaanse Besighede",
+    excerpt: "Storm POS is die enigste wolkgebaseerde verkoopstelsel met volle Afrikaanse ondersteuning. Wissel enige tyd tussen Engels en Afrikaans - fakture, verslae en alles.",
     readTime: "7 min lees",
     date: "January 12, 2026",
     author: "Storm Span",
@@ -122,7 +122,7 @@ const blogPosts: BlogPost[] = [
   {
     slug: "how-choose-right-pos-system-business",
     title: "How to Choose the Right POS System for Your Business",
-    excerpt: "From offline capabilities to payment integrations—a no-nonsense guide to selecting a POS system that actually works for South African businesses.",
+    excerpt: "From offline capabilities to payment integrations-a no-nonsense guide to selecting a POS system that actually works for South African businesses.",
     readTime: "10 min read",
     date: "December 8, 2025",
     author: "Storm Team",

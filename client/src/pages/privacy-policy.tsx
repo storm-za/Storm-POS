@@ -33,8 +33,8 @@ export default function PrivacyPolicy() {
               that information.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
-              By using our services — including the Storm POS web app, Windows desktop app, or
-              Android app — you agree to the practices described in this policy.
+              By using our services - including the Storm POS web app, Windows desktop app, or
+              Android app - you agree to the practices described in this policy.
             </p>
           </section>
 
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
             <ul className="list-disc pl-6 text-gray-700 space-y-1 mb-6">
               <li>Full name and email address</li>
               <li>Company name</li>
-              <li>Password (stored securely as a hashed value — never in plain text)</li>
+              <li>Password (stored securely as a hashed value - never in plain text)</li>
               <li>Subscription plan details</li>
             </ul>
 

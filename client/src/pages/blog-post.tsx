@@ -70,11 +70,11 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>Real-time inventory tracking</strong> — Know exactly what's selling and what's sitting on shelves</li>
-          <li><strong>Customer purchase history</strong> — Build loyalty and make smarter marketing decisions</li>
-          <li><strong>Sales analytics</strong> — Identify trends, peak hours, and top-performing products</li>
-          <li><strong>Staff performance data</strong> — See who's driving sales and who needs training</li>
-          <li><strong>Multi-location management</strong> — Run multiple stores from one dashboard</li>
+          <li><strong>Real-time inventory tracking</strong> - Know exactly what's selling and what's sitting on shelves</li>
+          <li><strong>Customer purchase history</strong> - Build loyalty and make smarter marketing decisions</li>
+          <li><strong>Sales analytics</strong> - Identify trends, peak hours, and top-performing products</li>
+          <li><strong>Staff performance data</strong> - See who's driving sales and who needs training</li>
+          <li><strong>Multi-location management</strong> - Run multiple stores from one dashboard</li>
         </ul>
 
         <p>
@@ -88,10 +88,10 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>Contactless payments</strong> — Tap-to-pay, QR codes, mobile wallets</li>
-          <li><strong>Digital receipts</strong> — Email and SMS options (better for the environment too)</li>
-          <li><strong>Buy Now, Pay Later</strong> — Flexible payment options are driving conversion</li>
-          <li><strong>Fast checkout</strong> — Nobody wants to wait in long queues</li>
+          <li><strong>Contactless payments</strong> - Tap-to-pay, QR codes, mobile wallets</li>
+          <li><strong>Digital receipts</strong> - Email and SMS options (better for the environment too)</li>
+          <li><strong>Buy Now, Pay Later</strong> - Flexible payment options are driving conversion</li>
+          <li><strong>Fast checkout</strong> - Nobody wants to wait in long queues</li>
         </ul>
 
         <p>
@@ -109,7 +109,7 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <p>
-          This omnichannel approach isn't optional anymore—it's survival. The retailers who nail this are the ones who'll thrive in the coming years.
+          This omnichannel approach isn't optional anymore-it's survival. The retailers who nail this are the ones who'll thrive in the coming years.
         </p>
 
         <h2>Making the Switch: What to Look For</h2>
@@ -119,20 +119,20 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>Offline capability</strong> — Non-negotiable for load shedding resilience</li>
-          <li><strong>Local payment integration</strong> — Yoco, SnapScan, Zapper compatibility</li>
-          <li><strong>Cloud sync</strong> — Access your data from anywhere, anytime</li>
-          <li><strong>Inventory management</strong> — Real-time stock tracking with low-stock alerts</li>
-          <li><strong>Customer database</strong> — Build relationships and loyalty programmes</li>
-          <li><strong>Reporting dashboard</strong> — Make data-driven decisions</li>
-          <li><strong>Multi-user support</strong> — Staff accounts with role-based access</li>
-          <li><strong>Mobile-friendly</strong> — Works on tablets and smartphones</li>
+          <li><strong>Offline capability</strong> - Non-negotiable for load shedding resilience</li>
+          <li><strong>Local payment integration</strong> - Yoco, SnapScan, Zapper compatibility</li>
+          <li><strong>Cloud sync</strong> - Access your data from anywhere, anytime</li>
+          <li><strong>Inventory management</strong> - Real-time stock tracking with low-stock alerts</li>
+          <li><strong>Customer database</strong> - Build relationships and loyalty programmes</li>
+          <li><strong>Reporting dashboard</strong> - Make data-driven decisions</li>
+          <li><strong>Multi-user support</strong> - Staff accounts with role-based access</li>
+          <li><strong>Mobile-friendly</strong> - Works on tablets and smartphones</li>
         </ul>
 
         <h2>The Bottom Line</h2>
 
         <p>
-          The shift to cloud POS isn't just a tech upgrade—it's a business transformation. Retailers who make the switch report faster checkout times, better inventory control, and insights that actually drive growth.
+          The shift to cloud POS isn't just a tech upgrade-it's a business transformation. Retailers who make the switch report faster checkout times, better inventory control, and insights that actually drive growth.
         </p>
 
         <p>
@@ -184,7 +184,7 @@ const blogContent: Record<string, BlogContent> = {
 
         <div className="callout">
           <h4>Consider This</h4>
-          <p>Only 6% of working-aged South Africans are business owners—compared to 20% in similar economies. Every small business matters. And every small business deserves to be found.</p>
+          <p>Only 6% of working-aged South Africans are business owners-compared to 20% in similar economies. Every small business matters. And every small business deserves to be found.</p>
         </div>
 
         <h2>The Trust Problem</h2>
@@ -267,10 +267,10 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>You don't own it</strong> — Facebook can change rules, shadowban you, or delete your page at any time</li>
-          <li><strong>Limited functionality</strong> — Can't take payments, customise your branding, or build email lists effectively</li>
-          <li><strong>Search visibility</strong> — Google prioritises websites over social profiles for business searches</li>
-          <li><strong>Professionalism</strong> — A Facebook-only business looks less established than one with a proper website</li>
+          <li><strong>You don't own it</strong> - Facebook can change rules, shadowban you, or delete your page at any time</li>
+          <li><strong>Limited functionality</strong> - Can't take payments, customise your branding, or build email lists effectively</li>
+          <li><strong>Search visibility</strong> - Google prioritises websites over social profiles for business searches</li>
+          <li><strong>Professionalism</strong> - A Facebook-only business looks less established than one with a proper website</li>
         </ul>
 
         <p>
@@ -311,7 +311,7 @@ const blogContent: Record<string, BlogContent> = {
 
         <div className="callout-cta">
           <h4>Ready to get online?</h4>
-          <p>Storm builds stunning, affordable websites for South African businesses. No complicated tech jargon—just results. <Link href="/web-development" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">See our packages →</Link></p>
+          <p>Storm builds stunning, affordable websites for South African businesses. No complicated tech jargon-just results. <Link href="/web-development" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">See our packages →</Link></p>
         </div>
       </>
     )
@@ -319,7 +319,7 @@ const blogContent: Record<string, BlogContent> = {
   "how-choose-right-pos-system-business": {
     slug: "how-choose-right-pos-system-business",
     title: "How to Choose the Right POS System for Your Business",
-    metaDescription: "A no-nonsense guide to selecting a POS system for South African businesses. From offline mode to payment integrations—what actually matters.",
+    metaDescription: "A no-nonsense guide to selecting a POS system for South African businesses. From offline mode to payment integrations-what actually matters.",
     readTime: "10 min read",
     date: "December 8, 2025",
     author: "Storm Team",
@@ -333,7 +333,7 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <p>
-          This guide cuts through the marketing noise and shows you exactly what to look for—specifically for South African businesses dealing with our unique challenges.
+          This guide cuts through the marketing noise and shows you exactly what to look for-specifically for South African businesses dealing with our unique challenges.
         </p>
 
         <h2>Step 1: Understand Your Business Type</h2>
@@ -405,11 +405,11 @@ const blogContent: Record<string, BlogContent> = {
           South African customers use a variety of payment methods. Your POS should support:
         </p>
         <ul>
-          <li><strong>Card payments</strong> — Chip, tap, and swipe</li>
-          <li><strong>Yoco</strong> — Popular for small businesses</li>
-          <li><strong>SnapScan</strong> — QR code payments</li>
-          <li><strong>Zapper</strong> — Mobile wallet</li>
-          <li><strong>EFT</strong> — For larger transactions</li>
+          <li><strong>Card payments</strong> - Chip, tap, and swipe</li>
+          <li><strong>Yoco</strong> - Popular for small businesses</li>
+          <li><strong>SnapScan</strong> - QR code payments</li>
+          <li><strong>Zapper</strong> - Mobile wallet</li>
+          <li><strong>EFT</strong> - For larger transactions</li>
         </ul>
 
         <h3>3. ZAR and VAT Support</h3>
@@ -483,10 +483,10 @@ const blogContent: Record<string, BlogContent> = {
 
         <h3>Software Costs</h3>
         <ul>
-          <li><strong>Free plans</strong> — Usually limited features, fine for very small operations</li>
-          <li><strong>Basic</strong> — R300-R900/month for essential features</li>
-          <li><strong>Growth</strong> — R900-R2,000/month for multi-user and advanced features</li>
-          <li><strong>Enterprise</strong> — R2,000+/month for large operations</li>
+          <li><strong>Free plans</strong> - Usually limited features, fine for very small operations</li>
+          <li><strong>Basic</strong> - R300-R900/month for essential features</li>
+          <li><strong>Growth</strong> - R900-R2,000/month for multi-user and advanced features</li>
+          <li><strong>Enterprise</strong> - R2,000+/month for large operations</li>
         </ul>
 
         <h3>Transaction Fees</h3>
@@ -508,16 +508,16 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>Request a demo</strong> — Watch how actual transactions work</li>
-          <li><strong>Test offline mode</strong> — Disconnect the internet and try processing a sale</li>
-          <li><strong>Check speed</strong> — How long does a typical transaction take?</li>
-          <li><strong>Try the reporting</strong> — Can you easily get the data you need?</li>
-          <li><strong>Add products</strong> — Is inventory management intuitive?</li>
-          <li><strong>Mobile test</strong> — Works on tablet? Phone? Different screen sizes?</li>
+          <li><strong>Request a demo</strong> - Watch how actual transactions work</li>
+          <li><strong>Test offline mode</strong> - Disconnect the internet and try processing a sale</li>
+          <li><strong>Check speed</strong> - How long does a typical transaction take?</li>
+          <li><strong>Try the reporting</strong> - Can you easily get the data you need?</li>
+          <li><strong>Add products</strong> - Is inventory management intuitive?</li>
+          <li><strong>Mobile test</strong> - Works on tablet? Phone? Different screen sizes?</li>
         </ul>
 
         <p>
-          Most reputable POS providers offer free trials. Use them. Involve your staff in testing—they're the ones who'll use it every day.
+          Most reputable POS providers offer free trials. Use them. Involve your staff in testing-they're the ones who'll use it every day.
         </p>
 
         <h2>Step 6: Assess Support & Reliability</h2>
@@ -527,17 +527,17 @@ const blogContent: Record<string, BlogContent> = {
         </p>
 
         <ul>
-          <li><strong>Support hours</strong> — Are they available when you're open? Weekends?</li>
-          <li><strong>Response time</strong> — What's their SLA for critical issues?</li>
-          <li><strong>Local support</strong> — South African team who understands local challenges?</li>
-          <li><strong>Self-help resources</strong> — Video tutorials, knowledge base, FAQs?</li>
-          <li><strong>Training</strong> — Do they help onboard you and your staff?</li>
+          <li><strong>Support hours</strong> - Are they available when you're open? Weekends?</li>
+          <li><strong>Response time</strong> - What's their SLA for critical issues?</li>
+          <li><strong>Local support</strong> - South African team who understands local challenges?</li>
+          <li><strong>Self-help resources</strong> - Video tutorials, knowledge base, FAQs?</li>
+          <li><strong>Training</strong> - Do they help onboard you and your staff?</li>
         </ul>
 
         <h2>The Bottom Line</h2>
 
         <p>
-          Choosing a POS system isn't just about features and price. It's about finding a solution that fits how you actually run your business—especially in the South African context with our unique challenges.
+          Choosing a POS system isn't just about features and price. It's about finding a solution that fits how you actually run your business-especially in the South African context with our unique challenges.
         </p>
 
         <p>
@@ -563,7 +563,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["free-pos-system-south-africa", "cloud-pos-vs-traditional-pos-south-africa", "how-choose-right-pos-system-business"],
     content: (
       <>
-        <p>Finding the best POS system for your small business in South Africa is harder than it looks. A quick search throws up dozens of international options — but most weren't designed with South African realities in mind. Load shedding, EFT payments, Afrikaans-speaking staff, and ZAR pricing all matter.</p>
+        <p>Finding the best POS system for your small business in South Africa is harder than it looks. A quick search throws up dozens of international options - but most weren't designed with South African realities in mind. Load shedding, EFT payments, Afrikaans-speaking staff, and ZAR pricing all matter.</p>
 
         <p>This guide cuts through the noise. We compare the most popular POS options available to SA businesses in 2025, and help you figure out which one actually suits your situation.</p>
 
@@ -571,7 +571,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>Before comparing specific systems, it's worth understanding what criteria actually matter in the SA context:</p>
         <ul>
           <li><strong>Load shedding resilience:</strong> Can it run on a tablet or phone during Eskom outages?</li>
-          <li><strong>Local payment support:</strong> Does it handle Cash, EFT, and Card — the three ways SA customers pay?</li>
+          <li><strong>Local payment support:</strong> Does it handle Cash, EFT, and Card - the three ways SA customers pay?</li>
           <li><strong>Rand pricing:</strong> Are fees quoted in ZAR, not USD that fluctuates with the rand?</li>
           <li><strong>Afrikaans support:</strong> If your staff or customers speak Afrikaans, can the system accommodate that?</li>
           <li><strong>No setup fees:</strong> Small businesses can't afford large upfront costs.</li>
@@ -581,24 +581,24 @@ const blogContent: Record<string, BlogContent> = {
 
         <h2>Top POS Systems for South African Small Businesses in 2025</h2>
 
-        <h3>1. Storm POS — Best Value for SA Retailers</h3>
-        <p>Storm POS is built specifically for South African retailers and is the only cloud POS with full Afrikaans language support. It runs on any device with a browser — phone, tablet, or laptop — making it naturally load-shedding resilient when paired with a mobile data connection.</p>
-        <p><strong>Pricing:</strong> No monthly fees. Pay only 0.5% per sale + R0.50 per invoice. This means a shop doing R50,000 per month pays R250 total — far less than fixed monthly fee systems.</p>
+        <h3>1. Storm POS - Best Value for SA Retailers</h3>
+        <p>Storm POS is built specifically for South African retailers and is the only cloud POS with full Afrikaans language support. It runs on any device with a browser - phone, tablet, or laptop - making it naturally load-shedding resilient when paired with a mobile data connection.</p>
+        <p><strong>Pricing:</strong> No monthly fees. Pay only 0.5% per sale + R0.50 per invoice. This means a shop doing R50,000 per month pays R250 total - far less than fixed monthly fee systems.</p>
         <p><strong>Key features:</strong> Real-time inventory, customer directory, invoicing and quoting, void sales, staff accounts with role permissions, sales analytics, and Excel import/export for products.</p>
         <div className="callout">
           <strong>Best for:</strong> Retailers, boutiques, hardware stores, trade businesses, and any SA business with Afrikaans-speaking staff or customers.
         </div>
 
-        <h3>2. iKhokha — Best for Card Payment Terminals</h3>
-        <p>iKhokha is a South African company focused on card payment acceptance. Their card machines are popular with mobile traders and small vendors. However, their POS functionality is limited compared to dedicated systems — inventory management is basic and reporting is minimal.</p>
-        <p><strong>Pricing:</strong> Card machine purchase from ~R699, then 2.75% per card transaction. No card, no payment — which limits you.</p>
+        <h3>2. iKhokha - Best for Card Payment Terminals</h3>
+        <p>iKhokha is a South African company focused on card payment acceptance. Their card machines are popular with mobile traders and small vendors. However, their POS functionality is limited compared to dedicated systems - inventory management is basic and reporting is minimal.</p>
+        <p><strong>Pricing:</strong> Card machine purchase from ~R699, then 2.75% per card transaction. No card, no payment - which limits you.</p>
         <p><strong>Best for:</strong> Market traders, pop-up shops, or businesses where card is the only payment type needed.</p>
 
-        <h3>3. Lightspeed — Best for Retail Chains</h3>
+        <h3>3. Lightspeed - Best for Retail Chains</h3>
         <p>Lightspeed is a powerful international POS with strong inventory features for multi-location retailers. However, it's expensive (USD pricing from $89/month), has no Afrikaans support, and is better suited to established businesses with multiple staff members.</p>
         <p><strong>Best for:</strong> Mid-to-large retailers with R500K+ monthly revenue and no need for Afrikaans.</p>
 
-        <h3>4. Shopify POS — Best for E-commerce Businesses</h3>
+        <h3>4. Shopify POS - Best for E-commerce Businesses</h3>
         <p>If you're running an online store and need in-person sales too, Shopify POS integrates seamlessly. But it requires a Shopify subscription (from ~R500/month), and the South African payment gateway options are limited.</p>
         <p><strong>Best for:</strong> Businesses already using Shopify for online sales.</p>
 
@@ -619,10 +619,10 @@ const blogContent: Record<string, BlogContent> = {
         <h2>How to Choose the Right POS for Your Business Size</h2>
 
         <h3>Micro businesses (0–2 staff, under R50K/month)</h3>
-        <p>Avoid expensive monthly subscriptions. Storm POS's per-transaction model means you pay nothing when sales are slow — ideal for seasonal businesses or those just starting out. A business doing R30K/month pays only R150 in POS fees.</p>
+        <p>Avoid expensive monthly subscriptions. Storm POS's per-transaction model means you pay nothing when sales are slow - ideal for seasonal businesses or those just starting out. A business doing R30K/month pays only R150 in POS fees.</p>
 
         <h3>Small businesses (3–10 staff, R50K–R500K/month)</h3>
-        <p>At this level you need proper inventory tracking, staff accounts, and reporting. Storm POS covers all of these with no additional cost. At R500K/month turnover, Storm's fee is just R2,500 — still far cheaper than Lightspeed's fixed fee.</p>
+        <p>At this level you need proper inventory tracking, staff accounts, and reporting. Storm POS covers all of these with no additional cost. At R500K/month turnover, Storm's fee is just R2,500 - still far cheaper than Lightspeed's fixed fee.</p>
 
         <h3>Growing businesses (10+ staff, R500K+/month)</h3>
         <p>Consider whether a fixed-fee system makes sense. At very high volumes, a flat monthly fee can become cheaper than percentage-based pricing. But factor in Afrikaans support, local customer service, and SA-specific features before going international.</p>
@@ -630,9 +630,9 @@ const blogContent: Record<string, BlogContent> = {
         <h2>What SA Small Business Owners Say They Need Most</h2>
         <p>Based on conversations with SA retailers, the top 3 requirements are consistently:</p>
         <ol>
-          <li><strong>Reliable sales recording</strong> — no missed transactions, clear receipt printing</li>
-          <li><strong>Stock tracking</strong> — knowing what's running low before it runs out</li>
-          <li><strong>Simple reporting</strong> — understanding daily, weekly, and monthly performance without an accountant</li>
+          <li><strong>Reliable sales recording</strong> - no missed transactions, clear receipt printing</li>
+          <li><strong>Stock tracking</strong> - knowing what's running low before it runs out</li>
+          <li><strong>Simple reporting</strong> - understanding daily, weekly, and monthly performance without an accountant</li>
         </ol>
         <p>A good POS covers all three without requiring advanced training or IT support.</p>
 
@@ -658,7 +658,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["best-pos-system-small-business-south-africa", "how-choose-right-pos-system-business", "why-south-african-retailers-switching-cloud-pos"],
     content: (
       <>
-        <p>Many South African small business owners search for a "free POS system" — and understandably so. Running a small business is expensive, and every rand saved on software is a rand back in your pocket. But is there really a free POS system that's worth using? Let's break it down honestly.</p>
+        <p>Many South African small business owners search for a "free POS system" - and understandably so. Running a small business is expensive, and every rand saved on software is a rand back in your pocket. But is there really a free POS system that's worth using? Let's break it down honestly.</p>
 
         <h2>The Truth About "Free" POS Systems</h2>
         <p>When a POS system is described as "free," it usually means one of three things:</p>
@@ -677,7 +677,7 @@ const blogContent: Record<string, BlogContent> = {
           <li>No per-user fee</li>
           <li>0.5% per sale + R0.50 per invoice generated</li>
         </ul>
-        <p>For a shop doing R20,000 in sales per month, that's R100. For a shop doing R5,000, that's R25. It scales with your business — and if you have a quiet month, your POS cost is proportionally lower.</p>
+        <p>For a shop doing R20,000 in sales per month, that's R100. For a shop doing R5,000, that's R25. It scales with your business - and if you have a quiet month, your POS cost is proportionally lower.</p>
 
         <div className="callout">
           <strong>The maths:</strong> A business making R100,000/month pays R500 to Storm POS. A traditional POS at R999/month charges the same amount regardless of your performance.
@@ -694,11 +694,11 @@ const blogContent: Record<string, BlogContent> = {
         <h3>Lightspeed Free Trial</h3>
         <p>Lightspeed offers a 14-day free trial, after which pricing starts at $89/month (around R1,700+). Not sustainable for a small SA business.</p>
 
-        <h3>Storm POS — 7-Day Free Trial, Then Pay Only What You Sell</h3>
+        <h3>Storm POS - 7-Day Free Trial, Then Pay Only What You Sell</h3>
         <p>Storm POS offers a 7-day fully-featured free trial, then moves to the 0.5%-per-sale model. Compared to competitors, it offers the most complete feature set at the lowest ongoing cost for SA businesses.</p>
 
         <h2>What Should a Free or Low-Cost POS Include?</h2>
-        <p>Don't accept a stripped-down system. A proper POS — even at low cost — should include:</p>
+        <p>Don't accept a stripped-down system. A proper POS - even at low cost - should include:</p>
         <ul>
           <li>Product/inventory management (add, edit, delete products)</li>
           <li>Sale processing with multiple payment types (Cash, Card, EFT)</li>
@@ -707,7 +707,7 @@ const blogContent: Record<string, BlogContent> = {
           <li>Receipt printing or digital receipt sending</li>
           <li>Staff accounts if you have employees</li>
         </ul>
-        <p>Any system that hides these behind a paywall after a "free" plan isn't really free — it's a funnel.</p>
+        <p>Any system that hides these behind a paywall after a "free" plan isn't really free - it's a funnel.</p>
 
         <h2>Hidden Costs to Watch For</h2>
         <p>When evaluating "free" POS systems, watch for these hidden costs:</p>
@@ -720,12 +720,12 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <h2>The Best Approach for SA Small Businesses</h2>
-        <p>Rather than chasing "free," look for the best value. A POS that costs R200–R500/month but saves you 2 hours of admin per week — at R150/hour — pays for itself in the first week. The question isn't "is it free?" but "does it earn back what I'm paying?"</p>
-        <p>Storm POS's per-transaction model removes the mental burden entirely. You're not paying for software — you're investing a small share of each sale in the tool that helped make it.</p>
+        <p>Rather than chasing "free," look for the best value. A POS that costs R200–R500/month but saves you 2 hours of admin per week - at R150/hour - pays for itself in the first week. The question isn't "is it free?" but "does it earn back what I'm paying?"</p>
+        <p>Storm POS's per-transaction model removes the mental burden entirely. You're not paying for software - you're investing a small share of each sale in the tool that helped make it.</p>
 
         <div className="callout-cta">
           <h4>Start Free, Stay Affordable</h4>
-          <p>Storm POS gives you 7 days completely free — full access, no card required. After that, pay only 0.5% per sale. No lock-in, no hidden fees. <Link href="/pos/signup" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Start Free Trial →</Link></p>
+          <p>Storm POS gives you 7 days completely free - full access, no card required. After that, pay only 0.5% per sale. No lock-in, no hidden fees. <Link href="/pos/signup" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Start Free Trial →</Link></p>
         </div>
       </>
     )
@@ -742,7 +742,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["best-pos-system-small-business-south-africa", "why-south-african-retailers-switching-cloud-pos", "load-shedding-pos-system-south-africa"],
     content: (
       <>
-        <p>If you're shopping for a new POS system in South Africa in 2025, you'll quickly encounter two types: cloud-based (also called SaaS or web-based) POS systems, and traditional (on-premise or legacy) POS systems. The difference matters — especially in South Africa, where load shedding, connectivity, and cost all play a role.</p>
+        <p>If you're shopping for a new POS system in South Africa in 2025, you'll quickly encounter two types: cloud-based (also called SaaS or web-based) POS systems, and traditional (on-premise or legacy) POS systems. The difference matters - especially in South Africa, where load shedding, connectivity, and cost all play a role.</p>
 
         <p>This guide explains both clearly, compares them head-to-head, and helps you decide which is right for your business.</p>
 
@@ -751,7 +751,7 @@ const blogContent: Record<string, BlogContent> = {
         <p><strong>Examples:</strong> AccpacPOS, Sage POS, older Pastel Point of Sale systems.</p>
 
         <h2>What is a Cloud POS System?</h2>
-        <p>A cloud POS runs in your web browser or as an app. Your data is stored securely on remote servers, accessible from any device — phone, tablet, or laptop. You typically pay a monthly subscription or per-transaction fee, and updates happen automatically.</p>
+        <p>A cloud POS runs in your web browser or as an app. Your data is stored securely on remote servers, accessible from any device - phone, tablet, or laptop. You typically pay a monthly subscription or per-transaction fee, and updates happen automatically.</p>
         <p><strong>Examples:</strong> Storm POS, Lightspeed, Shopify POS, Square.</p>
 
         <h2>Head-to-Head Comparison for SA Businesses</h2>
@@ -762,7 +762,7 @@ const blogContent: Record<string, BlogContent> = {
             <tr><td>Monthly cost</td><td>R0 (after purchase)</td><td>R0 – R1,500+</td></tr>
             <tr><td>Load shedding impact</td><td>Stops working (no UPS = no POS)</td><td>Runs on mobile data + tablet</td></tr>
             <tr><td>Data backup</td><td>Manual, risky</td><td>Automatic, cloud-synced</td></tr>
-            <tr><td>Access from home</td><td>❌ No</td><td>✅ Yes — any device</td></tr>
+            <tr><td>Access from home</td><td>❌ No</td><td>✅ Yes - any device</td></tr>
             <tr><td>Updates</td><td>Annual (paid)</td><td>Automatic, free</td></tr>
             <tr><td>Setup time</td><td>Days (technician required)</td><td>Minutes (self-service)</td></tr>
             <tr><td>Hardware needed</td><td>Specific terminal</td><td>Any device with browser</td></tr>
@@ -780,8 +780,8 @@ const blogContent: Record<string, BlogContent> = {
         <h2>Data Security: Cloud vs Local</h2>
         <p>Many traditional POS owners believe their data is safer "on-site." In reality, local data is far more vulnerable:</p>
         <ul>
-          <li>Hard drives fail — and often take months of transaction history with them</li>
-          <li>Theft is common — a stolen PC means stolen business data</li>
+          <li>Hard drives fail - and often take months of transaction history with them</li>
+          <li>Theft is common - a stolen PC means stolen business data</li>
           <li>Fire or flooding destroys local backups</li>
         </ul>
         <p>Cloud POS systems store data in encrypted, redundant servers with automatic backups. A flood, theft, or fire at your store means you log in on a new device and continue.</p>
@@ -792,7 +792,7 @@ const blogContent: Record<string, BlogContent> = {
           <li><strong>Traditional POS (3 years):</strong> R15,000 + R9,000 = R24,000</li>
           <li><strong>Storm POS (3 years):</strong> 0.5% × R50,000 × 36 months = R9,000</li>
         </ul>
-        <p>Storm POS saves R15,000 over 3 years — plus there are no emergency technician call-out fees, no hardware breakdowns, and no data loss.</p>
+        <p>Storm POS saves R15,000 over 3 years - plus there are no emergency technician call-out fees, no hardware breakdowns, and no data loss.</p>
 
         <h2>When Traditional POS Still Makes Sense</h2>
         <p>There are still situations where traditional POS might be appropriate:</p>
@@ -801,19 +801,19 @@ const blogContent: Record<string, BlogContent> = {
           <li>High-volume retailers with existing sunk costs in traditional hardware</li>
           <li>Highly specialized industries with niche software requirements</li>
         </ul>
-        <p>But for most South African small and medium businesses in 2025, the advantages of cloud POS — especially load shedding resilience — make it the clear choice.</p>
+        <p>But for most South African small and medium businesses in 2025, the advantages of cloud POS - especially load shedding resilience - make it the clear choice.</p>
 
         <div className="callout-cta">
           <h4>Make the Switch to Cloud POS</h4>
-          <p>Storm POS is built for South African businesses — cloud-based, load-shedding resilient, with Afrikaans support. Start your 7-day free trial today. <Link href="/pos" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Try Storm POS Free →</Link></p>
+          <p>Storm POS is built for South African businesses - cloud-based, load-shedding resilient, with Afrikaans support. Start your 7-day free trial today. <Link href="/pos" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Try Storm POS Free →</Link></p>
         </div>
       </>
     )
   },
-  "afrikaanse-kassastelsel-pos-stelsel": {
-    slug: "afrikaanse-kassastelsel-pos-stelsel",
-    title: "Beste Afrikaanse Kassastelsel vir Suid-Afrikaanse Besighede",
-    metaDescription: "Op soek na 'n kassastelsel in Afrikaans? Storm POS is die enigste wolkgebaseerde kassastelsel met volle Afrikaanse ondersteuning vir Suid-Afrikaanse kleinsakke.",
+  "afrikaanse-verkoopstelsel-pos-stelsel": {
+    slug: "afrikaanse-verkoopstelsel-pos-stelsel",
+    title: "Beste Afrikaanse Verkoopstelsel vir Suid-Afrikaanse Besighede",
+    metaDescription: "Op soek na 'n verkoopstelsel in Afrikaans? Storm POS is die enigste wolkgebaseerde verkoopstelsel met volle Afrikaanse ondersteuning vir Suid-Afrikaanse kleinsakke.",
     readTime: "7 min lees",
     date: "January 12, 2026",
     author: "Storm Span",
@@ -822,12 +822,12 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["best-pos-system-small-business-south-africa", "why-south-african-retailers-switching-cloud-pos", "how-choose-right-pos-system-business"],
     content: (
       <>
-        <p>As Afrikaanse sake-eienaar in Suid-Afrika, soek jy 'n kassastelsel wat jou taal praat — letterlik. Die meeste POS-stelsels op die mark is slegs in Engels beskikbaar, wat dit moeilik maak vir Afrikaanse personeel en klante.</p>
+        <p>As Afrikaanse sake-eienaar in Suid-Afrika, soek jy 'n verkoopstelsel wat jou taal praat - letterlik. Die meeste POS-stelsels op die mark is slegs in Engels beskikbaar, wat dit moeilik maak vir Afrikaanse personeel en klante.</p>
 
-        <p>Storm POS is die enigste wolkgebaseerde kassastelsel met <strong>volle Afrikaanse taalondersteuning</strong>. Jy kan enige tyd tussen Engels en Afrikaans skakel, en elke deel van die stelsel — van die verkoopsskerm tot fakture — werk naatloos in Afrikaans.</p>
+        <p>Storm POS is die enigste wolkgebaseerde verkoopstelsel met <strong>volle Afrikaanse taalondersteuning</strong>. Jy kan enige tyd tussen Engels en Afrikaans skakel, en elke deel van die stelsel - van die verkoopsskerm tot fakture - werk naatloos in Afrikaans.</p>
 
-        <h2>Waarom 'n Afrikaanse Kassastelsel Saak Maak</h2>
-        <p>Meer as 7 miljoen Suid-Afrikaners praat Afrikaans as huistaaltaal. Vir baie kleinsakke in die Wes-Kaap, Noord-Kaap, Vrystaat, en ander streke is Afrikaans die primêre taal van besigheid. Wanneer jou personeel 'n kassastelsel gebruik wat hulle nie gemaklik mee is nie, gebeur hierdie probleme:</p>
+        <h2>Waarom 'n Afrikaanse Verkoopstelsel Saak Maak</h2>
+        <p>Meer as 7 miljoen Suid-Afrikaners praat Afrikaans as huistaaltaal. Vir baie kleinsakke in die Wes-Kaap, Noord-Kaap, Vrystaat, en ander streke is Afrikaans die primêre taal van besigheid. Wanneer jou personeel 'n verkoopstelsel gebruik wat hulle nie gemaklik mee is nie, gebeur hierdie probleme:</p>
         <ul>
           <li>Foute tydens verkope (verkeerde produkte, pryse, of betalings)</li>
           <li>Stadige opleidingstyd vir nuwe personeel</li>
@@ -836,7 +836,7 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
         <p>In jou eie taal werk almal vinniger en met meer selfvertroue.</p>
 
-        <h2>Storm POS Afrikaans — Volle Ondersteuning, Nie Net 'n Vertaling</h2>
+        <h2>Storm POS Afrikaans - Volle Ondersteuning, Nie Net 'n Vertaling</h2>
         <p>Baie internasionale POS-stelsels bied "Afrikaans" as 'n taalopsie aan, maar dit is dikwels 'n gedeeltelike masjienverta­ling met Engelse terme wat oorgebly het. Storm POS is anders:</p>
         <ul>
           <li>Die hele verkoopskoppelvlak is in Afrikaans</li>
@@ -846,13 +846,13 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <div className="callout">
-          <strong>Eenvoudige skakelaar:</strong> Enige gebruiker kan enige tyd tussen Engels en Afrikaans skakel — geen herlaai of herbegin nodig nie.
+          <strong>Eenvoudige skakelaar:</strong> Enige gebruiker kan enige tyd tussen Engels en Afrikaans skakel - geen herlaai of herbegin nodig nie.
         </div>
 
         <h2>Kenmerke van Storm POS in Afrikaans</h2>
 
         <h3>Verkope Verwerk</h3>
-        <p>Voeg produkte by 'n bestelling, kies betalingstipe (Kontant, Kaart, EFT), en druk 'n kwitansie — alles in Afrikaans. Die verkoopsskerm is eenvoudig en intuïtief, selfs vir personeel wat nog nooit 'n kassastelsel gebruik het nie.</p>
+        <p>Voeg produkte by 'n bestelling, kies betalingstipe (Kontant, Kaart, EFT), en druk 'n kwitansie - alles in Afrikaans. Die verkoopsskerm is eenvoudig en intuïtief, selfs vir personeel wat nog nooit 'n verkoopstelsel gebruik het nie.</p>
 
         <h3>Voorraadbestuur</h3>
         <p>Voeg produkte by met prys, SKU, en kategorie. Stel lae-voorraadwaarskuwings op. Importeer produkte uit Excel. Alles in Afrikaans, met duidelike Afrikaanse terme.</p>
@@ -861,16 +861,16 @@ const blogContent: Record<string, BlogContent> = {
         <p>Genereer professionele fakture en kwotasies in Afrikaans, met jou besigheidslogo en inligting. Stuur dit as PDF direk aan klante. Die woorde "FAKTUUR" en "KWOTASIE" verskyn op die dokument, nie "INVOICE" of "QUOTE" nie.</p>
 
         <h3>Klantedirektief</h3>
-        <p>Stoor klantebesonderhede, sien hulle koopgeskiednis, en skep oop rekeninge (tabs) vir gereelde klante — alles in Afrikaans.</p>
+        <p>Stoor klantebesonderhede, sien hulle koopgeskiednis, en skep oop rekeninge (tabs) vir gereelde klante - alles in Afrikaans.</p>
 
         <h3>Verkoopsverslae</h3>
         <p>Sien daaglikse, weeklikse, en maandelikse verkoopsontledings. Alle grafieke en statistieke is in Afrikaans.</p>
 
-        <h2>Prys — Bekostigbaar vir Suid-Afrikaanse Kleinsakke</h2>
+        <h2>Prys - Bekostigbaar vir Suid-Afrikaanse Kleinsakke</h2>
         <p>Storm POS het geen maandelikse fooi nie. Jy betaal slegs:</p>
         <ul>
-          <li><strong>0,5% per verkoop</strong> — 'n winkel wat R50,000/maand verkoop, betaal R250</li>
-          <li><strong>R0,50 per faktuur</strong> — slegs wanneer jy 'n faktuur genereer</li>
+          <li><strong>0,5% per verkoop</strong> - 'n winkel wat R50,000/maand verkoop, betaal R250</li>
+          <li><strong>R0,50 per faktuur</strong> - slegs wanneer jy 'n faktuur genereer</li>
         </ul>
         <p>Geen oprigtingsfooi nie. Geen kontrak nie. Geen per-gebruiker fooi nie.</p>
 
@@ -901,7 +901,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["best-pos-system-small-business-south-africa", "free-pos-system-south-africa", "invoicing-software-south-africa"],
     content: (
       <>
-        <p>Poor inventory management is one of the top reasons South African small businesses struggle with cash flow. You either have too much stock tying up capital, or too little and you're losing sales. Getting it right is a competitive advantage — and it's more achievable than most business owners think.</p>
+        <p>Poor inventory management is one of the top reasons South African small businesses struggle with cash flow. You either have too much stock tying up capital, or too little and you're losing sales. Getting it right is a competitive advantage - and it's more achievable than most business owners think.</p>
 
         <p>This guide covers the fundamentals of inventory management for SA small businesses, from the basics to practical tools you can implement this week.</p>
 
@@ -912,7 +912,7 @@ const blogContent: Record<string, BlogContent> = {
           <li><strong>Supply chain disruptions:</strong> Port delays at Durban and Cape Town are common</li>
           <li><strong>Petrol price increases:</strong> Delivery costs fluctuate significantly</li>
           <li><strong>Load shedding:</strong> Cold storage failures and production disruptions affect perishable inventory</li>
-          <li><strong>Theft:</strong> SA has elevated retail theft rates — proper tracking helps identify shrinkage</li>
+          <li><strong>Theft:</strong> SA has elevated retail theft rates - proper tracking helps identify shrinkage</li>
         </ul>
 
         <h2>The Basics: What Is Inventory Management?</h2>
@@ -929,7 +929,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>Every product in your business needs a record with at minimum:</p>
         <ul>
           <li>Product name and description</li>
-          <li>SKU (Stock Keeping Unit) — a unique code for each product</li>
+          <li>SKU (Stock Keeping Unit) - a unique code for each product</li>
           <li>Selling price (retail and/or trade if applicable)</li>
           <li>Cost price (what you paid for it)</li>
           <li>Current stock quantity</li>
@@ -940,10 +940,10 @@ const blogContent: Record<string, BlogContent> = {
         <h2>Step 2: Choose an Inventory Tracking Method</h2>
 
         <h3>Periodic Inventory (Manual Counting)</h3>
-        <p>You count your stock manually at set intervals — weekly, monthly, or quarterly. This works for very small businesses with few products, but becomes impractical quickly. Manual counting is also error-prone and time-consuming.</p>
+        <p>You count your stock manually at set intervals - weekly, monthly, or quarterly. This works for very small businesses with few products, but becomes impractical quickly. Manual counting is also error-prone and time-consuming.</p>
 
         <h3>Perpetual Inventory (Real-time Tracking)</h3>
-        <p>A POS system automatically adjusts your stock every time you make a sale. Every transaction reduces the relevant product's stock count. This is the gold standard — you always know your exact stock levels without counting.</p>
+        <p>A POS system automatically adjusts your stock every time you make a sale. Every transaction reduces the relevant product's stock count. This is the gold standard - you always know your exact stock levels without counting.</p>
         <p>Storm POS uses perpetual inventory tracking. Every sale, return, or manual stock adjustment updates your inventory in real-time. You can see current stock levels from any device, any time.</p>
 
         <h2>Step 3: Set Reorder Points</h2>
@@ -960,10 +960,10 @@ const blogContent: Record<string, BlogContent> = {
           <li>Write off damaged or expired stock</li>
           <li>Update your records with any untracked adjustments</li>
         </ul>
-        <p>A full stocktake is disruptive, so many businesses do rolling stock counts — counting a portion of their catalogue each week so that every item gets counted every quarter.</p>
+        <p>A full stocktake is disruptive, so many businesses do rolling stock counts - counting a portion of their catalogue each week so that every item gets counted every quarter.</p>
 
         <h2>Managing Perishable Stock in Load Shedding</h2>
-        <p>For businesses with refrigerated goods — food, drinks, pharmaceuticals — load shedding adds a significant inventory risk. Best practices:</p>
+        <p>For businesses with refrigerated goods - food, drinks, pharmaceuticals - load shedding adds a significant inventory risk. Best practices:</p>
         <ul>
           <li>Keep a power outage log to track stock exposure to temperature risks</li>
           <li>Invest in a UPS or solar backup for cold storage</li>
@@ -972,11 +972,11 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <h2>Using Technology: Excel vs POS Inventory</h2>
-        <p>Many small SA businesses start inventory management in Excel or Google Sheets. It works — until it doesn't. Common problems with spreadsheet inventory:</p>
+        <p>Many small SA businesses start inventory management in Excel or Google Sheets. It works - until it doesn't. Common problems with spreadsheet inventory:</p>
         <ul>
           <li>Manual data entry errors (a typo can show you 1,000 units when you have 100)</li>
-          <li>No real-time updates — the sheet is always slightly out of date</li>
-          <li>Multiple staff, multiple versions — no single source of truth</li>
+          <li>No real-time updates - the sheet is always slightly out of date</li>
+          <li>Multiple staff, multiple versions - no single source of truth</li>
           <li>No alerts when stock is low</li>
         </ul>
         <p>A POS system with built-in inventory management solves all of these. Storm POS lets you import your existing product list from Excel to get started quickly, then manages all stock adjustments automatically from that point forward.</p>
@@ -985,8 +985,8 @@ const blogContent: Record<string, BlogContent> = {
         <p>South Africa has a significant retail shrinkage problem. The best defence is accurate tracking:</p>
         <ul>
           <li>Regular stock counts that compare system counts to physical counts</li>
-          <li>Staff accountability — track which staff member processed each sale</li>
-          <li>Void sale monitoring — unusual numbers of cancelled transactions can indicate fraud</li>
+          <li>Staff accountability - track which staff member processed each sale</li>
+          <li>Void sale monitoring - unusual numbers of cancelled transactions can indicate fraud</li>
           <li>Low-cost surveillance cameras at the till point</li>
         </ul>
 
@@ -1000,7 +1000,7 @@ const blogContent: Record<string, BlogContent> = {
   "website-koste-suid-afrika-2025": {
     slug: "website-koste-suid-afrika-2025",
     title: "How Much Does a Website Cost in South Africa? (2025 Pricing Guide)",
-    metaDescription: "Wondering how much a website costs in South Africa in 2025? Get a clear, honest breakdown of website pricing — from R799/month packages to R50,000 custom builds.",
+    metaDescription: "Wondering how much a website costs in South Africa in 2025? Get a clear, honest breakdown of website pricing - from R799/month packages to R50,000 custom builds.",
     readTime: "9 min read",
     date: "January 18, 2026",
     author: "Storm Team",
@@ -1009,7 +1009,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["real-cost-not-having-website-2025", "how-choose-right-pos-system-business", "best-pos-system-small-business-south-africa"],
     content: (
       <>
-        <p>One of the most common questions South African business owners ask when they decide to go online is: "How much does a website actually cost?" The honest answer is: it depends — but this guide gives you real numbers so you can budget properly.</p>
+        <p>One of the most common questions South African business owners ask when they decide to go online is: "How much does a website actually cost?" The honest answer is: it depends - but this guide gives you real numbers so you can budget properly.</p>
 
         <h2>The Wide Range of Website Costs in South Africa</h2>
         <p>Website costs in South Africa range from a few hundred rand per month to R50,000+ for a fully custom build. Here's why the range is so wide:</p>
@@ -1023,7 +1023,7 @@ const blogContent: Record<string, BlogContent> = {
         <h2>Option 1: DIY Website Builders (R0–R500/month)</h2>
         <p>Platforms like Wix, Squarespace, and WordPress.com let you build a site yourself. Cost is low, but:</p>
         <ul>
-          <li>Time investment is high — learning curve for non-technical users</li>
+          <li>Time investment is high - learning curve for non-technical users</li>
           <li>Results are often template-heavy and lack differentiation</li>
           <li>SEO setup is often incomplete</li>
           <li>Support is limited to documentation and forums</li>
@@ -1051,13 +1051,13 @@ const blogContent: Record<string, BlogContent> = {
         <p>Hiring a freelance web developer for a custom build typically costs R5,000–R20,000 for a small business site. This gives you more customization than a template, but:</p>
         <ul>
           <li>Ongoing maintenance is your responsibility (or another cost)</li>
-          <li>Quality varies enormously — experience is critical</li>
+          <li>Quality varies enormously - experience is critical</li>
           <li>Updates and new features require additional cost</li>
           <li>If the freelancer becomes unavailable, you may struggle to find someone familiar with the codebase</li>
         </ul>
 
         <h2>Option 4: Web Design Agency (R20,000–R100,000+)</h2>
-        <p>Agencies offer the most comprehensive service — strategy, design, development, copywriting, and SEO. Costs start at R20,000 for a basic site and can reach R100,000+ for complex, custom solutions. This is appropriate for established businesses with marketing budgets, not for most small businesses.</p>
+        <p>Agencies offer the most comprehensive service - strategy, design, development, copywriting, and SEO. Costs start at R20,000 for a basic site and can reach R100,000+ for complex, custom solutions. This is appropriate for established businesses with marketing budgets, not for most small businesses.</p>
 
         <h2>Hidden Website Costs to Budget For</h2>
         <p>Even after building the site, budget for these ongoing costs if not included in your package:</p>
@@ -1070,7 +1070,7 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <h2>What a Good Website Should Achieve</h2>
-        <p>A website isn't a cost — it's an investment. Before choosing a package, ask what business results you expect:</p>
+        <p>A website isn't a cost - it's an investment. Before choosing a package, ask what business results you expect:</p>
         <ul>
           <li>Do you want customers to find you on Google? (Requires SEO)</li>
           <li>Do you want online enquiries? (Requires a contact form)</li>
@@ -1079,10 +1079,10 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <h2>Is a Website Worth It for SA Small Businesses?</h2>
-        <p>Yes — consistently. A professional website:</p>
+        <p>Yes - consistently. A professional website:</p>
         <ul>
           <li>Gives you 24/7 visibility (your "always-open" shop window)</li>
-          <li>Builds credibility — 75% of consumers judge a business's credibility by its website</li>
+          <li>Builds credibility - 75% of consumers judge a business's credibility by its website</li>
           <li>Generates leads and enquiries from Google searches</li>
           <li>Reduces time spent answering basic questions (your site answers them)</li>
         </ul>
@@ -1107,7 +1107,7 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["cloud-pos-vs-traditional-pos-south-africa", "why-south-african-retailers-switching-cloud-pos", "best-pos-system-small-business-south-africa"],
     content: (
       <>
-        <p>Load shedding has become a defining challenge for South African retailers. At its peak in 2023, South Africa experienced over 330 days of load shedding — the most in history. For businesses relying on traditional POS systems connected to fixed power and internet, this means thousands of rand in lost sales every month.</p>
+        <p>Load shedding has become a defining challenge for South African retailers. At its peak in 2023, South Africa experienced over 330 days of load shedding - the most in history. For businesses relying on traditional POS systems connected to fixed power and internet, this means thousands of rand in lost sales every month.</p>
 
         <p>But many SA retailers have found ways to stay open and trading through every stage. This guide covers the practical setup for a load-shedding-proof POS system.</p>
 
@@ -1126,13 +1126,13 @@ const blogContent: Record<string, BlogContent> = {
 
         <h3>1. Cloud POS on a Tablet or Laptop</h3>
         <p>The core of your load-shedding setup is a cloud POS that runs in a web browser. A tablet (iPad or Android) or a laptop with a charged battery can run for 6–10 hours. No power needed during the outage.</p>
-        <p>Storm POS runs in any browser — open it on your tablet and you're ready to trade immediately.</p>
+        <p>Storm POS runs in any browser - open it on your tablet and you're ready to trade immediately.</p>
 
         <h3>2. Mobile Data for Internet</h3>
         <p>Your home router goes down with the power. But a mobile data SIM in a phone or a portable WiFi router keeps you connected. A standard Telkom, Vodacom, or MTN SIM with 5–10GB of data is sufficient for a full month of POS use.</p>
         <p><strong>Cost:</strong> R100–R200/month for mobile data.</p>
         <div className="callout">
-          <strong>Pro tip:</strong> Enable the hotspot on your personal cellphone as a backup during outages. Your phone's battery can typically last 4–6 hours as a hotspot. Data usage for a cloud POS is very low — typically less than 100MB per day.
+          <strong>Pro tip:</strong> Enable the hotspot on your personal cellphone as a backup during outages. Your phone's battery can typically last 4–6 hours as a hotspot. Data usage for a cloud POS is very low - typically less than 100MB per day.
         </div>
 
         <h3>3. Power Bank for Tablet and Phone</h3>
@@ -1143,7 +1143,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>Card terminals require internet (and often power) to process transactions. During load shedding, many SA retailers accept cash only. Make sure you have a float, a cash register or lockbox, and that your POS can record cash sales for reconciliation later.</p>
 
         <h3>5. Digital Receipts Instead of Printed</h3>
-        <p>Receipt printers need power. During outages, use email or WhatsApp receipts instead. Storm POS allows you to email receipts directly to customers — no printer needed.</p>
+        <p>Receipt printers need power. During outages, use email or WhatsApp receipts instead. Storm POS allows you to email receipts directly to customers - no printer needed.</p>
 
         <h2>The Full Cost of a Load-Shedding-Proof Setup</h2>
         <table className="cost-table">
@@ -1152,7 +1152,7 @@ const blogContent: Record<string, BlogContent> = {
             <tr><td>Tablet (entry level Android)</td><td>R2,500–R4,000</td><td>Once-off. Keep charged.</td></tr>
             <tr><td>Power bank (30,000mAh)</td><td>R500–R800</td><td>Once-off.</td></tr>
             <tr><td>Mobile data SIM</td><td>R100–R200/month</td><td>Ongoing.</td></tr>
-            <tr><td>Storm POS</td><td>0.5% per sale</td><td>Ongoing — only when trading.</td></tr>
+            <tr><td>Storm POS</td><td>0.5% per sale</td><td>Ongoing - only when trading.</td></tr>
             <tr><td><strong>Total setup cost</strong></td><td><strong>~R3,500</strong></td><td>Once-off hardware</td></tr>
           </tbody>
         </table>
@@ -1196,45 +1196,45 @@ const blogContent: Record<string, BlogContent> = {
     relatedPosts: ["best-pos-system-small-business-south-africa", "website-koste-suid-afrika-2025", "inventory-management-small-business-south-africa"],
     content: (
       <>
-        <p>Every South African small business that invoices clients — from freelancers and contractors to retailers and service providers — needs reliable invoicing software. Creating invoices in Word or Excel is slow, looks unprofessional, and makes tracking payments a nightmare.</p>
+        <p>Every South African small business that invoices clients - from freelancers and contractors to retailers and service providers - needs reliable invoicing software. Creating invoices in Word or Excel is slow, looks unprofessional, and makes tracking payments a nightmare.</p>
 
         <p>This guide compares the best invoicing software options for SA businesses, with honest assessments of pricing, features, and SA-specific suitability.</p>
 
         <h2>What Makes Good Invoicing Software for SA Businesses?</h2>
         <p>Before diving into options, here's what matters specifically for South African businesses:</p>
         <ul>
-          <li><strong>Rand (ZAR) currency support</strong> — sounds obvious, but many tools default to USD</li>
-          <li><strong>VAT-compliant invoices</strong> — SARS requires specific fields for VAT-registered businesses</li>
-          <li><strong>PDF export</strong> — professional invoices sent by email</li>
-          <li><strong>Quote-to-invoice conversion</strong> — create a quote, convert it to an invoice when approved</li>
-          <li><strong>Payment tracking</strong> — know which invoices are paid, unpaid, or overdue</li>
-          <li><strong>Client management</strong> — store client details for repeat invoicing</li>
-          <li><strong>Affordable pricing in ZAR</strong> — USD pricing hurts when the rand is weak</li>
+          <li><strong>Rand (ZAR) currency support</strong> - sounds obvious, but many tools default to USD</li>
+          <li><strong>VAT-compliant invoices</strong> - SARS requires specific fields for VAT-registered businesses</li>
+          <li><strong>PDF export</strong> - professional invoices sent by email</li>
+          <li><strong>Quote-to-invoice conversion</strong> - create a quote, convert it to an invoice when approved</li>
+          <li><strong>Payment tracking</strong> - know which invoices are paid, unpaid, or overdue</li>
+          <li><strong>Client management</strong> - store client details for repeat invoicing</li>
+          <li><strong>Affordable pricing in ZAR</strong> - USD pricing hurts when the rand is weak</li>
         </ul>
 
         <h2>Best Invoicing Software Options for SA Small Businesses</h2>
 
-        <h3>1. Storm POS Invoicing — Best for Retailers Who Also Invoice</h3>
+        <h3>1. Storm POS Invoicing - Best for Retailers Who Also Invoice</h3>
         <p>If your business handles retail sales AND issues invoices and quotes, Storm POS is unique in combining both in one system. You process daily sales through the POS, and generate professional PDF invoices and quotes from the same platform.</p>
         <p><strong>Features:</strong> Automatic invoice numbering, client selection, line items with quantities and prices, subtotal/VAT/total calculations, payment method, terms, due date, PDF export with your business logo, status tracking (Draft → Sent → Paid).</p>
         <p><strong>Pricing:</strong> R0.50 per invoice generated. No monthly subscription.</p>
         <p><strong>Best for:</strong> Retailers, hardware stores, trade businesses, wholesalers, or any business that has both counter sales and invoiced accounts.</p>
         <div className="callout">
-          <strong>Unique advantage:</strong> Storm POS invoices are linked to your customer directory and product catalogue — line items auto-fill from your existing products, and client details pull from your customer records.
+          <strong>Unique advantage:</strong> Storm POS invoices are linked to your customer directory and product catalogue - line items auto-fill from your existing products, and client details pull from your customer records.
         </div>
 
-        <h3>2. Sage One — Best for Accountant Integration</h3>
+        <h3>2. Sage One - Best for Accountant Integration</h3>
         <p>Sage One (now Sage Business Cloud Accounting) is one of the most popular accounting and invoicing tools among South African businesses. It integrates well with SA accountants and has strong VAT reporting.</p>
         <p><strong>Pricing:</strong> From R179/month (Start plan). Higher plans from R339/month.</p>
         <p><strong>Best for:</strong> Businesses that need full accounting software with invoicing included, and want their accountant to have direct access.</p>
 
-        <h3>3. Xero — Best for Growing Businesses</h3>
+        <h3>3. Xero - Best for Growing Businesses</h3>
         <p>Xero is an internationally-respected accounting platform with strong invoicing features. It has good South African support and integrates with many local banks for reconciliation.</p>
         <p><strong>Pricing:</strong> From $15/month (approximately R280/month at current rates).</p>
         <p><strong>Best for:</strong> Businesses that want professional accounting software with international-grade invoicing.</p>
 
-        <h3>4. Wave — Best Free Option</h3>
-        <p>Wave offers free invoicing software with no monthly fee. You pay only for payment processing if you use their payment feature. For SA businesses, payment processing isn't available locally — but the invoicing is free and works well.</p>
+        <h3>4. Wave - Best Free Option</h3>
+        <p>Wave offers free invoicing software with no monthly fee. You pay only for payment processing if you use their payment feature. For SA businesses, payment processing isn't available locally - but the invoicing is free and works well.</p>
         <p><strong>Pricing:</strong> Free for invoicing. Payments not available in SA.</p>
         <p><strong>Best for:</strong> Freelancers and very small businesses that only need basic invoicing with no accounting integration.</p>
 
@@ -1262,14 +1262,14 @@ const blogContent: Record<string, BlogContent> = {
           <li><strong>Quote (Quotation):</strong> A price offer to a client before work is done. Not a demand for payment. Valid for a set period.</li>
           <li><strong>Invoice:</strong> A formal request for payment after goods or services have been provided.</li>
         </ul>
-        <p>Good invoicing software lets you create a quote, send it to the client, and convert it to an invoice once approved — automatically carrying over all the line items.</p>
+        <p>Good invoicing software lets you create a quote, send it to the client, and convert it to an invoice once approved - automatically carrying over all the line items.</p>
 
         <h2>The Cost of Manual Invoicing</h2>
-        <p>If you spend 30 minutes per invoice on manual creation, and you issue 20 invoices per month, that's 10 hours of admin per month. At a billing rate of R200/hour, that's R2,000 worth of your time. Good invoicing software that costs R200/month and cuts that to 5 minutes per invoice saves you 9.5 hours — and pays for itself many times over.</p>
+        <p>If you spend 30 minutes per invoice on manual creation, and you issue 20 invoices per month, that's 10 hours of admin per month. At a billing rate of R200/hour, that's R2,000 worth of your time. Good invoicing software that costs R200/month and cuts that to 5 minutes per invoice saves you 9.5 hours - and pays for itself many times over.</p>
 
         <div className="callout-cta">
           <h4>Professional Invoicing Built Into Storm POS</h4>
-          <p>Create professional PDF invoices and quotes in seconds. Client details and products auto-fill from your existing records. Pay only R0.50 per invoice — or try it free for 7 days. <Link href="/pos" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Start Free Trial →</Link></p>
+          <p>Create professional PDF invoices and quotes in seconds. Client details and products auto-fill from your existing records. Pay only R0.50 per invoice - or try it free for 7 days. <Link href="/pos" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Start Free Trial →</Link></p>
         </div>
       </>
     )
@@ -1301,8 +1301,8 @@ const relatedPostData: Record<string, { title: string; category: string }> = {
     title: "Cloud POS vs Traditional POS: What SA Retailers Need to Know in 2025",
     category: "POS Systems"
   },
-  "afrikaanse-kassastelsel-pos-stelsel": {
-    title: "Beste Afrikaanse Kassastelsel vir Suid-Afrikaanse Besighede",
+  "afrikaanse-verkoopstelsel-pos-stelsel": {
+    title: "Beste Afrikaanse Verkoopstelsel vir Suid-Afrikaanse Besighede",
     category: "POS Stelsels"
   },
   "inventory-management-small-business-south-africa": {

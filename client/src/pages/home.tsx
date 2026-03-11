@@ -80,7 +80,7 @@ export default function Home() {
         {
           "@type": "Question",
           "name": "How much does a website cost in South Africa?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Storm offers professional website packages starting from R799 per month. This includes custom design, mobile optimization, hosting, and SEO setup — with no large upfront cost." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Storm offers professional website packages starting from R799 per month. This includes custom design, mobile optimization, hosting, and SEO setup - with no large upfront cost." }
         },
         {
           "@type": "Question",

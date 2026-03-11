@@ -314,7 +314,7 @@ export default function POS() {
 
               </motion.div>
 
-              {/* Desktop download — secondary link below main CTAs */}
+              {/* Desktop download - secondary link below main CTAs */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -554,7 +554,7 @@ export default function POS() {
               7 Days <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Completely Free</span>, Then Only Pay When You Sell
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              No credit card. No monthly fees. No risk—ever. If you don't make sales, you don't pay a cent.
+              No credit card. No monthly fees. No risk-ever. If you don't make sales, you don't pay a cent.
             </p>
           </motion.div>
 
@@ -597,7 +597,7 @@ export default function POS() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Pay Only What You Sell</h3>
               <p className="text-gray-600 leading-relaxed">
-                Don't use it? Don't pay. Simple as that—only 0.5% when you make sales
+                Don't use it? Don't pay. Simple as that-only 0.5% when you make sales
               </p>
             </motion.div>
           </motion.div>
@@ -742,7 +742,7 @@ export default function POS() {
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Lightning-Fast Performance</h3>
                     <p className="text-gray-600 leading-relaxed">
                       Process transactions in milliseconds with our optimized cloud architecture. 
-                      No lag, no delays—just instant responsiveness across all devices.
+                      No lag, no delays-just instant responsiveness across all devices.
                     </p>
                   </div>
                 </motion.div>
@@ -866,7 +866,7 @@ export default function POS() {
               Always Online
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Your business runs 24/7 in the cloud. Switch seamlessly between desktop, tablet, and smartphone—all your data syncs instantly in real-time.
+              Your business runs 24/7 in the cloud. Switch seamlessly between desktop, tablet, and smartphone-all your data syncs instantly in real-time.
             </p>
           </motion.div>
 
@@ -1926,7 +1926,7 @@ export default function POS() {
               </div>
 
               <p className="text-center text-gray-600">
-                Switch between languages anytime—no restart needed
+                Switch between languages anytime-no restart needed
               </p>
             </div>
           </motion.div>
@@ -2017,7 +2017,7 @@ export default function POS() {
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h3>
                 <p className="text-lg text-gray-600 leading-relaxed">
                   Just 0.5% on every sale, plus R0.50 per invoice you create. 
-                  No hidden costs, no surprises—you only pay when you succeed.
+                  No hidden costs, no surprises-you only pay when you succeed.
                 </p>
               </div>
 
@@ -2144,7 +2144,7 @@ export default function POS() {
                 No Browser Needed
               </h2>
               <p className="text-lg text-gray-400 mb-8 max-w-lg">
-                Run Storm POS as a native Windows application — just like any other software on your PC. Download once, launch from your taskbar, and you're ready to sell.
+                Run Storm POS as a native Windows application - just like any other software on your PC. Download once, launch from your taskbar, and you're ready to sell.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 items-center lg:items-start justify-center lg:justify-start">
                 <Button
@@ -2181,10 +2181,10 @@ export default function POS() {
               className="flex-1 grid grid-cols-1 gap-4"
             >
               {[
-                { icon: Monitor, title: "Native window", desc: "Opens straight to your taskbar — no browser tabs, no URL bar" },
+                { icon: Monitor, title: "Native window", desc: "Opens straight to your taskbar - no browser tabs, no URL bar" },
                 { icon: Zap, title: "One click to launch", desc: "Double-click the desktop icon and you're in your POS immediately" },
-                { icon: Shield, title: "Same account, same data", desc: "Log in with your existing Storm POS credentials — nothing changes" },
-                { icon: RefreshCw, title: "Always up to date", desc: "New features reach you automatically — no manual updates needed" },
+                { icon: Shield, title: "Same account, same data", desc: "Log in with your existing Storm POS credentials - nothing changes" },
+                { icon: RefreshCw, title: "Always up to date", desc: "New features reach you automatically - no manual updates needed" },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-xl p-4">
                   <div className="shrink-0 w-10 h-10 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">

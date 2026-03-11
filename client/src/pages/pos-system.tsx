@@ -1959,7 +1959,7 @@ export default function PosSystem() {
       if (result.type === 'sale') {
         const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
 
-        // Capture state before clearing — needed for print/share in success dialog
+        // Capture state before clearing - needed for print/share in success dialog
         setSaleCompleteData({
           total: calculateTotal(),
           items: [...currentSale],
@@ -2987,7 +2987,7 @@ export default function PosSystem() {
     doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y);
     y += 7;
 
-    // Business Details — left side, below invoice number
+    // Business Details - left side, below invoice number
     const showBizInfo = invoice.showBusinessInfo !== false;
     if (showBizInfo) {
       if (companyName) {
@@ -3070,7 +3070,7 @@ export default function PosSystem() {
     const visOf = (key: string, defaultVal = true) =>
       cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
 
-    // Bill To — custom fields for billTo section
+    // Bill To - custom fields for billTo section
     const billToCustomFields = customFields.filter((f: any) => f.section === 'billTo' && f.visible !== false);
     billToCustomFields.forEach((field: any) => {
       const val = cfValues[`cf_${field.id}`];
@@ -3374,7 +3374,7 @@ export default function PosSystem() {
     doc.text(`#${invoice.documentNumber || 'N/A'}`, margin, y);
     y += 7;
 
-    // Business Details — left side, below invoice number
+    // Business Details - left side, below invoice number
     if (companyName) {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');

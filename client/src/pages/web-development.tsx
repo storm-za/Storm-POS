@@ -173,7 +173,7 @@ export default function WebDevelopment() {
         {
           "@type": "Question",
           "name": "Is SEO included in the website packages?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes, all Storm website packages include basic SEO setup — including meta tags, Google Search Console submission, sitemap generation, and mobile-first optimization to help your site rank on Google." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, all Storm website packages include basic SEO setup - including meta tags, Google Search Console submission, sitemap generation, and mobile-first optimization to help your site rank on Google." }
         },
         {
           "@type": "Question",
@@ -1191,7 +1191,7 @@ export default function WebDevelopment() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Let's Build Your Website — On Your Terms
+              Let's Build Your Website - On Your Terms
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
               Join the growing number of South African businesses that trust Storm for their web presence.

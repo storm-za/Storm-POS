@@ -751,7 +751,7 @@ export default function PosSystemAfrikaans() {
     doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y);
     y += 7;
 
-    // Besigheidsbesonderhede — links, onder faktuurnommer
+    // Besigheidsbesonderhede - links, onder faktuurnommer
     if (companyName) {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
@@ -1100,7 +1100,7 @@ export default function PosSystemAfrikaans() {
     doc.text(`#${invoice.documentNumber || 'N/B'}`, margin, y);
     y += 7;
 
-    // Besigheidsbesonderhede — links, onder faktuurnommer
+    // Besigheidsbesonderhede - links, onder faktuurnommer
     if (companyName) {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
@@ -2278,7 +2278,7 @@ export default function PosSystemAfrikaans() {
       if (result.type === 'sale') {
         const selectedCustomer = selectedCustomerId ? customers.find(c => c.id === selectedCustomerId) : null;
 
-        // Capture before clearing state — used by success dialog print/share
+        // Capture before clearing state - used by success dialog print/share
         setSaleCompleteData({
           sale: result.data,
           customer: selectedCustomer,

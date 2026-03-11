@@ -1580,7 +1580,7 @@ Sitemap: ${PRODUCTION_DOMAIN}/sitemap_index.xml
     { slug: 'best-pos-system-small-business-south-africa', date: '2026-01-05' },
     { slug: 'free-pos-system-south-africa', date: '2026-01-08' },
     { slug: 'cloud-pos-vs-traditional-pos-south-africa', date: '2026-01-10' },
-    { slug: 'afrikaanse-kassastelsel-pos-stelsel', date: '2026-01-12' },
+    { slug: 'afrikaanse-verkoopstelsel-pos-stelsel', date: '2026-01-12' },
     { slug: 'inventory-management-small-business-south-africa', date: '2026-01-15' },
     { slug: 'website-koste-suid-afrika-2025', date: '2026-01-18' },
     { slug: 'load-shedding-pos-system-south-africa', date: '2026-01-20' },
