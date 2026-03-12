@@ -6332,7 +6332,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0">
           <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
           <div className="relative">
             <div className="px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0">
@@ -6352,7 +6352,7 @@ ${dateFilteredSales.map(sale =>
             </div>
             
             <Form {...productForm}>
-              <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5 overflow-y-auto">
+              <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={productForm.control}
@@ -6825,7 +6825,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Add Products to Category Dialog */}
       <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <DialogTitle className="text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
