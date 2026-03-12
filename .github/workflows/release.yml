@@ -146,6 +146,19 @@ jobs:
           rm -rf src-tauri/gen/android
           npx tauri android init
 
+      - name: Inject custom icons into generated Android project
+        run: |
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            dest="src-tauri/gen/android/app/src/main/res/mipmap-${density}"
+            src="src-tauri/icons/android/mipmap-${density}"
+            mkdir -p "$dest"
+            cp "${src}/ic_launcher.png"            "${dest}/ic_launcher.png"
+            cp "${src}/ic_launcher_round.png"      "${dest}/ic_launcher_round.png"
+            cp "${src}/ic_launcher_foreground.png" "${dest}/ic_launcher_foreground.png"
+            echo "Copied icons for ${density}"
+          done
+          echo "All custom icons injected."
+
       - name: Build Android AAB (release)
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
