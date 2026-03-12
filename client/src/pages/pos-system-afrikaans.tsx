@@ -4704,7 +4704,7 @@ ${dateFilteredSales.map(sale =>
 
           {/* PO View Dialog */}
           <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
-            <DialogContent className="max-w-2xl bg-black border-gray-700 text-white max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl bg-black border-gray-700 text-white max-h-[85vh] overflow-y-auto">
               <DialogHeader><DialogTitle className="text-white text-xl">Aankoopbestelling: {selectedPO?.poNumber}</DialogTitle></DialogHeader>
               {selectedPO && (
                 <div className="space-y-4">
@@ -4756,7 +4756,7 @@ ${dateFilteredSales.map(sale =>
                 <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <h4 className="text-sm text-gray-400 font-medium flex items-center gap-2"><User className="h-4 w-4" /> Verskaffer Besonderhede</h4>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {suppliers.length > 0 && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -4859,7 +4859,7 @@ ${dateFilteredSales.map(sale =>
 
           {/* PO Delete Confirmation */}
           <Dialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
-            <DialogContent className="bg-black border-gray-700 text-white">
+            <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto bg-black border-gray-700 text-white max-h-[85vh] overflow-y-auto">
               <DialogHeader><DialogTitle className="text-white">Bevestig Verwydering</DialogTitle></DialogHeader>
               <p className="text-gray-400">Is jy seker jy wil hierdie aankoopbestelling verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.</p>
               <div className="flex justify-end gap-3 mt-4">
@@ -4897,7 +4897,7 @@ ${dateFilteredSales.map(sale =>
                       openAccounts.map((account) => (
                         <motion.div
                           key={account.id}
-                          className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group"
+                          className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group overflow-hidden w-full"
                           whileHover={{ scale: 1.01, y: -2 }}
                           transition={{ duration: 0.2 }}
                         >
@@ -4941,7 +4941,7 @@ ${dateFilteredSales.map(sale =>
                             )}
                           </div>
 
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Button
                               size="sm"
                               variant="outline"
@@ -6247,7 +6247,7 @@ ${dateFilteredSales.map(sale =>
       {/* For brevity, I'm including the key ones */}
       {/* Category Management Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
@@ -6332,10 +6332,10 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-        <DialogContent className="sm:max-w-[560px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
           <div className="relative">
-            <div className="px-6 pt-6 pb-4 border-b border-gray-700/50">
+            <div className="px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0">
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                   <Package className="w-6 h-6 text-white" />
@@ -6352,7 +6352,7 @@ ${dateFilteredSales.map(sale =>
             </div>
             
             <Form {...productForm}>
-              <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5">
+              <form onSubmit={productForm.handleSubmit(handleProductSubmit)} className="px-6 py-5 space-y-5 overflow-y-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={productForm.control}
@@ -6560,7 +6560,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingCustomer ? "Redigeer Klient" : "Voeg Nuwe Klient By"}
@@ -6646,7 +6646,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Oop Rekening Skep Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
@@ -6806,7 +6806,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Management Password Dialog */}
       <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[400px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Bestuurstoegang Vereis</DialogTitle>
             <DialogDescription>
@@ -6825,7 +6825,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Add Products to Category Dialog */}
       <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <DialogTitle className="text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
@@ -6914,7 +6914,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Bywerk Maatskappy Logo</DialogTitle>
             <DialogDescription>
@@ -7112,7 +7112,7 @@ ${dateFilteredSales.map(sale =>
           setVoidReason("");
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Kanselleer Verkoop</DialogTitle>
             <DialogDescription>
@@ -7166,7 +7166,7 @@ ${dateFilteredSales.map(sale =>
           setViewVoidDialog({ open: false, sale: null });
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Gekanselleerde Verkoop Besonderhede</DialogTitle>
           </DialogHeader>
@@ -7207,7 +7207,7 @@ ${dateFilteredSales.map(sale =>
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Voer Wagwoord In</DialogTitle>
             <DialogDescription>
@@ -7263,7 +7263,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Simplified Staff Creation Dialog */}
       <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Skep Nuwe Gebruiker</DialogTitle>
             <DialogDescription>
@@ -7341,7 +7341,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className="sm:max-w-2xl p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
             <div className="flex items-center gap-3">
@@ -7696,7 +7696,7 @@ ${dateFilteredSales.map(sale =>
 
             {/* Client Selection */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                 <Label>Kliënt</Label>
                 <button
                   type="button"

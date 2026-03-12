@@ -4613,10 +4613,10 @@ export default function PosSystem() {
                             Add Product
                           </Button>
                         </DialogTrigger>
-                    <DialogContent className="sm:max-w-[560px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden" aria-describedby="product-dialog-description">
+                    <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0 overflow-hidden" aria-describedby="product-dialog-description">
                       <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
-                      <div className="relative">
-                        <div className="px-6 pt-6 pb-4 border-b border-gray-700/50">
+                      <div className="relative flex flex-col">
+                        <div className="px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0">
                           <div className="flex items-center gap-4">
                             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                               <Package className="w-6 h-6 text-white" />
@@ -4638,7 +4638,7 @@ export default function PosSystem() {
                               e.preventDefault();
                               productForm.handleSubmit(handleProductSubmit)(e);
                             }} 
-                            className="px-6 py-5 space-y-5"
+                            className="px-6 py-5 space-y-5 overflow-y-auto"
                           >
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <FormField
@@ -5577,7 +5577,7 @@ export default function PosSystem() {
                             )}
                           </div>
                           
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Button
                               size="sm"
                               variant="outline"
@@ -7044,7 +7044,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Purchase Order View Panel */}
       <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-lg max-h-[85vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
               <span className="text-[hsl(217,90%,60%)] font-mono">{selectedPO?.poNumber}</span>
@@ -7111,7 +7111,7 @@ export default function PosSystem() {
       </AlertDialog>
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]" aria-describedby="customer-dialog-description">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto" aria-describedby="customer-dialog-description">
           <DialogHeader>
             <DialogTitle>
               {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
@@ -7200,7 +7200,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Open Account Creation Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Open Account</DialogTitle>
           </DialogHeader>
@@ -7480,7 +7480,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Add Products to Category Dialog */}
       <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <DialogTitle className="text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
@@ -7569,7 +7569,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Update Company Logo</DialogTitle>
             <DialogDescription>
@@ -7661,7 +7661,7 @@ export default function PosSystem() {
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Enter Password</DialogTitle>
             <DialogDescription>
@@ -7717,7 +7717,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Simplified Staff Creation Dialog */}
       <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New User</DialogTitle>
             <DialogDescription>
@@ -7795,7 +7795,7 @@ export default function PosSystem() {
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className="sm:max-w-2xl p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
             <div className="flex items-center gap-3">
@@ -8006,7 +8006,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Management Access Notification Dialog */}
       <Dialog open={managementPasswordDialog} onOpenChange={setManagementPasswordDialog}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[400px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Management Access Required</DialogTitle>
             <DialogDescription>
@@ -8030,7 +8030,7 @@ export default function PosSystem() {
           setVoidReason("");
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Void Sale</DialogTitle>
             <DialogDescription>
@@ -8084,7 +8084,7 @@ export default function PosSystem() {
           setViewVoidDialog({ open: false, sale: null });
         }
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Void Sale Details</DialogTitle>
             <DialogDescription>
@@ -8208,7 +8208,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Category Management Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
@@ -8351,7 +8351,7 @@ export default function PosSystem() {
 
             {/* Client Selection */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                 <Label>Client</Label>
                 <button
                   type="button"
