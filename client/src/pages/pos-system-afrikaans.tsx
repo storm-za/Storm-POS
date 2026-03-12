@@ -1360,13 +1360,13 @@ export default function PosSystemAfrikaans() {
 
   // Logout function
   const logout = async () => {
+    localStorage.removeItem('posUser');
+    localStorage.removeItem('posLoginTimestamp');
     try {
       await fetch('/api/pos/logout', { method: 'POST' });
-      window.location.href = '/pos/login';
-    } catch (error) {
-      console.error('Fout met uitlog:', error);
-      window.location.href = '/pos/login';
+    } catch {
     }
+    window.location.href = '/pos/login';
   };
 
   const closeManagementDialog = () => {

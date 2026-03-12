@@ -12,9 +12,10 @@ import { apiRequest } from "@/lib/queryClient";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { updatePageSEO } from "@/lib/seo";
 
-const REMEMBER_EMAIL_KEY = "posRememberedEmail";
-const REMEMBER_PASS_KEY  = "posRememberedPass";
-const REMEMBER_FLAG_KEY  = "posRememberMe";
+const REMEMBER_EMAIL_KEY  = "posRememberedEmail";
+const REMEMBER_PASS_KEY   = "posRememberedPass";
+const REMEMBER_FLAG_KEY   = "posRememberMe";
+const SESSION_TTL_MS      = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function saveRemembered(email: string, password: string) {
   localStorage.setItem(REMEMBER_FLAG_KEY, "1");
@@ -30,11 +31,24 @@ function clearRemembered() {
 
 function loadRemembered(): { email: string; password: string } | null {
   if (localStorage.getItem(REMEMBER_FLAG_KEY) !== "1") return null;
-  const email = localStorage.getItem(REMEMBER_EMAIL_KEY);
+  const email   = localStorage.getItem(REMEMBER_EMAIL_KEY);
   const passB64 = localStorage.getItem(REMEMBER_PASS_KEY);
   if (!email || !passB64) return null;
+  try { return { email, password: atob(passB64) }; } catch { return null; }
+}
+
+function getActiveSession(): { user: any; destination: string } | null {
   try {
-    return { email, password: atob(passB64) };
+    const raw = localStorage.getItem("posUser");
+    const ts  = parseInt(localStorage.getItem("posLoginTimestamp") || "0", 10);
+    if (!raw || !ts) return null;
+    if (Date.now() - ts > SESSION_TTL_MS) return null;
+    const user = JSON.parse(raw);
+    let destination = "/pos/inactive";
+    if (user.paid) {
+      destination = user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system";
+    }
+    return { user, destination };
   } catch {
     return null;
   }
@@ -45,19 +59,22 @@ export default function PosLogin() {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Login - Storm POS | Access Your Point of Sale System',
-      description: 'Log in to your Storm POS account. Manage sales, inventory, customers, and reports from any device. Secure cloud-based access.',
-      canonical: window.location.origin + '/pos/login'
+      title: "Login - Storm POS | Access Your Point of Sale System",
+      description:
+        "Log in to your Storm POS account. Manage sales, inventory, customers, and reports from any device. Secure cloud-based access.",
+      canonical: window.location.origin + "/pos/login",
     });
   }, []);
 
+  const activeSession = getActiveSession();
   const saved = loadRemembered();
-  const [email, setEmail]             = useState(saved?.email ?? "");
-  const [password, setPassword]       = useState(saved?.password ?? "");
+
+  const [email, setEmail]               = useState(saved?.email ?? "");
+  const [password, setPassword]         = useState(saved?.password ?? "");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe]   = useState(!!saved);
-  const autoSubmitted = useRef(false);
-  const { toast } = useToast();
+  const [rememberMe, setRememberMe]     = useState(!!saved);
+  const autoSubmitted                   = useRef(false);
+  const { toast }                       = useToast();
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
@@ -70,30 +87,28 @@ export default function PosLogin() {
       } else {
         clearRemembered();
       }
-      localStorage.setItem('posUser', JSON.stringify(data.user));
-      localStorage.setItem('posLoginTimestamp', Date.now().toString());
+      localStorage.setItem("posUser", JSON.stringify(data.user));
+      localStorage.setItem("posLoginTimestamp", Date.now().toString());
 
       if (data.user.paid) {
-        if (data.user.preferredLanguage === 'af') {
-          setLocation("/pos/system/afrikaans");
-        } else {
-          setLocation("/pos/system");
-        }
+        setLocation(data.user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
       } else {
         setLocation("/pos/inactive");
       }
     },
     onError: (error: Error) => {
       autoSubmitted.current = false;
-      toast({
-        title: "Login failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Login failed", description: error.message, variant: "destructive" });
     },
   });
 
   useEffect(() => {
+    // 1. If an active session exists, jump straight in — no server call needed
+    if (activeSession) {
+      setLocation(activeSession.destination);
+      return;
+    }
+    // 2. If "remember me" credentials are saved, auto-submit the login form
     if (saved && !autoSubmitted.current) {
       autoSubmitted.current = true;
       loginMutation.mutate({ email: saved.email, password: saved.password });
@@ -113,6 +128,8 @@ export default function PosLogin() {
     loginMutation.mutate({ email, password });
   };
 
+  const isAutoLoading = (activeSession !== null) || (loginMutation.isPending && autoSubmitted.current);
+
   return (
     <div className="min-h-screen overflow-x-hidden w-full bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
       <motion.div
@@ -129,30 +146,32 @@ export default function PosLogin() {
             <div>
               <h1 className="text-2xl font-bold">Storm POS</h1>
               <p className="text-blue-100">
-                {loginMutation.isPending && autoSubmitted.current
-                  ? "Signing you in..."
-                  : "Sign in to your account"}
+                {isAutoLoading ? "Opening your account..." : "Sign in to your account"}
               </p>
             </div>
           </CardHeader>
 
           <CardContent className="p-8">
-            {loginMutation.isPending && autoSubmitted.current ? (
+            {isAutoLoading ? (
               <div className="flex flex-col items-center py-8 gap-4">
                 <div className="w-10 h-10 border-4 border-[hsl(217,90%,40%)] border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-500">Logging you in automatically...</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    autoSubmitted.current = false;
-                    clearRemembered();
-                    setRememberMe(false);
-                    loginMutation.reset();
-                  }}
-                  className="text-xs text-gray-400 hover:text-gray-600 underline mt-2"
-                >
-                  Cancel & sign in manually
-                </button>
+                <p className="text-sm text-gray-500">
+                  {activeSession ? "Resuming your session..." : "Logging you in automatically..."}
+                </p>
+                {!activeSession && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      autoSubmitted.current = false;
+                      clearRemembered();
+                      setRememberMe(false);
+                      loginMutation.reset();
+                    }}
+                    className="text-xs text-gray-400 hover:text-gray-600 underline mt-2"
+                  >
+                    Cancel &amp; sign in manually
+                  </button>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -230,10 +249,7 @@ export default function PosLogin() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <a
-                  href="/pos/signup"
-                  className="text-[hsl(217,90%,40%)] hover:underline font-medium"
-                >
+                <a href="/pos/signup" className="text-[hsl(217,90%,40%)] hover:underline font-medium">
                   Create an Account for free
                 </a>
               </p>
@@ -242,10 +258,7 @@ export default function PosLogin() {
         </Card>
 
         <div className="mt-6 text-center">
-          <a
-            href="/pos"
-            className="text-sm text-gray-600 hover:text-[hsl(217,90%,40%)] hover:underline"
-          >
+          <a href="/pos" className="text-sm text-gray-600 hover:text-[hsl(217,90%,40%)] hover:underline">
             ← Back to POS Info
           </a>
         </div>

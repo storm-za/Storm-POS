@@ -2925,7 +2925,8 @@ export default function PosSystem() {
 
   // Logout
   const logout = () => {
-    // In a real app, you'd clear session/tokens here
+    localStorage.removeItem('posUser');
+    localStorage.removeItem('posLoginTimestamp');
     window.location.href = "/pos/login";
   };
 
