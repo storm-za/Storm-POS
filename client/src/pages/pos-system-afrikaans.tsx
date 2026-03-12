@@ -3326,7 +3326,7 @@ ${dateFilteredSales.map(sale =>
                 </button>
               ))}
             </nav>
-            <div className="p-3 border-t border-gray-100 space-y-2">
+            <div className="p-3 border-t border-gray-100 space-y-2 sidebar-bottom-safe">
               <div className="flex items-center gap-3 px-3 py-2.5">
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
                   {currentUser?.companyLogo ? (
@@ -3538,7 +3538,7 @@ ${dateFilteredSales.map(sale =>
         </aside>
 
         <main className={`flex-1 min-h-screen min-w-0 overflow-x-hidden w-full transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
-          <div className="md:hidden flex items-center gap-3 px-3 py-3 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+          <div className="md:hidden flex items-center gap-3 px-3 pb-3 bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm mobile-header-safe">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation">
               <Menu className="h-6 w-6" />
             </button>
@@ -3546,7 +3546,7 @@ ${dateFilteredSales.map(sale =>
             <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
           </div>
 
-          <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden">
+          <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden content-bottom-safe">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
 
           {/* Sales Tab */}
@@ -3802,7 +3802,7 @@ ${dateFilteredSales.map(sale =>
                         </div>
                       </div>
                       <div className="space-y-3 pt-3 border-t border-gray-700/30">
-                        <div className="flex gap-1.5">
+                        <div className="flex flex-wrap gap-1.5">
                           <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'open-account' ? 'complete' : 'open-account')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Oop Rekening</Button>
                           <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'add-to-account' ? 'complete' : 'add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Voeg by Rekening</Button>
                         </div>
