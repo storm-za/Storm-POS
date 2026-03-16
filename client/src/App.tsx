@@ -11,6 +11,7 @@ import PosLogin from "@/pages/pos-login";
 import PosSignup from "@/pages/pos-signup";
 import PosSignupSuccess from "@/pages/pos-signup-success";
 import PosInactive from "@/pages/pos-inactive";
+import PosPaymentOption from "@/pages/pos-payment-option";
 import { HelpCenter } from "@/pages/HelpCenter";
 import { HelpCenterAfrikaans } from "@/pages/HelpCenterAfrikaans";
 import Blog from "@/pages/blog";
@@ -42,6 +43,7 @@ function Router() {
         <Route path="/pos/login" component={PosLogin} />
         <Route path="/pos/signup" component={PosSignup} />
         <Route path="/pos/signup/success" component={PosSignupSuccess} />
+        <Route path="/pos/payment-option" component={PosPaymentOption} />
         <Route path="/pos/system">
           {() => (
             <Suspense fallback={<div className="flex items-center justify-center h-screen bg-gray-950 text-white">Loading...</div>}>

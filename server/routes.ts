@@ -188,7 +188,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           trialStartDate: newUser.trialStartDate,
           preferredLanguage: newUser.preferredLanguage,
           selectedStaffAccountId: newUser.selectedStaffAccountId,
-          receiptSettings: newUser.receiptSettings
+          receiptSettings: newUser.receiptSettings,
+          paymentOptionSelected: newUser.paymentOptionSelected,
+          paymentPlan: newUser.paymentPlan
         }
       });
     } catch (error) {
@@ -233,7 +235,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           trialStartDate: user.trialStartDate,
           preferredLanguage: user.preferredLanguage,
           selectedStaffAccountId: user.selectedStaffAccountId,
-          receiptSettings: user.receiptSettings
+          receiptSettings: user.receiptSettings,
+          paymentOptionSelected: user.paymentOptionSelected,
+          paymentPlan: user.paymentPlan
         }
       });
     } catch (error) {
@@ -243,6 +247,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update user company logo (PUT method with user ID)
+  app.put("/api/pos/user/:id/payment-plan", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { plan } = req.body;
+      
+      if (!plan || !['percent', 'flat'].includes(plan)) {
+        return res.status(400).json({ message: "Invalid plan. Must be 'percent' or 'flat'." });
+      }
+      
+      const updatedUser = await storage.updatePosUserPaymentPlan(userId, plan);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json({
+        success: true,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          paid: updatedUser.paid,
+          companyLogo: updatedUser.companyLogo,
+          companyName: updatedUser.companyName,
+          tutorialCompleted: updatedUser.tutorialCompleted,
+          trialStartDate: updatedUser.trialStartDate,
+          preferredLanguage: updatedUser.preferredLanguage,
+          selectedStaffAccountId: updatedUser.selectedStaffAccountId,
+          receiptSettings: updatedUser.receiptSettings,
+          paymentOptionSelected: updatedUser.paymentOptionSelected,
+          paymentPlan: updatedUser.paymentPlan
+        }
+      });
+    } catch (error) {
+      console.error("Payment plan update error:", error);
+      res.status(500).json({ message: "Failed to update payment plan" });
+    }
+  });
+
   app.put("/api/pos/user/:id/logo", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);

@@ -68,6 +68,7 @@ export interface IStorage {
   updatePosUserPreferredLanguage(id: number, language: string): Promise<PosUser | undefined>;
   updatePosUserStaffSelection(id: number, staffAccountId: number | null): Promise<PosUser | undefined>;
   updatePosUserPassword(id: number, hashedPassword: string): Promise<PosUser | undefined>;
+  updatePosUserPaymentPlan(id: number, plan: string): Promise<PosUser | undefined>;
   
   // Category Operations
   getPosCategories(userId: number): Promise<PosCategory[]>;
@@ -374,6 +375,15 @@ export class MemStorage implements IStorage {
     if (!user) return undefined;
     
     const updatedUser: PosUser = { ...user, salesDisplayMode: mode };
+    this.posUsers.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updatePosUserPaymentPlan(id: number, plan: string): Promise<PosUser | undefined> {
+    const user = this.posUsers.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser: PosUser = { ...user, paymentPlan: plan, paymentOptionSelected: true };
     this.posUsers.set(id, updatedUser);
     return updatedUser;
   }
@@ -814,6 +824,15 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(posUsers)
       .set({ salesDisplayMode: mode })
+      .where(eq(posUsers.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updatePosUserPaymentPlan(id: number, plan: string): Promise<PosUser | undefined> {
+    const [user] = await db
+      .update(posUsers)
+      .set({ paymentPlan: plan, paymentOptionSelected: true })
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;

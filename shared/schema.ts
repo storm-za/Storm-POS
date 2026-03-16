@@ -42,6 +42,8 @@ export const posUsers = pgTable("pos_users", {
   xeroLastSync: timestamp("xero_last_sync"), // Last successful sync time
   selectedStaffAccountId: integer("selected_staff_account_id"), // Persisted staff account selection
   salesDisplayMode: text("sales_display_mode").notNull().default("grid"), // 'grid' or 'tabs' for category display
+  paymentOptionSelected: boolean("payment_option_selected").notNull().default(false),
+  paymentPlan: text("payment_plan"), // 'percent' (0.5% per sale) or 'flat' (R1.00 per sale)
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -24,7 +24,12 @@ export default function PosSignupSuccess() {
 
     const storedUser = localStorage.getItem('posUser');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed);
+      if (!parsed.paymentOptionSelected) {
+        setLocation("/pos/payment-option");
+        return;
+      }
     }
 
     if (window.gtag) {

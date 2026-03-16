@@ -45,7 +45,9 @@ function getActiveSession(): { user: any; destination: string } | null {
     if (Date.now() - ts > SESSION_TTL_MS) return null;
     const user = JSON.parse(raw);
     let destination = "/pos/inactive";
-    if (user.paid) {
+    if (!user.paymentOptionSelected) {
+      destination = "/pos/payment-option";
+    } else if (user.paid) {
       destination = user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system";
     }
     return { user, destination };
@@ -90,7 +92,9 @@ export default function PosLogin() {
       localStorage.setItem("posUser", JSON.stringify(data.user));
       localStorage.setItem("posLoginTimestamp", Date.now().toString());
 
-      if (data.user.paid) {
+      if (!data.user.paymentOptionSelected) {
+        setLocation("/pos/payment-option");
+      } else if (data.user.paid) {
         setLocation(data.user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
       } else {
         setLocation("/pos/inactive");
