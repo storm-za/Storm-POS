@@ -250,15 +250,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pos/user/:id/payment-plan", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      const { plan } = req.body;
+      const { plan, userEmail } = req.body;
       
       if (!plan || !['percent', 'flat'].includes(plan)) {
         return res.status(400).json({ message: "Invalid plan. Must be 'percent' or 'flat'." });
       }
+
+      if (!userEmail) {
+        return res.status(400).json({ message: "User email is required for verification." });
+      }
+      
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (existingUser.email !== userEmail) {
+        return res.status(403).json({ message: "Unauthorized: email does not match user." });
+      }
+
+      if (existingUser.paymentOptionSelected) {
+        return res.status(409).json({ message: "Payment plan has already been selected. Contact support to change your plan." });
+      }
       
       const updatedUser = await storage.updatePosUserPaymentPlan(userId, plan);
       if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(500).json({ message: "Failed to update payment plan" });
       }
       
       res.json({

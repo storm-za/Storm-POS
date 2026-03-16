@@ -94,7 +94,7 @@ export default function PosPaymentOption() {
 
   const confirmMutation = useMutation({
     mutationFn: async (plan: string) => {
-      const response = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan });
+      const response = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan, userEmail: user.email });
       return response.json();
     },
     onSuccess: (data) => {
@@ -103,6 +103,12 @@ export default function PosPaymentOption() {
       setLocation(dest);
     },
     onError: (error: Error) => {
+      if (error.message.includes("already been selected")) {
+        const updatedUser = { ...user, paymentOptionSelected: true };
+        localStorage.setItem("posUser", JSON.stringify(updatedUser));
+        setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+        return;
+      }
       toast({ title: lang === "af" ? "Fout" : "Error", description: error.message, variant: "destructive" });
     },
   });
