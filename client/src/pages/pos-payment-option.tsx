@@ -140,10 +140,10 @@ export default function PosPaymentOption() {
           <p className="text-sm text-gray-400">{labels.subtitle}</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 mb-2 md:mb-4">
           <button
             onClick={() => setSelectedPlan("percent")}
-            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all ${
+            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all flex items-center gap-3 md:block ${
               selectedPlan === "percent"
                 ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/15 shadow-lg shadow-blue-500/20"
                 : "border-white/10 bg-white/5 hover:border-white/20"
@@ -154,18 +154,20 @@ export default function PosPaymentOption() {
                 <Check className="w-3 h-3 text-white" />
               </div>
             )}
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center mb-2 shadow-lg shadow-blue-500/20">
-              <Percent className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center flex-shrink-0 md:mb-2 shadow-lg shadow-blue-500/20">
+              <Percent className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-sm md:text-base font-bold text-white mb-0.5">{labels.percentTitle}</h3>
-            <p className="text-lg md:text-xl font-bold text-[hsl(217,90%,60%)] mb-0.5">{labels.percentRate}</p>
-            <p className="text-xs text-gray-400">{labels.percentExample}</p>
-            <p className="text-[10px] md:text-xs text-gray-500 mt-1 hidden md:block">{labels.percentDesc}</p>
+            <div className="min-w-0">
+              <h3 className="text-sm md:text-base font-bold text-white">{labels.percentTitle}</h3>
+              <p className="text-base md:text-xl font-bold text-[hsl(217,90%,60%)]">{labels.percentRate}</p>
+              <p className="text-xs text-gray-400">{labels.percentExample}</p>
+              <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 hidden md:block">{labels.percentDesc}</p>
+            </div>
           </button>
 
           <button
             onClick={() => setSelectedPlan("flat")}
-            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all ${
+            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all flex items-center gap-3 md:block ${
               selectedPlan === "flat"
                 ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/15 shadow-lg shadow-blue-500/20"
                 : "border-white/10 bg-white/5 hover:border-white/20"
@@ -176,13 +178,15 @@ export default function PosPaymentOption() {
                 <Check className="w-3 h-3 text-white" />
               </div>
             )}
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center mb-2 shadow-lg shadow-blue-500/20">
-              <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center flex-shrink-0 md:mb-2 shadow-lg shadow-blue-500/20">
+              <DollarSign className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-sm md:text-base font-bold text-white mb-0.5">{labels.flatTitle}</h3>
-            <p className="text-lg md:text-xl font-bold text-[hsl(217,90%,60%)] mb-0.5">{labels.flatRate}</p>
-            <p className="text-xs text-gray-400">{labels.flatExample}</p>
-            <p className="text-[10px] md:text-xs text-gray-500 mt-1 hidden md:block">{labels.flatDesc}</p>
+            <div className="min-w-0">
+              <h3 className="text-sm md:text-base font-bold text-white">{labels.flatTitle}</h3>
+              <p className="text-base md:text-xl font-bold text-[hsl(217,90%,60%)]">{labels.flatRate}</p>
+              <p className="text-xs text-gray-400">{labels.flatExample}</p>
+              <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 hidden md:block">{labels.flatDesc}</p>
+            </div>
           </button>
         </div>
 
