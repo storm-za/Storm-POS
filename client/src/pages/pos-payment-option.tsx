@@ -88,7 +88,11 @@ export default function PosPaymentOption() {
       return;
     }
     if (user.paymentOptionSelected) {
-      setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+      if (user.paid) {
+        setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+      } else {
+        setLocation("/pos/inactive");
+      }
     }
   }, []);
 
@@ -124,124 +128,93 @@ export default function PosPaymentOption() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden w-full bg-gradient-to-br from-[hsl(217,30%,8%)] via-[hsl(217,25%,12%)] to-[hsl(217,20%,10%)] flex items-center justify-center px-4 py-8 relative">
+    <div className="h-screen overflow-hidden w-full bg-gradient-to-br from-[hsl(217,30%,8%)] via-[hsl(217,25%,12%)] to-[hsl(217,20%,10%)] flex items-center justify-center px-4 relative">
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.2, 0.4] }}
-          transition={{ duration: 10, repeat: Infinity }}
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 w-full max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{labels.title}</h1>
-          <p className="text-gray-400">{labels.subtitle}</p>
-        </motion.div>
+        <div className="text-center mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">{labels.title}</h1>
+          <p className="text-sm text-gray-400">{labels.subtitle}</p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4">
+          <button
             onClick={() => setSelectedPlan("percent")}
-            className={`relative text-left rounded-2xl p-6 border-2 transition-all ${
+            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all ${
               selectedPlan === "percent"
                 ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/15 shadow-lg shadow-blue-500/20"
                 : "border-white/10 bg-white/5 hover:border-white/20"
             }`}
           >
             {selectedPlan === "percent" && (
-              <div className="absolute top-4 right-4 w-6 h-6 bg-[hsl(217,90%,50%)] rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+              <div className="absolute top-2 right-2 md:top-3 md:right-3 w-5 h-5 bg-[hsl(217,90%,50%)] rounded-full flex items-center justify-center">
+                <Check className="w-3 h-3 text-white" />
               </div>
             )}
-            <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-              <Percent className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center mb-2 shadow-lg shadow-blue-500/20">
+              <Percent className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">{labels.percentTitle}</h3>
-            <p className="text-2xl font-bold text-[hsl(217,90%,60%)] mb-1">{labels.percentRate}</p>
-            <p className="text-sm text-gray-400 mb-2">{labels.percentExample}</p>
-            <p className="text-xs text-gray-500">{labels.percentDesc}</p>
-          </motion.button>
+            <h3 className="text-sm md:text-base font-bold text-white mb-0.5">{labels.percentTitle}</h3>
+            <p className="text-lg md:text-xl font-bold text-[hsl(217,90%,60%)] mb-0.5">{labels.percentRate}</p>
+            <p className="text-xs text-gray-400">{labels.percentExample}</p>
+            <p className="text-[10px] md:text-xs text-gray-500 mt-1 hidden md:block">{labels.percentDesc}</p>
+          </button>
 
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          <button
             onClick={() => setSelectedPlan("flat")}
-            className={`relative text-left rounded-2xl p-6 border-2 transition-all ${
+            className={`relative text-left rounded-xl p-3 md:p-5 border-2 transition-all ${
               selectedPlan === "flat"
                 ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/15 shadow-lg shadow-blue-500/20"
                 : "border-white/10 bg-white/5 hover:border-white/20"
             }`}
           >
             {selectedPlan === "flat" && (
-              <div className="absolute top-4 right-4 w-6 h-6 bg-[hsl(217,90%,50%)] rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+              <div className="absolute top-2 right-2 md:top-3 md:right-3 w-5 h-5 bg-[hsl(217,90%,50%)] rounded-full flex items-center justify-center">
+                <Check className="w-3 h-3 text-white" />
               </div>
             )}
-            <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-              <DollarSign className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center mb-2 shadow-lg shadow-blue-500/20">
+              <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">{labels.flatTitle}</h3>
-            <p className="text-2xl font-bold text-[hsl(217,90%,60%)] mb-1">{labels.flatRate}</p>
-            <p className="text-sm text-gray-400 mb-2">{labels.flatExample}</p>
-            <p className="text-xs text-gray-500">{labels.flatDesc}</p>
-          </motion.button>
+            <h3 className="text-sm md:text-base font-bold text-white mb-0.5">{labels.flatTitle}</h3>
+            <p className="text-lg md:text-xl font-bold text-[hsl(217,90%,60%)] mb-0.5">{labels.flatRate}</p>
+            <p className="text-xs text-gray-400">{labels.flatExample}</p>
+            <p className="text-[10px] md:text-xs text-gray-500 mt-1 hidden md:block">{labels.flatDesc}</p>
+          </button>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 mb-6"
-        >
-          <p className="text-sm font-semibold text-white mb-3">{labels.includes}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3 md:p-4 mb-3 md:mb-4">
+          <p className="text-xs font-semibold text-white mb-2">{labels.includes}</p>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
             {[labels.feature1, labels.feature2, labels.feature3, labels.feature4, labels.feature5].map((f, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                <Zap className="w-3.5 h-3.5 text-[hsl(217,90%,60%)] flex-shrink-0" />
+              <div key={i} className="flex items-center gap-1.5 text-xs text-gray-300">
+                <Zap className="w-3 h-3 text-[hsl(217,90%,60%)] flex-shrink-0" />
                 {f}
               </div>
             ))}
+            <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <FileText className="w-3 h-3 text-[hsl(217,90%,60%)] flex-shrink-0" />
+              {labels.invoiceNote}
+            </div>
           </div>
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/10 text-sm text-gray-400">
-            <FileText className="w-3.5 h-3.5 text-[hsl(217,90%,60%)] flex-shrink-0" />
-            {labels.invoiceNote}
-          </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center"
-        >
+        <div className="text-center">
           <Button
             onClick={handleConfirm}
             disabled={!selectedPlan || confirmMutation.isPending}
-            size="lg"
-            className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] text-white font-bold px-10 py-6 text-lg shadow-2xl shadow-blue-500/30 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,55%)] text-white font-bold px-8 py-5 text-base shadow-2xl shadow-blue-500/30 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             {confirmMutation.isPending ? labels.saving : labels.confirm}
           </Button>
-          <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
-            <Shield className="w-3.5 h-3.5" />
+          <div className="flex items-center justify-center gap-1.5 mt-2 text-[10px] md:text-xs text-gray-500">
+            <Shield className="w-3 h-3" />
             {labels.disclaimer}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
