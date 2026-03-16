@@ -103,14 +103,21 @@ export default function PosPaymentOption() {
     },
     onSuccess: (data) => {
       localStorage.setItem("posUser", JSON.stringify(data.user));
-      const dest = data.user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system";
-      setLocation(dest);
+      if (data.user.paid) {
+        setLocation(data.user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+      } else {
+        setLocation("/pos/inactive");
+      }
     },
     onError: (error: Error) => {
       if (error.message.includes("already been selected")) {
         const updatedUser = { ...user, paymentOptionSelected: true };
         localStorage.setItem("posUser", JSON.stringify(updatedUser));
-        setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+        if (updatedUser.paid) {
+          setLocation(updatedUser.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+        } else {
+          setLocation("/pos/inactive");
+        }
         return;
       }
       toast({ title: lang === "af" ? "Fout" : "Error", description: error.message, variant: "destructive" });
