@@ -2932,6 +2932,7 @@ export default function PosSystem() {
 
   // PDF Export Function - Professional Invoice/Quote with Business Details
   const generateInvoicePDF = (invoice: any) => {
+  try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -3317,6 +3318,14 @@ export default function PosSystem() {
       title: "PDF Generated",
       description: `${invoice.documentNumber} has been downloaded`,
     });
+  } catch (err: any) {
+    console.error('PDF error:', err);
+    toast({
+      title: "PDF Error",
+      description: "Could not generate PDF. Please try again.",
+      variant: "destructive"
+    });
+  }
   };
 
   // Share Invoice via WhatsApp
@@ -3594,7 +3603,9 @@ export default function PosSystem() {
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     
     // Try Web Share API first (works on mobile)
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    let canShareFiles = false;
+    try { canShareFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (canShareFiles) {
       try {
         await navigator.share({
           files: [file],
@@ -3610,7 +3621,7 @@ export default function PosSystem() {
           // Fallback: Download PDF and open WhatsApp with message
           doc.save(fileName);
           const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-          window.open(`https://wa.me/?text=${message}`, '_blank');
+          window.location.href = `https://wa.me/?text=${message}`;
           toast({
             title: "PDF Downloaded",
             description: "Attach the downloaded PDF to your WhatsApp message",
@@ -3621,7 +3632,7 @@ export default function PosSystem() {
       // Fallback for desktop: Download PDF and open WhatsApp Web
       doc.save(fileName);
       const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-      window.open(`https://wa.me/?text=${message}`, '_blank');
+      window.location.href = `https://wa.me/?text=${message}`;
       toast({
         title: "PDF Downloaded",
         description: "Attach the downloaded PDF to your WhatsApp message",
@@ -3642,7 +3653,9 @@ export default function PosSystem() {
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    let canShareReceipt = false;
+    try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (canShareReceipt) {
       try {
         await navigator.share({ files: [file], title: `Receipt – R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
       } catch (e: any) {
@@ -9481,6 +9494,7 @@ export default function PosSystem() {
                           setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                          setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
                           setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                           setInvoiceShowBusinessInfo(selectedInvoice.showBusinessInfo !== false);

@@ -695,6 +695,7 @@ export default function PosSystemAfrikaans() {
 
   // PDF Export Funksie - Professionele Faktuur/Kwotasie met Besigheidsbesonderhede
   const generateInvoicePDF = (invoice: any) => {
+  try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -1045,6 +1046,14 @@ export default function PosSystemAfrikaans() {
       title: "PDF Gegenereer",
       description: `${invoice.documentNumber} is afgelaai`,
     });
+  } catch (err: any) {
+    console.error('PDF fout:', err);
+    toast({
+      title: "PDF Fout",
+      description: "Kon nie PDF genereer nie. Probeer asseblief weer.",
+      variant: "destructive"
+    });
+  }
   };
 
   // Deel Faktuur via WhatsApp
@@ -1325,7 +1334,9 @@ export default function PosSystemAfrikaans() {
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     
     // Probeer eers Web Share API (werk op selfoon)
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    let canShareFiles = false;
+    try { canShareFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (canShareFiles) {
       try {
         await navigator.share({
           files: [file],
@@ -1340,7 +1351,7 @@ export default function PosSystemAfrikaans() {
         if (error.name !== 'AbortError') {
           doc.save(fileName);
           const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-          window.open(`https://wa.me/?text=${message}`, '_blank');
+          window.location.href = `https://wa.me/?text=${message}`;
           toast({
             title: "PDF Afgelaai",
             description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap",
@@ -1350,7 +1361,7 @@ export default function PosSystemAfrikaans() {
     } else {
       doc.save(fileName);
       const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-      window.open(`https://wa.me/?text=${message}`, '_blank');
+      window.location.href = `https://wa.me/?text=${message}`;
       toast({
         title: "PDF Afgelaai",
         description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap",
@@ -3136,7 +3147,9 @@ ${dateFilteredSales.map(sale =>
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    let canShareReceipt = false;
+    try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
+    if (canShareReceipt) {
       try {
         await navigator.share({ files: [file], title: `Kwitansie – R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
       } catch (e: any) {
@@ -8832,6 +8845,7 @@ ${dateFilteredSales.map(sale =>
                           setInvoiceDiscountAmount(parseFloat(selectedInvoice.discountAmount || '0').toString());
                           setInvoiceShippingAmount(parseFloat(selectedInvoice.shippingAmount || '0').toString());
                           setInvoicePaymentMethod(selectedInvoice.paymentMethod || '');
+                          setInvoicePaymentDetails(selectedInvoice.paymentDetails || '');
                           setInvoiceTerms(selectedInvoice.terms || '');
                           setInvoiceTaxEnabled(parseFloat(selectedInvoice.taxPercent || '15') > 0);
                           
