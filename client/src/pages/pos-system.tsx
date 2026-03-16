@@ -3041,6 +3041,9 @@ export default function PosSystem() {
     let clientY = y + 15;
     const clientPhone = invoice.clientPhone || client?.phone;
     const clientEmail = invoice.clientEmail || client?.email;
+    const cfValues: Record<string, any> = (invoice.customFieldValues as any) || {};
+    const visOf = (key: string, defaultVal = true) =>
+      cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
     if (clientPhone && visOf('clientPhone')) {
       doc.text(`Tel: ${clientPhone}`, leftColX, clientY);
       clientY += 5;
@@ -3061,15 +3064,9 @@ export default function PosSystem() {
     
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(0, 0, 0);
-    // Get custom field values and visibility from invoice
-    const cfValues: Record<string, any> = (invoice.customFieldValues as any) || {};
-
     // Get invoice custom fields from user's settings
     const invoiceSettings = mergeReceiptSettings(currentUser?.receiptSettings);
     const customFields: any[] = (invoiceSettings as any).invoiceSettings?.customFields || [];
-
-    const visOf = (key: string, defaultVal = true) =>
-      cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
 
     // Bill To - custom fields for billTo section
     const billToCustomFields = customFields.filter((f: any) => f.section === 'billTo' && f.visible !== false);
@@ -3422,6 +3419,9 @@ export default function PosSystem() {
     let clientY = y + 15;
     const clientPhone2 = invoice.clientPhone || client?.phone;
     const clientEmail2 = invoice.clientEmail || client?.email;
+    const cfValues: Record<string, any> = (invoice.customFieldValues as any) || {};
+    const visOf = (key: string, defaultVal = true) =>
+      cfValues[`vis_${key}`] !== undefined ? cfValues[`vis_${key}`] : defaultVal;
     if (clientPhone2 && visOf('clientPhone')) { doc.text(`Tel: ${clientPhone2}`, leftColX, clientY); clientY += 5; }
     if (clientEmail2 && visOf('clientEmail')) { doc.text(`Email: ${clientEmail2}`, leftColX, clientY); clientY += 5; }
     if (client?.notes) { doc.text(client.notes, leftColX, clientY); }
