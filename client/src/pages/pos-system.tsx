@@ -3221,6 +3221,7 @@ export default function PosSystem() {
     
     // ===== PAYMENT DETAILS =====
     if (invoice.paymentDetails && visOf('paymentDetails')) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -3235,8 +3236,7 @@ export default function PosSystem() {
     
     // ===== NOTES SECTION =====
     if (invoice.notes && visOf('notes')) {
-      // Only add page break for 10+ items when running out of space
-      if (needsSecondPage && y > pageHeight - 60) {
+      if (y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -3254,8 +3254,7 @@ export default function PosSystem() {
     
     // ===== TERMS & CONDITIONS =====
     if (invoice.terms && visOf('terms')) {
-      // Only add page break for 10+ items when running out of space
-      if (needsSecondPage && y > pageHeight - 60) {
+      if (y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -3550,6 +3549,7 @@ export default function PosSystem() {
     }
     
     if (invoice.notes) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -3563,6 +3563,7 @@ export default function PosSystem() {
     }
     
     if (invoice.terms) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       y += 10;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);

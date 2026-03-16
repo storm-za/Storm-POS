@@ -965,6 +965,7 @@ export default function PosSystemAfrikaans() {
     
     // ===== BETALINGSBESONDERHEDE =====
     if (invoice.paymentDetails && visOf('paymentDetails')) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -979,8 +980,7 @@ export default function PosSystemAfrikaans() {
     
     // ===== NOTAS AFDELING =====
     if (invoice.notes && visOf('notes')) {
-      // Only add page break for 10+ items when running out of space
-      if (needsSecondPage && y > pageHeight - 60) {
+      if (y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -998,8 +998,7 @@ export default function PosSystemAfrikaans() {
     
     // ===== TERME & VOORWAARDES =====
     if (invoice.terms && visOf('terms')) {
-      // Only add page break for 10+ items when running out of space
-      if (needsSecondPage && y > pageHeight - 60) {
+      if (y > pageHeight - 60) {
         doc.addPage();
         y = 20;
       }
@@ -1281,6 +1280,7 @@ export default function PosSystemAfrikaans() {
     }
     
     if (invoice.notes && visOf2('notes')) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
@@ -1294,6 +1294,7 @@ export default function PosSystemAfrikaans() {
     }
     
     if (invoice.terms && visOf2('terms')) {
+      if (y > pageHeight - 60) { doc.addPage(); y = 20; }
       y += 10;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
