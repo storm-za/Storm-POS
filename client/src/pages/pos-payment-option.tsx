@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, Percent, DollarSign, FileText, Zap, Shield } from "lucide-react";
+import { Check, Percent, DollarSign, FileText, Zap, Shield, Gift } from "lucide-react";
 import { updatePageSEO } from "@/lib/seo";
 
 const t = {
@@ -31,6 +31,8 @@ const t = {
     disclaimer: "This choice is permanent. Contact support to change your plan.",
     selectPlan: "Select a plan to continue",
     saving: "Saving...",
+    trialBadge: "7-Day Free Trial",
+    trialNote: "No charges for 7 days — billing only starts after your free trial ends.",
   },
   af: {
     title: "Kies Jou Plan",
@@ -54,6 +56,8 @@ const t = {
     disclaimer: "Hierdie keuse is permanent. Kontak ondersteuning om jou plan te verander.",
     selectPlan: "Kies 'n plan om voort te gaan",
     saving: "Stoor...",
+    trialBadge: "7-Dag Gratis Proeftydperk",
+    trialNote: "Geen koste vir 7 dae — fakturering begin eers na jou gratis proeftydperk.",
   },
 };
 
@@ -142,7 +146,11 @@ export default function PosPaymentOption() {
       </div>
 
       <div className="relative z-10 w-full max-w-3xl">
-        <div className="text-center mb-4 md:mb-6">
+        <div className="text-center mb-4 md:mb-5">
+          <div className="inline-flex items-center gap-2 bg-green-500/15 border border-green-500/30 text-green-400 px-4 py-1.5 rounded-full text-xs font-semibold mb-3">
+            <Gift className="w-3.5 h-3.5" />
+            {labels.trialBadge}
+          </div>
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">{labels.title}</h1>
           <p className="text-sm text-gray-400">{labels.subtitle}</p>
         </div>
@@ -221,7 +229,8 @@ export default function PosPaymentOption() {
           >
             {confirmMutation.isPending ? labels.saving : labels.confirm}
           </Button>
-          <div className="flex items-center justify-center gap-1.5 mt-2 text-[10px] md:text-xs text-gray-500">
+          <p className="mt-2 text-xs text-green-400/80 font-medium">{labels.trialNote}</p>
+          <div className="flex items-center justify-center gap-1.5 mt-1.5 text-[10px] md:text-xs text-gray-500">
             <Shield className="w-3 h-3" />
             {labels.disclaimer}
           </div>
