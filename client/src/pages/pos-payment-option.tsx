@@ -147,10 +147,6 @@ export default function PosPaymentOption() {
 
       <div className="relative z-10 w-full max-w-3xl">
         <div className="text-center mb-4 md:mb-5">
-          <div className="inline-flex items-center gap-2 bg-green-500/15 border border-green-500/30 text-green-400 px-4 py-1.5 rounded-full text-xs font-semibold mb-3">
-            <Gift className="w-3.5 h-3.5" />
-            {labels.trialBadge}
-          </div>
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">{labels.title}</h1>
           <p className="text-sm text-gray-400">{labels.subtitle}</p>
         </div>
@@ -172,11 +168,15 @@ export default function PosPaymentOption() {
             <div className="w-10 h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center flex-shrink-0 md:mb-2 shadow-lg shadow-blue-500/20">
               <Percent className="w-5 h-5 text-white" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h3 className="text-sm md:text-base font-bold text-white">{labels.percentTitle}</h3>
               <p className="text-base md:text-xl font-bold text-[hsl(217,90%,60%)]">{labels.percentRate}</p>
               <p className="text-xs text-gray-400">{labels.percentExample}</p>
               <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 hidden md:block">{labels.percentDesc}</p>
+              <div className="inline-flex items-center gap-1 bg-green-500/15 border border-green-500/25 text-green-400 px-2 py-0.5 rounded-full text-[10px] font-semibold mt-1.5">
+                <Gift className="w-2.5 h-2.5" />
+                {labels.trialBadge}
+              </div>
             </div>
           </button>
 
@@ -196,11 +196,15 @@ export default function PosPaymentOption() {
             <div className="w-10 h-10 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-lg flex items-center justify-center flex-shrink-0 md:mb-2 shadow-lg shadow-blue-500/20">
               <DollarSign className="w-5 h-5 text-white" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h3 className="text-sm md:text-base font-bold text-white">{labels.flatTitle}</h3>
               <p className="text-base md:text-xl font-bold text-[hsl(217,90%,60%)]">{labels.flatRate}</p>
               <p className="text-xs text-gray-400">{labels.flatExample}</p>
               <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 hidden md:block">{labels.flatDesc}</p>
+              <div className="inline-flex items-center gap-1 bg-green-500/15 border border-green-500/25 text-green-400 px-2 py-0.5 rounded-full text-[10px] font-semibold mt-1.5">
+                <Gift className="w-2.5 h-2.5" />
+                {labels.trialBadge}
+              </div>
             </div>
           </button>
         </div>
@@ -229,8 +233,7 @@ export default function PosPaymentOption() {
           >
             {confirmMutation.isPending ? labels.saving : labels.confirm}
           </Button>
-          <p className="mt-2 text-xs text-green-400/80 font-medium">{labels.trialNote}</p>
-          <div className="flex items-center justify-center gap-1.5 mt-1.5 text-[10px] md:text-xs text-gray-500">
+          <div className="flex items-center justify-center gap-1.5 mt-2 text-[10px] md:text-xs text-gray-500">
             <Shield className="w-3 h-3" />
             {labels.disclaimer}
           </div>
