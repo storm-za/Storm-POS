@@ -221,6 +221,15 @@ export default function PosSystemAfrikaans() {
   const [isEditDocNumberDialogOpen, setIsEditDocNumberDialogOpen] = useState(false);
   const [editingDocNumberInvoice, setEditingDocNumberInvoice] = useState<any | null>(null);
   const [newDocumentNumber, setNewDocumentNumber] = useState("");
+  const [invoiceCardColumns, setInvoiceCardColumns] = useState<Set<string>>(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('posUser') || 'null');
+      const saved = localStorage.getItem(`invoiceCardCols_${u?.id || 'guest'}`);
+      if (saved) return new Set(JSON.parse(saved));
+    } catch {}
+    return new Set(['dueDate']);
+  });
+  const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -2487,6 +2496,31 @@ export default function PosSystemAfrikaans() {
     }
   };
 
+  const invoiceCustomFieldDefs = useMemo(() => {
+    const settings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
+    return ((settings as any).invoiceSettings?.customFields || []) as Array<{id: string; label: string}>;
+  }, [currentUser?.receiptSettings]);
+
+  const toggleInvoiceColumn = useCallback((key: string) => {
+    setInvoiceCardColumns(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      try {
+        const u = JSON.parse(localStorage.getItem('posUser') || 'null');
+        localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next)));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    try {
+      const saved = localStorage.getItem(`invoiceCardCols_${currentUser.id}`);
+      if (saved) setInvoiceCardColumns(new Set(JSON.parse(saved)));
+    } catch {}
+  }, [currentUser?.id]);
+
   // Generate Afrikaans receipt
   const generateAfrikaansReceipt = (sale: any, customer: any, tipEnabled = false, customSettings?: any, returnDoc = false): any => {
     const doc = new jsPDF();
@@ -4416,6 +4450,62 @@ ${dateFilteredSales.map(sale =>
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <CardTitle className="text-white text-lg sm:text-xl font-bold">Fakture & Kwotasies</CardTitle>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  {/* Kolomsigbaarheid keusekys */}
+                  <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-white/20 text-white hover:bg-white/10 transition-all duration-200">
+                        <SlidersHorizontal className="h-4 w-4 mr-2" />
+                        Kolomme
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-[#111] border border-white/20 text-white">
+                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Standaard Velde</div>
+                      {([
+                        { key: 'dueDate', label: 'Vervaldatum' },
+                        { key: 'clientEmail', label: 'Kliënt E-pos' },
+                        { key: 'clientPhone', label: 'Kliënt Telefoon' },
+                        { key: 'poNumber', label: 'PO Nommer' },
+                        { key: 'dueTerms', label: 'Betalingsvoorwaardes' },
+                        { key: 'paymentMethod', label: 'Betaalmetode' },
+                        { key: 'notes', label: 'Notas' },
+                        { key: 'discount', label: 'Afslag' },
+                      ] as const).map(col => (
+                        <DropdownMenuItem
+                          key={col.key}
+                          onSelect={(e) => { e.preventDefault(); toggleInvoiceColumn(col.key); }}
+                          className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+                        >
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(col.key) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : 'border-white/30'}`}>
+                            {invoiceCardColumns.has(col.key) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                          </div>
+                          <span className="text-sm">{col.label}</span>
+                        </DropdownMenuItem>
+                      ))}
+                      {invoiceCustomFieldDefs.length > 0 && (
+                        <>
+                          <DropdownMenuSeparator className="bg-white/10" />
+                          <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pasgemaakte Velde</div>
+                          {invoiceCustomFieldDefs.map(field => (
+                            <DropdownMenuItem
+                              key={field.id}
+                              onSelect={(e) => { e.preventDefault(); toggleInvoiceColumn(`cf_${field.id}`); }}
+                              className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+                            >
+                              <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(`cf_${field.id}`) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : 'border-white/30'}`}>
+                                {invoiceCardColumns.has(`cf_${field.id}`) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                              </div>
+                              <span className="text-sm">{field.label}</span>
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
+                      <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuItem
+                        onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
+                        className="text-xs text-gray-400 hover:bg-white/10 focus:bg-white/10 cursor-pointer"
+                      >Herstel na verstek</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Button 
                     variant="outline"
                     size="sm"
@@ -4605,9 +4695,38 @@ ${dateFilteredSales.map(sale =>
                             <p className="text-gray-300 text-xs sm:text-sm truncate">
                               Kliënt: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
                             </p>
-                            <p className="text-gray-400 text-xs sm:text-sm">
-                              Vervaldatum: {new Date(invoice.dueDate).toLocaleDateString()}
-                            </p>
+                            {invoiceCardColumns.has('dueDate') && invoice.dueDate && (
+                              <p className="text-gray-400 text-xs sm:text-sm">Vervaldatum: {new Date(invoice.dueDate).toLocaleDateString()}</p>
+                            )}
+                            {invoiceCardColumns.has('clientEmail') && (invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email) && (
+                              <p className="text-gray-400 text-xs sm:text-sm truncate">E-pos: {invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email}</p>
+                            )}
+                            {invoiceCardColumns.has('clientPhone') && (invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone) && (
+                              <p className="text-gray-400 text-xs sm:text-sm">Telefoon: {invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone}</p>
+                            )}
+                            {invoiceCardColumns.has('poNumber') && invoice.poNumber && (
+                              <p className="text-gray-400 text-xs sm:text-sm">PO: {invoice.poNumber}</p>
+                            )}
+                            {invoiceCardColumns.has('dueTerms') && invoice.dueTerms && (
+                              <p className="text-gray-400 text-xs sm:text-sm">Voorwaardes: {invoice.dueTerms}</p>
+                            )}
+                            {invoiceCardColumns.has('paymentMethod') && invoice.paymentMethod && (
+                              <p className="text-gray-400 text-xs sm:text-sm">Betaling: {invoice.paymentMethod}</p>
+                            )}
+                            {invoiceCardColumns.has('notes') && invoice.notes && (
+                              <p className="text-gray-400 text-xs sm:text-sm truncate">Notas: {invoice.notes}</p>
+                            )}
+                            {invoiceCardColumns.has('discount') && (parseFloat(invoice.discountAmount || '0') > 0 || parseFloat(invoice.discountPercent || '0') > 0) && (
+                              <p className="text-gray-400 text-xs sm:text-sm">
+                                Afslag: {invoice.discountType === 'percent' ? `${invoice.discountPercent}%` : `R${parseFloat(invoice.discountAmount || '0').toFixed(2)}`}
+                              </p>
+                            )}
+                            {invoiceCustomFieldDefs.filter(f => invoiceCardColumns.has(`cf_${f.id}`)).map(field => {
+                              const val = (invoice.customFieldValues as any)?.[`cf_${field.id}`];
+                              return val ? (
+                                <p key={field.id} className="text-gray-400 text-xs sm:text-sm truncate">{field.label}: {val}</p>
+                              ) : null;
+                            })}
                           </div>
                           <div className="text-left sm:text-right flex-shrink-0">
                             <p className="text-white font-bold text-base sm:text-lg">
