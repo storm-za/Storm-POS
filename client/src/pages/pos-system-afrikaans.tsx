@@ -94,6 +94,24 @@ interface Category {
   sortOrder?: number;
 }
 
+const getInvoiceVisDefs = (): Record<string, any> => {
+  try {
+    const u = JSON.parse(localStorage.getItem('posUser') || 'null');
+    const saved = localStorage.getItem(`invoiceVisDefs_${u?.id || 'guest'}`);
+    return saved ? JSON.parse(saved) : {};
+  } catch { return {}; }
+};
+
+const saveInvoiceVisDef = (key: string, hidden: boolean) => {
+  try {
+    const u = JSON.parse(localStorage.getItem('posUser') || 'null');
+    const storageKey = `invoiceVisDefs_${u?.id || 'guest'}`;
+    const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    if (hidden) current[key] = false; else delete current[key];
+    localStorage.setItem(storageKey, JSON.stringify(current));
+  } catch {}
+};
+
 export default function PosSystemAfrikaans() {
   const [currentSale, setCurrentSale] = useState<SaleItem[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
@@ -1838,7 +1856,7 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
-      setInvoiceCustomFieldValues({});
+      setInvoiceCustomFieldValues(getInvoiceVisDefs());
       setInvoiceShowBusinessInfo(true);
       setShowQuickAddProduct(false);
       setQuickAddName("");
@@ -1887,7 +1905,7 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentDetails("");
       setInvoiceTerms("");
       setInvoiceTaxEnabled(true);
-      setInvoiceCustomFieldValues({});
+      setInvoiceCustomFieldValues(getInvoiceVisDefs());
       setInvoiceShowBusinessInfo(true);
       setShowQuickAddProduct(false);
       setQuickAddName("");
@@ -7794,7 +7812,7 @@ ${dateFilteredSales.map(sale =>
             setInvoiceTerms("");
             setInvoiceTaxEnabled(true);
             setInvoiceType('invoice');
-            setInvoiceCustomFieldValues({});
+            setInvoiceCustomFieldValues(getInvoiceVisDefs());
             setInvoiceShowBusinessInfo(true);
           }
         }}
@@ -7892,8 +7910,9 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <Label>Kliënt Telefoon (Opsioneel)</Label>
-                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_clientPhone: prev.vis_clientPhone === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_clientPhone === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                  {invoiceCustomFieldValues.vis_clientPhone === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_clientPhone !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_clientPhone: !nh })); saveInvoiceVisDef('vis_clientPhone', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_clientPhone === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                  {invoiceCustomFieldValues.vis_clientPhone === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {invoiceCustomFieldValues.vis_clientPhone === false ? 'Verberg' : 'Sigbaar'}
                 </button>
               </div>
               <input
@@ -7909,8 +7928,9 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <Label>PO Nommer (Opsioneel)</Label>
-                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_poNumber: prev.vis_poNumber === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_poNumber === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                  {invoiceCustomFieldValues.vis_poNumber === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_poNumber !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_poNumber: !nh })); saveInvoiceVisDef('vis_poNumber', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_poNumber === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                  {invoiceCustomFieldValues.vis_poNumber === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {invoiceCustomFieldValues.vis_poNumber === false ? 'Verberg' : 'Sigbaar'}
                 </button>
               </div>
               <input
@@ -7926,8 +7946,9 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <Label>Betalingsvoorwaardes</Label>
-                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueTerms: prev.vis_dueTerms === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_dueTerms === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                  {invoiceCustomFieldValues.vis_dueTerms === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueTerms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueTerms: !nh })); saveInvoiceVisDef('vis_dueTerms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueTerms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                  {invoiceCustomFieldValues.vis_dueTerms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {invoiceCustomFieldValues.vis_dueTerms === false ? 'Verberg' : 'Sigbaar'}
                 </button>
               </div>
               <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
@@ -7949,8 +7970,9 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <Label>Vervaldatum (Opsioneel)</Label>
-                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueDate: prev.vis_dueDate === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_dueDate === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                  {invoiceCustomFieldValues.vis_dueDate === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueDate !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueDate: !nh })); saveInvoiceVisDef('vis_dueDate', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueDate === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                  {invoiceCustomFieldValues.vis_dueDate === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {invoiceCustomFieldValues.vis_dueDate === false ? 'Verberg' : 'Sigbaar'}
                 </button>
               </div>
               <input
@@ -8336,8 +8358,9 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <Label>Betaalmetode (Opsioneel)</Label>
-                <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentMethod: prev.vis_paymentMethod === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_paymentMethod === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                  {invoiceCustomFieldValues.vis_paymentMethod === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentMethod !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentMethod: !nh })); saveInvoiceVisDef('vis_paymentMethod', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentMethod === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                  {invoiceCustomFieldValues.vis_paymentMethod === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  {invoiceCustomFieldValues.vis_paymentMethod === false ? 'Verberg' : 'Sigbaar'}
                 </button>
               </div>
               <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
@@ -8358,8 +8381,9 @@ ${dateFilteredSales.map(sale =>
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <Label>Betalingsbesonderhede (Opsioneel)</Label>
-                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentDetails: prev.vis_paymentDetails === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_paymentDetails === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                    {invoiceCustomFieldValues.vis_paymentDetails === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentDetails !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentDetails: !nh })); saveInvoiceVisDef('vis_paymentDetails', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentDetails === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                    {invoiceCustomFieldValues.vis_paymentDetails === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    {invoiceCustomFieldValues.vis_paymentDetails === false ? 'Verberg' : 'Sigbaar'}
                   </button>
                 </div>
                 {savedPaymentDetails.length > 0 && (
@@ -8414,8 +8438,9 @@ ${dateFilteredSales.map(sale =>
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
-                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_notes: prev.vis_notes === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_notes === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                    {invoiceCustomFieldValues.vis_notes === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_notes !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_notes: !nh })); saveInvoiceVisDef('vis_notes', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_notes === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                    {invoiceCustomFieldValues.vis_notes === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    {invoiceCustomFieldValues.vis_notes === false ? 'Verberg' : 'Sigbaar'}
                   </button>
                 </div>
                 <textarea
@@ -8430,8 +8455,9 @@ ${dateFilteredSales.map(sale =>
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
-                  <button type="button" onClick={() => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_terms: prev.vis_terms === false ? true : false }))} className="p-1 text-gray-400 hover:text-gray-600 rounded" title={invoiceCustomFieldValues.vis_terms === false ? 'Wys op PDF' : 'Verberg van PDF'}>
-                    {invoiceCustomFieldValues.vis_terms === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_terms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_terms: !nh })); saveInvoiceVisDef('vis_terms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_terms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
+                    {invoiceCustomFieldValues.vis_terms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    {invoiceCustomFieldValues.vis_terms === false ? 'Verberg' : 'Sigbaar'}
                   </button>
                 </div>
                 <textarea
