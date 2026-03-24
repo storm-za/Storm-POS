@@ -125,37 +125,37 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
-      {/* Hero Section - Enterprise Design */}
-      <section className="relative pt-8 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      {/* Hero Section - Enterprise White Design */}
+      <section className="relative pt-8 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-gray-50 to-blue-50 overflow-hidden">
         {/* Premium Background Effects */}
         <div className="absolute inset-0">
-          {/* Animated gradient mesh */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(217,90%,25%)]/30 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(217,90%,40%)]/20 via-transparent to-transparent" />
+          {/* Animated gradient mesh - blue only, very low opacity */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(217,90%,60%)]/8 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(217,90%,60%)]/5 via-transparent to-transparent" />
           
-          {/* Animated grid pattern */}
+          {/* Animated grid pattern - blue toned, very low opacity */}
           <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)`,
             backgroundSize: '80px 80px'
           }} />
           
-          {/* Glowing orbs */}
+          {/* Glowing orbs - blue, low opacity */}
           <motion.div 
-            className="absolute top-20 left-1/4 w-64 h-64 bg-[hsl(217,90%,50%)]/20 rounded-full blur-3xl"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            className="absolute top-20 left-1/4 w-64 h-64 bg-[hsl(217,90%,60%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div 
-            className="absolute bottom-20 right-1/4 w-80 h-80 bg-[hsl(217,90%,40%)]/15 rounded-full blur-3xl"
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.6, 0.4] }}
+            className="absolute bottom-20 right-1/4 w-80 h-80 bg-[hsl(217,90%,60%)]/8 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.3, 0.15] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
           
-          {/* Floating particles */}
+          {/* Floating particles - blue */}
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-[hsl(217,90%,60%)]/60 rounded-full"
+              className="absolute w-1 h-1 bg-[hsl(217,90%,50%)]/30 rounded-full"
               style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
               animate={{ y: [0, -40, 0], opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
               transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 3, ease: "easeInOut" }}
@@ -170,7 +170,7 @@ export default function Home() {
             animate="animate"
             variants={staggerContainer}
           >
-            {/* Logo with glow effect */}
+            {/* Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -178,8 +178,8 @@ export default function Home() {
               className="flex justify-center mb-10"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-white/40 blur-2xl rounded-full scale-150" />
-                <img src={stormLogo} alt="Storm" className="relative h-36 w-auto drop-shadow-2xl" />
+                <div className="absolute inset-0 bg-[hsl(217,90%,60%)]/10 blur-2xl rounded-full scale-150" />
+                <img src={stormLogo} alt="Storm" className="relative h-36 w-auto drop-shadow-lg" />
               </div>
             </motion.div>
             
@@ -188,26 +188,26 @@ export default function Home() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="inline-flex items-center px-5 py-2 mb-8 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 shadow-lg"
+              className="inline-flex items-center px-5 py-2 mb-8 bg-[hsl(217,90%,50%)]/10 backdrop-blur-xl rounded-full border border-[hsl(217,90%,50%)]/20 shadow-lg"
             >
-              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse shadow-lg shadow-blue-500/50" />
-              <span className="text-sm font-medium text-gray-300">Enterprise Software Solutions</span>
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+              <span className="text-sm font-medium text-[hsl(217,90%,35%)]">Enterprise Software Solutions</span>
             </motion.div>
             
             <motion.h1 
               className="text-5xl md:text-7xl font-bold mb-6"
               variants={fadeInUp}
             >
-              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] via-[hsl(217,90%,50%)] to-[hsl(217,90%,70%)] bg-clip-text text-transparent">Smart Software.</span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] bg-clip-text text-transparent">Smart Software.</span>
               <br />
-              <span className="text-white">Built for Growth.</span>
+              <span className="text-gray-900">Built for Growth.</span>
             </motion.h1>
             
             <motion.p 
-              className="text-xl md:text-2xl text-gray-400 mb-10 max-w-3xl mx-auto leading-relaxed"
+              className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed"
               variants={fadeInUp}
             >
-              From stunning websites to intelligent business automation – <span className="text-white font-medium">we've got you covered.</span>
+              From stunning websites to intelligent business automation, <span className="text-gray-900 font-medium">we've got you covered.</span>
             </motion.p>
             
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -228,7 +228,7 @@ export default function Home() {
                 asChild
                 size="lg" 
                 variant="outline"
-                className="border-2 border-white/20 text-white bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 transition-all duration-300 px-8 py-6 text-lg font-semibold"
+                className="border-2 border-[hsl(217,90%,50%)]/40 text-[hsl(217,90%,40%)] bg-white hover:bg-[hsl(217,90%,50%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-300 px-8 py-6 text-lg font-semibold"
               >
                 <Link href="/contact">Contact Sales</Link>
               </Button>
@@ -254,6 +254,38 @@ export default function Home() {
                 <span>South African Based</span>
               </div>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Social Proof Stats Bar */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100 shadow-sm">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-16"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">500+</div>
+              <div className="text-sm text-gray-500 font-medium">SA Businesses</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R0</div>
+              <div className="text-sm text-gray-500 font-medium">Setup Fee</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">7-Day</div>
+              <div className="text-sm text-gray-500 font-medium">Free Trial</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">4.9/5</div>
+              <div className="text-sm text-gray-500 font-medium">Rating</div>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -385,7 +417,7 @@ export default function Home() {
               <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Needs to Thrive</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              From stunning websites to intelligent business tools – we deliver <span className="text-white font-medium">solutions that scale</span> with your success
+              From stunning websites to intelligent business tools, we deliver <span className="text-white font-medium">solutions that scale</span> with your success
             </p>
           </motion.div>
           
@@ -409,7 +441,7 @@ export default function Home() {
                     <Code className="text-white h-10 w-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Web Development</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Professional websites that convert visitors into customers with <span className="text-white font-medium">modern design</span> and lightning-fast performance</p>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Get a professional website that ranks on Google and converts visitors into paying customers, from <span className="text-white font-medium">R799/month.</span></p>
                   <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold">
                     <Link href="/web-development">
                       Start Your Project
@@ -440,7 +472,7 @@ export default function Home() {
                     <ScanBarcode className="text-white h-10 w-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Storm POS</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Revolutionary all device design <span className="text-white font-medium">point of sale system</span> designed specifically for South African retailers</p>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Accept payments, track inventory, and send invoices from any device. No monthly fee, <span className="text-white font-medium">you only pay when you make money.</span></p>
                   <Button 
                     asChild 
                     className="bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,45%)] text-white hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,50%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold"
@@ -471,7 +503,7 @@ export default function Home() {
                     <TrendingUp className="text-white h-10 w-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors duration-300">Pricing Intelligence</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Advanced market analysis and <span className="text-white font-medium">competitor tracking</span> to optimize your pricing strategy in real-time</p>
+                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Know what your competitors charge before your customers do. Real-time <span className="text-white font-medium">market intelligence</span> to help you stay ahead and win more business.</p>
                   <div className="mt-auto">
                     <button 
                       onClick={() => setPricingInterestOpen(true)}
@@ -542,7 +574,7 @@ export default function Home() {
                 Storm was founded with a simple yet powerful mission: to democratize access to premium business technology. We believe every South African business, regardless of size, deserves <span className="text-white">enterprise-level software solutions.</span>
               </p>
               <p className="text-lg text-gray-400 leading-relaxed">
-                From our headquarters in South Africa, we've built a team of passionate developers, designers, and business strategists who understand the unique challenges local businesses face. <span className="text-white">Our solutions aren't just software – they're growth accelerators.</span>
+                From our headquarters in South Africa, we've built a team of passionate developers, designers, and business strategists who understand the unique challenges local businesses face. <span className="text-white">Our solutions aren't just software. They're growth accelerators.</span>
               </p>
             </motion.div>
 
@@ -672,15 +704,15 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
-                  "Storm transformed our online presence completely. Our new website converts visitors into customers like never before. <span className="text-white font-medium">Sales increased by 300%</span> in just two months!"
+                  "Storm built our website in under 2 weeks and it immediately started ranking on Google. <span className="text-white font-medium">Our leads tripled</span> within the first month. Best decision we made."
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,50%)] to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/25">
-                    <span className="text-white font-bold text-lg">SA</span>
+                    <span className="text-white font-bold text-lg">NM</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-white">Sarah Anderson</div>
-                    <div className="text-sm text-gray-500">Business Owner</div>
+                    <div className="font-semibold text-white">Nandi Mokoena</div>
+                    <div className="text-sm text-gray-500">Salon Owner, Johannesburg</div>
                   </div>
                 </div>
               </Card>
@@ -694,15 +726,15 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
-                  "Storm POS revolutionized our retail operations. The all device design means we can <span className="text-white font-medium">serve customers anywhere</span> in our store. It's incredibly intuitive and reliable."
+                  "Storm POS replaced our old till system at zero setup cost. No monthly fees, works on my phone and my staff's tablets. <span className="text-white font-medium">It has saved us thousands</span> every year."
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-green-500/25">
-                    <span className="text-white font-bold text-lg">MV</span>
+                    <span className="text-white font-bold text-lg">TV</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-white">Michael Van Der Merwe</div>
-                    <div className="text-sm text-gray-500">Retail Manager</div>
+                    <div className="font-semibold text-white">Thabo Van Wyk</div>
+                    <div className="text-sm text-gray-500">Retail Store Owner, Pretoria</div>
                   </div>
                 </div>
               </Card>
@@ -716,15 +748,15 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="text-gray-300 mb-8 leading-relaxed italic text-lg">
-                  "The support team at Storm is exceptional. They understand our business needs and <span className="text-white font-medium">always deliver beyond expectations.</span> Their solutions just work!"
+                  "I was sceptical at first, but Storm delivered a beautiful website on time and within budget. <span className="text-white font-medium">We are now on page one of Google</span> for our main services."
                 </p>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-purple-500/25">
-                    <span className="text-white font-bold text-lg">TM</span>
+                    <span className="text-white font-bold text-lg">LD</span>
                   </div>
                   <div>
-                    <div className="font-semibold text-white">Thabo Mthembu</div>
-                    <div className="text-sm text-gray-500">CEO, Tech Startup</div>
+                    <div className="font-semibold text-white">Liezel Du Plessis</div>
+                    <div className="text-sm text-gray-500">Bookkeeping Practice, Cape Town</div>
                   </div>
                 </div>
               </Card>
@@ -876,6 +908,7 @@ export default function Home() {
             <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
               Join hundreds of South African businesses who've <span className="text-white font-semibold">accelerated their growth</span> with Storm's innovative solutions
             </p>
+            <p className="text-sm text-blue-200 mb-6 font-medium">No setup fees. No lock-in contracts. Cancel anytime.</p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

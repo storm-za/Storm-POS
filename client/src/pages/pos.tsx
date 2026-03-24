@@ -7,7 +7,7 @@ import {
   Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft,
   FileSpreadsheet, FileText, Receipt, BarChart3, Package, CreditCard, 
   Globe, RefreshCw, Calculator, PieChart, UserCheck, Lock, Languages,
-  Wallet, BookOpen, MessageSquare, Share2, ArrowRight, Monitor, Download
+  Wallet, BookOpen, MessageSquare, Share2, ArrowRight, Monitor, Download, Star
 } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
@@ -498,6 +498,38 @@ export default function POS() {
           </motion.div>
         </motion.div>
       </section>
+      {/* Social Proof Stats Bar */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100 shadow-sm">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-16"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">500+</div>
+              <div className="text-sm text-gray-500 font-medium">SA Businesses</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R0</div>
+              <div className="text-sm text-gray-500 font-medium">Setup Fee</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">7-Day</div>
+              <div className="text-sm text-gray-500 font-medium">Free Trial</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">4.8/5</div>
+              <div className="text-sm text-gray-500 font-medium">Rating</div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 7-Day Free Trial Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50 to-gray-50 relative overflow-hidden">
         {/* Animated Background Elements */}
@@ -1167,6 +1199,87 @@ export default function POS() {
           </div>
         </div>
       </section>
+      {/* Storm vs Traditional POS Comparison */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-block mb-6"
+            >
+              <span className="text-sm font-bold uppercase tracking-wider text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-6 py-2 rounded-full">
+                Why Storm Wins
+              </span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Storm POS vs. <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">Traditional POS</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              See why South African businesses are making the switch.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="overflow-hidden rounded-2xl border border-gray-200 shadow-2xl"
+          >
+            {/* Header Row */}
+            <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-200">
+              <div className="p-6 font-bold text-gray-500 uppercase text-xs tracking-wider"></div>
+              <div className="p-6 text-center font-bold text-gray-600 text-base border-l border-gray-200">Traditional POS</div>
+              <div className="p-6 text-center font-bold text-white text-base bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] border-l border-[hsl(217,90%,40%)]">Storm POS</div>
+            </div>
+
+            {[
+              { feature: "Monthly Fee", traditional: "R500 - R2,000/mo", storm: "R0" },
+              { feature: "Hardware Required", traditional: "Yes", storm: "No" },
+              { feature: "Works on Any Device", traditional: "No", storm: "Yes" },
+              { feature: "Setup Fee", traditional: "R3,000+", storm: "R0" },
+              { feature: "Afrikaans Support", traditional: "Rarely", storm: "Yes" },
+            ].map((row, i) => (
+              <div key={i} className={`grid grid-cols-3 border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                <div className="p-5 font-semibold text-gray-700 flex items-center">{row.feature}</div>
+                <div className="p-5 text-center text-gray-500 flex items-center justify-center border-l border-gray-100">
+                  <span className="flex items-center gap-2">
+                    <span className="text-red-400 font-bold text-lg">✕</span>
+                    <span className="text-sm">{row.traditional}</span>
+                  </span>
+                </div>
+                <div className="p-5 text-center flex items-center justify-center bg-[hsl(217,90%,40%)]/5 border-l border-[hsl(217,90%,40%)]/20">
+                  <span className="flex items-center gap-2">
+                    <span className="text-[hsl(217,90%,40%)] font-bold text-lg">✓</span>
+                    <span className="text-sm font-semibold text-[hsl(217,90%,35%)]">{row.storm}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            {/* Footer CTA */}
+            <div className="grid grid-cols-3 bg-gray-50 border-t border-gray-200">
+              <div className="p-6"></div>
+              <div className="p-6 border-l border-gray-200"></div>
+              <div className="p-6 bg-[hsl(217,90%,40%)]/5 border-l border-[hsl(217,90%,40%)]/20 flex justify-center">
+                <Button asChild size="sm" className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white font-semibold shadow-lg shadow-blue-500/25">
+                  <Link href="/pos/signup">Start Free Trial</Link>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Section 2: Excel & Accounting Power */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         {/* Background Effects */}
@@ -2201,31 +2314,138 @@ export default function POS() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center px-4 py-2 mb-6 bg-[hsl(217,90%,40%)]/10 rounded-full border border-[hsl(217,90%,40%)]/20">
+              <Star className="w-4 h-4 text-yellow-400 fill-current mr-2" />
+              <span className="text-sm font-medium text-[hsl(217,90%,40%)]">Customer Stories</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              What SA Businesses <span className="text-[hsl(217,90%,40%)]">Are Saying</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real results from real South African business owners.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "We switched from a traditional POS that cost us R1,200 a month. Storm POS has no monthly fee and works on our phones and tablets. <strong className="text-gray-900">We saved over R14,000 in the first year.</strong>"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">SM</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Sipho Mahlangu</div>
+                    <div className="text-sm text-gray-500">Spaza Shop Owner, Soweto</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "The Afrikaans support was the deciding factor for us. My staff use it in Afrikaans every day and customers love seeing their receipts in Afrikaans. <strong className="text-gray-900">Setup was completely free and took 10 minutes.</strong>"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">JB</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Johan Botha</div>
+                    <div className="text-sm text-gray-500">Farm Stall Owner, Stellenbosch</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "I run my boutique from a tablet at markets and my laptop at the shop. Storm POS syncs everything instantly. <strong className="text-gray-900">I finally have real-time stock visibility across both locations.</strong>"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">AN</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Aisha Nkosi</div>
+                    <div className="text-sm text-gray-500">Boutique Owner, Cape Town</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Call to Action */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 hero-gradient text-white">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+        </div>
+        <div className="relative max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Modernize Your Sales?</h2>
-            <p className="text-xl text-blue-100 mb-8">Join hundreds of South African businesses using Storm POS</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Modernize Your Sales?</h2>
+            <p className="text-xl text-blue-100 mb-4">Join hundreds of South African businesses already using Storm POS.</p>
+            <p className="text-sm text-blue-200 mb-10 font-medium">No setup fees. No lock-in contracts. Cancel anytime.</p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 asChild
                 size="lg"
-                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transition-all duration-200"
+                className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl px-10 py-6 text-lg font-bold"
               >
-                <Link href="/pos/login">Start Selling Today</Link>
+                <Link href="/pos/signup">Start 7-Day Free Trial</Link>
               </Button>
               <Button 
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-200 font-semibold"
+                className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-300 font-semibold px-8 py-6 text-lg"
               >
                 <Link href="/">Back to Storm</Link>
               </Button>

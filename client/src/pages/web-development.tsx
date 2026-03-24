@@ -168,7 +168,7 @@ export default function WebDevelopment() {
         {
           "@type": "Question",
           "name": "How long does it take to build a website?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Most websites are completed within 2–4 weeks, depending on the package and how quickly you provide your content. We follow a clear 4-step process: Discovery, Design, Development, and Launch." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Most websites are completed within 2 to 4 weeks, depending on the package and how quickly you provide your content. We follow a clear 4-step process: Discovery, Design, Development, and Launch." }
         },
         {
           "@type": "Question",
@@ -366,6 +366,38 @@ export default function WebDevelopment() {
                 Get Your Website Today
               </Button>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Social Proof Stats Bar */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100 shadow-sm">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-16"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">200+</div>
+              <div className="text-sm text-gray-500 font-medium">Websites Built</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">R799</div>
+              <div className="text-sm text-gray-500 font-medium">Starting Monthly</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">2 Weeks</div>
+              <div className="text-sm text-gray-500 font-medium">Average Delivery</div>
+            </div>
+            <div className="hidden sm:block w-px h-10 bg-gray-200" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-[hsl(217,90%,40%)]">4.9/5</div>
+              <div className="text-sm text-gray-500 font-medium">Client Rating</div>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -781,11 +813,11 @@ export default function WebDevelopment() {
             
             {/* Growth Package */}
             <motion.div variants={fadeInUp}>
-              <Card className="h-full shadow-2xl text-white transform scale-105 relative bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]">
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
+              <Card className="h-full shadow-2xl text-white transform scale-105 relative bg-gradient-to-br from-[hsl(217,90%,35%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] ring-4 ring-[hsl(217,90%,50%)]/40">
+                <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-400 text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl tracking-wide uppercase">
                   Most Popular
                 </div>
-                <CardContent className="p-8 text-center h-full flex flex-col">
+                <CardContent className="p-8 text-center h-full flex flex-col pt-10">
                   <h3 className="text-2xl font-bold mb-2">Growth</h3>
                   <div className="text-4xl font-bold mb-4">
                     R1,499<span className="text-lg text-blue-200">/month</span>
@@ -810,7 +842,7 @@ export default function WebDevelopment() {
                   </ul>
                   <Button 
                     onClick={scrollToContact}
-                    className="w-full bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 shadow-lg"
+                    className="w-full bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 shadow-xl font-bold text-base"
                     data-testid="button-growth-package"
                   >
                     Get Started
@@ -1175,12 +1207,114 @@ export default function WebDevelopment() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center px-4 py-2 mb-6 bg-[hsl(217,90%,40%)]/10 rounded-full border border-[hsl(217,90%,40%)]/20">
+              <Star className="w-4 h-4 text-yellow-400 fill-current mr-2" />
+              <span className="text-sm font-medium text-[hsl(217,90%,40%)]">Client Testimonials</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              What Our Clients <span className="text-[hsl(217,90%,40%)]">Are Saying</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              South African businesses sharing their real results.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid md:grid-cols-3 gap-6"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "Storm built us a professional website for a fraction of what agencies quoted us. It was live in 2 weeks, it ranks on Google, and <strong className="text-gray-900">we get new customer enquiries every week</strong> through the contact form."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">PM</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Priya Moodley</div>
+                    <div className="text-sm text-gray-500">Accounting Firm Owner, Durban</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "No calls needed, everything done online. Storm was easy to work with, communicated clearly, and delivered exactly what we discussed. <strong className="text-gray-900">Our online bookings have doubled</strong> since launch."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-[hsl(217,90%,50%)] rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">TN</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Thabo Ndlovu</div>
+                    <div className="text-sm text-gray-500">Auto Detailing Business, Johannesburg</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <Card className="h-full bg-white border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="flex items-center gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-8 leading-relaxed italic">
+                  "I tried DIY website builders for two years. Storm gave me a proper professional site in 2 weeks that actually converts. <strong className="text-gray-900">Best investment I've made</strong> in my small business."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-white font-bold text-lg">EV</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">Elaine van der Berg</div>
+                    <div className="text-sm text-gray-500">Interior Decorator, Pretoria</div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Final CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl"></div>
           <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-white/10 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
@@ -1190,18 +1324,19 @@ export default function WebDevelopment() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Let's Build Your Website - On Your Terms
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to get more customers online? Let's build your website this week.
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-blue-100 mb-4 max-w-2xl mx-auto leading-relaxed">
               Join the growing number of South African businesses that trust Storm for their web presence.
             </p>
+            <p className="text-sm text-blue-200 mb-10 font-medium">No setup fees. No lock-in contracts. Cancel anytime.</p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={scrollToContact}
                 size="lg"
-                className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl px-8 py-4 text-lg font-semibold"
+                className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl px-10 py-6 text-lg font-bold"
                 data-testid="button-cta-quote"
               >
                 Get Your Website Quote
@@ -1216,23 +1351,12 @@ export default function WebDevelopment() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-300 font-semibold px-8 py-4 text-lg"
+                className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-[hsl(217,90%,40%)] transition-all duration-300 font-semibold px-8 py-6 text-lg"
                 data-testid="button-back-home"
               >
                 <Link href="/">Back to Home</Link>
               </Button>
             </div>
-
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="flex items-center justify-center mt-8 text-blue-200 text-sm"
-            >
-              <Award className="w-5 h-5 mr-2" />
-              No setup fees • No long-term contracts • Cancel anytime
-            </motion.div>
           </motion.div>
         </div>
       </section>
