@@ -144,7 +144,9 @@ export default function PosLogin() {
           <a href="/pos" className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm transition-colors mb-12">
             <ArrowLeft className="w-4 h-4" />Back to Storm POS
           </a>
-          <img src="/storm-logo.png" alt="Storm POS" className="h-14 w-auto mb-10 brightness-0 invert" />
+          <div className="mb-10 inline-flex items-center justify-center bg-white rounded-2xl p-3 shadow-lg">
+            <img src="/storm-logo.png" alt="Storm POS" className="h-10 w-auto" />
+          </div>
           <h2 className="text-3xl font-bold text-white leading-snug mb-3">
             Your entire business,<br />in one place.
           </h2>
