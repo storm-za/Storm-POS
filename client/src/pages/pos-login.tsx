@@ -107,7 +107,7 @@ export default function PosLogin() {
   });
 
   useEffect(() => {
-    // 1. If an active session exists, jump straight in — no server call needed
+    // 1. If an active session exists, jump straight in - no server call needed
     if (activeSession) {
       setLocation(activeSession.destination);
       return;

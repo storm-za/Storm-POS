@@ -618,10 +618,10 @@ const blogContent: Record<string, BlogContent> = {
 
         <h2>How to Choose the Right POS for Your Business Size</h2>
 
-        <h3>Micro businesses (0–2 staff, under R50K/month)</h3>
+        <h3>Micro businesses (0-2 staff, under R50K/month)</h3>
         <p>Avoid expensive monthly subscriptions. Storm POS's per-transaction model means you pay nothing when sales are slow - ideal for seasonal businesses or those just starting out. A business doing R30K/month pays only R150 in POS fees.</p>
 
-        <h3>Small businesses (3–10 staff, R50K–R500K/month)</h3>
+        <h3>Small businesses (3-10 staff, R50K-R500K/month)</h3>
         <p>At this level you need proper inventory tracking, staff accounts, and reporting. Storm POS covers all of these with no additional cost. At R500K/month turnover, Storm's fee is just R2,500 - still far cheaper than Lightspeed's fixed fee.</p>
 
         <h3>Growing businesses (10+ staff, R500K+/month)</h3>
@@ -637,7 +637,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>A good POS covers all three without requiring advanced training or IT support.</p>
 
         <h2>The Load Shedding Factor</h2>
-        <p>This is uniquely South African. During Stage 4–6 load shedding, traditional POS systems tied to a desktop PC or fixed-line internet simply stop working. A cloud POS running on a tablet with mobile data keeps trading through any outage. This alone has caused thousands of SA retailers to switch systems in the past two years.</p>
+        <p>This is uniquely South African. During Stage 4-6 load shedding, traditional POS systems tied to a desktop PC or fixed-line internet simply stop working. A cloud POS running on a tablet with mobile data keeps trading through any outage. This alone has caused thousands of SA retailers to switch systems in the past two years.</p>
 
         <div className="callout-cta">
           <h4>Ready to Try the Best POS for SA Small Business?</h4>
@@ -664,7 +664,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>When a POS system is described as "free," it usually means one of three things:</p>
         <ol>
           <li><strong>Free tier with limited features:</strong> Basic functionality that becomes unusable once your business grows past a few products or transactions.</li>
-          <li><strong>Free software, paid hardware:</strong> The app is free but you must buy a specific card machine or terminal, often at R1,000–R3,000 upfront.</li>
+          <li><strong>Free software, paid hardware:</strong> The app is free but you must buy a specific card machine or terminal, often at R1,000-R3,000 upfront.</li>
           <li><strong>Free upfront, pay per transaction:</strong> No monthly fee, but a percentage of every sale goes to the platform. This is actually the most honest model.</li>
         </ol>
 
@@ -712,7 +712,7 @@ const blogContent: Record<string, BlogContent> = {
         <h2>Hidden Costs to Watch For</h2>
         <p>When evaluating "free" POS systems, watch for these hidden costs:</p>
         <ul>
-          <li><strong>Per-user fees:</strong> Some systems charge R200–R500 per staff member per month</li>
+          <li><strong>Per-user fees:</strong> Some systems charge R200-R500 per staff member per month</li>
           <li><strong>Reporting add-ons:</strong> Basic reports are free, but detailed analytics cost extra</li>
           <li><strong>Hardware lock-in:</strong> You must use their card reader, which often charges high transaction fees</li>
           <li><strong>Data export fees:</strong> Can't get your own customer or sales data without paying</li>
@@ -720,7 +720,7 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
 
         <h2>The Best Approach for SA Small Businesses</h2>
-        <p>Rather than chasing "free," look for the best value. A POS that costs R200–R500/month but saves you 2 hours of admin per week - at R150/hour - pays for itself in the first week. The question isn't "is it free?" but "does it earn back what I'm paying?"</p>
+        <p>Rather than chasing "free," look for the best value. A POS that costs R200-R500/month but saves you 2 hours of admin per week - at R150/hour - pays for itself in the first week. The question isn't "is it free?" but "does it earn back what I'm paying?"</p>
         <p>Storm POS's per-transaction model removes the mental burden entirely. You're not paying for software - you're investing a small share of each sale in the tool that helped make it.</p>
 
         <div className="callout-cta">
@@ -747,7 +747,7 @@ const blogContent: Record<string, BlogContent> = {
         <p>This guide explains both clearly, compares them head-to-head, and helps you decide which is right for your business.</p>
 
         <h2>What is a Traditional POS System?</h2>
-        <p>A traditional POS system runs on a dedicated computer or terminal installed at your shop. The software is installed locally on the machine, and data is stored on a hard drive at your premises. You typically buy a license upfront (R5,000–R30,000), pay for annual updates, and call a technician when something breaks.</p>
+        <p>A traditional POS system runs on a dedicated computer or terminal installed at your shop. The software is installed locally on the machine, and data is stored on a hard drive at your premises. You typically buy a license upfront (R5,000-R30,000), pay for annual updates, and call a technician when something breaks.</p>
         <p><strong>Examples:</strong> AccpacPOS, Sage POS, older Pastel Point of Sale systems.</p>
 
         <h2>What is a Cloud POS System?</h2>
@@ -758,8 +758,8 @@ const blogContent: Record<string, BlogContent> = {
         <table className="cost-table">
           <thead><tr><th>Factor</th><th>Traditional POS</th><th>Cloud POS</th></tr></thead>
           <tbody>
-            <tr><td>Upfront cost</td><td>R5,000 – R30,000</td><td>R0 – R500</td></tr>
-            <tr><td>Monthly cost</td><td>R0 (after purchase)</td><td>R0 – R1,500+</td></tr>
+            <tr><td>Upfront cost</td><td>R5,000 - R30,000</td><td>R0 - R500</td></tr>
+            <tr><td>Monthly cost</td><td>R0 (after purchase)</td><td>R0 - R1,500+</td></tr>
             <tr><td>Load shedding impact</td><td>Stops working (no UPS = no POS)</td><td>Runs on mobile data + tablet</td></tr>
             <tr><td>Data backup</td><td>Manual, risky</td><td>Automatic, cloud-synced</td></tr>
             <tr><td>Access from home</td><td>❌ No</td><td>✅ Yes - any device</td></tr>
@@ -771,7 +771,7 @@ const blogContent: Record<string, BlogContent> = {
 
         <h2>The Load Shedding Reality</h2>
         <p>This is the biggest differentiator for South African businesses. During Stage 4 or Stage 6 load shedding, a traditional POS running on a desktop PC is completely unusable unless you have an expensive UPS or generator setup.</p>
-        <p>A cloud POS running on a tablet or laptop with a charged battery and mobile data (or a cheap WiFi router on a power bank) keeps trading through any outage. Many SA retailers report that switching to cloud POS during the load shedding crisis of 2022–2024 saved them tens of thousands in lost sales.</p>
+        <p>A cloud POS running on a tablet or laptop with a charged battery and mobile data (or a cheap WiFi router on a power bank) keeps trading through any outage. Many SA retailers report that switching to cloud POS during the load shedding crisis of 2022-2024 saved them tens of thousands in lost sales.</p>
 
         <div className="callout">
           <strong>Load shedding maths:</strong> If Stage 4 costs you 4 hours of trading per day at R2,000/hour average sales, that's R8,000 lost per day. Over 30 days, R240,000 in lost revenue. A cloud POS that keeps you trading is worth every rand.
@@ -954,7 +954,7 @@ const blogContent: Record<string, BlogContent> = {
         </div>
 
         <h2>Step 4: Conduct Regular Stock Takes</h2>
-        <p>Even with a POS, a physical stock count every 3–6 months is important to:</p>
+        <p>Even with a POS, a physical stock count every 3-6 months is important to:</p>
         <ul>
           <li>Identify discrepancies between system counts and physical stock (indicating theft or damage)</li>
           <li>Write off damaged or expired stock</li>
@@ -967,7 +967,7 @@ const blogContent: Record<string, BlogContent> = {
         <ul>
           <li>Keep a power outage log to track stock exposure to temperature risks</li>
           <li>Invest in a UPS or solar backup for cold storage</li>
-          <li>Reduce perishable stock levels before anticipated Stage 4–6 periods</li>
+          <li>Reduce perishable stock levels before anticipated Stage 4-6 periods</li>
           <li>Write off spoiled stock promptly and record it in your POS</li>
         </ul>
 
@@ -1020,7 +1020,7 @@ const blogContent: Record<string, BlogContent> = {
           <li>Features like booking systems, payment gateways, or custom functionality</li>
         </ul>
 
-        <h2>Option 1: DIY Website Builders (R0–R500/month)</h2>
+        <h2>Option 1: DIY Website Builders (R0-R500/month)</h2>
         <p>Platforms like Wix, Squarespace, and WordPress.com let you build a site yourself. Cost is low, but:</p>
         <ul>
           <li>Time investment is high - learning curve for non-technical users</li>
@@ -1030,7 +1030,7 @@ const blogContent: Record<string, BlogContent> = {
         </ul>
         <p><strong>Best for:</strong> Hobbyists, very early-stage businesses testing an idea, or people with technical skills.</p>
 
-        <h2>Option 2: Monthly Web Development Packages (R799–R2,499/month)</h2>
+        <h2>Option 2: Monthly Web Development Packages (R799-R2,499/month)</h2>
         <p>This is the most popular model for South African small businesses that want a professional result without a large upfront payment. Providers like Storm build and host your website for a monthly fee.</p>
 
         <table className="cost-table">
@@ -1047,8 +1047,8 @@ const blogContent: Record<string, BlogContent> = {
           <strong>Storm's web development packages</strong> include custom design, mobile optimization, SEO setup, Google Analytics, and ongoing support. Prices start at R799/month with no setup fee. <Link href="/web-development" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">View packages →</Link>
         </div>
 
-        <h2>Option 3: Freelance Web Developer (R5,000–R20,000 once-off)</h2>
-        <p>Hiring a freelance web developer for a custom build typically costs R5,000–R20,000 for a small business site. This gives you more customization than a template, but:</p>
+        <h2>Option 3: Freelance Web Developer (R5,000-R20,000 once-off)</h2>
+        <p>Hiring a freelance web developer for a custom build typically costs R5,000-R20,000 for a small business site. This gives you more customization than a template, but:</p>
         <ul>
           <li>Ongoing maintenance is your responsibility (or another cost)</li>
           <li>Quality varies enormously - experience is critical</li>
@@ -1056,16 +1056,16 @@ const blogContent: Record<string, BlogContent> = {
           <li>If the freelancer becomes unavailable, you may struggle to find someone familiar with the codebase</li>
         </ul>
 
-        <h2>Option 4: Web Design Agency (R20,000–R100,000+)</h2>
+        <h2>Option 4: Web Design Agency (R20,000-R100,000+)</h2>
         <p>Agencies offer the most comprehensive service - strategy, design, development, copywriting, and SEO. Costs start at R20,000 for a basic site and can reach R100,000+ for complex, custom solutions. This is appropriate for established businesses with marketing budgets, not for most small businesses.</p>
 
         <h2>Hidden Website Costs to Budget For</h2>
         <p>Even after building the site, budget for these ongoing costs if not included in your package:</p>
         <ul>
-          <li><strong>Domain name:</strong> R200–R400/year for a .co.za domain</li>
-          <li><strong>SSL certificate:</strong> R0–R1,500/year (often included in hosting)</li>
-          <li><strong>Hosting:</strong> R100–R500/month for shared hosting</li>
-          <li><strong>Content updates:</strong> If you can't update it yourself, factor in R500–R2,000/month</li>
+          <li><strong>Domain name:</strong> R200-R400/year for a .co.za domain</li>
+          <li><strong>SSL certificate:</strong> R0-R1,500/year (often included in hosting)</li>
+          <li><strong>Hosting:</strong> R100-R500/month for shared hosting</li>
+          <li><strong>Content updates:</strong> If you can't update it yourself, factor in R500-R2,000/month</li>
           <li><strong>Google Ads:</strong> Optional but recommended for a new site to get initial traffic</li>
         </ul>
 
@@ -1119,24 +1119,24 @@ const blogContent: Record<string, BlogContent> = {
           <li>A receipt printer (needs mains power)</li>
           <li>A credit card terminal (may have battery, but needs internet)</li>
         </ul>
-        <p>When the power goes out, all of these stop. During a 2.5–4 hour Stage 4 outage, you could lose an entire morning or afternoon's trading.</p>
+        <p>When the power goes out, all of these stop. During a 2.5-4 hour Stage 4 outage, you could lose an entire morning or afternoon's trading.</p>
 
         <h2>The Load-Shedding-Proof POS Setup</h2>
         <p>The solution is a cloud-based POS running on battery-powered devices with mobile data. Here's the full setup:</p>
 
         <h3>1. Cloud POS on a Tablet or Laptop</h3>
-        <p>The core of your load-shedding setup is a cloud POS that runs in a web browser. A tablet (iPad or Android) or a laptop with a charged battery can run for 6–10 hours. No power needed during the outage.</p>
+        <p>The core of your load-shedding setup is a cloud POS that runs in a web browser. A tablet (iPad or Android) or a laptop with a charged battery can run for 6-10 hours. No power needed during the outage.</p>
         <p>Storm POS runs in any browser - open it on your tablet and you're ready to trade immediately.</p>
 
         <h3>2. Mobile Data for Internet</h3>
-        <p>Your home router goes down with the power. But a mobile data SIM in a phone or a portable WiFi router keeps you connected. A standard Telkom, Vodacom, or MTN SIM with 5–10GB of data is sufficient for a full month of POS use.</p>
-        <p><strong>Cost:</strong> R100–R200/month for mobile data.</p>
+        <p>Your home router goes down with the power. But a mobile data SIM in a phone or a portable WiFi router keeps you connected. A standard Telkom, Vodacom, or MTN SIM with 5-10GB of data is sufficient for a full month of POS use.</p>
+        <p><strong>Cost:</strong> R100-R200/month for mobile data.</p>
         <div className="callout">
-          <strong>Pro tip:</strong> Enable the hotspot on your personal cellphone as a backup during outages. Your phone's battery can typically last 4–6 hours as a hotspot. Data usage for a cloud POS is very low - typically less than 100MB per day.
+          <strong>Pro tip:</strong> Enable the hotspot on your personal cellphone as a backup during outages. Your phone's battery can typically last 4-6 hours as a hotspot. Data usage for a cloud POS is very low - typically less than 100MB per day.
         </div>
 
         <h3>3. Power Bank for Tablet and Phone</h3>
-        <p>A 20,000–30,000mAh power bank charges your tablet and phone during the outage. At R400–R800, this is one of the most cost-effective investments a retailer can make.</p>
+        <p>A 20,000-30,000mAh power bank charges your tablet and phone during the outage. At R400-R800, this is one of the most cost-effective investments a retailer can make.</p>
         <p>Charge the power bank whenever the power is on. During an outage, plug your tablet and phone into it.</p>
 
         <h3>4. Handle Cash During Outages</h3>
@@ -1149,9 +1149,9 @@ const blogContent: Record<string, BlogContent> = {
         <table className="cost-table">
           <thead><tr><th>Item</th><th>Cost</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>Tablet (entry level Android)</td><td>R2,500–R4,000</td><td>Once-off. Keep charged.</td></tr>
-            <tr><td>Power bank (30,000mAh)</td><td>R500–R800</td><td>Once-off.</td></tr>
-            <tr><td>Mobile data SIM</td><td>R100–R200/month</td><td>Ongoing.</td></tr>
+            <tr><td>Tablet (entry level Android)</td><td>R2,500-R4,000</td><td>Once-off. Keep charged.</td></tr>
+            <tr><td>Power bank (30,000mAh)</td><td>R500-R800</td><td>Once-off.</td></tr>
+            <tr><td>Mobile data SIM</td><td>R100-R200/month</td><td>Ongoing.</td></tr>
             <tr><td>Storm POS</td><td>0.5% per sale</td><td>Ongoing - only when trading.</td></tr>
             <tr><td><strong>Total setup cost</strong></td><td><strong>~R3,500</strong></td><td>Once-off hardware</td></tr>
           </tbody>
@@ -1160,8 +1160,8 @@ const blogContent: Record<string, BlogContent> = {
         <h2>What About Larger Setups?</h2>
         <p>For businesses with multiple tills or larger premises, consider:</p>
         <ul>
-          <li><strong>UPS (Uninterruptible Power Supply):</strong> Powers your setup for 2–4 hours. R2,000–R8,000 for a reliable unit.</li>
-          <li><strong>Inverter + battery bank:</strong> For longer backup duration. R5,000–R20,000 but handles Stage 6 easily.</li>
+          <li><strong>UPS (Uninterruptible Power Supply):</strong> Powers your setup for 2-4 hours. R2,000-R8,000 for a reliable unit.</li>
+          <li><strong>Inverter + battery bank:</strong> For longer backup duration. R5,000-R20,000 but handles Stage 6 easily.</li>
           <li><strong>Solar panels:</strong> For permanent load-shedding immunity. R15,000+ but eliminates the problem entirely.</li>
         </ul>
 
@@ -1170,7 +1170,7 @@ const blogContent: Record<string, BlogContent> = {
         <ol>
           <li>Switching from desktop POS to tablet-based cloud POS</li>
           <li>Keeping a personal hotspot phone charged at all times</li>
-          <li>Accepting cash-only during Stage 4–6 and updating the system after power returns</li>
+          <li>Accepting cash-only during Stage 4-6 and updating the system after power returns</li>
           <li>Posting load shedding schedules to help customers know when to visit</li>
         </ol>
 

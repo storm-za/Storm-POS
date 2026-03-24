@@ -84,7 +84,7 @@ export default function POS() {
   }, []);
 
   const features = [
-    { icon: CreditCard,    title: "Real-Time Sales",         desc: "Cash, Card & EFT — instant processing" },
+    { icon: CreditCard,    title: "Real-Time Sales",         desc: "Cash, Card & EFT - instant processing" },
     { icon: Package,       title: "Inventory Management",    desc: "Live stock tracking with alerts" },
     { icon: Users,         title: "Customer Directory",      desc: "Full CRM with history & notes" },
     { icon: BarChart3,     title: "Sales Analytics",         desc: "Charts, filters & daily breakdowns" },
@@ -177,7 +177,7 @@ export default function POS() {
               </div>
             </motion.div>
 
-            {/* Right — device stack */}
+            {/* Right - device stack */}
             <motion.div initial={{ opacity:0, x:40 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.8, delay:0.2 }} className="relative flex justify-center">
               <div className="relative w-full max-w-md">
                 <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/15 to-[hsl(217,90%,55%)]/10 blur-3xl rounded-full scale-110" />
@@ -220,7 +220,7 @@ export default function POS() {
             initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
             <span className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full">Everything You Need</span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-4 mb-3">One System. Every Feature.</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">Every tool your business needs — built in, not bolted on.</p>
+            <p className="text-gray-500 max-w-2xl mx-auto">Every tool your business needs - built in, not bolted on.</p>
           </motion.div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -257,7 +257,7 @@ export default function POS() {
               <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</div>
               <TrendingUp className="w-9 h-9 mb-4 opacity-90" />
               <div className="text-4xl font-bold mb-1">0.5%</div>
-              <div className="text-white/80 text-sm mb-5">per sale — pay less as you grow</div>
+              <div className="text-white/80 text-sm mb-5">per sale - pay less as you grow</div>
               <ul className="space-y-2.5">
                 {["Best for growing businesses","Scales with your revenue","+ R0.50 per invoice/quote","7-day free trial included"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-300 shrink-0" />{t}</li>
@@ -270,9 +270,9 @@ export default function POS() {
               className="bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-lg hover:border-[hsl(217,90%,40%)]/40 transition-all">
               <CreditCard className="w-9 h-9 text-[hsl(217,90%,40%)] mb-4" />
               <div className="text-4xl font-bold text-gray-900 mb-1">R1.00</div>
-              <div className="text-gray-500 text-sm mb-5">flat per sale — predictable costs</div>
+              <div className="text-gray-500 text-sm mb-5">flat per sale - predictable costs</div>
               <ul className="space-y-2.5">
-                {["Best for high-value transactions","Fixed cost per sale — no surprises","+ R0.50 per invoice/quote","7-day free trial included"].map(t => (
+                {["Best for high-value transactions","Fixed cost per sale - no surprises","+ R0.50 per invoice/quote","7-day free trial included"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
@@ -281,7 +281,7 @@ export default function POS() {
 
           <div className="bg-green-50 border border-green-200 rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <div className="font-semibold text-green-800 text-sm">7-Day Free Trial — No Credit Card</div>
+              <div className="font-semibold text-green-800 text-sm">7-Day Free Trial - No Credit Card</div>
               <div className="text-green-700 text-xs mt-0.5">Full access to every feature. Cancel anytime. Zero risk.</div>
             </div>
             <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] text-white font-bold px-6 border-0 hover:scale-105 transition-all shrink-0">

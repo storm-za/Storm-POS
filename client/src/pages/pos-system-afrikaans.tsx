@@ -3204,7 +3204,7 @@ ${dateFilteredSales.map(sale =>
     try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
     if (canShareReceipt) {
       try {
-        await navigator.share({ files: [file], title: `Kwitansie – R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
+        await navigator.share({ files: [file], title: `Kwitansie - R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
       } catch (e: any) {
         if (e.name !== 'AbortError') doc.save(fileName);
       }

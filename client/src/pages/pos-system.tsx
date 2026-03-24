@@ -3711,7 +3711,7 @@ export default function PosSystem() {
     try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
     if (canShareReceipt) {
       try {
-        await navigator.share({ files: [file], title: `Receipt – R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
+        await navigator.share({ files: [file], title: `Receipt - R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
       } catch (e: any) {
         if (e.name !== 'AbortError') doc.save(fileName);
       }

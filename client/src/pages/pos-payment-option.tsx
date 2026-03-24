@@ -32,7 +32,7 @@ const t = {
     selectPlan: "Select a plan to continue",
     saving: "Saving...",
     trialBadge: "7-Day Free Trial",
-    trialNote: "No charges for 7 days — billing only starts after your free trial ends.",
+    trialNote: "No charges for 7 days - billing only starts after your free trial ends.",
   },
   af: {
     title: "Kies Jou Plan",
@@ -57,7 +57,7 @@ const t = {
     selectPlan: "Kies 'n plan om voort te gaan",
     saving: "Stoor...",
     trialBadge: "7-Dag Gratis Proeftydperk",
-    trialNote: "Geen koste vir 7 dae — fakturering begin eers na jou gratis proeftydperk.",
+    trialNote: "Geen koste vir 7 dae - fakturering begin eers na jou gratis proeftydperk.",
   },
 };
 
