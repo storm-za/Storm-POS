@@ -2984,7 +2984,7 @@ export default function PosSystem() {
   };
 
   // PDF Export Function - Professional Invoice/Quote with Business Details
-  const generateInvoicePDF = (invoice: any) => {
+  const generateInvoicePDF = async (invoice: any) => {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -3362,10 +3362,22 @@ export default function PosSystem() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Download PDF
+    // Download / Share PDF (Android share sheet, web download fallback)
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
-    doc.save(fileName);
-    
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    let canShare = false;
+    try { canShare = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })); } catch (e) {}
+    if (canShare) {
+      try {
+        await navigator.share({ files: [pdfFile], title: fileName });
+      } catch (e: any) {
+        if (e.name !== 'AbortError') doc.save(fileName);
+      }
+    } else {
+      doc.save(fileName);
+    }
+
     toast({
       title: "PDF Generated",
       description: `${invoice.documentNumber} has been downloaded`,

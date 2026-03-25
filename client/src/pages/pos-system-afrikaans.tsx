@@ -721,7 +721,7 @@ export default function PosSystemAfrikaans() {
   }, [invoices, invoiceSearchQuery, invoiceStatusFilter, invoiceTypeFilter, invoiceDateFrom, invoiceDateTo, customers, invoiceSortOrder]);
 
   // PDF Export Funksie - Professionele Faktuur/Kwotasie met Besigheidsbesonderhede
-  const generateInvoicePDF = (invoice: any) => {
+  const generateInvoicePDF = async (invoice: any) => {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -1064,10 +1064,22 @@ export default function PosSystemAfrikaans() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Laai PDF af
+    // Laai / Deel PDF af (Android deel-skerm, web aflaai as terugval)
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
-    doc.save(fileName);
-    
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    let canShare = false;
+    try { canShare = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })); } catch (e) {}
+    if (canShare) {
+      try {
+        await navigator.share({ files: [pdfFile], title: fileName });
+      } catch (e: any) {
+        if (e.name !== 'AbortError') doc.save(fileName);
+      }
+    } else {
+      doc.save(fileName);
+    }
+
     toast({
       title: "PDF Gegenereer",
       description: `${invoice.documentNumber} is afgelaai`,
