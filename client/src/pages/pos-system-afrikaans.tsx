@@ -112,8 +112,8 @@ const saveInvoiceVisDef = (key: string, hidden: boolean) => {
   } catch {}
 };
 
-// Upload PDF to server and trigger download via URL (works in Tauri Android WebView)
-async function downloadViaTempUrl(doc: any, fileName: string): Promise<boolean> {
+// Upload PDF bytes to server; returns a full URL for sharing/downloading
+async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null> {
   try {
     const base64 = (doc.output('datauristring') as string).split(',')[1];
     const res = await fetch('/api/pos/pdf-temp', {
@@ -121,17 +121,17 @@ async function downloadViaTempUrl(doc: any, fileName: string): Promise<boolean> 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: base64, filename: fileName }),
     });
-    if (!res.ok) return false;
+    if (!res.ok) return null;
     const { token } = await res.json();
-    window.location.href = `/api/pos/pdf-temp/${token}`;
-    return true;
+    return `${window.location.origin}/api/pos/pdf-temp/${token}`;
   } catch {
-    return false;
+    return null;
   }
 }
 
-// Universal PDF share/download: tries Web Share API first, then server URL download, then jsPDF save
+// Universal PDF share/download for all environments including Tauri Android
 async function sharePDF(doc: any, fileName: string, title: string, text?: string): Promise<void> {
+  // 1. Try native file share (works on some Android devices natively)
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -142,8 +142,29 @@ async function sharePDF(doc: any, fileName: string, title: string, text?: string
       if (e.name === 'AbortError') return;
     }
   }
-  const ok = await downloadViaTempUrl(doc, fileName);
-  if (!ok) doc.save(fileName);
+  // 2. Upload to server and share URL via native share sheet (Tauri Android)
+  //    The user picks their browser from the share sheet -> browser downloads the PDF
+  const tempUrl = await getTempPdfUrl(doc, fileName);
+  if (tempUrl && navigator.share) {
+    try {
+      await navigator.share({ title, text: `Tik om PDF af te laai: ${fileName}`, url: tempUrl });
+      return;
+    } catch (e: any) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  // 3. Desktop fallback: trigger download via anchor click
+  if (tempUrl) {
+    const a = document.createElement('a');
+    a.href = tempUrl;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 200);
+    return;
+  }
+  doc.save(fileName);
 }
 
 export default function PosSystemAfrikaans() {
@@ -1395,25 +1416,42 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     
-    // Probeer Web Share API (werk op Android/selfoon)
+    const docType = invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie';
+    const shareTitle = `${docType} ${invoice.documentNumber}`;
+    const shareText = `Hier is die ${docType.toLowerCase()} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`;
+
+    // 1. Try sharing PDF file directly
     if (navigator.share) {
       try {
-        await navigator.share({
-          files: [file],
-          title: `${invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} ${invoice.documentNumber}`,
-          text: `Hier is die aangehegte ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}.`
-        });
+        await navigator.share({ files: [file], title: shareTitle, text: shareText });
         toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
         return;
       } catch (error: any) {
         if (error.name === 'AbortError') return;
       }
     }
-    // Terugval: laai PDF af (via bediener) en maak WhatsApp oop
-    const waMsg = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-    const downloaded = await downloadViaTempUrl(doc, fileName);
-    if (!downloaded) doc.save(fileName);
-    setTimeout(() => { window.open(`https://wa.me/?text=${waMsg}`, '_blank'); }, 800);
+    // 2. Upload to server; share URL via native share sheet (Tauri Android)
+    //    User picks WhatsApp from the share sheet and the link + message is sent
+    const tempUrl = await getTempPdfUrl(doc, fileName);
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, text: shareText, ...(tempUrl ? { url: tempUrl } : {}) });
+        toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
+        return;
+      } catch (error: any) {
+        if (error.name === 'AbortError') return;
+      }
+    }
+    // 3. Desktop fallback: download PDF + open WhatsApp Web
+    if (tempUrl) {
+      const a = document.createElement('a'); a.href = tempUrl; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => document.body.removeChild(a), 200);
+    } else {
+      doc.save(fileName);
+    }
+    const waMsg = encodeURIComponent(shareText + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+    setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
     toast({ title: "PDF Afgelaai", description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap" });
   };
 
