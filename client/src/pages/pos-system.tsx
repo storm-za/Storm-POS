@@ -7161,18 +7161,22 @@ export default function PosSystem() {
               ) : (
                 <div className="space-y-2">
                   {poItems.map((item: any, index: number) => (
-                    <div key={index} className="flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                      <div className="flex-1 min-w-0">
-                        <input type="text" value={item.name} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], name: e.target.value, productId: null }; setPOItems(u); }} className="w-full bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm font-medium text-white px-0 py-0.5" placeholder="Item name" />
-                        {item.sku && <span className="text-xs text-gray-500">{item.sku}</span>}
+                    <div key={index} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <input type="text" value={item.name} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], name: e.target.value, productId: null }; setPOItems(u); }} className="w-full bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm font-medium text-white px-0 py-0.5" placeholder="Item name" />
+                          {item.sku && <span className="text-xs text-gray-500">{item.sku}</span>}
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="shrink-0 h-7 w-7 p-0 text-gray-500 hover:text-red-400"><Trash2 className="w-4 h-4" /></Button>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <input type="number" min="1" value={item.quantity} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], quantity: Math.max(1, parseInt(e.target.value) || 1) }; setPOItems(u); }} className="w-14 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-center text-white px-0 py-0.5" />
-                        <span className="text-xs text-gray-500">x</span>
-                        <div className="flex items-center"><span className="text-xs text-gray-500 mr-0.5">R</span><input type="number" step="0.01" min="0" value={item.costPrice} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], costPrice: parseFloat(e.target.value) || 0 }; setPOItems(u); }} className="w-20 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-white px-0 py-0.5" /></div>
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-xs text-gray-500">Qty</span>
+                        <input type="number" min="1" value={item.quantity} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], quantity: Math.max(1, parseInt(e.target.value) || 1) }; setPOItems(u); }} className="w-12 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-center text-white px-0 py-0.5" />
+                        <span className="text-gray-500">x</span>
+                        <span className="text-xs text-gray-500">R</span>
+                        <input type="number" step="0.01" min="0" value={item.costPrice} onChange={(e) => { const u = [...poItems]; u[index] = { ...u[index], costPrice: parseFloat(e.target.value) || 0 }; setPOItems(u); }} className="w-20 bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none text-sm text-white px-0 py-0.5" />
+                        <span className="ml-auto font-medium text-sm text-white">= R{(item.costPrice * item.quantity).toFixed(2)}</span>
                       </div>
-                      <div className="text-right font-medium text-sm min-w-[70px] text-white">R{(item.costPrice * item.quantity).toFixed(2)}</div>
-                      <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="text-gray-500 hover:text-red-400"><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   ))}
                 </div>
@@ -8486,7 +8490,7 @@ export default function PosSystem() {
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingInvoice ? 'Edit' : 'Create'} {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
@@ -8660,20 +8664,33 @@ export default function PosSystem() {
                   const product = item.productId ? products.find(p => p.id === item.productId) : null;
                   const itemName = item.customName || product?.name || 'Unknown Product';
                   return (
-                    <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                      <div className="flex-1 min-w-0">
-                        <input
-                          type="text"
-                          value={itemName}
-                          onChange={(e) => {
-                            const updated = [...invoiceItems];
-                            updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
-                            setInvoiceItems(updated);
-                          }}
-                          className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
-                        />
+                    <div key={index} className="p-2 border rounded space-y-1.5">
+                      {/* Row 1: Product name + delete */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={itemName}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
+                          className="shrink-0 h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-1">
+                      {/* Row 2: Qty x Price = Total */}
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-xs text-gray-400">Qty</span>
                         <input
                           type="number"
                           min="1"
@@ -8683,37 +8700,24 @@ export default function PosSystem() {
                             updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
                             setInvoiceItems(updated);
                           }}
-                          className="w-14 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
+                          className="w-12 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
                         />
-                        <span className="text-xs text-gray-400">x</span>
-                        <div className="flex items-center">
-                          <span className="text-xs text-gray-400 mr-0.5">R</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={item.price}
-                            onChange={(e) => {
-                              const updated = [...invoiceItems];
-                              updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
-                              setInvoiceItems(updated);
-                            }}
-                            className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
-                          />
-                        </div>
+                        <span className="text-gray-400">x</span>
+                        <span className="text-xs text-gray-400">R</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
+                        />
+                        <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
-                      <div className="text-right font-medium text-sm min-w-[70px]">
-                        R{(item.price * item.quantity).toFixed(2)}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   );
                 })}

@@ -4977,13 +4977,19 @@ ${dateFilteredSales.map(sale =>
                   ) : (
                     <div className="space-y-2">
                       {poItems.map((item: any, index: number) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                          <Input value={item.name} onChange={(e) => { const updated = [...poItems]; updated[index].name = e.target.value; setPOItems(updated); }} placeholder="Item naam" className="flex-1 bg-gray-900 border-gray-700 text-white text-sm h-8" />
-                          <Input value={item.sku || ''} onChange={(e) => { const updated = [...poItems]; updated[index].sku = e.target.value; setPOItems(updated); }} placeholder="SKU" className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" />
-                          <Input type="number" min="1" value={item.quantity} onChange={(e) => { const updated = [...poItems]; updated[index].quantity = parseInt(e.target.value) || 1; setPOItems(updated); }} className="w-16 bg-gray-900 border-gray-700 text-white text-sm h-8 text-center" />
-                          <div className="flex items-center"><span className="text-gray-500 text-sm mr-1">R</span><Input type="number" step="0.01" value={item.costPrice} onChange={(e) => { const updated = [...poItems]; updated[index].costPrice = parseFloat(e.target.value) || 0; setPOItems(updated); }} className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" /></div>
-                          <span className="text-gray-300 text-sm w-24 text-right font-medium">R{(item.costPrice * item.quantity).toFixed(2)}</span>
-                          <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8 p-0"><Trash2 className="h-3 w-3" /></Button>
+                        <div key={index} className="p-2 bg-gray-800/50 rounded-lg border border-gray-700/50 space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <Input value={item.name} onChange={(e) => { const updated = [...poItems]; updated[index].name = e.target.value; setPOItems(updated); }} placeholder="Item naam" className="flex-1 bg-gray-900 border-gray-700 text-white text-sm h-8" />
+                            <Input value={item.sku || ''} onChange={(e) => { const updated = [...poItems]; updated[index].sku = e.target.value; setPOItems(updated); }} placeholder="SKU" className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" />
+                            <Button variant="ghost" size="sm" onClick={() => setPOItems(poItems.filter((_: any, i: number) => i !== index))} className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8 p-0 shrink-0"><Trash2 className="h-3 w-3" /></Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Hv</span>
+                            <Input type="number" min="1" value={item.quantity} onChange={(e) => { const updated = [...poItems]; updated[index].quantity = parseInt(e.target.value) || 1; setPOItems(updated); }} className="w-16 bg-gray-900 border-gray-700 text-white text-sm h-8 text-center" />
+                            <span className="text-gray-500 text-sm">x R</span>
+                            <Input type="number" step="0.01" value={item.costPrice} onChange={(e) => { const updated = [...poItems]; updated[index].costPrice = parseFloat(e.target.value) || 0; setPOItems(updated); }} className="w-20 bg-gray-900 border-gray-700 text-white text-sm h-8" />
+                            <span className="ml-auto text-gray-300 text-sm font-medium">= R{(item.costPrice * item.quantity).toFixed(2)}</span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -7829,7 +7835,7 @@ ${dateFilteredSales.map(sale =>
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
@@ -8003,20 +8009,33 @@ ${dateFilteredSales.map(sale =>
                   const product = item.productId ? products.find(p => p.id === item.productId) : null;
                   const itemName = item.customName || product?.name || 'Onbekende Produk';
                   return (
-                    <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                      <div className="flex-1 min-w-0">
-                        <input
-                          type="text"
-                          value={itemName}
-                          onChange={(e) => {
-                            const updated = [...invoiceItems];
-                            updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
-                            setInvoiceItems(updated);
-                          }}
-                          className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
-                        />
+                    <div key={index} className="p-2 border rounded space-y-1.5">
+                      {/* Ry 1: Produknaam + verwyder */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={itemName}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
+                          className="shrink-0 h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-1">
+                      {/* Ry 2: Hv x Prys = Totaal */}
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-xs text-gray-400">Hv</span>
                         <input
                           type="number"
                           min="1"
@@ -8026,37 +8045,24 @@ ${dateFilteredSales.map(sale =>
                             updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
                             setInvoiceItems(updated);
                           }}
-                          className="w-14 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
+                          className="w-12 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
                         />
-                        <span className="text-xs text-gray-400">x</span>
-                        <div className="flex items-center">
-                          <span className="text-xs text-gray-400 mr-0.5">R</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={item.price}
-                            onChange={(e) => {
-                              const updated = [...invoiceItems];
-                              updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
-                              setInvoiceItems(updated);
-                            }}
-                            className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
-                          />
-                        </div>
+                        <span className="text-gray-400">x</span>
+                        <span className="text-xs text-gray-400">R</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
+                        />
+                        <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
-                      <div className="text-right font-medium text-sm min-w-[70px]">
-                        R{(item.price * item.quantity).toFixed(2)}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setInvoiceItems(invoiceItems.filter((_, i) => i !== index));
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   );
                 })}
