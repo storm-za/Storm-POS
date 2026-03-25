@@ -1064,13 +1064,11 @@ export default function PosSystemAfrikaans() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Laai / Deel PDF af (Android deel-skerm, web aflaai as terugval)
+    // Laai / Deel PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const pdfBlob = doc.output('blob');
     const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    let canShare = false;
-    try { canShare = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })); } catch (e) {}
-    if (canShare) {
+    if (navigator.share) {
       try {
         await navigator.share({ files: [pdfFile], title: fileName });
       } catch (e: any) {
@@ -1373,40 +1371,25 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     
-    // Probeer eers Web Share API (werk op selfoon)
-    let canShareFiles = false;
-    try { canShareFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
-    if (canShareFiles) {
+    // Probeer Web Share API (werk op Android/selfoon)
+    if (navigator.share) {
       try {
         await navigator.share({
           files: [file],
           title: `${invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'} ${invoice.documentNumber}`,
           text: `Hier is die aangehegte ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}.`
         });
-        toast({
-          title: "Suksesvol Gedeel",
-          description: `${invoice.documentNumber} is gedeel`,
-        });
+        toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
+        return;
       } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          doc.save(fileName);
-          const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-          window.location.href = `https://wa.me/?text=${message}`;
-          toast({
-            title: "PDF Afgelaai",
-            description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap",
-          });
-        }
+        if (error.name === 'AbortError') return;
       }
-    } else {
-      doc.save(fileName);
-      const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-      window.location.href = `https://wa.me/?text=${message}`;
-      toast({
-        title: "PDF Afgelaai",
-        description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap",
-      });
     }
+    // Terugval: laai PDF af en maak WhatsApp oop
+    doc.save(fileName);
+    const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+    window.location.href = `https://wa.me/?text=${message}`;
+    toast({ title: "PDF Afgelaai", description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap" });
   };
 
   // Logout function
@@ -3199,9 +3182,22 @@ ${dateFilteredSales.map(sale =>
 
   const stormFee = monthlyRevenue * 0.005;
 
-  const handlePrintSaleReceiptAfr = () => {
+  const handlePrintSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
-    generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled);
+    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) return;
+    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
+    if (navigator.share) {
+      try {
+        const blob = doc.output('blob');
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        await navigator.share({ files: [file], title: 'Kwitansie' });
+        return;
+      } catch (e: any) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+    doc.save(fileName);
   };
 
   const handleShareSaleReceiptAfr = async () => {
@@ -3212,18 +3208,16 @@ ${dateFilteredSales.map(sale =>
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    let canShareReceipt = false;
-    try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
-    if (canShareReceipt) {
+    if (navigator.share) {
       try {
         await navigator.share({ files: [file], title: `Kwitansie - R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
+        return;
       } catch (e: any) {
-        if (e.name !== 'AbortError') doc.save(fileName);
+        if (e.name === 'AbortError') return;
       }
-    } else {
-      doc.save(fileName);
-      toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om via e-pos of boodskappe te deel" });
     }
+    doc.save(fileName);
+    toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om via e-pos of boodskappe te deel" });
   };
 
   return (

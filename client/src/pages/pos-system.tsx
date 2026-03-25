@@ -3362,13 +3362,11 @@ export default function PosSystem() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Download / Share PDF (Android share sheet, web download fallback)
+    // Download / Share PDF
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const pdfBlob = doc.output('blob');
     const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    let canShare = false;
-    try { canShare = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })); } catch (e) {}
-    if (canShare) {
+    if (navigator.share) {
       try {
         await navigator.share({ files: [pdfFile], title: fileName });
       } catch (e: any) {
@@ -3668,47 +3666,43 @@ export default function PosSystem() {
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     
-    // Try Web Share API first (works on mobile)
-    let canShareFiles = false;
-    try { canShareFiles = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
-    if (canShareFiles) {
+    // Try Web Share API (works on Android/mobile)
+    if (navigator.share) {
       try {
         await navigator.share({
           files: [file],
           title: `${invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'} ${invoice.documentNumber}`,
           text: `Please find attached ${invoice.documentType} ${invoice.documentNumber} from ${companyName}.`
         });
-        toast({
-          title: "Shared Successfully",
-          description: `${invoice.documentNumber} has been shared`,
-        });
+        toast({ title: "Shared Successfully", description: `${invoice.documentNumber} has been shared` });
+        return;
       } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          // Fallback: Download PDF and open WhatsApp with message
-          doc.save(fileName);
-          const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-          window.location.href = `https://wa.me/?text=${message}`;
-          toast({
-            title: "PDF Downloaded",
-            description: "Attach the downloaded PDF to your WhatsApp message",
-          });
-        }
+        if (error.name === 'AbortError') return;
       }
-    } else {
-      // Fallback for desktop: Download PDF and open WhatsApp Web
-      doc.save(fileName);
-      const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-      window.location.href = `https://wa.me/?text=${message}`;
-      toast({
-        title: "PDF Downloaded",
-        description: "Attach the downloaded PDF to your WhatsApp message",
-      });
     }
+    // Fallback: Download PDF and open WhatsApp
+    doc.save(fileName);
+    const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+    window.location.href = `https://wa.me/?text=${message}`;
+    toast({ title: "PDF Downloaded", description: "Attach the downloaded PDF to your WhatsApp message" });
   };
 
-  const handlePrintSaleReceipt = () => {
+  const handlePrintSaleReceipt = async () => {
     if (!saleCompleteData) return;
-    generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled);
+    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) return;
+    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
+    if (navigator.share) {
+      try {
+        const blob = doc.output('blob');
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        await navigator.share({ files: [file], title: 'Receipt' });
+        return;
+      } catch (e: any) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+    doc.save(fileName);
   };
 
   const handleShareSaleReceipt = async () => {
@@ -3719,18 +3713,16 @@ export default function PosSystem() {
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    let canShareReceipt = false;
-    try { canShareReceipt = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) {}
-    if (canShareReceipt) {
+    if (navigator.share) {
       try {
         await navigator.share({ files: [file], title: `Receipt - R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
+        return;
       } catch (e: any) {
-        if (e.name !== 'AbortError') doc.save(fileName);
+        if (e.name === 'AbortError') return;
       }
-    } else {
-      doc.save(fileName);
-      toast({ title: "Receipt saved", description: "Attach the PDF to share via email or messaging" });
     }
+    doc.save(fileName);
+    toast({ title: "Receipt saved", description: "Attach the PDF to share via email or messaging" });
   };
 
   return (
