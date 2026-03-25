@@ -69,7 +69,37 @@ async function checkAndPerformMonthlyReset() {
 // Set up monthly reset interval - check every hour to catch the 1st day of month
 setInterval(checkAndPerformMonthlyReset, 60 * 60 * 1000);
 
+// In-memory temporary PDF storage for Android download workaround
+const pdfTempStore = new Map<string, { data: Buffer; filename: string; expires: number }>();
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of pdfTempStore) if (v.expires < now) pdfTempStore.delete(k);
+}, 5 * 60 * 1000);
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Temporary PDF storage endpoint (used by Android/Tauri to trigger native download)
+  app.post("/api/pos/pdf-temp", (req, res) => {
+    try {
+      const { data, filename } = req.body as { data: string; filename: string };
+      if (!data || !filename) return res.status(400).json({ error: "Missing data or filename" });
+      const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      const buffer = Buffer.from(data, "base64");
+      pdfTempStore.set(token, { data: buffer, filename, expires: Date.now() + 10 * 60 * 1000 });
+      res.json({ token });
+    } catch (e) {
+      res.status(500).json({ error: "Failed to store PDF" });
+    }
+  });
+
+  app.get("/api/pos/pdf-temp/:token", (req, res) => {
+    const entry = pdfTempStore.get(req.params.token);
+    if (!entry || entry.expires < Date.now()) return res.status(404).json({ error: "PDF not found or expired" });
+    pdfTempStore.delete(req.params.token);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${entry.filename}"`);
+    res.send(entry.data);
+  });
+
   // Contact form submission endpoint
   app.post("/api/contact", async (req, res) => {
     try {

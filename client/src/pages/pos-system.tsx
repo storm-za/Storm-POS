@@ -102,6 +102,40 @@ const saveInvoiceVisDef = (key: string, hidden: boolean) => {
   } catch {}
 };
 
+// Upload PDF to server and trigger download via URL (works in Tauri Android WebView)
+async function downloadViaTempUrl(doc: any, fileName: string): Promise<boolean> {
+  try {
+    const base64 = (doc.output('datauristring') as string).split(',')[1];
+    const res = await fetch('/api/pos/pdf-temp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64, filename: fileName }),
+    });
+    if (!res.ok) return false;
+    const { token } = await res.json();
+    window.location.href = `/api/pos/pdf-temp/${token}`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Universal PDF share/download: tries Web Share API first, then server URL download, then jsPDF save
+async function sharePDF(doc: any, fileName: string, title: string, text?: string): Promise<void> {
+  if (navigator.share) {
+    try {
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      await navigator.share({ files: [file], title, ...(text ? { text } : {}) });
+      return;
+    } catch (e: any) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  const ok = await downloadViaTempUrl(doc, fileName);
+  if (!ok) doc.save(fileName);
+}
+
 export default function PosSystem() {
   const [currentSale, setCurrentSale] = useState<SaleItem[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
@@ -3364,17 +3398,7 @@ export default function PosSystem() {
     
     // Download / Share PDF
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
-    const pdfBlob = doc.output('blob');
-    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [pdfFile], title: fileName });
-      } catch (e: any) {
-        if (e.name !== 'AbortError') doc.save(fileName);
-      }
-    } else {
-      doc.save(fileName);
-    }
+    await sharePDF(doc, fileName, fileName);
 
     toast({
       title: "PDF Generated",
@@ -3680,10 +3704,11 @@ export default function PosSystem() {
         if (error.name === 'AbortError') return;
       }
     }
-    // Fallback: Download PDF and open WhatsApp
-    doc.save(fileName);
-    const message = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-    window.location.href = `https://wa.me/?text=${message}`;
+    // Fallback: Download PDF (via server) and open WhatsApp
+    const waMsg = encodeURIComponent(`Hi! Please find the ${invoice.documentType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+    const downloaded = await downloadViaTempUrl(doc, fileName);
+    if (!downloaded) doc.save(fileName);
+    setTimeout(() => { window.open(`https://wa.me/?text=${waMsg}`, '_blank'); }, 800);
     toast({ title: "PDF Downloaded", description: "Attach the downloaded PDF to your WhatsApp message" });
   };
 
@@ -3692,37 +3717,16 @@ export default function PosSystem() {
     const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) return;
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
-    if (navigator.share) {
-      try {
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
-        await navigator.share({ files: [file], title: 'Receipt' });
-        return;
-      } catch (e: any) {
-        if (e.name === 'AbortError') return;
-      }
-    }
-    doc.save(fileName);
+    await sharePDF(doc, fileName, 'Receipt');
   };
 
   const handleShareSaleReceipt = async () => {
     if (!saleCompleteData) return;
     const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) return;
-    const pdfBlob = doc.output('blob');
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
-    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [file], title: `Receipt - R${saleCompleteData.total}`, text: `Sales receipt from ${companyName}` });
-        return;
-      } catch (e: any) {
-        if (e.name === 'AbortError') return;
-      }
-    }
-    doc.save(fileName);
-    toast({ title: "Receipt saved", description: "Attach the PDF to share via email or messaging" });
+    await sharePDF(doc, fileName, `Receipt - R${saleCompleteData.total}`, `Sales receipt from ${companyName}`);
   };
 
   return (

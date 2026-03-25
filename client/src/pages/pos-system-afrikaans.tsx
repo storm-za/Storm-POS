@@ -112,6 +112,40 @@ const saveInvoiceVisDef = (key: string, hidden: boolean) => {
   } catch {}
 };
 
+// Upload PDF to server and trigger download via URL (works in Tauri Android WebView)
+async function downloadViaTempUrl(doc: any, fileName: string): Promise<boolean> {
+  try {
+    const base64 = (doc.output('datauristring') as string).split(',')[1];
+    const res = await fetch('/api/pos/pdf-temp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64, filename: fileName }),
+    });
+    if (!res.ok) return false;
+    const { token } = await res.json();
+    window.location.href = `/api/pos/pdf-temp/${token}`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Universal PDF share/download: tries Web Share API first, then server URL download, then jsPDF save
+async function sharePDF(doc: any, fileName: string, title: string, text?: string): Promise<void> {
+  if (navigator.share) {
+    try {
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      await navigator.share({ files: [file], title, ...(text ? { text } : {}) });
+      return;
+    } catch (e: any) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  const ok = await downloadViaTempUrl(doc, fileName);
+  if (!ok) doc.save(fileName);
+}
+
 export default function PosSystemAfrikaans() {
   const [currentSale, setCurrentSale] = useState<SaleItem[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
@@ -1066,17 +1100,7 @@ export default function PosSystemAfrikaans() {
     
     // Laai / Deel PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
-    const pdfBlob = doc.output('blob');
-    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [pdfFile], title: fileName });
-      } catch (e: any) {
-        if (e.name !== 'AbortError') doc.save(fileName);
-      }
-    } else {
-      doc.save(fileName);
-    }
+    await sharePDF(doc, fileName, fileName);
 
     toast({
       title: "PDF Gegenereer",
@@ -1385,10 +1409,11 @@ export default function PosSystemAfrikaans() {
         if (error.name === 'AbortError') return;
       }
     }
-    // Terugval: laai PDF af en maak WhatsApp oop
-    doc.save(fileName);
-    const message = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
-    window.location.href = `https://wa.me/?text=${message}`;
+    // Terugval: laai PDF af (via bediener) en maak WhatsApp oop
+    const waMsg = encodeURIComponent(`Hi! Hier is die ${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`);
+    const downloaded = await downloadViaTempUrl(doc, fileName);
+    if (!downloaded) doc.save(fileName);
+    setTimeout(() => { window.open(`https://wa.me/?text=${waMsg}`, '_blank'); }, 800);
     toast({ title: "PDF Afgelaai", description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap" });
   };
 
@@ -3187,37 +3212,16 @@ ${dateFilteredSales.map(sale =>
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) return;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    if (navigator.share) {
-      try {
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
-        await navigator.share({ files: [file], title: 'Kwitansie' });
-        return;
-      } catch (e: any) {
-        if (e.name === 'AbortError') return;
-      }
-    }
-    doc.save(fileName);
+    await sharePDF(doc, fileName, 'Kwitansie');
   };
 
   const handleShareSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) return;
-    const pdfBlob = doc.output('blob');
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
     const companyName = currentUser?.companyName || 'Storm POS';
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [file], title: `Kwitansie - R${saleCompleteData.sale.total}`, text: `Verkoopkwitansie van ${companyName}` });
-        return;
-      } catch (e: any) {
-        if (e.name === 'AbortError') return;
-      }
-    }
-    doc.save(fileName);
-    toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om via e-pos of boodskappe te deel" });
+    await sharePDF(doc, fileName, `Kwitansie - R${saleCompleteData.sale.total}`, `Verkoopkwitansie van ${companyName}`);
   };
 
   return (
