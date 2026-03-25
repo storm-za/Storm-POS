@@ -9212,7 +9212,7 @@ ${dateFilteredSales.map(sale =>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Sjabloonnaam</Label>
+              <Label>Naam</Label>
               <Input
                 value={savePaymentName}
                 onChange={(e) => setSavePaymentName(e.target.value)}
@@ -9247,7 +9247,7 @@ ${dateFilteredSales.map(sale =>
               disabled={savePaymentDetailsMutation.isPending || !savePaymentName.trim()}
               data-testid="button-confirm-save-payment-af"
             >
-              {savePaymentDetailsMutation.isPending ? 'Stoor...' : 'Stoor Sjabloon'}
+              {savePaymentDetailsMutation.isPending ? 'Stoor...' : 'Stoor Besonderhede'}
             </Button>
           </div>
         </DialogContent>
