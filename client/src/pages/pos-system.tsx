@@ -141,7 +141,8 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Share PDF via native Android share sheet (WhatsApp, Gmail, Telegram, etc.) or desktop fallback
+// Share PDF via native Android share sheet (WhatsApp, Gmail, Telegram, etc.)
+// Desktop fallback: download PDF + open WhatsApp Web text-only
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   const tempUrl = await getTempPdfUrl(doc, fileName);
   if (navigator.share) {
@@ -152,6 +153,7 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
+  // Desktop fallback: download PDF then open WhatsApp Web text-only
   if (tempUrl) {
     const a = document.createElement('a');
     a.href = tempUrl; a.download = fileName;
@@ -160,6 +162,8 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
   } else {
     doc.save(fileName);
   }
+  const waMsg = encodeURIComponent(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
   return 'fallback';
 }
 

@@ -151,7 +151,8 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Deel PDF via Android deel-skerm (WhatsApp, Gmail, Telegram, ens.) of rekenaar-terugval
+// Deel PDF via Android deel-skerm (WhatsApp, Gmail, Telegram, ens.)
+// Rekenaar-terugval: laai PDF af + maak WhatsApp Web oop (teks-slegs)
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   const tempUrl = await getTempPdfUrl(doc, fileName);
   if (navigator.share) {
@@ -162,6 +163,7 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
+  // Rekenaar-terugval: laai PDF af, maak dan WhatsApp Web oop (teks-slegs)
   if (tempUrl) {
     const a = document.createElement('a');
     a.href = tempUrl; a.download = fileName;
@@ -170,6 +172,8 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
   } else {
     doc.save(fileName);
   }
+  const waMsg = encodeURIComponent(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
   return 'fallback';
 }
 
