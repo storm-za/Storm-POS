@@ -128,8 +128,29 @@ async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null>
   }
 }
 
-// Laai PDF af / Maak oop - wys "Maak oop met" op Android (PDF-leser, druk, ens.)
+// Speur Tauri op Android (nie 'n blaaier of rekenaar nie)
+const isTauriAndroid = (): boolean =>
+  typeof window !== 'undefined' &&
+  '__TAURI_INTERNALS__' in window &&
+  navigator.maxTouchPoints > 0;
+
+// Laai PDF af / Maak oop
+// Tauri Android: laai op na bediener en maak oop in Chrome (Chrome laai PDF natively af)
+// Blaaier/rekenaar: navigator.share met leer, dan anker-aflaai-terugval
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
+  if (isTauriAndroid()) {
+    const tempUrl = await getTempPdfUrl(doc, fileName);
+    if (tempUrl) {
+      try {
+        const { openUrl } = await import('@tauri-apps/plugin-opener');
+        await openUrl(tempUrl);
+        return;
+      } catch (e) {
+        console.error('opener.openUrl misluk:', e);
+      }
+    }
+    return;
+  }
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -151,9 +172,22 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Deel PDF via Android deel-skerm (WhatsApp, Gmail, Telegram, ens.)
-// Rekenaar-terugval: laai PDF af + maak WhatsApp Web oop (teks-slegs)
+// Deel PDF via deel-skerm
+// Tauri Android: gebruik tauri-plugin-sharekit vir Android Deel-skerm (WhatsApp, Gmail, ens.)
+// Blaaier/rekenaar: navigator.share of WhatsApp Web-terugval
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
+  if (isTauriAndroid()) {
+    const tempUrl = await getTempPdfUrl(doc, fileName);
+    try {
+      const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
+      await shareText(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+      return 'shared';
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').toLowerCase();
+      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      return 'fallback';
+    }
+  }
   const tempUrl = await getTempPdfUrl(doc, fileName);
   if (navigator.share) {
     try {

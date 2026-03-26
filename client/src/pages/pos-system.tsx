@@ -118,8 +118,29 @@ async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null>
   }
 }
 
-// Download/Open PDF - opens "Open with" dialog on Android (PDF reader, print, etc.)
+// Detect Tauri running on Android (not a browser or desktop)
+const isTauriAndroid = (): boolean =>
+  typeof window !== 'undefined' &&
+  '__TAURI_INTERNALS__' in window &&
+  navigator.maxTouchPoints > 0;
+
+// Download/Open PDF
+// Tauri Android: uploads to server then opens URL in Chrome (Chrome downloads/views PDF natively)
+// Browser/desktop: navigator.share with file, then anchor download fallback
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
+  if (isTauriAndroid()) {
+    const tempUrl = await getTempPdfUrl(doc, fileName);
+    if (tempUrl) {
+      try {
+        const { openUrl } = await import('@tauri-apps/plugin-opener');
+        await openUrl(tempUrl);
+        return;
+      } catch (e) {
+        console.error('opener.openUrl failed:', e);
+      }
+    }
+    return;
+  }
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -141,9 +162,22 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Share PDF via native Android share sheet (WhatsApp, Gmail, Telegram, etc.)
-// Desktop fallback: download PDF + open WhatsApp Web text-only
+// Share PDF via native share sheet
+// Tauri Android: uses tauri-plugin-sharekit to open Android Sharesheet (WhatsApp, Gmail, etc.)
+// Browser/desktop: navigator.share or WhatsApp Web fallback
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
+  if (isTauriAndroid()) {
+    const tempUrl = await getTempPdfUrl(doc, fileName);
+    try {
+      const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
+      await shareText(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+      return 'shared';
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').toLowerCase();
+      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      return 'fallback';
+    }
+  }
   const tempUrl = await getTempPdfUrl(doc, fileName);
   if (navigator.share) {
     try {
