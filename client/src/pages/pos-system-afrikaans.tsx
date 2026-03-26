@@ -25,7 +25,6 @@ import {
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
   AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2
 } from "lucide-react";
-import { SiWhatsapp } from "react-icons/si";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -129,42 +128,49 @@ async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null>
   }
 }
 
-// Universal PDF share/download for all environments including Tauri Android
-async function sharePDF(doc: any, fileName: string, title: string, text?: string): Promise<void> {
-  // 1. Try native file share (works on some Android devices natively)
+// Laai PDF af / Maak oop - wys "Maak oop met" op Android (PDF-leser, druk, ens.)
+async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
       const file = new File([blob], fileName, { type: 'application/pdf' });
-      await navigator.share({ files: [file], title, ...(text ? { text } : {}) });
+      await navigator.share({ files: [file], title: fileName });
       return;
     } catch (e: any) {
       if (e.name === 'AbortError') return;
     }
   }
-  // 2. Upload to server and share URL via native share sheet (Tauri Android)
-  //    The user picks their browser from the share sheet -> browser downloads the PDF
   const tempUrl = await getTempPdfUrl(doc, fileName);
-  if (tempUrl && navigator.share) {
-    try {
-      await navigator.share({ title, text: `Tik om PDF af te laai: ${fileName}`, url: tempUrl });
-      return;
-    } catch (e: any) {
-      if (e.name === 'AbortError') return;
-    }
-  }
-  // 3. Desktop fallback: trigger download via anchor click
   if (tempUrl) {
     const a = document.createElement('a');
-    a.href = tempUrl;
-    a.download = fileName;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
+    a.href = tempUrl; a.download = fileName;
+    a.style.display = 'none'; document.body.appendChild(a); a.click();
     setTimeout(() => document.body.removeChild(a), 200);
     return;
   }
   doc.save(fileName);
+}
+
+// Deel PDF via Android deel-skerm (WhatsApp, Gmail, Telegram, ens.) of rekenaar-terugval
+async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
+  const tempUrl = await getTempPdfUrl(doc, fileName);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: fileName, text: message, ...(tempUrl ? { url: tempUrl } : {}) });
+      return 'shared';
+    } catch (e: any) {
+      if (e.name === 'AbortError') return 'cancelled';
+    }
+  }
+  if (tempUrl) {
+    const a = document.createElement('a');
+    a.href = tempUrl; a.download = fileName;
+    a.style.display = 'none'; document.body.appendChild(a); a.click();
+    setTimeout(() => document.body.removeChild(a), 200);
+  } else {
+    doc.save(fileName);
+  }
+  return 'fallback';
 }
 
 export default function PosSystemAfrikaans() {
@@ -1119,9 +1125,8 @@ export default function PosSystemAfrikaans() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Laai / Deel PDF af
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
-    await sharePDF(doc, fileName, fileName);
+    await downloadOpenPDF(doc, fileName);
 
     toast({
       title: "PDF Gegenereer",
@@ -1137,8 +1142,8 @@ export default function PosSystemAfrikaans() {
   }
   };
 
-  // Deel Faktuur via WhatsApp
-  const shareInvoiceWhatsApp = async (invoice: any) => {
+  // Deel Faktuur via deel-skerm
+  const shareInvoice = async (invoice: any) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -1411,48 +1416,15 @@ export default function PosSystemAfrikaans() {
     const stormTextX = (pageWidth - stormTextWidth) / 2;
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
-    // Genereer PDF blob vir deel
-    const pdfBlob = doc.output('blob');
-    const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
-    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    
     const docType = invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie';
-    const shareTitle = `${docType} ${invoice.documentNumber}`;
-    const shareText = `Hier is die ${docType.toLowerCase()} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`;
-
-    // 1. Try sharing PDF file directly
-    if (navigator.share) {
-      try {
-        await navigator.share({ files: [file], title: shareTitle, text: shareText });
-        toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
-        return;
-      } catch (error: any) {
-        if (error.name === 'AbortError') return;
-      }
+    const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
+    const message = `${docType} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`;
+    const result = await sharePDFViaSheet(doc, fileName, message);
+    if (result === 'shared') {
+      toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
+    } else if (result === 'fallback') {
+      toast({ title: "PDF Gestoor", description: `${invoice.documentNumber} is gestoor` });
     }
-    // 2. Upload to server; share URL via native share sheet (Tauri Android)
-    //    User picks WhatsApp from the share sheet and the link + message is sent
-    const tempUrl = await getTempPdfUrl(doc, fileName);
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: shareTitle, text: shareText, ...(tempUrl ? { url: tempUrl } : {}) });
-        toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
-        return;
-      } catch (error: any) {
-        if (error.name === 'AbortError') return;
-      }
-    }
-    // 3. Desktop fallback: download PDF + open WhatsApp Web
-    if (tempUrl) {
-      const a = document.createElement('a'); a.href = tempUrl; a.download = fileName;
-      a.style.display = 'none'; document.body.appendChild(a); a.click();
-      setTimeout(() => document.body.removeChild(a), 200);
-    } else {
-      doc.save(fileName);
-    }
-    const waMsg = encodeURIComponent(shareText + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
-    setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
-    toast({ title: "PDF Afgelaai", description: "Heg die afgelaaide PDF aan jou WhatsApp-boodskap" });
   };
 
   // Logout function
@@ -3245,12 +3217,11 @@ ${dateFilteredSales.map(sale =>
 
   const stormFee = monthlyRevenue * 0.005;
 
-  const handlePrintSaleReceiptAfr = async () => {
+  const handleDownloadSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) return;
-    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    await sharePDF(doc, fileName, 'Kwitansie');
+    await downloadOpenPDF(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`);
   };
 
   const handleShareSaleReceiptAfr = async () => {
@@ -3259,7 +3230,8 @@ ${dateFilteredSales.map(sale =>
     if (!doc) return;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     const companyName = currentUser?.companyName || 'Storm POS';
-    await sharePDF(doc, fileName, `Kwitansie - R${saleCompleteData.sale.total}`, `Verkoopkwitansie van ${companyName}`);
+    const result = await sharePDFViaSheet(doc, fileName, `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`);
+    if (result === 'fallback') toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om te deel" });
   };
 
   return (
@@ -3325,9 +3297,9 @@ ${dateFilteredSales.map(sale =>
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handlePrintSaleReceiptAfr} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
-                  <Printer className="w-4 h-4 mr-2 shrink-0" />
-                  Druk
+                <Button onClick={handleDownloadSaleReceiptAfr} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
+                  <Download className="w-4 h-4 mr-2 shrink-0" />
+                  Aflaai
                 </Button>
                 <Button onClick={handleShareSaleReceiptAfr} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all">
                   <Share2 className="w-4 h-4 mr-2 shrink-0" />
@@ -8997,12 +8969,12 @@ ${dateFilteredSales.map(sale =>
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-green-600 hover:bg-green-700 text-xs col-span-2"
-                    data-testid="button-share-whatsapp"
-                    onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2"
+                    data-testid="button-share-invoice"
+                    onClick={() => shareInvoice(selectedInvoice)}
                   >
-                    <SiWhatsapp className="w-3 h-3 mr-1" />
-                    Deel via WhatsApp
+                    <Share2 className="w-3 h-3 mr-1" />
+                    Deel
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9101,12 +9073,12 @@ ${dateFilteredSales.map(sale =>
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-green-600 hover:bg-green-700"
-                      data-testid="button-share-whatsapp-desktop"
-                      onClick={() => shareInvoiceWhatsApp(selectedInvoice)}
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      data-testid="button-share-invoice-desktop"
+                      onClick={() => shareInvoice(selectedInvoice)}
                     >
-                      <SiWhatsapp className="w-4 h-4 mr-2" />
-                      WhatsApp
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Deel
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
