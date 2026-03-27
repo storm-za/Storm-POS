@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, EyeOff, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2
+  AlertTriangle, XCircle, Tag, Hash, Lock, Folder, FolderPlus, Grid3X3, LayoutList, ChevronLeft, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2, Loader2
 } from "lucide-react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -266,6 +266,9 @@ export default function PosSystem() {
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { total: string; items: any[]; customerName?: string; notes?: string; paymentType?: string; staffName?: string; tipEnabled: boolean; saleId: number; }>(null);
+  const [receiptPdfUrl, setReceiptPdfUrl] = useState<string | null>(null);
+  const [receiptPdfBusy, setReceiptPdfBusy] = useState(false);
+  const [invoicePdfBusy, setInvoicePdfBusy] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [editingOpenAccount, setEditingOpenAccount] = useState<PosOpenAccount | null>(null);
   const [editOpenAccountName, setEditOpenAccountName] = useState("");
@@ -3084,6 +3087,7 @@ export default function PosSystem() {
 
   // PDF Export Function - Professional Invoice/Quote with Business Details
   const generateInvoicePDF = async (invoice: any) => {
+  setInvoicePdfBusy(true);
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -3475,10 +3479,13 @@ export default function PosSystem() {
       description: "Could not generate PDF. Please try again.",
       variant: "destructive"
     });
+  } finally {
+    setInvoicePdfBusy(false);
   }
   };
 
   const shareInvoice = async (invoice: any) => {
+    setInvoicePdfBusy(true);
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -3752,6 +3759,7 @@ export default function PosSystem() {
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const message = `${docType} ${invoice.documentNumber} from ${companyName}. Total: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`;
     const result = await sharePDFViaSheet(doc, fileName, message);
+    setInvoicePdfBusy(false);
     if (result === 'shared') {
       toast({ title: "Shared Successfully", description: `${invoice.documentNumber} has been shared` });
     } else if (result === 'fallback') {
@@ -3759,21 +3767,51 @@ export default function PosSystem() {
     }
   };
 
+  // Pre-generate the receipt PDF URL as soon as the sale dialog opens
+  useEffect(() => {
+    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBusy(false); return; }
+    setReceiptPdfBusy(true);
+    setReceiptPdfUrl(null);
+    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) { setReceiptPdfBusy(false); return; }
+    getTempPdfUrl(doc, `receipt-${saleCompleteData.saleId}.pdf`).then(url => {
+      setReceiptPdfUrl(url);
+      setReceiptPdfBusy(false);
+    }).catch(() => setReceiptPdfBusy(false));
+  }, [saleCompleteData]);
+
   const handleDownloadSaleReceipt = async () => {
     if (!saleCompleteData) return;
+    if (receiptPdfUrl) {
+      if (isTauriAndroid()) {
+        try { const { openUrl } = await import('@tauri-apps/plugin-opener'); await openUrl(receiptPdfUrl); return; } catch (e) { console.error(e); }
+      } else {
+        const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = `receipt-${saleCompleteData.saleId}.pdf`;
+        a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
+      }
+    }
     const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-    if (!doc) return;
-    await downloadOpenPDF(doc, `receipt-${saleCompleteData.saleId}.pdf`);
+    if (doc) await downloadOpenPDF(doc, `receipt-${saleCompleteData.saleId}.pdf`);
   };
 
   const handleShareSaleReceipt = async () => {
     if (!saleCompleteData) return;
-    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-    if (!doc) return;
-    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
     const companyName = currentUser?.companyName || 'Storm POS';
-    const result = await sharePDFViaSheet(doc, fileName, `Sales receipt from ${companyName} - R${saleCompleteData.total}`);
-    if (result === 'fallback') toast({ title: "Receipt saved", description: "Attach the PDF to share" });
+    const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
+    if (isTauriAndroid()) {
+      try {
+        const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
+        await shareText(message + (receiptPdfUrl ? `\n\nPDF: ${receiptPdfUrl}` : '')); return;
+      } catch (e) { console.error(e); }
+    }
+    if (navigator.share && receiptPdfUrl) {
+      try { await navigator.share({ title: `receipt-${saleCompleteData.saleId}.pdf`, text: message, url: receiptPdfUrl }); return; } catch (e: any) { if (e.name === 'AbortError') return; }
+    }
+    if (receiptPdfUrl) {
+      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message + ` PDF: ${receiptPdfUrl}`)}`, '_blank'); return;
+    }
+    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+    if (doc) { const result = await sharePDFViaSheet(doc, `receipt-${saleCompleteData.saleId}.pdf`, message); if (result === 'fallback') toast({ title: "Receipt saved", description: "Attach the PDF to share" }); }
   };
 
   return (
@@ -3837,13 +3875,13 @@ export default function PosSystem() {
 
               {/* Action buttons */}
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceipt} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
-                  <Download className="w-4 h-4 mr-2 shrink-0" />
-                  Download
+                <Button onClick={handleDownloadSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all disabled:opacity-60">
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Preparing...' : 'Download'}
                 </Button>
-                <Button onClick={handleShareSaleReceipt} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all">
-                  <Share2 className="w-4 h-4 mr-2 shrink-0" />
-                  Share
+                <Button onClick={handleShareSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all disabled:opacity-60">
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Preparing...' : 'Share'}
                 </Button>
               </motion.div>
             </div>
@@ -9643,21 +9681,23 @@ export default function PosSystem() {
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs disabled:opacity-60"
                     data-testid="button-export-pdf"
+                    disabled={invoicePdfBusy}
                     onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
-                    <Download className="w-3 h-3 mr-1" />
-                    PDF
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? '...' : 'PDF'}
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2 disabled:opacity-60"
                     data-testid="button-share-invoice"
+                    disabled={invoicePdfBusy}
                     onClick={() => shareInvoice(selectedInvoice)}
                   >
-                    <Share2 className="w-3 h-3 mr-1" />
-                    Share
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? 'Working...' : 'Share'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9747,21 +9787,23 @@ export default function PosSystem() {
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
                       data-testid="button-export-pdf-desktop"
+                      disabled={invoicePdfBusy}
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      <Download className="w-4 h-4 mr-2" />
-                      Export PDF
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Generating...' : 'Export PDF'}
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
                       data-testid="button-share-invoice-desktop"
+                      disabled={invoicePdfBusy}
                       onClick={() => shareInvoice(selectedInvoice)}
                     >
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Working...' : 'Share'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Close

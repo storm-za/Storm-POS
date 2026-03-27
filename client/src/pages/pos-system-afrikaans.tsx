@@ -23,7 +23,7 @@ import {
   CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
   Calendar, TrendingUp, FileText, Clock, Eye, EyeOff, Download, User, UserPlus, Settings, X, Printer,
   ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2
+  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2, Loader2
 } from "lucide-react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -286,6 +286,9 @@ export default function PosSystemAfrikaans() {
   const [selectedItemsForPrint, setSelectedItemsForPrint] = useState<number[]>([]);
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { sale: any; customer: any; tipEnabled: boolean; }>(null);
+  const [receiptPdfUrl, setReceiptPdfUrl] = useState<string | null>(null);
+  const [receiptPdfBusy, setReceiptPdfBusy] = useState(false);
+  const [invoicePdfBusy, setInvoicePdfBusy] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
   const [editingOpenAccount, setEditingOpenAccount] = useState<PosOpenAccount | null>(null);
   const [editOpenAccountName, setEditOpenAccountName] = useState("");
@@ -821,6 +824,7 @@ export default function PosSystemAfrikaans() {
 
   // PDF Export Funksie - Professionele Faktuur/Kwotasie met Besigheidsbesonderhede
   const generateInvoicePDF = async (invoice: any) => {
+  setInvoicePdfBusy(true);
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -1177,11 +1181,14 @@ export default function PosSystemAfrikaans() {
       description: "Kon nie PDF genereer nie. Probeer asseblief weer.",
       variant: "destructive"
     });
+  } finally {
+    setInvoicePdfBusy(false);
   }
   };
 
   // Deel Faktuur via deel-skerm
   const shareInvoice = async (invoice: any) => {
+    setInvoicePdfBusy(true);
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -1458,6 +1465,7 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const message = `${docType} ${invoice.documentNumber} van ${companyName}. Totaal: R${typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}`;
     const result = await sharePDFViaSheet(doc, fileName, message);
+    setInvoicePdfBusy(false);
     if (result === 'shared') {
       toast({ title: "Suksesvol Gedeel", description: `${invoice.documentNumber} is gedeel` });
     } else if (result === 'fallback') {
@@ -3255,21 +3263,51 @@ ${dateFilteredSales.map(sale =>
 
   const stormFee = monthlyRevenue * 0.005;
 
+  // Pre-generate the receipt PDF URL as soon as the sale dialog opens
+  useEffect(() => {
+    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBusy(false); return; }
+    setReceiptPdfBusy(true);
+    setReceiptPdfUrl(null);
+    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+    if (!doc) { setReceiptPdfBusy(false); return; }
+    getTempPdfUrl(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`).then(url => {
+      setReceiptPdfUrl(url);
+      setReceiptPdfBusy(false);
+    }).catch(() => setReceiptPdfBusy(false));
+  }, [saleCompleteData]);
+
   const handleDownloadSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
+    if (receiptPdfUrl) {
+      if (isTauriAndroid()) {
+        try { const { openUrl } = await import('@tauri-apps/plugin-opener'); await openUrl(receiptPdfUrl); return; } catch (e) { console.error(e); }
+      } else {
+        const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = `kwitansie-${saleCompleteData.sale.id}.pdf`;
+        a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
+      }
+    }
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-    if (!doc) return;
-    await downloadOpenPDF(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`);
+    if (doc) await downloadOpenPDF(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`);
   };
 
   const handleShareSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
-    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-    if (!doc) return;
-    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     const companyName = currentUser?.companyName || 'Storm POS';
-    const result = await sharePDFViaSheet(doc, fileName, `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`);
-    if (result === 'fallback') toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om te deel" });
+    const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
+    if (isTauriAndroid()) {
+      try {
+        const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
+        await shareText(message + (receiptPdfUrl ? `\n\nPDF: ${receiptPdfUrl}` : '')); return;
+      } catch (e) { console.error(e); }
+    }
+    if (navigator.share && receiptPdfUrl) {
+      try { await navigator.share({ title: `kwitansie-${saleCompleteData.sale.id}.pdf`, text: message, url: receiptPdfUrl }); return; } catch (e: any) { if (e.name === 'AbortError') return; }
+    }
+    if (receiptPdfUrl) {
+      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message + ` PDF: ${receiptPdfUrl}`)}`, '_blank'); return;
+    }
+    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+    if (doc) { const result = await sharePDFViaSheet(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`, message); if (result === 'fallback') toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om te deel" }); }
   };
 
   return (
@@ -3335,13 +3373,13 @@ ${dateFilteredSales.map(sale =>
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceiptAfr} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all">
-                  <Download className="w-4 h-4 mr-2 shrink-0" />
-                  Aflaai
+                <Button onClick={handleDownloadSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all disabled:opacity-60">
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Berei voor...' : 'Aflaai'}
                 </Button>
-                <Button onClick={handleShareSaleReceiptAfr} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all">
-                  <Share2 className="w-4 h-4 mr-2 shrink-0" />
-                  Deel
+                <Button onClick={handleShareSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all disabled:opacity-60">
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Berei voor...' : 'Deel'}
                 </Button>
               </motion.div>
             </div>
@@ -8998,21 +9036,23 @@ ${dateFilteredSales.map(sale =>
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs disabled:opacity-60"
                     data-testid="button-export-pdf"
+                    disabled={invoicePdfBusy}
                     onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
-                    <Download className="w-3 h-3 mr-1" />
-                    PDF
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? '...' : 'PDF'}
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2 disabled:opacity-60"
                     data-testid="button-share-invoice"
+                    disabled={invoicePdfBusy}
                     onClick={() => shareInvoice(selectedInvoice)}
                   >
-                    <Share2 className="w-3 h-3 mr-1" />
-                    Deel
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? 'Besig...' : 'Deel'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9102,21 +9142,23 @@ ${dateFilteredSales.map(sale =>
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
                       data-testid="button-export-pdf-desktop"
+                      disabled={invoicePdfBusy}
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      <Download className="w-4 h-4 mr-2" />
-                      Eksporteer PDF
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Genereer...' : 'Eksporteer PDF'}
                     </Button>
                     <Button 
                       size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
                       data-testid="button-share-invoice-desktop"
+                      disabled={invoicePdfBusy}
                       onClick={() => shareInvoice(selectedInvoice)}
                     >
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Deel
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Besig...' : 'Deel'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
