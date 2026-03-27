@@ -134,21 +134,30 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
+// Stoor 'n PDF-blob in die toep se kas-vouer en maak dit oop met die inheemse PDF-kyker.
+// Tauri Android alleen - een-tik in-toep aflaai, geen blaaier betrokke nie.
+async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+  const { invoke } = await import('@tauri-apps/api/core');
+  const { openPath } = await import('@tauri-apps/plugin-opener');
+  const arrayBuffer = await blob.arrayBuffer();
+  const uint8 = new Uint8Array(arrayBuffer);
+  let binary = '';
+  const chunkSize = 65536;
+  for (let i = 0; i < uint8.length; i += chunkSize) {
+    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+  }
+  const base64 = btoa(binary);
+  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  await openPath(path);
+}
+
 // Laai PDF af / Maak oop
-// Tauri Android: laai op na bediener en maak oop in Chrome (Chrome laai PDF natively af)
-// Blaaier/rekenaar: navigator.share met leer, dan anker-aflaai-terugval
+// Tauri Android: stoor PDF in toepkaskas en maak oop met inheemse PDF-kyker (in-toep, geen blaaier)
+// Mobiele blaaier: navigator.share met leer-aanhegsel
+// Rekenaar-terugval: anker-aflaai
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
-    const tempUrl = await getTempPdfUrl(doc, fileName);
-    if (tempUrl) {
-      try {
-        const { openUrl } = await import('@tauri-apps/plugin-opener');
-        await openUrl(tempUrl);
-        return;
-      } catch (e) {
-        console.error('opener.openUrl misluk:', e);
-      }
-    }
+    await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
     return;
   }
   if (navigator.share) {
@@ -3279,16 +3288,25 @@ ${dateFilteredSales.map(sale =>
 
   const handleDownloadSaleReceiptAfr = async () => {
     if (!saleCompleteData) return;
+    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
+    if (isTauriAndroid()) {
+      // In-toep aflaai: stoor in toepkas en maak oop met inheemse PDF-kyker (geen blaaier)
+      try {
+        const blob = receiptPdfBlob || ((): Blob | null => {
+          const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+          return doc ? (doc.output('blob') as Blob) : null;
+        })();
+        if (blob) await saveAndOpenPdfAndroid(blob, fileName);
+      } catch (e) { console.error('save_pdf_to_cache fout:', e); }
+      return;
+    }
+    // Web: oombliklike anker-aflaai met vooraf-gegenereerde blob-URL
     if (receiptPdfUrl) {
-      if (isTauriAndroid()) {
-        try { const { openUrl } = await import('@tauri-apps/plugin-opener'); await openUrl(receiptPdfUrl); return; } catch (e) { console.error(e); }
-      } else {
-        const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-        a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
-      }
+      const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
     }
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) await downloadOpenPDF(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`);
+    if (doc) await downloadOpenPDF(doc, fileName);
   };
 
   const handleShareSaleReceiptAfr = async () => {

@@ -124,21 +124,30 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
+// Save a PDF blob to the device's app cache folder and open it with the native PDF viewer.
+// Tauri Android only - one-tap in-app download, no browser involved.
+async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+  const { invoke } = await import('@tauri-apps/api/core');
+  const { openPath } = await import('@tauri-apps/plugin-opener');
+  const arrayBuffer = await blob.arrayBuffer();
+  const uint8 = new Uint8Array(arrayBuffer);
+  let binary = '';
+  const chunkSize = 65536;
+  for (let i = 0; i < uint8.length; i += chunkSize) {
+    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+  }
+  const base64 = btoa(binary);
+  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  await openPath(path);
+}
+
 // Download/Open PDF
-// Tauri Android: uploads to server then opens URL in Chrome (Chrome downloads/views PDF natively)
-// Browser/desktop: navigator.share with file, then anchor download fallback
+// Tauri Android: saves PDF to device cache then opens with native PDF viewer (in-app, no browser)
+// Mobile browser: navigator.share with file attachment
+// Desktop fallback: anchor download
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
-    const tempUrl = await getTempPdfUrl(doc, fileName);
-    if (tempUrl) {
-      try {
-        const { openUrl } = await import('@tauri-apps/plugin-opener');
-        await openUrl(tempUrl);
-        return;
-      } catch (e) {
-        console.error('opener.openUrl failed:', e);
-      }
-    }
+    await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
     return;
   }
   if (navigator.share) {
@@ -3783,16 +3792,25 @@ export default function PosSystem() {
 
   const handleDownloadSaleReceipt = async () => {
     if (!saleCompleteData) return;
+    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
+    if (isTauriAndroid()) {
+      // In-app download: save to device cache and open with native PDF viewer (no browser)
+      try {
+        const blob = receiptPdfBlob || ((): Blob | null => {
+          const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+          return doc ? (doc.output('blob') as Blob) : null;
+        })();
+        if (blob) await saveAndOpenPdfAndroid(blob, fileName);
+      } catch (e) { console.error('save_pdf_to_cache error:', e); }
+      return;
+    }
+    // Web: instant anchor download using pre-generated blob URL
     if (receiptPdfUrl) {
-      if (isTauriAndroid()) {
-        try { const { openUrl } = await import('@tauri-apps/plugin-opener'); await openUrl(receiptPdfUrl); return; } catch (e) { console.error(e); }
-      } else {
-        const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = `receipt-${saleCompleteData.saleId}.pdf`;
-        a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
-      }
+      const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
     }
     const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) await downloadOpenPDF(doc, `receipt-${saleCompleteData.saleId}.pdf`);
+    if (doc) await downloadOpenPDF(doc, fileName);
   };
 
   const handleShareSaleReceipt = async () => {
