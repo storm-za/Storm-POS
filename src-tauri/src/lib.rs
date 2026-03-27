@@ -1,3 +1,5 @@
+use tauri::Manager;
+
 #[cfg(desktop)]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 #[cfg(desktop)]
