@@ -172,15 +172,15 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Deel PDF via deel-skerm
-// Tauri Android: gebruik tauri-plugin-sharekit vir Android Deel-skerm (WhatsApp, Gmail, ens.)
-// Blaaier/rekenaar: navigator.share of WhatsApp Web-terugval
+// Deel PDF via deel-skerm -- stuur altyd die werklike PDF-leeer, nooit 'n skakel nie
+// Tauri Android: gebruik tauri-plugin-sharekit vir Android Deel-skerm (slegs boodskapsteks)
+// Blaaier/mobiel: navigator.share({ files }) heg die PDF direk aan (WhatsApp, Gmail, ens.)
+// Rekenaar-terugval: stoor PDF plaaslik, maak WhatsApp Web oop met boodskapsteks slegs
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   if (isTauriAndroid()) {
-    const tempUrl = await getTempPdfUrl(doc, fileName);
     try {
       const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-      await shareText(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+      await shareText(message);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
@@ -188,26 +188,24 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       return 'fallback';
     }
   }
-  const tempUrl = await getTempPdfUrl(doc, fileName);
+  // Mobiel/blaaier: deel werklike PDF-leeer as aanhegsel
   if (navigator.share) {
     try {
-      await navigator.share({ title: fileName, text: message, ...(tempUrl ? { url: tempUrl } : {}) });
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName, text: message });
+      } else {
+        await navigator.share({ title: fileName, text: message });
+      }
       return 'shared';
     } catch (e: any) {
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
-  // Rekenaar-terugval: laai PDF af, maak dan WhatsApp Web oop (teks-slegs)
-  if (tempUrl) {
-    const a = document.createElement('a');
-    a.href = tempUrl; a.download = fileName;
-    a.style.display = 'none'; document.body.appendChild(a); a.click();
-    setTimeout(() => document.body.removeChild(a), 200);
-  } else {
-    doc.save(fileName);
-  }
-  const waMsg = encodeURIComponent(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
-  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
+  // Rekenaar-terugval: stoor PDF + maak WhatsApp Web oop met teks slegs (geen skakel nie)
+  doc.save(fileName);
+  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
   return 'fallback';
 }
 
@@ -287,6 +285,7 @@ export default function PosSystemAfrikaans() {
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { sale: any; customer: any; tipEnabled: boolean; }>(null);
   const [receiptPdfUrl, setReceiptPdfUrl] = useState<string | null>(null);
+  const [receiptPdfBlob, setReceiptPdfBlob] = useState<Blob | null>(null);
   const [receiptPdfBusy, setReceiptPdfBusy] = useState(false);
   const [invoicePdfBusy, setInvoicePdfBusy] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
@@ -3263,13 +3262,15 @@ ${dateFilteredSales.map(sale =>
 
   const stormFee = monthlyRevenue * 0.005;
 
-  // Pre-generate the receipt PDF URL as soon as the sale dialog opens
+  // Pre-generate kwitansie PDF-blob + aflaai-URL sodra die verkoopsdialoog oopgaan
   useEffect(() => {
-    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBusy(false); return; }
+    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBlob(null); setReceiptPdfBusy(false); return; }
     setReceiptPdfBusy(true);
     setReceiptPdfUrl(null);
+    setReceiptPdfBlob(null);
     const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) { setReceiptPdfBusy(false); return; }
+    setReceiptPdfBlob(doc.output('blob') as Blob);
     getTempPdfUrl(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`).then(url => {
       setReceiptPdfUrl(url);
       setReceiptPdfBusy(false);
@@ -3294,20 +3295,29 @@ ${dateFilteredSales.map(sale =>
     if (!saleCompleteData) return;
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
+    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     if (isTauriAndroid()) {
+      try { const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api'); await shareText(message); return; } catch (e) { console.error(e); }
+    }
+    if (navigator.share && receiptPdfBlob) {
       try {
-        const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-        await shareText(message + (receiptPdfUrl ? `\n\nPDF: ${receiptPdfUrl}` : '')); return;
-      } catch (e) { console.error(e); }
+        const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: fileName, text: message });
+        } else {
+          await navigator.share({ title: fileName, text: message });
+        }
+        return;
+      } catch (e: any) { if (e.name === 'AbortError') return; }
     }
-    if (navigator.share && receiptPdfUrl) {
-      try { await navigator.share({ title: `kwitansie-${saleCompleteData.sale.id}.pdf`, text: message, url: receiptPdfUrl }); return; } catch (e: any) { if (e.name === 'AbortError') return; }
+    // Rekenaar-terugval: stoor PDF + WhatsApp Web teks slegs
+    if (receiptPdfBlob) {
+      const url = URL.createObjectURL(receiptPdfBlob);
+      const a = document.createElement('a'); a.href = url; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
     }
-    if (receiptPdfUrl) {
-      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message + ` PDF: ${receiptPdfUrl}`)}`, '_blank'); return;
-    }
-    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) { const result = await sharePDFViaSheet(doc, `kwitansie-${saleCompleteData.sale.id}.pdf`, message); if (result === 'fallback') toast({ title: "Kwitansie gestoor", description: "Heg die PDF aan om te deel" }); }
+    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

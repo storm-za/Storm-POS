@@ -162,15 +162,15 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   doc.save(fileName);
 }
 
-// Share PDF via native share sheet
-// Tauri Android: uses tauri-plugin-sharekit to open Android Sharesheet (WhatsApp, Gmail, etc.)
-// Browser/desktop: navigator.share or WhatsApp Web fallback
+// Share PDF via native share sheet — always sends the actual PDF file, never a link
+// Tauri Android: uses tauri-plugin-sharekit to open Android Sharesheet with message text
+// Browser/mobile: navigator.share({ files }) attaches the PDF directly (WhatsApp, Gmail, etc.)
+// Desktop fallback: saves PDF locally then opens WhatsApp Web with message text only
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   if (isTauriAndroid()) {
-    const tempUrl = await getTempPdfUrl(doc, fileName);
     try {
       const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-      await shareText(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
+      await shareText(message);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
@@ -178,26 +178,24 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       return 'fallback';
     }
   }
-  const tempUrl = await getTempPdfUrl(doc, fileName);
+  // Mobile/browser: share actual PDF file as attachment
   if (navigator.share) {
     try {
-      await navigator.share({ title: fileName, text: message, ...(tempUrl ? { url: tempUrl } : {}) });
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName, text: message });
+      } else {
+        await navigator.share({ title: fileName, text: message });
+      }
       return 'shared';
     } catch (e: any) {
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
-  // Desktop fallback: download PDF then open WhatsApp Web text-only
-  if (tempUrl) {
-    const a = document.createElement('a');
-    a.href = tempUrl; a.download = fileName;
-    a.style.display = 'none'; document.body.appendChild(a); a.click();
-    setTimeout(() => document.body.removeChild(a), 200);
-  } else {
-    doc.save(fileName);
-  }
-  const waMsg = encodeURIComponent(message + (tempUrl ? `\n\nPDF: ${tempUrl}` : ''));
-  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${waMsg}`, '_blank'), 500);
+  // Desktop fallback: save PDF locally + open WhatsApp Web with text only (no link)
+  doc.save(fileName);
+  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
   return 'fallback';
 }
 
@@ -267,6 +265,7 @@ export default function PosSystem() {
   const [tipOptionEnabled, setTipOptionEnabled] = useState(false);
   const [saleCompleteData, setSaleCompleteData] = useState<null | { total: string; items: any[]; customerName?: string; notes?: string; paymentType?: string; staffName?: string; tipEnabled: boolean; saleId: number; }>(null);
   const [receiptPdfUrl, setReceiptPdfUrl] = useState<string | null>(null);
+  const [receiptPdfBlob, setReceiptPdfBlob] = useState<Blob | null>(null);
   const [receiptPdfBusy, setReceiptPdfBusy] = useState(false);
   const [invoicePdfBusy, setInvoicePdfBusy] = useState(false);
   const [openAccountTipEnabled, setOpenAccountTipEnabled] = useState(false);
@@ -3767,13 +3766,15 @@ export default function PosSystem() {
     }
   };
 
-  // Pre-generate the receipt PDF URL as soon as the sale dialog opens
+  // Pre-generate receipt PDF blob + download URL when sale dialog opens
   useEffect(() => {
-    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBusy(false); return; }
+    if (!saleCompleteData) { setReceiptPdfUrl(null); setReceiptPdfBlob(null); setReceiptPdfBusy(false); return; }
     setReceiptPdfBusy(true);
     setReceiptPdfUrl(null);
+    setReceiptPdfBlob(null);
     const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
     if (!doc) { setReceiptPdfBusy(false); return; }
+    setReceiptPdfBlob(doc.output('blob') as Blob);
     getTempPdfUrl(doc, `receipt-${saleCompleteData.saleId}.pdf`).then(url => {
       setReceiptPdfUrl(url);
       setReceiptPdfBusy(false);
@@ -3798,20 +3799,29 @@ export default function PosSystem() {
     if (!saleCompleteData) return;
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
+    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
     if (isTauriAndroid()) {
+      try { const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api'); await shareText(message); return; } catch (e) { console.error(e); }
+    }
+    if (navigator.share && receiptPdfBlob) {
       try {
-        const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-        await shareText(message + (receiptPdfUrl ? `\n\nPDF: ${receiptPdfUrl}` : '')); return;
-      } catch (e) { console.error(e); }
+        const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: fileName, text: message });
+        } else {
+          await navigator.share({ title: fileName, text: message });
+        }
+        return;
+      } catch (e: any) { if (e.name === 'AbortError') return; }
     }
-    if (navigator.share && receiptPdfUrl) {
-      try { await navigator.share({ title: `receipt-${saleCompleteData.saleId}.pdf`, text: message, url: receiptPdfUrl }); return; } catch (e: any) { if (e.name === 'AbortError') return; }
+    // Desktop fallback: save PDF + WhatsApp Web text only
+    if (receiptPdfBlob) {
+      const url = URL.createObjectURL(receiptPdfBlob);
+      const a = document.createElement('a'); a.href = url; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
     }
-    if (receiptPdfUrl) {
-      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message + ` PDF: ${receiptPdfUrl}`)}`, '_blank'); return;
-    }
-    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) { const result = await sharePDFViaSheet(doc, `receipt-${saleCompleteData.saleId}.pdf`, message); if (result === 'fallback') toast({ title: "Receipt saved", description: "Attach the PDF to share" }); }
+    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
