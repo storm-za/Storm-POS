@@ -1,0 +1,122 @@
+Core Objective: Design and code a multi-step user segmentation funnel ("Psych-In" onboarding) to classify new users into the correct pricing tier, reduce "Time to Value," and replace generic site assets with a cohesive, professional, custom-illustrated visual system.
+
+I. THE VISUAL STYLE GUIDE (Global Replacement Rule)
+We must move away from generic web assets and establish a unified brand look, similar to the refined, trustworthy aesthetic of "Google Corporate Memphis" or "Printify."
+
+1. Defined Aesthetic: Modern, Refined, Outlined Flat Vector Illustration (Minimalist Monoline).
+2. Visual Elements & Constraints (APPLY TO ALL ASSETS):
+Thick, Consistent Line Weights: A strict black, monoline outline must be used on all shapes, devices, and icons. This builds "Expert Trust" and technical clarity.
+
+Strict Color Palette: A maximum of three colors are allowed on the entire site for illustrations and onboarding:
+
+Pure Black (Outlines).
+
+Pure White (Fill).
+
+[PRIMARY_BRAND_COLOR] (e.g., a specific Gold, Orange, or Teal) - Use placeholder [PRIMARY_BRAND_COLOR] for now.
+
+The "Spot Color" Technique: This is critical. The [PRIMARY_BRAND_COLOR] is a "Spot Color" or "Hero Color" used only to highlight value, action, and success.
+
+DO USE it for: Money stacks, profit figures, growth arrows, checkmarks, invoice brand logos, "PAID" stamps, user action buttons.
+
+DO NOT USE it for: Backgrounds, full shapes, or unessential details. The illustrations must rely on negative space and clean black lines.
+
+Assets to be Replaced: Every existing image across the site (storm_pos_desktop.png, storm_pos_mobile.png, invoice.png, reporting.png, staff profile photos, language selection icons) must be replaced by a custom illustration meeting these rules.
+
+II. THE MULTI-STEP ONBOARDING FLOW (The Segmentation Funnel)
+Replit AI must code a multi-step user experience that segments the user into the appropriate pricing tier silently, presenting options at the end of the flow based on their answers.
+
+Step 0: Frictionless Entry (Removal)
+Rule: NO CREDIT CARD required during trial. Use Social Sign-in (Google/Apple) or a minimal email/password form to get the user into the environment in <10 seconds.
+
+Pre-Onboarding Goal: Create "Endowment Effect." Allow users to choose their language (English/Afrikaans) and upload their logo before segmentation.
+
+Step 1: The JTBD Context ("Choose Your Adventure")
+Mental State: Confident.
+
+Header (Localized): "Welcome to Storm POS! What kind of operation are we setting up today?" (Afrikaans: "Welkom by Storm POS! Watter soort besigheid stel ons vandag op?")
+
+Ask: A "Choose Your Business Type" segmented control.
+
+Options with custom NEW illustrated icons:
+
+Retail/Boutique (Icon: Clean vector shopping bag/tags)
+
+Restaurant/Bar (Icon: Vector plate/cutlery and a wine glass/bottle, using Spot Color only on the "wine" color)
+
+Service/Freelancer (Icon: Stylized calendar/laptop, using Spot Color only on a "Project Complete" checkmark)
+
+High-Volume Wholesaler (Icon: Stacked vector crates and a forklift)
+
+Step 2: Pricing/Volume Estimation (The Silent Filter)
+Mental State: Secure.
+
+Header (Localized): "Let's make sure we recommend the perfect plan for your business." (Afrikaans: "Kom ons maak seker ons beveel die perfekte plan vir jou besigheid aan.")
+
+Ask: "What is your estimated monthly sales volume?"
+
+Options with custom NEW illustrated icons:
+
+Micro Business (< R10,000) (Icon: Small vector money pouch, maybe one or two coins with Spot Color)
+
+Growing Business (R10,000 – R100,000) (Icon: Stack of R100/R200 notes and an up-arrow with Spot Color)
+
+High-Volume (R100,000+ / 10+ Daily Sales) (Icon: A full cash register or a massive stack of notes/coins with multiple Spot Color highlights)
+
+Step 3: Segmentation & Results ("The Safety Net vs. The Power User")
+Logic (Silent Filtering):
+
+If Step 2 Answer = Micro (< R10k): Present the user with a customized screen recommending the "% per sale" plan (The "Safety Net"). Example Text: "The R10k+ club starts here. Your monthly volume fits our pay-as-you-grow plan perfectly: 0.5% per sale + R0.50 per invoice. Only pay when you sell!"
+
+If Step 2 Answer = Growth (R10k-R100k): Present both plans, but highlight the "% per sale" plan as the primary option, noting the option to switch to a Flat Monthly when ready.
+
+If Step 2 Answer = High-Volume (> R100k): Present the Flat Monthly plan as the "Power User" recommendation, highlighting "Unlimited transactions for one fixed price." (Example Text: Maximize your profit as you grow. No 'success tax'—just one fixed monthly fee.)
+
+Asset to Generate for This Screen: A custom vector illustration comparing a "Safety Harness/Net" (%-based) and a "Rocket Launchpad" (Fixed Fee), using the Spot Color on the harness and the rocket trail.
+
+Step 4: "The Aha! Moment" Checklist (Time-to-Value)
+Objective: Immediate utility. Don't show the full dashboard. Present a minimal checklist.
+
+Header (Localized): "Complete these 4 steps to process your first sale!" (Afrikaans: "Voltooi hierdie 4 stappe om jou eerste verkoop te verwerk!")
+
+List Items with Custom NEW Illustrated Icons:
+
+Upload Logo (Personalization): Icon: An outlined photo frame/brand logo placeholder.
+
+Add Your First Product (Inventory Setup): Icon: Outlined product box and a '+' sign.
+
+Create a 'Test Sale' (Understanding): Icon: A vectorized test payment screen and a 'Confirm' button.
+
+Connect Payment Methods: Icon: Outlined credit card, cash stack, and an EFT symbol, all with Spot Color checkmarks.
+
+Reward: When completed, pop a notification: "Congratulations! To celebrate your first setup, your next 5 invoices are fee-free!"
+
+III. KEY ASSET SPECIFICATION (The Replacement Targets)
+Replit AI, replace all images currently in assets/images with new versions meeting the style guide above.
+
+1. Replace storm_pos_desktop.png and storm_pos_mobile.png:
+New Asset: A single graphic demonstrating Native Multi-Device Sync.
+
+Visual: Vectorized outlines of a desktop computer, a tablet, and a smartphone. All are connected by clean monoline dotted sync lines. The Spot Color must be used ONLY on successful data flow pulses and finalized data checkmarks on each screen. The devices should show the minimal dashboard from Step 4.
+
+2. Replace invoice.png:
+New Asset: Professional Documents.
+
+Visual: A vector template of a minimal invoice. Use custom, illustrative vector icons for sections (Bill To, Product, Date). The Spot Color must be used ONLY on the "Your Business Logo" placeholder and the final localized "PAID" or "DRAFT" stamps.
+
+3. Replace reporting.png:
+New Asset: Real-Time Intelligence.
+
+Visual: A vectorized composition of a clean line chart (daily revenue), a bar chart (payment methods), and a money stack. Spot Color must highlight only the upward trend lines, key profit figures, and money coins. Use high negative space.
+
+4. Replace Iconography (Global Upgrade):
+Current Generic Icons: Replace all menu icons (Home, Sales, Inventory, Settings, Staff) with custom, outlined vector versions unique to the brand. They must be cohesive in stroke weight. (Example: Standard shopping cart -> clean vector shopping bag/tags with [PRIMARY_BRAND_COLOR] accents.)
+
+IV. LOCALIZATION AND IMPLEMENTATION DETAILS
+Trigger (Upsell Logic): Code the back-end trigger for users on the %-based plan. When their sales volume hits the threshold X where the flat fee is cheaper, Replit AI must implement a localized in-app notification and an automated email/WhatsApp message suggesting they switch to the Flat Monthly plan (e.g., "You've reached a new milestone! Switch to our Professional Plan now to save [Calculated Saving Amount] on transaction fees this month.")
+
+Language Persistence: Verify that once the language (English/Afrikaans) is selected, it persists across the entire onboarding and app interface, including the upsell logic and professional PDF document generation. Ensure all newly generated text and illustrations use the correct localized phrases where appropriate.
+
+Asset Management: Store all new illustrative assets in a logical directory (e.g., assets/images/illustrations, assets/icons/monoline). All generated images must be optimized for fast web loading (e.g., SVG/WebP formats where possible).
+
+Test & Verify: All segmentation logic (user classification and recommended plans) and localized trigger pop-ups must be extensively tested for accuracy based on input data (business type, sales volume, current plan cost vs. potential flat fee saving).
