@@ -265,9 +265,15 @@
 
 /* --- Card / container backgrounds --- */
 html:not(.dark) .pos-app .bg-gray-800\/50,
-html:not(.dark) .pos-app .bg-gray-800\/30 {
+html:not(.dark) .pos-app .bg-gray-800\/30,
+html:not(.dark) .pos-app .bg-gray-800\/40,
+html:not(.dark) .pos-app .bg-gray-800\/60 {
   background-color: #ffffff !important;
   border-color: hsl(220, 14%, 90%) !important;
+}
+html:not(.dark) .pos-app .bg-gray-700\/30 {
+  background-color: rgba(248, 250, 252, 0.8) !important;
+  border-color: hsl(220, 14%, 88%) !important;
 }
 html:not(.dark) .pos-app .bg-gray-900\/40,
 html:not(.dark) .pos-app .bg-gray-900\/60,
@@ -295,7 +301,8 @@ html:not(.dark) .pos-app .bg-white\/5 {
 html:not(.dark) .pos-app .from-gray-900\/80,
 html:not(.dark) .pos-app .from-gray-900\/95,
 html:not(.dark) .pos-app .from-gray-800\/80,
-html:not(.dark) .pos-app .from-gray-800\/95 {
+html:not(.dark) .pos-app .from-gray-800\/95,
+html:not(.dark) .pos-app .from-gray-800\/60 {
   --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
   --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position) !important;
 }
@@ -305,7 +312,8 @@ html:not(.dark) .pos-app .via-gray-800\/95 {
 html:not(.dark) .pos-app .to-gray-800\/80,
 html:not(.dark) .pos-app .to-gray-800\/95,
 html:not(.dark) .pos-app .to-gray-900\/80,
-html:not(.dark) .pos-app .to-gray-900\/95 {
+html:not(.dark) .pos-app .to-gray-900\/95,
+html:not(.dark) .pos-app .to-gray-900\/60 {
   --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
 }
 
