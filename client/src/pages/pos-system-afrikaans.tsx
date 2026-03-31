@@ -163,21 +163,18 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
 
 // Laai PDF af / Maak oop
 // Tauri Android: stoor PDF in toepkaskas en maak oop met inheemse PDF-kyker (in-toep, geen blaaier)
-// Laai altyd direk af -- maak nooit die deel-skerm oop nie
+// Laai altyd direk af via plaaslike blob URL -- maak nooit die deel-skerm oop nie
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
     await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
     return;
   }
-  const tempUrl = await getTempPdfUrl(doc, fileName);
-  if (tempUrl) {
-    const a = document.createElement('a');
-    a.href = tempUrl; a.download = fileName;
-    a.style.display = 'none'; document.body.appendChild(a); a.click();
-    setTimeout(() => document.body.removeChild(a), 200);
-    return;
-  }
-  doc.save(fileName);
+  const blob: Blob = doc.output('blob');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fileName;
+  a.style.display = 'none'; document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
 }
 
 // Deel PDF via deel-skerm -- stuur altyd die werklike PDF-leeer, nooit 'n skakel nie

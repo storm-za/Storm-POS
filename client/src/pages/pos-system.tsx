@@ -152,21 +152,18 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
 
 // Download/Open PDF
 // Tauri Android: saves PDF to device cache then opens with native PDF viewer (in-app, no browser)
-// Always triggers a direct file download — never opens the share sheet
+// Always triggers a direct file download using a local blob URL — never opens the share sheet
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
     await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
     return;
   }
-  const tempUrl = await getTempPdfUrl(doc, fileName);
-  if (tempUrl) {
-    const a = document.createElement('a');
-    a.href = tempUrl; a.download = fileName;
-    a.style.display = 'none'; document.body.appendChild(a); a.click();
-    setTimeout(() => document.body.removeChild(a), 200);
-    return;
-  }
-  doc.save(fileName);
+  const blob: Blob = doc.output('blob');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fileName;
+  a.style.display = 'none'; document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
 }
 
 // Share PDF via native share sheet — always sends the actual PDF file, never a link
