@@ -33,13 +33,14 @@ export default function ReportingDashboard({ className }: Props) {
       <rect x="30" y="28" width="60" height="8" rx="3" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="96" y="28" width="40" height="8" rx="3" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="142" y="28" width="40" height="8" rx="3" fill="white" stroke="#111" strokeWidth="1"/>
-      <rect x="300" y="26" width="50" height="10" rx="4" fill={BLUE}/>
-      <rect x="304" y="29" width="30" height="4" rx="2" fill="white"/>
+      <rect x="300" y="26" width="50" height="10" rx="4" fill="white" stroke="#111" strokeWidth="1.5"/>
+      <rect x="304" y="29" width="30" height="4" rx="2" fill="#111"/>
 
       {/* Stat card 1 */}
       <rect x="30" y="62" width="90" height="55" rx="6" fill="white" stroke="#111" strokeWidth="1.5"/>
       <rect x="38" y="70" width="35" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="38" y="80" width="60" height="12" rx="2" fill="#111"/>
+      {/* Key profit figure - blue spot colour */}
       <rect x="38" y="97" width="40" height="5" rx="2" fill={BLUE}/>
 
       {/* Stat card 2 */}
@@ -55,7 +56,7 @@ export default function ReportingDashboard({ className }: Props) {
         <line key={i} x1="46" y1={195 - r * barMaxH} x2="225" y2={195 - r * barMaxH} stroke="#111" strokeWidth="0.5" strokeDasharray="4 3"/>
       ))}
 
-      {/* Bars: non-highlight bars are white with black outline; highlight bar is BLUE */}
+      {/* Bars: all white/outlined; highlight bar is black fill */}
       {barData.map((v, i) => {
         const x = barStartX + i * (barW + barGap);
         const h = (v / 100) * barMaxH;
@@ -69,14 +70,14 @@ export default function ReportingDashboard({ className }: Props) {
             width={barW}
             height={h}
             rx="3"
-            fill={isHighlight ? BLUE : "white"}
+            fill={isHighlight ? "#111" : "white"}
             stroke="#111"
-            strokeWidth={isHighlight ? 0 : 1}
+            strokeWidth="1"
           />
         );
       })}
 
-      {/* Trend line */}
+      {/* Trend line - blue spot colour */}
       <polyline
         points={linePoints}
         stroke={BLUE}
@@ -84,8 +85,8 @@ export default function ReportingDashboard({ className }: Props) {
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeDasharray="5 3"
       />
+      {/* Trend dots: highlight dot is blue (coin highlight); others white */}
       {barData.map((v, i) => {
         const x = barStartX + i * (barW + barGap) + barW / 2;
         const y = barBaseY - (v / 100) * barMaxH;
@@ -106,6 +107,7 @@ export default function ReportingDashboard({ className }: Props) {
       {/* Top-right metric card */}
       <rect x="244" y="62" width="106" height="55" rx="6" fill="white" stroke="#111" strokeWidth="1.5"/>
       <rect x="252" y="70" width="35" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
+      {/* Key profit figure - blue spot colour */}
       <rect x="252" y="80" width="50" height="10" rx="2" fill={BLUE}/>
       <rect x="252" y="95" width="80" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="252" y="103" width="60" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
@@ -113,9 +115,9 @@ export default function ReportingDashboard({ className }: Props) {
       {/* Donut chart card */}
       <rect x="250" y="127" width="110" height="115" rx="6" fill="white" stroke="#111" strokeWidth="1.5"/>
       <rect x="258" y="135" width="50" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
-      {/* Donut ring (background) */}
-      <circle cx="305" cy="165" r="28" fill="none" stroke="#111" strokeWidth="10" opacity="0.08"/>
-      {/* Donut ring (brand fill) */}
+      {/* Donut ring background */}
+      <circle cx="305" cy="165" r="28" fill="none" stroke="#111" strokeWidth="10" opacity="0.1"/>
+      {/* Donut ring highlight - blue spot colour (coin/profit highlight) */}
       <circle cx="305" cy="165" r="28" fill="none" stroke={BLUE} strokeWidth="10"
         strokeDasharray="88 176" strokeDashoffset="0" strokeLinecap="round"/>
       {/* Centre label */}
@@ -126,7 +128,7 @@ export default function ReportingDashboard({ className }: Props) {
       <rect x="258" y="216" width="40" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="302" y="216" width="30" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="258" y="227" width="40" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
-      <rect x="302" y="227" width="40" height="5" rx="2" fill={BLUE}/>
+      <rect x="302" y="227" width="40" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
     </svg>
   );
 }

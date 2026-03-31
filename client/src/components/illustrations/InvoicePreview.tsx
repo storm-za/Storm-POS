@@ -18,7 +18,7 @@ export default function InvoicePreview({ className }: Props) {
       {/* Header band */}
       <rect x="40" y="20" width="200" height="50" rx="6" fill="white" stroke="#111" strokeWidth="2"/>
       <rect x="40" y="48" width="200" height="22" fill="white"/>
-      {/* Logo block */}
+      {/* Logo placeholder - blue spot colour for brand identity */}
       <rect x="48" y="28" width="28" height="28" rx="4" fill={BLUE}/>
       <rect x="52" y="32" width="6" height="20" rx="1" fill="white"/>
       <rect x="60" y="32" width="12" height="4" rx="1" fill="white"/>
@@ -39,12 +39,12 @@ export default function InvoicePreview({ className }: Props) {
       <rect x="48" y="94" width="80" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="48" y="102" width="60" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       {/* Divider */}
-      <rect x="48" y="116" width="184" height="1" fill="#111"/>
+      <line x1="48" y1="116" x2="232" y2="116" stroke="#111" strokeWidth="1"/>
       {/* Table header */}
       <rect x="48" y="122" width="80" height="5" rx="2" fill="#111"/>
       <rect x="170" y="122" width="30" height="5" rx="2" fill="#111"/>
       <rect x="212" y="122" width="20" height="5" rx="2" fill="#111"/>
-      <rect x="48" y="132" width="180" height="1" fill="#111"/>
+      <line x1="48" y1="132" x2="232" y2="132" stroke="#111" strokeWidth="1"/>
       {/* Line items */}
       <rect x="48" y="137" width="70" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="170" y="137" width="24" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
@@ -59,21 +59,21 @@ export default function InvoicePreview({ className }: Props) {
       <rect x="170" y="164" width="24" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="212" y="164" width="16" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       {/* Subtotals */}
-      <rect x="48" y="178" width="184" height="1" fill="#111"/>
+      <line x1="48" y1="178" x2="232" y2="178" stroke="#111" strokeWidth="1"/>
       <rect x="130" y="184" width="50" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="188" y="184" width="44" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="130" y="194" width="50" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="188" y="194" width="44" height="5" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       {/* Total row */}
       <rect x="130" y="204" width="50" height="7" rx="2" fill="#111"/>
-      <rect x="186" y="204" width="46" height="7" rx="2" fill={BLUE}/>
+      <rect x="186" y="204" width="46" height="7" rx="2" fill="white" stroke="#111" strokeWidth="1.5"/>
       {/* Notes section */}
       <rect x="48" y="220" width="80" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="48" y="228" width="60" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
-      <rect x="48" y="240" width="184" height="1" fill="#111"/>
+      <line x1="48" y1="240" x2="232" y2="240" stroke="#111" strokeWidth="1"/>
       <rect x="48" y="246" width="100" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
       <rect x="48" y="254" width="80" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1"/>
-      {/* PAID stamp */}
+      {/* PAID stamp - blue spot colour */}
       <g transform="translate(205, 135) rotate(-15)">
         <rect x="-38" y="-18" width="76" height="36" rx="5" fill="none" stroke={BLUE} strokeWidth="3"/>
         <text x="0" y="0" textAnchor="middle" dominantBaseline="central" fontSize="14" fontWeight="bold" fill={BLUE} letterSpacing="4">PAID</text>
@@ -82,6 +82,7 @@ export default function InvoicePreview({ className }: Props) {
       <rect x="270" y="50" width="90" height="110" rx="5" fill="white" stroke="#111" strokeWidth="1.5" opacity="0.9"/>
       <rect x="270" y="50" width="90" height="30" rx="5" fill="white" stroke="#111" strokeWidth="1.5" opacity="0.9"/>
       <rect x="270" y="62" width="90" height="18" fill="white" opacity="0.9"/>
+      {/* Quote logo placeholder - blue spot colour */}
       <rect x="276" y="55" width="22" height="22" rx="3" fill={BLUE} opacity="0.8"/>
       <rect x="302" y="57" width="40" height="6" rx="2" fill="white" stroke="#111" strokeWidth="1" opacity="0.8"/>
       <rect x="302" y="65" width="28" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1" opacity="0.8"/>
@@ -89,9 +90,8 @@ export default function InvoicePreview({ className }: Props) {
       <rect x="276" y="96" width="60" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1" opacity="0.8"/>
       <rect x="276" y="104" width="70" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1" opacity="0.8"/>
       <rect x="276" y="112" width="50" height="4" rx="2" fill="white" stroke="#111" strokeWidth="1" opacity="0.8"/>
-      <rect x="276" y="124" width="76" height="18" rx="4" fill={BLUE} opacity="0.8"/>
-      <rect x="280" y="128" width="40" height="4" rx="2" fill="white" opacity="0.9"/>
-      {/* DRAFT stamp */}
+      <rect x="276" y="124" width="76" height="18" rx="4" fill="white" stroke="#111" strokeWidth="1.5" opacity="0.8"/>
+      {/* DRAFT stamp - blue spot colour */}
       <g transform="translate(310, 105) rotate(-12)">
         <rect x="-28" y="-14" width="56" height="28" rx="4" fill="none" stroke={BLUE} strokeWidth="2.5" opacity="0.8"/>
         <text x="0" y="0" textAnchor="middle" dominantBaseline="central" fontSize="10" fontWeight="bold" fill={BLUE} letterSpacing="3" opacity="0.8">DRAFT</text>
