@@ -4744,15 +4744,15 @@ export default function PosSystem() {
                   transition={{ delay: 0.1 }}
                   className="relative group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300">
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40'}`}>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                         <Package className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs font-medium">Total Products</p>
-                        <p className="text-white text-xl font-bold">{products.length}</p>
+                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Total Products</p>
+                        <p className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{products.length}</p>
                       </div>
                     </div>
                   </div>
@@ -4764,15 +4764,15 @@ export default function PosSystem() {
                   transition={{ delay: 0.2 }}
                   className="relative group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-green-500/50 transition-all duration-300">
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-green-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-400/40'}`}>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/30">
                         <TrendingUp className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs font-medium">In Stock</p>
-                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity > 5).length}</p>
+                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>In Stock</p>
+                        <p className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{products.filter(p => p.quantity > 5).length}</p>
                       </div>
                     </div>
                   </div>
@@ -4784,15 +4784,15 @@ export default function PosSystem() {
                   transition={{ delay: 0.3 }}
                   className="relative group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-amber-500/50 transition-all duration-300">
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-amber-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-amber-400/40'}`}>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30">
                         <AlertTriangle className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs font-medium">Low Stock</p>
-                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity <= 5 && p.quantity > 0).length}</p>
+                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Low Stock</p>
+                        <p className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{products.filter(p => p.quantity <= 5 && p.quantity > 0).length}</p>
                       </div>
                     </div>
                   </div>
@@ -4804,15 +4804,15 @@ export default function PosSystem() {
                   transition={{ delay: 0.4 }}
                   className="relative group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-rose-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-4 hover:border-red-500/50 transition-all duration-300">
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-rose-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-red-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-red-400/40'}`}>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/30">
                         <XCircle className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs font-medium">Out of Stock</p>
-                        <p className="text-white text-xl font-bold">{products.filter(p => p.quantity === 0).length}</p>
+                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Out of Stock</p>
+                        <p className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{products.filter(p => p.quantity === 0).length}</p>
                       </div>
                     </div>
                   </div>
