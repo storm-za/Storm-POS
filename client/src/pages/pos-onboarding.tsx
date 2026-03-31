@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -381,6 +381,7 @@ type Plan    = "percent" | "flat";
 export default function PosOnboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const user = (() => {
     try { return JSON.parse(localStorage.getItem("posUser") ?? "null"); } catch { return null; }
@@ -388,10 +389,11 @@ export default function PosOnboarding() {
   const lang: "en" | "af" = user?.preferredLanguage === "af" ? "af" : "en";
   const L: LabelSet = LABELS[lang];
 
-  const [step,     setStep]     = useState<Step>(0);
-  const [bizType,  setBizType]  = useState<BizType | null>(null);
-  const [volume,   setVolume]   = useState<Volume | null>(null);
-  const [checked,  setChecked]  = useState<Set<string>>(() => {
+  const [step,          setStep]         = useState<Step>(0);
+  const [bizType,       setBizType]      = useState<BizType | null>(null);
+  const [volume,        setVolume]       = useState<Volume | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [checked,       setChecked]      = useState<Set<string>>(() => {
     try {
       const raw = localStorage.getItem(`storm-checklist-${user?.id}`);
       return raw ? new Set(JSON.parse(raw)) : new Set();
@@ -417,7 +419,20 @@ export default function PosOnboarding() {
   const recommendedPlan: Plan = volume === "high" ? "flat" : "percent";
   const secondaryPlan:   Plan = recommendedPlan === "flat" ? "percent" : "flat";
 
+  const markItemChecked = useCallback((id: string) => {
+    setChecked(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem(`storm-checklist-${user?.id}`, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }, [user?.id]);
+
   const toggleCheck = useCallback((id: string) => {
+    if (id === "logo") {
+      logoInputRef.current?.click();
+      return;
+    }
     setChecked(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -425,6 +440,45 @@ export default function PosOnboarding() {
       return next;
     });
   }, [user?.id]);
+
+  const handleLogoFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setLogoUploading(true);
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 200;
+            const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+            const canvas = document.createElement("canvas");
+            canvas.width  = Math.round(img.width  * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", 0.8));
+          };
+          img.onerror = reject;
+          img.src = ev.target?.result as string;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await apiRequest("PUT", `/api/pos/user/${user.id}/logo`, { logo: base64, userEmail: user.email });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      const updated = { ...user, companyLogo: data.user?.companyLogo ?? base64 };
+      localStorage.setItem("posUser", JSON.stringify(updated));
+      markItemChecked("logo");
+      toast({ title: lang === "af" ? "Logo opgelaai!" : "Logo uploaded!", description: lang === "af" ? "Jou logo is gestoor." : "Your logo has been saved." });
+    } catch {
+      toast({ title: lang === "af" ? "Fout" : "Error", description: lang === "af" ? "Kon nie logo oplaai nie. Probeer asseblief weer." : "Could not upload logo. Please try again.", variant: "destructive" });
+    } finally {
+      setLogoUploading(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }, [user, lang, markItemChecked, toast]);
 
   const confirmMutation = useMutation({
     mutationFn: async (plan: Plan) => {
@@ -461,12 +515,29 @@ export default function PosOnboarding() {
     setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
   };
 
-  const goPOS = () => setLocation(user?.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+  const goPOS = async () => {
+    if (allDone) {
+      try {
+        await apiRequest("PUT", `/api/pos/user/${user.id}/tutorial-complete`, { userEmail: user.email });
+        const updated = { ...user, tutorialCompleted: true };
+        localStorage.setItem("posUser", JSON.stringify(updated));
+      } catch { /* non-blocking */ }
+    }
+    setLocation(user?.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+  };
 
   if (!user) return null;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[hsl(217,30%,8%)] via-[hsl(217,25%,12%)] to-[hsl(217,20%,10%)] flex flex-col items-center justify-start px-4 pt-8 pb-12 relative overflow-x-hidden">
+      <input
+        ref={logoInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleLogoFileSelect}
+      />
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/8 rounded-full blur-3xl"/>
         <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-[hsl(217,90%,50%)]/8 rounded-full blur-3xl"/>
@@ -523,7 +594,7 @@ export default function PosOnboarding() {
               onSkip={handleSkip}
             />
           )}
-          {step === 3 && <Step4 L={L} checked={checked} allDone={allDone} onToggle={toggleCheck} onGo={goPOS}/>}
+          {step === 3 && <Step4 L={L} checked={checked} allDone={allDone} logoUploading={logoUploading} onToggle={toggleCheck} onGo={goPOS}/>}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -785,10 +856,11 @@ const CHECKLIST_ICONS: Record<string, () => JSX.Element> = {
   payment: PaymentCheckIcon,
 };
 
-function Step4({ L, checked, allDone, onToggle, onGo }: {
+function Step4({ L, checked, allDone, logoUploading, onToggle, onGo }: {
   L: LabelSet;
   checked: Set<string>;
   allDone: boolean;
+  logoUploading: boolean;
   onToggle: (id: string) => void;
   onGo: () => void;
 }) {
@@ -820,15 +892,17 @@ function Step4({ L, checked, allDone, onToggle, onGo }: {
         {L.checklist.map(item => {
           const Icon = CHECKLIST_ICONS[item.id];
           const isDone = checked.has(item.id);
+          const isLogoLoading = item.id === "logo" && logoUploading;
           return (
             <button
               key={item.id}
               onClick={() => onToggle(item.id)}
+              disabled={isLogoLoading}
               className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group ${
                 isDone
                   ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/12"
                   : "border-white/10 bg-white/5 hover:border-white/25"
-              }`}
+              } ${isLogoLoading ? "opacity-70 cursor-wait" : ""}`}
             >
               <div className={`w-12 h-12 rounded-xl p-1.5 flex-shrink-0 transition-all ${isDone ? "bg-white/15" : "bg-white/8 group-hover:bg-white/12"}`}>
                 <Icon/>
@@ -840,7 +914,10 @@ function Step4({ L, checked, allDone, onToggle, onGo }: {
               <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
                 isDone ? "bg-[hsl(217,90%,50%)] border-[hsl(217,90%,50%)]" : "border-white/30"
               }`}>
-                {isDone && <Check className="w-3.5 h-3.5 text-white"/>}
+                {isLogoLoading
+                  ? <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"/>
+                  : isDone && <Check className="w-3.5 h-3.5 text-white"/>
+                }
               </div>
             </button>
           );

@@ -31,7 +31,8 @@ import {
   Warning as AlertTriangle, XCircle, Tag, Hash, Lock,
   GridNine as Grid3X3, ListBullets as LayoutList, Folder, FolderSimplePlus as FolderPlus,
   Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
-  CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2
+  CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2,
+  Bell, ListChecks
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -382,6 +383,7 @@ export default function PosSystemAfrikaans() {
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcomeToast, setShowWelcomeToast] = useState(true);
   const [expandedSales, setExpandedSales] = useState<Set<number>>(new Set());
@@ -2254,6 +2256,23 @@ export default function PosSystemAfrikaans() {
   });
 
   // Logo upload mutation
+  const markTutorialMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser) throw new Error("Geen gebruiker");
+      const res = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/tutorial-complete`, { userEmail: currentUser.email });
+      return res.json();
+    },
+    onSuccess: () => {
+      setCurrentUser(prev => prev ? { ...prev, tutorialCompleted: true } : null);
+      const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
+      localStorage.setItem("posUser", JSON.stringify({ ...stored, tutorialCompleted: true }));
+      toast({ title: "Opstelling voltooi!", description: "Jou rekening is volledig opgestel." });
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Kon nie opstelling as voltooi merk nie.", variant: "destructive" });
+    },
+  });
+
   const logoUploadMutation = useMutation({
     mutationFn: async (logo: string) => {
       const userId = currentUser?.id || 1;
@@ -3581,6 +3600,49 @@ ${dateFilteredSales.map(sale =>
           </motion.div>
         </>
       )}
+      {/* Kennisgewings Paneel */}
+      {notifOpen && (
+        <div className="fixed inset-0 z-50" onClick={() => setNotifOpen(false)}>
+          <div
+            className="fixed top-16 right-3 md:top-auto md:bottom-32 md:left-72 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                <p className="font-semibold text-gray-900 text-sm">Kennisgewings</p>
+              </div>
+              <button onClick={() => setNotifOpen(false)} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-2">
+              {!currentUser?.tutorialCompleted ? (
+                <button
+                  onClick={() => { handleTabChange('instellings'); setNotifOpen(false); }}
+                  className="w-full text-left flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[hsl(217,90%,40%)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <ListChecks className="w-4 h-4 text-[hsl(217,90%,40%)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">Voltooi jou rekeningopstelling</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">Laai jou logo op, voeg produkte by, en meer. Tik vir Instellings.</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1 group-hover:text-[hsl(217,90%,40%)] transition-colors" />
+                </button>
+              ) : (
+                <div className="flex flex-col items-center py-6 gap-2">
+                  <CheckCircle2 className="w-8 h-8 text-green-500" />
+                  <p className="text-sm font-medium text-gray-700">Alles op datum!</p>
+                  <p className="text-xs text-gray-400">Jou rekening is volledig opgestel.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex min-h-screen relative z-10 pos-mobile-safe">
         <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
           <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
@@ -3613,7 +3675,18 @@ ${dateFilteredSales.map(sale =>
               </button>
             ))}
           </nav>
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 space-y-1">
+            <button
+              onClick={() => setNotifOpen(o => !o)}
+              title={sidebarCollapsed ? "Kennisgewings" : undefined}
+              className={`relative flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all ${sidebarCollapsed ? 'justify-center' : ''}`}
+            >
+              <Bell className="h-5 w-5 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Kennisgewings</span>}
+              {!currentUser?.tutorialCompleted && (
+                <span className={`${sidebarCollapsed ? 'absolute top-1.5 right-1.5' : 'ml-auto'} w-5 h-5 bg-red-500 rounded-full text-white text-[9px] font-bold flex items-center justify-center leading-none flex-shrink-0`}>1</span>
+              )}
+            </button>
             <button
               onClick={() => window.location.href = '/pos/help/afrikaans'}
               className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all ${sidebarCollapsed ? 'justify-center' : ''}`}
@@ -3769,7 +3842,19 @@ ${dateFilteredSales.map(sale =>
               <Menu className="h-6 w-6" />
             </button>
             <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
-            <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => setNotifOpen(o => !o)}
+                className="relative p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation"
+                aria-label="Kennisgewings"
+              >
+                <Bell className="h-5 w-5" />
+                {!currentUser?.tutorialCompleted && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[9px] font-bold flex items-center justify-center leading-none">1</span>
+                )}
+              </button>
+              <span className="text-gray-900 text-sm font-semibold capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
+            </div>
           </div>
 
           {currentUser && currentUser.paymentPlan === 'percent' && (currentUser.planSavingAmount ?? 0) > 0 && (
@@ -6112,6 +6197,31 @@ ${dateFilteredSales.map(sale =>
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
+              {/* Opstelling Voltooiingskaart */}
+              {!currentUser?.tutorialCompleted && (
+                <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
+                  <CardContent className="pt-5 pb-5">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-[hsl(217,90%,40%)]/20 flex items-center justify-center flex-shrink-0">
+                        <ListChecks className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-semibold text-sm">Voltooi jou rekeningopstelling</p>
+                        <p className="text-gray-400 text-xs mt-0.5">Laai jou logo hieronder op, voeg jou eerste produk by, doen 'n toetsverkoop en koppel betaalmetodes. Klik op Merk Voltooi as jy klaar is.</p>
+                      </div>
+                      <Button
+                        onClick={() => markTutorialMutation.mutate()}
+                        disabled={markTutorialMutation.isPending}
+                        size="sm"
+                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white flex-shrink-0 whitespace-nowrap"
+                      >
+                        {markTutorialMutation.isPending ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />Stoor...</> : <><Check className="w-3.5 h-3.5 mr-1.5" />Merk Voltooi</>}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Account & Preferences Section */}
               <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                 <CardHeader className="border-b border-white/10 pb-4">

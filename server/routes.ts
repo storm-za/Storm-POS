@@ -382,6 +382,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/pos/user/:id/tutorial-complete", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { userEmail } = req.body;
+      if (!userEmail) return res.status(400).json({ message: "userEmail is required." });
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) return res.status(404).json({ message: "User not found" });
+      if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized" });
+      const updatedUser = await storage.updatePosUserTutorialStatus(userId, true);
+      if (!updatedUser) return res.status(500).json({ message: "Failed to update" });
+      res.json({ success: true, user: { ...updatedUser, planSavingAmount: null } });
+    } catch (error) {
+      console.error("Tutorial complete error:", error);
+      res.status(500).json({ message: "Failed to mark tutorial complete" });
+    }
+  });
+
   app.get("/api/pos/user/:id", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
