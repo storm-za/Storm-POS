@@ -4074,8 +4074,8 @@ ${dateFilteredSales.map(sale =>
                     </div>
                     </div>
                   </div>
-                  <div data-testid="current-sale-card" className="w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 bg-[hsl(217,20%,11%)]/60 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
-                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-[hsl(217,25%,13%)]/50">
+                  <div data-testid="current-sale-card" className={`w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto ${posTheme === 'dark' ? 'bg-[hsl(217,20%,11%)]/60' : 'bg-white'}`}>
+                    <div className={`px-3 py-3 sm:px-5 sm:py-4 border-b ${posTheme === 'dark' ? 'border-gray-700/30 bg-[hsl(217,25%,13%)]/50' : 'border-gray-100 bg-gray-50'}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
