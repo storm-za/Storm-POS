@@ -25,7 +25,7 @@ Preferred communication style: Simple, everyday language.
 - **API**: RESTful Express.js server.
 
 ### Feature Specifications
-- **Marketing Website**: Homepage, Web Development service page, Contact form with lead capture.
+- **Marketing Website**: Homepage, Web Development service page, Contact form with lead capture, dedicated `/pricing` page with interactive calculator, feature comparison table, and FAQ.
 - **POS System**:
     - **Core**: Real-time sales, inventory management (CRUD), customer directory (CRUD), multiple payment types (Cash, Card, EFT).
     - **Advanced**: Staff account management with role-based access, void sale functionality with reason tracking, tip options for sales.
