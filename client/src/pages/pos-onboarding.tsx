@@ -738,9 +738,9 @@ function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm
         <p className="text-gray-400 text-sm max-w-md mx-auto">{body}</p>
       </div>
 
-      <div className={`grid gap-4 mb-4 ${volume === "growth" ? "grid-cols-2" : "grid-cols-1 max-w-sm mx-auto"}`}>
+      <div className={`grid gap-4 mb-4 ${volume !== "high" ? "grid-cols-2" : "grid-cols-1 max-w-sm mx-auto"}`}>
         <PlanCard {...planData(recommendedPlan, true)} L={L}/>
-        {volume === "growth" && <PlanCard {...planData(secondaryPlan, false)} L={L}/>}
+        {volume !== "high" && <PlanCard {...planData(secondaryPlan, false)} L={L}/>}
       </div>
 
       <p className="text-center text-xs text-gray-500 mb-6 flex items-center justify-center gap-1.5">
