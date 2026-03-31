@@ -1,4 +1,4 @@
-import { Mail, MapPin } from "lucide-react";
+import { EnvelopeSimple as Mail, MapPin } from "@phosphor-icons/react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 

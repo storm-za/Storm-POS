@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mail, ArrowLeft, Clock, MapPin, CheckCircle, Zap } from "lucide-react";
+import { EnvelopeSimple as Mail, ArrowLeft, Clock, MapPin, CheckCircle, RocketLaunch as Zap } from "@phosphor-icons/react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 import { updatePageSEO } from "@/lib/seo";

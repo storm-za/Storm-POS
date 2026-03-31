@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { List as Menu, X } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 
 export default function Navigation() {

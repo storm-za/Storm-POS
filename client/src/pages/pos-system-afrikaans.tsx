@@ -18,13 +18,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
 import { z } from "zod";
-import { 
-  ShoppingCart, Package, Users, BarChart3, Plus, Minus, Trash2, 
-  CreditCard, DollarSign, Receipt, Search, LogOut, Edit, PlusCircle,
-  Calendar, TrendingUp, FileText, Clock, Eye, EyeOff, Download, User, UserPlus, Settings, X, Printer,
-  ChevronDown, ChevronRight, ChevronLeft, Globe, BookOpen, HelpCircle, Share2, Upload, FileSpreadsheet, RefreshCw, Link2, Check, Menu,
-  AlertTriangle, XCircle, Tag, Hash, Lock, Grid3X3, LayoutList, Folder, FolderPlus, Palette, ClipboardList, SlidersHorizontal, CheckCircle2, Building2, Loader2
-} from "lucide-react";
+import {
+  ShoppingCart, Package, Users, ChartBar as BarChart3, Plus, Minus, Trash as Trash2,
+  CreditCard, CurrencyDollar as DollarSign, Receipt, MagnifyingGlass as Search,
+  SignOut as LogOut, NotePencil as Edit, PlusCircle,
+  Calendar, TrendUp as TrendingUp, FileText, Clock, Eye, EyeSlash as EyeOff,
+  DownloadSimple as Download, User, UserPlus, GearSix as Settings, X, Printer,
+  CaretDown as ChevronDown, CaretRight as ChevronRight, CaretLeft as ChevronLeft,
+  Globe, BookOpen, Question as HelpCircle, ShareNetwork as Share2,
+  UploadSimple as Upload, Table as FileSpreadsheet, ArrowClockwise as RefreshCw,
+  Link as Link2, Check, List as Menu,
+  Warning as AlertTriangle, XCircle, Tag, Hash, Lock,
+  GridNine as Grid3X3, ListBullets as LayoutList, Folder, FolderSimplePlus as FolderPlus,
+  Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
+  CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2
+} from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";

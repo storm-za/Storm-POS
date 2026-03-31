@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, ArrowLeft, Check, Zap } from "lucide-react";
+import { Eye, EyeSlash as EyeOff, ArrowLeft, Check, RocketLaunch as Zap } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 const perks = [

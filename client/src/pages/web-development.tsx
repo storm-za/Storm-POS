@@ -3,29 +3,13 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  Check, 
-  ArrowLeft, 
-  Zap, 
-  Shield, 
-  Smartphone, 
-  Search,
-  Code, 
-  Palette, 
-  Rocket,
-  BarChart3,
-  ChevronDown,
-  ChevronUp,
-  Award,
-  Clock,
-  Target,
-  TrendingUp,
-  CheckCircle,
-  XCircle,
-  Users,
-  MapPin,
-  Star
-} from "lucide-react";
+import {
+  Check, ArrowLeft, RocketLaunch as Zap, ShieldCheck as Shield,
+  DeviceMobile as Smartphone, MagnifyingGlass as Search, Code, Palette,
+  Rocket, ChartBar as BarChart3, CaretDown as ChevronDown,
+  CaretUp as ChevronUp, Medal as Award, Clock, Target,
+  TrendUp as TrendingUp, CheckCircle, XCircle, Users, MapPin, Star
+} from "@phosphor-icons/react";
 import WebDevSVG from "@/components/web-dev-svg";
 import ContactForm from "@/components/contact-form";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";

@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { 
-  Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap,
-  FileSpreadsheet, FileText, Receipt, BarChart3, Package, CreditCard, 
-  Globe, Calculator, PieChart, UserCheck, Languages,
-  Wallet, MessageSquare, Share2, Monitor, Star, X, Menu
-} from "lucide-react";
+import {
+  Check, DeviceMobile as Smartphone, Cloud, TrendUp as TrendingUp,
+  Users, ShieldCheck as Shield, RocketLaunch as Zap,
+  Table as FileSpreadsheet, FileText, Receipt, ChartBar as BarChart3,
+  Package, CreditCard, Globe, Calculator, ChartPie as PieChart,
+  UserCircleCheck as UserCheck, Translate as Languages,
+  Wallet, ChatCircle as MessageSquare, ShareNetwork as Share2,
+  Desktop as Monitor, Star, X, List as Menu
+} from "@phosphor-icons/react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
 import { updatePageSEO } from "@/lib/seo";

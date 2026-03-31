@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useParams } from "wouter";
-import { ArrowLeft, Clock, Calendar, User, Share2, Linkedin, Twitter, Facebook, CheckCircle, ArrowRight } from "lucide-react";
+import { Linkedin, Twitter, Facebook } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, User, ShareNetwork as Share2, CheckCircle, ArrowRight } from "@phosphor-icons/react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { updatePageSEO } from "@/lib/seo";

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { defaultReceiptSettings, type ReceiptSettings, type InvoiceCustomField } from "@shared/schema";
-import { ChevronUp, ChevronDown, FileText, Plus, Trash2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { CaretUp as ChevronUp, CaretDown as ChevronDown, FileText, Plus, Trash as Trash2, Eye, EyeSlash as EyeOff, WarningCircle as AlertCircle } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiRequest } from "@/lib/queryClient";
 

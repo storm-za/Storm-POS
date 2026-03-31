@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, ArrowLeft, Check, Shield, Cloud, Zap } from "lucide-react";
+import { Eye, EyeSlash as EyeOff, ArrowLeft, Check, ShieldCheck as Shield, Cloud, RocketLaunch as Zap } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 const REMEMBER_EMAIL_KEY  = "posRememberedEmail";

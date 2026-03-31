@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ShoppingCart, Package, Users, FileText, BarChart3, CreditCard, Settings, Receipt, HelpCircle, User, Globe } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Package, Users, FileText, ChartBar as BarChart3, CreditCard, GearSix as Settings, Receipt, Question as HelpCircle, User, Globe } from "@phosphor-icons/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 

@@ -3,7 +3,11 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, ScanBarcode, TrendingUp, Users, Award, Shield, CheckCircle, Star, ChevronDown, ChevronUp, Mail, Sparkles, X, Bell } from "lucide-react";
+import {
+  Code, Barcode as ScanBarcode, TrendUp as TrendingUp, Users, Medal as Award,
+  ShieldCheck as Shield, CheckCircle, Star, CaretDown as ChevronDown,
+  CaretUp as ChevronUp, EnvelopeSimple as Mail, Sparkle as Sparkles, X, Bell
+} from "@phosphor-icons/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";

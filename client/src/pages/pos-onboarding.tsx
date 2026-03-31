@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, ArrowRight, ArrowLeft, Sparkles, Shield, ChevronRight } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Sparkle as Sparkles, ShieldCheck as Shield, CaretRight as ChevronRight } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 const B = "hsl(217,90%,40%)";

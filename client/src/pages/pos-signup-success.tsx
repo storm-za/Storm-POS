@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Sparkles, ArrowRight, Shield, Zap, BarChart3 } from "lucide-react";
+import { CheckCircle, Sparkle as Sparkles, ArrowRight, ShieldCheck as Shield, RocketLaunch as Zap, ChartBar as BarChart3 } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 declare global {

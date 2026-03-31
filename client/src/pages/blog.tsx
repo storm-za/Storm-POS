@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, ArrowRight, Calendar, User } from "lucide-react";
+import { Clock, ArrowRight, Calendar, User } from "@phosphor-icons/react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { updatePageSEO } from "@/lib/seo";

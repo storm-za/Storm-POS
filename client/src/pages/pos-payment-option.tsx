@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, Percent, DollarSign, FileText, Zap, Shield, Gift } from "lucide-react";
+import { Check, Percent, CurrencyDollar as DollarSign, FileText, RocketLaunch as Zap, ShieldCheck as Shield, Gift } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 const t = {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, TrendingDown } from "lucide-react";
+import { X, TrendDown as TrendingDown } from "@phosphor-icons/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
