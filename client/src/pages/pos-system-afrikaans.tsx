@@ -347,7 +347,7 @@ export default function PosSystemAfrikaans() {
   const [invoiceCustomClient, setInvoiceCustomClient] = useState("");
   const [invoiceClientEmail, setInvoiceClientEmail] = useState("");
   const [invoiceClientPhone, setInvoiceClientPhone] = useState("");
-  const [isCustomClient, setIsCustomClient] = useState(false);
+  const [isCustomClient, setIsCustomClient] = useState(true);
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
   const [invoicePoNumber, setInvoicePoNumber] = useState("");
@@ -1966,7 +1966,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceCustomClient("");
       setInvoiceClientEmail("");
       setInvoiceClientPhone("");
-      setIsCustomClient(false);
+      setIsCustomClient(true);
       setInvoiceDueDate("");
       setInvoiceNotes("");
       setInvoicePoNumber("");
@@ -2015,7 +2015,7 @@ export default function PosSystemAfrikaans() {
       setInvoiceCustomClient("");
       setInvoiceClientEmail("");
       setInvoiceClientPhone("");
-      setIsCustomClient(false);
+      setIsCustomClient(true);
       setInvoiceDueDate("");
       setInvoiceNotes("");
       setInvoicePoNumber("");
@@ -8132,7 +8132,7 @@ ${dateFilteredSales.map(sale =>
             setInvoiceCustomClient("");
             setInvoiceClientEmail("");
             setInvoiceClientPhone("");
-            setIsCustomClient(false);
+            setIsCustomClient(true);
             setInvoiceDueDate("");
             setInvoiceNotes("");
             setInvoicePoNumber("");
