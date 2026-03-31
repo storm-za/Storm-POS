@@ -10,9 +10,10 @@ import {
 } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
-import laptopMockup from "@assets/STORM_(3)_1768301814534.png";
-import mobileMockup from "@assets/STORM__18_-removebg-preview_1761855233465.png";
 import { updatePageSEO } from "@/lib/seo";
+import MultiDeviceSync from "@/components/illustrations/MultiDeviceSync";
+import InvoicePreview from "@/components/illustrations/InvoicePreview";
+import ReportingDashboard from "@/components/illustrations/ReportingDashboard";
 
 export default function POS() {
   useEffect(() => {
@@ -177,17 +178,14 @@ export default function POS() {
               </div>
             </motion.div>
 
-            {/* Right - device stack */}
+            {/* Right - multi-device SVG illustration */}
             <motion.div initial={{ opacity:0, x:40 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.8, delay:0.2 }} className="relative flex justify-center">
               <div className="relative w-full max-w-md">
                 <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/15 to-[hsl(217,90%,55%)]/10 blur-3xl rounded-full scale-110" />
                 <div className="relative bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-[hsl(217,90%,40%)]/15 shadow-2xl">
-                  <motion.img src={laptopMockup} alt="Storm POS Dashboard" className="w-full h-auto"
-                    animate={{ y:[0,-10,0] }} transition={{ duration:4, repeat:Infinity, ease:"easeInOut" }} />
-                </div>
-                <div className="absolute -bottom-8 -left-6 w-36 bg-white/80 backdrop-blur-xl rounded-2xl p-3 border border-[hsl(217,90%,40%)]/20 shadow-xl">
-                  <motion.img src={mobileMockup} alt="Storm POS Mobile" className="w-full h-auto"
-                    animate={{ y:[0,-8,0] }} transition={{ duration:5, repeat:Infinity, ease:"easeInOut", delay:0.5 }} />
+                  <motion.div animate={{ y:[0,-10,0] }} transition={{ duration:4, repeat:Infinity, ease:"easeInOut" }}>
+                    <MultiDeviceSync className="w-full h-auto" />
+                  </motion.div>
                 </div>
                 <div className="absolute -top-4 -right-2 bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] text-white px-4 py-2.5 rounded-xl shadow-xl text-sm font-bold flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />99.9% Uptime
@@ -210,6 +208,51 @@ export default function POS() {
               <div className="text-xs text-gray-500 font-medium">{lbl}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── FEATURE SHOWCASE ──────────────────────────────────── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto space-y-20">
+          {/* Invoice & Quotes */}
+          <motion.div className="grid md:grid-cols-2 gap-10 items-center"
+            initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-full">Invoices & Quotes</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-4 mb-3">Professional documents in seconds</h2>
+              <p className="text-gray-500 mb-5">Create branded invoices and quotes with automatic numbering, line items, tax, and PDF export. Send via WhatsApp or email directly from the system.</p>
+              <ul className="space-y-2">
+                {["Automatic INV/QUO numbering","PDF export with your logo","Status workflow: Draft to Paid","WhatsApp & email sharing"].map(item => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
+                    <Check className="h-4 w-4 text-[hsl(217,90%,40%)] shrink-0" />{item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+              <InvoicePreview className="w-full h-auto" />
+            </div>
+          </motion.div>
+
+          {/* Reporting */}
+          <motion.div className="grid md:grid-cols-2 gap-10 items-center"
+            initial={{ opacity:0, y:30 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
+            <div className="order-2 md:order-1 bg-gray-50 rounded-2xl p-6 border border-gray-100">
+              <ReportingDashboard className="w-full h-auto" />
+            </div>
+            <div className="order-1 md:order-2">
+              <span className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-full">Analytics & Reports</span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-4 mb-3">Know your numbers at a glance</h2>
+              <p className="text-gray-500 mb-5">Real-time sales dashboard with charts, date filters, staff breakdowns, and Excel export. Make data-driven decisions every day.</p>
+              <ul className="space-y-2">
+                {["Daily, weekly & monthly sales charts","Staff performance tracking","Excel export for accountants","Best-seller product insights"].map(item => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
+                    <Check className="h-4 w-4 text-[hsl(217,90%,40%)] shrink-0" />{item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
         </div>
       </section>
 

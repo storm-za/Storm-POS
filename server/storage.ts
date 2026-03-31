@@ -138,6 +138,8 @@ export interface IStorage {
   incrementUserUsage(userId: number, amount: string): Promise<void>;
   resetAllUsersUsage(): Promise<void>;
   getUserUsage(userId: number): Promise<string>;
+  markUpsellEmailSent(userId: number, month: string): Promise<void>;
+  switchPosUserToFlatPlan(userId: number): Promise<PosUser | undefined>;
   
   // System settings for idempotent operations
   getSystemSetting(key: string): Promise<string | null>;
@@ -688,6 +690,14 @@ export class MemStorage implements IStorage {
     return "0.00";
   }
 
+  async markUpsellEmailSent(userId: number, month: string): Promise<void> {
+    // No-op in MemStorage
+  }
+
+  async switchPosUserToFlatPlan(userId: number): Promise<PosUser | undefined> {
+    return undefined;
+  }
+
   // System settings (stub implementations for MemStorage)
   async getSystemSetting(key: string): Promise<string | null> {
     return null;
@@ -1198,7 +1208,8 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(posUsers)
       .set({ 
-        currentUsage: sql`current_usage + ${amount}`
+        currentUsage: sql`current_usage + ${amount}`,
+        currentSalesCount: sql`current_sales_count + 1`
       })
       .where(eq(posUsers.id, userId));
   }
@@ -1206,7 +1217,23 @@ export class DatabaseStorage implements IStorage {
   async resetAllUsersUsage(): Promise<void> {
     await db
       .update(posUsers)
-      .set({ currentUsage: "0.00" });
+      .set({ currentUsage: "0.00", currentSalesCount: 0, upsellEmailSentMonth: null });
+  }
+
+  async markUpsellEmailSent(userId: number, month: string): Promise<void> {
+    await db
+      .update(posUsers)
+      .set({ upsellEmailSentMonth: month })
+      .where(eq(posUsers.id, userId));
+  }
+
+  async switchPosUserToFlatPlan(userId: number): Promise<PosUser | undefined> {
+    const [updated] = await db
+      .update(posUsers)
+      .set({ paymentPlan: 'flat' })
+      .where(and(eq(posUsers.id, userId), eq(posUsers.paymentPlan, 'percent')))
+      .returning();
+    return updated || undefined;
   }
 
   async getUserUsage(userId: number): Promise<string> {

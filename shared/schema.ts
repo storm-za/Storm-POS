@@ -44,6 +44,8 @@ export const posUsers = pgTable("pos_users", {
   salesDisplayMode: text("sales_display_mode").notNull().default("grid"), // 'grid' or 'tabs' for category display
   paymentOptionSelected: boolean("payment_option_selected").notNull().default(false),
   paymentPlan: text("payment_plan"), // 'percent' (0.5% per sale) or 'flat' (R1.00 per sale)
+  currentSalesCount: integer("current_sales_count").notNull().default(0), // Non-trial sales this billing month
+  upsellEmailSentMonth: text("upsell_email_sent_month"), // 'YYYY-MM' of month upsell email was sent
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

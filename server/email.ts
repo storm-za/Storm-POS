@@ -343,6 +343,104 @@ Storm Contact System
   }
 }
 
+export async function sendUpsellSwitchEmail(
+  userEmail: string,
+  userName: string,
+  savingAmount: number,
+  language: string
+): Promise<boolean> {
+  const transporter = createTransporter();
+
+  const isAf = language === 'af';
+  const subject = isAf
+    ? `Storm POS: Bespaar R${savingAmount.toFixed(2)} hierdie maand deur na plat plan te skakel`
+    : `Storm POS: Switch to flat plan and save R${savingAmount.toFixed(2)} this month`;
+
+  const bodyText = isAf ? `
+Hallo ${userName},
+
+Goeie nuus! Op grond van jou verkoopsvolume hierdie maand sou jy R${savingAmount.toFixed(2)} bespaar het as jy op die plat R1.00-per-verkoop-plan was.
+
+Skakel nou na die plat plan deur in te teken en na Gebruik & Fakturering te gaan.
+
+Groete,
+Die Storm-span
+  `.trim() : `
+Hi ${userName},
+
+Good news! Based on your sales volume this month, you would have saved R${savingAmount.toFixed(2)} if you were on the flat R1.00 per sale plan.
+
+Switch to the flat plan now by logging in and navigating to Usage & Billing.
+
+Best,
+The Storm Team
+  `.trim();
+
+  const htmlBody = isAf ? `
+    <p>Hallo <strong>${userName}</strong>,</p>
+    <p>Op grond van jou verkoopsvolume hierdie maand sou jy <strong style="color:hsl(217,90%,40%)">R${savingAmount.toFixed(2)}</strong> bespaar het as jy op die <strong>plat R1.00-per-verkoop-plan</strong> was.</p>
+    <p>Skakel nou na die plat plan deur in te teken en na <strong>Gebruik &amp; Fakturering</strong> te gaan.</p>
+  ` : `
+    <p>Hi <strong>${userName}</strong>,</p>
+    <p>Based on your sales volume this month, you would have saved <strong style="color:hsl(217,90%,40%)">R${savingAmount.toFixed(2)}</strong> if you were on the <strong>flat R1.00 per sale plan</strong>.</p>
+    <p>Switch to the flat plan now by logging in and going to <strong>Usage &amp; Billing</strong>.</p>
+  `;
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, hsl(217,90%,40%) 0%, hsl(217,90%,52%) 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
+    .saving { font-size: 2rem; font-weight: bold; color: hsl(217,90%,40%); text-align: center; margin: 20px 0; }
+    .cta-button { display: inline-block; background: hsl(217,90%,40%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+    .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; border-radius: 0 0 10px 10px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin:0;">Storm POS</h1>
+      <p style="margin:8px 0 0;opacity:0.85;">${isAf ? 'Bespaar meer hierdie maand' : 'Save more this month'}</p>
+    </div>
+    <div class="content">
+      ${htmlBody}
+      <div class="saving">R${savingAmount.toFixed(2)}</div>
+      <p style="text-align:center;">
+        <a href="https://stormsoftware.co.za/pos/login" class="cta-button">${isAf ? 'Teken in &amp; Skakel Nou' : 'Log In &amp; Switch Now'}</a>
+      </p>
+    </div>
+    <div class="footer">stormsoftware.co.za</div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  if (!transporter) {
+    console.log(`📧 Upsell email (no transporter): ${userEmail} | save R${savingAmount.toFixed(2)}`);
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: userEmail,
+      subject,
+      text: bodyText,
+      html: htmlContent,
+    });
+    console.log(`✅ Upsell switch email sent to ${userEmail} (save R${savingAmount.toFixed(2)})`);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Failed to send upsell email:', error.message);
+    return false;
+  }
+}
+
 export async function sendPricingInterestEmail(email: string): Promise<boolean> {
   const transporter = createTransporter();
   

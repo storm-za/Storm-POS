@@ -29,6 +29,7 @@ import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_17621973881
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
+import UpsellBanner from "@/components/UpsellBanner";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
@@ -245,7 +246,7 @@ export default function PosSystem() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; receiptSettings?: any} | null>(null);
+  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string; receiptSettings?: any; paymentPlan?: string; planSavingAmount?: number | null; preferredLanguage?: string} | null>(null);
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
@@ -4239,6 +4240,16 @@ export default function PosSystem() {
             <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
             <span className="text-gray-900 text-sm font-semibold ml-auto capitalize">{currentTab === 'sales' ? 'Sales' : currentTab === 'products' ? 'Products' : currentTab === 'customers' ? 'Customers' : currentTab === 'invoices' ? 'Invoices' : currentTab === 'purchase-orders' ? 'Purchase Orders' : currentTab === 'open-accounts' ? 'Open Accounts' : currentTab === 'reports' ? 'Reports' : currentTab === 'usage' ? 'Usage' : 'Settings'}</span>
           </div>
+
+          {currentUser && currentUser.paymentPlan === 'percent' && (currentUser.planSavingAmount ?? 0) > 0 && (
+            <UpsellBanner
+              userId={currentUser.id}
+              userEmail={currentUser.email}
+              planSavingAmount={currentUser.planSavingAmount!}
+              language={currentUser.preferredLanguage || 'en'}
+              onSwitched={(u) => setCurrentUser(prev => prev ? { ...prev, ...(u as typeof prev) } : prev)}
+            />
+          )}
 
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden content-bottom-safe">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">

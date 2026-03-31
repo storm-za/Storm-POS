@@ -11,13 +11,26 @@ import {
   signupPosUserSchema,
   insertPosCategorySchema
 } from "@shared/schema";
-import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail } from "./email";
+import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail, sendUpsellSwitchEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import * as XLSX from "xlsx";
 
 const scryptAsync = promisify(scrypt);
+
+function computePlanSavingAmount(user: { paymentPlan?: string | null; currentUsage?: string | null; currentSalesCount?: number | null }): number | null {
+  if (user.paymentPlan !== 'percent') return null;
+  const currentUsage = parseFloat(user.currentUsage || '0');
+  const flatCost = (user.currentSalesCount || 0) * 1.0;
+  const saving = currentUsage - flatCost;
+  return saving > 0.005 ? Math.round(saving * 100) / 100 : null;
+}
+
+function currentBillingMonth(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
 
 // Secure password hashing using Node.js built-in crypto
 async function hashPassword(password: string): Promise<string> {
@@ -220,7 +233,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           selectedStaffAccountId: newUser.selectedStaffAccountId,
           receiptSettings: newUser.receiptSettings,
           paymentOptionSelected: newUser.paymentOptionSelected,
-          paymentPlan: newUser.paymentPlan
+          paymentPlan: newUser.paymentPlan,
+          planSavingAmount: computePlanSavingAmount(newUser)
         }
       });
     } catch (error) {
@@ -267,7 +281,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           selectedStaffAccountId: user.selectedStaffAccountId,
           receiptSettings: user.receiptSettings,
           paymentOptionSelected: user.paymentOptionSelected,
-          paymentPlan: user.paymentPlan
+          paymentPlan: user.paymentPlan,
+          planSavingAmount: computePlanSavingAmount(user)
         }
       });
     } catch (error) {
@@ -328,6 +343,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Payment plan update error:", error);
       res.status(500).json({ message: "Failed to update payment plan" });
+    }
+  });
+
+  app.put("/api/pos/user/:id/upgrade-plan", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { userEmail } = req.body;
+      if (!userEmail) return res.status(400).json({ message: "User email is required for verification." });
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) return res.status(404).json({ message: "User not found" });
+      if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized: email does not match user." });
+      if (existingUser.paymentPlan !== 'percent') return res.status(409).json({ message: "Can only upgrade from percent plan to flat plan." });
+      const updatedUser = await storage.switchPosUserToFlatPlan(userId);
+      if (!updatedUser) return res.status(500).json({ message: "Failed to switch plan" });
+      res.json({
+        success: true,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          paid: updatedUser.paid,
+          companyLogo: updatedUser.companyLogo,
+          companyName: updatedUser.companyName,
+          tutorialCompleted: updatedUser.tutorialCompleted,
+          trialStartDate: updatedUser.trialStartDate,
+          preferredLanguage: updatedUser.preferredLanguage,
+          selectedStaffAccountId: updatedUser.selectedStaffAccountId,
+          receiptSettings: updatedUser.receiptSettings,
+          paymentOptionSelected: updatedUser.paymentOptionSelected,
+          paymentPlan: updatedUser.paymentPlan,
+          planSavingAmount: null
+        }
+      });
+    } catch (error) {
+      console.error("Plan upgrade error:", error);
+      res.status(500).json({ message: "Failed to upgrade plan" });
     }
   });
 
@@ -885,6 +935,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const saleTotal = parseFloat(validatedData.total);
             const usageAmount = (saleTotal * 0.005).toFixed(2); // 0.5% of sale total
             await storage.incrementUserUsage(userIdToUse, usageAmount);
+
+            // Upsell check: if % plan user's cost now exceeds flat plan cost, send one email per month
+            if (user.paymentPlan === 'percent') {
+              const newUsage = parseFloat(user.currentUsage || '0') + parseFloat(usageAmount);
+              const newCount = (user.currentSalesCount || 0) + 1;
+              const flatCost = newCount * 1.0;
+              const saving = newUsage - flatCost;
+              const billingMonth = currentBillingMonth();
+              if (saving > 0.005 && user.upsellEmailSentMonth !== billingMonth) {
+                // Mark first so duplicate sends are avoided even if email throws
+                await storage.markUpsellEmailSent(userIdToUse, billingMonth);
+                const userName = user.firstName || user.companyName;
+                sendUpsellSwitchEmail(user.email, userName, Math.round(saving * 100) / 100, user.preferredLanguage || 'en').catch(() => {});
+              }
+            }
           }
         }
       } catch (usageError) {
