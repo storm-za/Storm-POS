@@ -35,7 +35,9 @@ Preferred communication style: Simple, everyday language.
     - **Functionality**: Full CRUD for invoices and quotes, automatic numbering, client selection, comprehensive form fields (PO, terms, due date, line items, calculations, payment method, notes, T&Cs).
     - **Management**: Status workflow (Draft, Sent, Paid, Cancelled), search, filter by status, type, date range.
     - **Export**: PDF export with Storm branding and business details (logo, company info).
-- **Email System**: Automated welcome emails for new users.
+- **Email System**: Automated welcome emails for new users; bilingual (EN/AF) upsell switch emails sent once per billing month when a percent-plan user's sale fees exceed the flat-plan equivalent cost.
+- **Upsell System**: When a user on the 0.5% per-sale plan has paid more in fees than the R1.00/sale flat plan would have cost, a dismissible banner appears in the POS and a one-time monthly email is sent. `PUT /api/pos/user/:id/upgrade-plan` (email-verified) switches percent to flat plan. `currentUsage` tracks sale fees only; invoice fees are separate and apply equally on all plans. `currentSalesCount` and `upsellEmailSentMonth` columns on `posUsers` support this.
+- **SVG Illustrations**: Three brand-style inline SVG components in `client/src/components/illustrations/` (MultiDeviceSync, InvoicePreview, ReportingDashboard) use strict black #111 outlines, white fills, and `hsl(217,90%,40%)` spot colour only on value/action elements (sync pulse dots, checkmarks, PAID/DRAFT stamps, logo placeholders, profit figures, trend line, donut arc).
 - **Blog**: SEO-optimized blog section with 11 long-form articles targeting SA-specific keywords, internal linking, social sharing, and related posts. Article JSON-LD and BreadcrumbList schema on every post.
 - **SEO**: Full technical SEO audit implemented — correct canonical URLs, absolute og:url, Article schema on blog posts, FAQPage schema on Home/Web Development/POS, BreadcrumbList on all key pages, hreflang for English/Afrikaans help pages, dynamic blog sitemap, robots.txt via server (no duplicate static file).
 
