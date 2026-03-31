@@ -8,10 +8,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { Check, ArrowRight, ArrowLeft, Sparkles, Shield, ChevronRight } from "lucide-react";
 import { updatePageSEO } from "@/lib/seo";
 
-// ─── Brand colour constant ────────────────────────────────────────────────────
 const B = "hsl(217,90%,40%)";
 
-// ─── Translations ─────────────────────────────────────────────────────────────
 const LABELS = {
   en: {
     step: (n: number) => `Step ${n} of 4`,
@@ -19,7 +17,6 @@ const LABELS = {
     next: "Next",
     back: "Back",
     recommended: "Recommended",
-    // Step 1
     s1Title: "What kind of operation are we setting up today?",
     s1Sub: "We'll personalise your Storm POS experience based on your business type.",
     bizTypes: [
@@ -28,7 +25,6 @@ const LABELS = {
       { id: "service",    label: "Service / Freelancer",     sub: "Salon, repairs, consulting" },
       { id: "wholesale",  label: "High-Volume Wholesale",    sub: "Bulk supply, distribution" },
     ],
-    // Step 2
     s2Title: "Let's recommend the perfect plan for your business.",
     s2Sub: "Your monthly sales volume helps us make sure you're not over- or under-paying.",
     volumes: [
@@ -36,7 +32,6 @@ const LABELS = {
       { id: "growth", label: "Growing Business",    sub: "R10,000 – R100,000 / month" },
       { id: "high",   label: "High-Volume",         sub: "R100,000+ / month or 10+ daily sales" },
     ],
-    // Step 3
     s3MicroTitle:  "The perfect starting plan for you",
     s3MicroBody:   "Your volume fits our pay-as-you-grow plan perfectly. Only pay when you sell — no monthly minimums!",
     s3GrowthTitle: "Two great options — we suggest starting here",
@@ -53,7 +48,6 @@ const LABELS = {
     trialNote:  "7-day free trial on both plans — no credit card needed",
     confirmPlan: "Confirm This Plan",
     saving: "Saving...",
-    // Step 4
     s4Title: "Complete these 4 steps to process your first sale!",
     s4Sub:   "Tick each step as you go — we'll celebrate when you're done.",
     checklist: [
@@ -117,7 +111,6 @@ const LABELS = {
   },
 } as const;
 
-// ─── Shared label type (used in all step component props) ─────────────────────
 interface LabelSet {
   step: (n: number) => string;
   skip: string;
@@ -154,7 +147,6 @@ interface LabelSet {
   goToPOS: string;
 }
 
-// ─── SVG Icons — monoline black outlines, white fills, brand-blue spot ────────
 const SL = { strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
 function RetailIcon() {
@@ -381,7 +373,6 @@ function RocketIcon() {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 type Step = 0 | 1 | 2 | 3;
 type BizType = "retail" | "restaurant" | "service" | "wholesale";
 type Volume  = "micro" | "growth" | "high";
@@ -391,14 +382,12 @@ export default function PosOnboarding() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  // ── Resolve user from localStorage ──
   const user = (() => {
     try { return JSON.parse(localStorage.getItem("posUser") ?? "null"); } catch { return null; }
   })();
   const lang: "en" | "af" = user?.preferredLanguage === "af" ? "af" : "en";
   const L: LabelSet = LABELS[lang];
 
-  // ── State ──
   const [step,     setStep]     = useState<Step>(0);
   const [bizType,  setBizType]  = useState<BizType | null>(null);
   const [volume,   setVolume]   = useState<Volume | null>(null);
@@ -411,7 +400,6 @@ export default function PosOnboarding() {
 
   const allDone = checked.size === 4;
 
-  // ── Redirect guards ──
   useEffect(() => {
     updatePageSEO({
       title: lang === "af" ? "Welkom by Storm POS - Aanboord" : "Welcome to Storm POS - Onboarding",
@@ -426,11 +414,9 @@ export default function PosOnboarding() {
     }
   }, []);
 
-  // ── Derived recommended plan ──
   const recommendedPlan: Plan = volume === "high" ? "flat" : "percent";
   const secondaryPlan:   Plan = recommendedPlan === "flat" ? "percent" : "flat";
 
-  // ── Persist checklist ──
   const toggleCheck = useCallback((id: string) => {
     setChecked(prev => {
       const next = new Set(prev);
@@ -440,7 +426,6 @@ export default function PosOnboarding() {
     });
   }, [user?.id]);
 
-  // ── Plan confirmation mutation ──
   const confirmMutation = useMutation({
     mutationFn: async (plan: Plan) => {
       const res = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan, userEmail: user.email });
@@ -461,7 +446,6 @@ export default function PosOnboarding() {
     },
   });
 
-  // ── Skip handler ──
   const handleSkip = async () => {
     if (!user.paymentOptionSelected) {
       try {
@@ -481,23 +465,19 @@ export default function PosOnboarding() {
 
   if (!user) return null;
 
-  // ── Shared layout wrapper ──────────────────────────────────────────────────
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[hsl(217,30%,8%)] via-[hsl(217,25%,12%)] to-[hsl(217,20%,10%)] flex flex-col items-center justify-start px-4 pt-8 pb-12 relative overflow-x-hidden">
-      {/* Background glows */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[hsl(217,90%,40%)]/8 rounded-full blur-3xl"/>
         <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-[hsl(217,90%,50%)]/8 rounded-full blur-3xl"/>
       </div>
 
-      {/* Top bar: logo + step indicator */}
       <div className="relative z-10 w-full max-w-2xl flex items-center justify-between mb-8">
         <div className="bg-white rounded-xl p-2 shadow-md">
           <img src="/storm-logo.png" alt="Storm POS" className="h-8 w-auto block"/>
         </div>
         {step < 3 && (
           <div className="flex items-center gap-2">
-            {/* Step dots */}
             {([0, 1, 2, 3] as Step[]).map(s => (
               <div
                 key={s}
@@ -513,7 +493,6 @@ export default function PosOnboarding() {
         )}
       </div>
 
-      {/* Progress bar */}
       {step < 3 && (
         <div className="relative z-10 w-full max-w-2xl h-0.5 bg-white/10 rounded-full mb-8">
           <motion.div
@@ -525,7 +504,6 @@ export default function PosOnboarding() {
         </div>
       )}
 
-      {/* Step content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
@@ -556,7 +534,6 @@ export default function PosOnboarding() {
   );
 }
 
-// ─── Step 1: Business Type ────────────────────────────────────────────────────
 const BIZ_ICONS: Record<string, () => JSX.Element> = {
   retail: RetailIcon,
   restaurant: RestaurantIcon,
@@ -623,7 +600,6 @@ function Step1({ L, selected, onSelect, onNext, onSkip }: {
   );
 }
 
-// ─── Step 2: Sales Volume ─────────────────────────────────────────────────────
 const VOL_ICONS: Record<string, () => JSX.Element> = {
   micro: MicroIcon,
   growth: GrowthIcon,
@@ -696,7 +672,6 @@ function Step2({ L, selected, onSelect, onNext, onBack, onSkip }: {
   );
 }
 
-// ─── Step 3: Plan Recommendation ─────────────────────────────────────────────
 function PlanCard({
   isRecommended,
   plan,
@@ -807,7 +782,6 @@ function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm
   );
 }
 
-// ─── Step 4: Aha Checklist ────────────────────────────────────────────────────
 const CHECKLIST_ICONS: Record<string, () => JSX.Element> = {
   logo:    LogoCheckIcon,
   product: ProductCheckIcon,
@@ -824,7 +798,6 @@ function Step4({ L, checked, allDone, onToggle, onGo }: {
 }) {
   return (
     <div>
-      {/* Celebration banner */}
       <AnimatePresence>
         {allDone && (
           <motion.div
@@ -878,7 +851,6 @@ function Step4({ L, checked, allDone, onToggle, onGo }: {
         })}
       </div>
 
-      {/* Progress counter */}
       <div className="flex items-center gap-2 mb-6">
         <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
           <motion.div
