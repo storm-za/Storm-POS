@@ -95,14 +95,15 @@ export default function MultiDeviceSync({ className }: Props) {
       <circle cx="454" cy="167" r="4" fill="white" stroke="#111" strokeWidth="1.5"/>
       <polyline points="452,167 453.5,169 456.5,164.5" stroke={BLUE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 
-      {/* Sync pulse dots (blue spot colour) */}
-      <line x1="242" y1="115" x2="268" y2="115" stroke={BLUE} strokeWidth="1.5" strokeDasharray="4 3"/>
+      {/* Sync connector lines - black stroke */}
+      <line x1="242" y1="115" x2="268" y2="115" stroke="#111" strokeWidth="1.5" strokeDasharray="4 3"/>
+      <line x1="392" y1="140" x2="413" y2="140" stroke="#111" strokeWidth="1.5" strokeDasharray="4 3"/>
+      <path d="M 255 115 Q 255 200 330 200" stroke="#111" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
+      {/* Sync pulse dots - blue spot colour only */}
       <circle cx="242" cy="115" r="3.5" fill={BLUE}/>
       <circle cx="268" cy="115" r="3.5" fill={BLUE}/>
-      <line x1="392" y1="140" x2="413" y2="140" stroke={BLUE} strokeWidth="1.5" strokeDasharray="4 3"/>
       <circle cx="392" cy="140" r="3.5" fill={BLUE}/>
       <circle cx="413" cy="140" r="3.5" fill={BLUE}/>
-      <path d="M 255 115 Q 255 200 330 200" stroke={BLUE} strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
       <circle cx="330" cy="200" r="3.5" fill={BLUE}/>
     </svg>
   );
