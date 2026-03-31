@@ -368,7 +368,7 @@ export default function PosSystem() {
       const saved = localStorage.getItem(`invoiceCardCols_${u?.id || 'guest'}`);
       if (saved) return new Set(JSON.parse(saved));
     } catch {}
-    return new Set(['dueDate']);
+    return new Set(['dueDate','clientEmail','clientPhone','poNumber','dueTerms','paymentMethod','notes','discount']);
   });
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -5560,11 +5560,11 @@ export default function PosSystem() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-white/20 text-white hover:bg-white/10 transition-all duration-200">
                         <SlidersHorizontal className="h-4 w-4 mr-2" />
-                        Columns
+                        Settings
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 bg-[#111] border border-white/20 text-white">
-                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Standard Fields</div>
+                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Field Settings</div>
                       {([
                         { key: 'dueDate', label: 'Due Date' },
                         { key: 'clientEmail', label: 'Client Email' },
@@ -5606,7 +5606,7 @@ export default function PosSystem() {
                       )}
                       <DropdownMenuSeparator className="bg-white/10" />
                       <DropdownMenuItem
-                        onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
+                        onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate','clientEmail','clientPhone','poNumber','dueTerms','paymentMethod','notes','discount']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
                         className="text-xs text-gray-400 hover:bg-white/10 focus:bg-white/10 cursor-pointer"
                       >Reset to default</DropdownMenuItem>
                     </DropdownMenuContent>
@@ -8800,176 +8800,186 @@ export default function PosSystem() {
           }
         }}
       >
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingInvoice ? 'Edit' : 'Create'} {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Document Type Selection */}
+        <DialogContent className="w-[calc(100vw-0.5rem)] sm:w-[92vw] sm:max-w-2xl max-h-[92vh] flex flex-col p-0 gap-0">
+          {/* Sticky Header */}
+          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 bg-white shrink-0">
             <div>
-              <Label>Document Type</Label>
-              <Select 
-                value={invoiceType} 
-                onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
-                disabled={!!editingInvoice}
-              >
-                <SelectTrigger disabled={!!editingInvoice}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="invoice">Invoice</SelectItem>
-                  <SelectItem value="quote">Quote</SelectItem>
-                </SelectContent>
-              </Select>
-              {editingInvoice && (
-                <p className="text-xs text-gray-500 mt-1">Document type cannot be changed when editing</p>
-              )}
+              <h2 className="text-base font-semibold text-gray-900 leading-tight">
+                {editingInvoice ? 'Edit' : 'New'} {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
+              </h2>
+              <p className="text-xs text-gray-400 mt-0.5">Fill in the details below</p>
             </div>
-
-            {/* Client Selection */}
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
-                <Label>Client</Label>
+            {/* Doc type tab switcher */}
+            {!editingInvoice && (
+              <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsCustomClient(!isCustomClient);
-                    if (!isCustomClient) {
-                      setInvoiceClientId(null);
-                    } else {
-                      setInvoiceCustomClient("");
-                    }
-                  }}
-                  className="text-xs text-blue-600 hover:text-blue-700 underline"
-                  data-testid="button-toggle-custom-client"
+                  onClick={() => setInvoiceType('invoice')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${invoiceType === 'invoice' ? 'bg-white text-[hsl(217,90%,40%)] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  {isCustomClient ? "Select from list" : "Enter custom client"}
+                  Invoice
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInvoiceType('quote')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${invoiceType === 'quote' ? 'bg-white text-[hsl(217,90%,40%)] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Quote
                 </button>
               </div>
-              {isCustomClient ? (
-                <Input
-                  type="text"
-                  value={invoiceCustomClient}
-                  onChange={(e) => setInvoiceCustomClient(e.target.value)}
-                  placeholder="Enter client name"
-                  className="w-full"
-                  data-testid="input-custom-client"
-                />
-              ) : (
-                <Select 
-                  value={invoiceClientId?.toString() || ""} 
-                  onValueChange={(value) => setInvoiceClientId(parseInt(value))}
-                  data-testid="select-client"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id.toString()}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            )}
+            {editingInvoice && (
+              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-md">
+                {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
+              </span>
+            )}
+          </div>
+
+          {/* Scrollable Body */}
+          <div className="overflow-y-auto flex-1 bg-gray-50 px-3 sm:px-5 py-4 space-y-3">{/* section gap */}
+
+            {/* Section: Client */}
+            <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Client</span>
+              </div>
+
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
+                  <Label className="text-sm text-gray-700">Client</Label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomClient(!isCustomClient);
+                      if (!isCustomClient) {
+                        setInvoiceClientId(null);
+                      } else {
+                        setInvoiceCustomClient("");
+                      }
+                    }}
+                    className="text-xs text-[hsl(217,90%,40%)] hover:underline font-medium"
+                  >
+                    {isCustomClient ? "Select from list" : "Enter custom client"}
+                  </button>
+                </div>
+                {isCustomClient ? (
+                  <input
+                    type="text"
+                    value={invoiceCustomClient}
+                    onChange={(e) => setInvoiceCustomClient(e.target.value)}
+                    placeholder="Enter client name"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                  />
+                ) : (
+                  <Select
+                    value={invoiceClientId?.toString() || ""}
+                    onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+                  >
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Select a client" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                          {customer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {(invoiceCardColumns.has('clientEmail') || invoiceCardColumns.has('clientPhone')) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {invoiceCardColumns.has('clientEmail') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">Email (Optional)</Label>
+                      <input
+                        type="email"
+                        value={invoiceClientEmail}
+                        onChange={(e) => setInvoiceClientEmail(e.target.value)}
+                        placeholder="client@example.com"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                      />
+                    </div>
+                  )}
+                  {invoiceCardColumns.has('clientPhone') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">Phone (Optional)</Label>
+                      <input
+                        type="tel"
+                        value={invoiceClientPhone}
+                        onChange={(e) => setInvoiceClientPhone(e.target.value)}
+                        placeholder="+27 12 345 6789"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
-            {/* Client Email */}
-            <div>
-              <Label>Client Email (Optional)</Label>
-              <input
-                type="email"
-                value={invoiceClientEmail}
-                onChange={(e) => setInvoiceClientEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="client@example.com"
-              />
-            </div>
-
-            {/* Client Phone */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Client Phone (Optional)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_clientPhone !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_clientPhone: !nh })); saveInvoiceVisDef('vis_clientPhone', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_clientPhone === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_clientPhone === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_clientPhone === false ? 'Hidden' : 'Visible'}
-                </button>
+            {/* Section: Document Details */}
+            {(invoiceCardColumns.has('poNumber') || invoiceCardColumns.has('dueTerms') || invoiceCardColumns.has('dueDate')) && (
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Document Details</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {invoiceCardColumns.has('poNumber') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">PO Number</Label>
+                      <input
+                        type="text"
+                        value={invoicePoNumber}
+                        onChange={(e) => setInvoicePoNumber(e.target.value)}
+                        placeholder="Optional"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                      />
+                    </div>
+                  )}
+                  {invoiceCardColumns.has('dueTerms') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">Payment Terms</Label>
+                      <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="7 days">7 Days</SelectItem>
+                          <SelectItem value="14 days">14 Days</SelectItem>
+                          <SelectItem value="30 days">30 Days</SelectItem>
+                          <SelectItem value="60 days">60 Days</SelectItem>
+                          <SelectItem value="90 days">90 Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  {invoiceCardColumns.has('dueDate') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">Due Date</Label>
+                      <input
+                        type="date"
+                        value={invoiceDueDate}
+                        onChange={(e) => setInvoiceDueDate(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-              <input
-                type="tel"
-                value={invoiceClientPhone}
-                onChange={(e) => setInvoiceClientPhone(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="+27 12 345 6789"
-              />
-            </div>
+            )}
 
-            {/* PO Number */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>PO Number (Optional)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_poNumber !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_poNumber: !nh })); saveInvoiceVisDef('vis_poNumber', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_poNumber === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_poNumber === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_poNumber === false ? 'Hidden' : 'Visible'}
-                </button>
+            {/* Section: Line Items */}
+            <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Line Items</span>
               </div>
-              <input
-                type="text"
-                value={invoicePoNumber}
-                onChange={(e) => setInvoicePoNumber(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="Purchase order number"
-              />
-            </div>
-
-            {/* Payment Terms */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Payment Terms</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueTerms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueTerms: !nh })); saveInvoiceVisDef('vis_dueTerms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueTerms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_dueTerms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_dueTerms === false ? 'Hidden' : 'Visible'}
-                </button>
-              </div>
-              <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="7 days">7 Days</SelectItem>
-                  <SelectItem value="14 days">14 Days</SelectItem>
-                  <SelectItem value="30 days">30 Days</SelectItem>
-                  <SelectItem value="60 days">60 Days</SelectItem>
-                  <SelectItem value="90 days">90 Days</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Due Date */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Due Date (Optional)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueDate !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueDate: !nh })); saveInvoiceVisDef('vis_dueDate', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueDate === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_dueDate === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_dueDate === false ? 'Hidden' : 'Visible'}
-                </button>
-              </div>
-              <input
-                type="date"
-                value={invoiceDueDate}
-                onChange={(e) => setInvoiceDueDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </div>
-
-            {/* Add Products */}
-            <div>
-              <Label>Add Products</Label>
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2">
                 {invoiceItems.map((item, index) => {
                   const product = item.productId ? products.find(p => p.id === item.productId) : null;
                   const itemName = item.customName || product?.name || 'Unknown Product';
@@ -9229,241 +9239,192 @@ export default function PosSystem() {
                   )}
                 </div>
                 
-                {/* Totals */}
-                {invoiceItems.length > 0 && (
-                  <div className="border-t pt-2 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Subtotal:</span>
-                      <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
-                    </div>
-                    
-                    {/* Discount Input */}
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <span>Discount:</span>
-                        <select
-                          value={invoiceDiscountType}
-                          onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')}
-                          className="px-2 py-1 border rounded text-xs"
-                        >
+              </div>
+            </div>
+
+            {/* Section: Totals */}
+            {(() => {
+              const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+              const discountAmt = invoiceDiscountType === 'percent'
+                ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
+                : parseFloat(invoiceDiscountAmount) || 0;
+              const afterDiscount = subtotal - discountAmt;
+              const taxAmt = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
+              const shipping = parseFloat(invoiceShippingAmount) || 0;
+              const total = afterDiscount + taxAmt + shipping;
+              return (
+                <div className="rounded-2xl bg-[hsl(217,90%,40%)] text-white p-4 space-y-2.5 shadow-sm">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-1.5 h-4 rounded-full bg-white/40 inline-block" />
+                    <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">Totals</span>
+                  </div>
+                  <div className="flex justify-between text-sm"><span className="text-white/70">Subtotal</span><span className="text-white">R{subtotal.toFixed(2)}</span></div>
+
+                  {invoiceCardColumns.has('discount') && (
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2 text-white/70">
+                        <span>Discount</span>
+                        <select value={invoiceDiscountType} onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')} className="px-2 py-0.5 border border-white/20 rounded-lg text-xs bg-white/10 text-white focus:outline-none focus:border-white/40">
                           <option value="percent">%</option>
                           <option value="amount">R</option>
                         </select>
                       </div>
                       <div className="flex items-center gap-1">
-                        {invoiceDiscountType === 'amount' && <span>R</span>}
-                        <input
-                          type="number"
-                          value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount}
-                          onChange={(e) => {
-                            if (invoiceDiscountType === 'percent') {
-                              setInvoiceDiscountPercent(e.target.value);
-                            } else {
-                              setInvoiceDiscountAmount(e.target.value);
-                            }
-                          }}
-                          className="w-20 px-2 py-1 border rounded text-right"
-                          min="0"
-                          max={invoiceDiscountType === 'percent' ? "100" : undefined}
-                          step="0.01"
-                        />
-                        {invoiceDiscountType === 'percent' && <span>%</span>}
+                        {invoiceDiscountType === 'amount' && <span className="text-xs text-white/60">R</span>}
+                        <input type="number" value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount} onChange={(e) => { if (invoiceDiscountType === 'percent') { setInvoiceDiscountPercent(e.target.value); } else { setInvoiceDiscountAmount(e.target.value); } }} className="w-20 px-2 py-1 border border-white/20 rounded-lg text-right text-sm bg-white/10 text-white focus:outline-none focus:border-white/40" min="0" max={invoiceDiscountType === 'percent' ? "100" : undefined} step="0.01" />
+                        {invoiceDiscountType === 'percent' && <span className="text-xs text-white/60">%</span>}
                       </div>
                     </div>
-                    {((invoiceDiscountType === 'percent' && parseFloat(invoiceDiscountPercent) > 0) || 
-                      (invoiceDiscountType === 'amount' && parseFloat(invoiceDiscountAmount) > 0)) && (
-                      <div className="flex justify-between text-sm text-red-600">
-                        <span>Discount Amount:</span>
-                        <span>-R{invoiceDiscountType === 'percent' 
-                          ? (invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)
-                          : parseFloat(invoiceDiscountAmount).toFixed(2)
-                        }</span>
-                      </div>
-                    )}
-                    
-                    {/* Tax Toggle */}
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Add VAT (15%):</span>
-                      <Switch
-                        checked={invoiceTaxEnabled}
-                        onCheckedChange={setInvoiceTaxEnabled}
-                      />
+                  )}
+
+                  {discountAmt > 0 && <div className="flex justify-between text-sm"><span className="text-white/70">Discount Applied</span><span className="text-red-300">-R{discountAmt.toFixed(2)}</span></div>}
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-white/70">
+                      <span>VAT (15%)</span>
+                      <Switch checked={invoiceTaxEnabled} onCheckedChange={setInvoiceTaxEnabled} />
                     </div>
-                    
-                    {invoiceTaxEnabled && (
-                      <div className="flex justify-between text-sm">
-                        <span>VAT (15%):</span>
-                        <span>R{(() => {
-                          const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                          const discount = invoiceDiscountType === 'percent' 
-                            ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
-                            : parseFloat(invoiceDiscountAmount) || 0;
-                          return ((subtotal - discount) * 0.15).toFixed(2);
-                        })()}</span>
-                      </div>
-                    )}
-                    
-                    {/* Shipping Input */}
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Shipping:</span>
-                      <div className="flex items-center gap-1">
-                        <span>R</span>
-                        <input
-                          type="number"
-                          value={invoiceShippingAmount}
-                          onChange={(e) => setInvoiceShippingAmount(e.target.value)}
-                          className="w-20 px-2 py-1 border rounded text-right"
-                          min="0"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between font-bold text-base border-t pt-2">
-                      <span>Total:</span>
-                      <span>R{(() => {
-                        const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                        const discount = invoiceDiscountType === 'percent' 
-                          ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
-                          : parseFloat(invoiceDiscountAmount) || 0;
-                        const afterDiscount = subtotal - discount;
-                        const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
-                        const shipping = parseFloat(invoiceShippingAmount) || 0;
-                        return (afterDiscount + tax + shipping).toFixed(2);
-                      })()}</span>
+                    {invoiceTaxEnabled && <span className="text-white">R{taxAmt.toFixed(2)}</span>}
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">Shipping</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-white/60">R</span>
+                      <input type="number" value={invoiceShippingAmount} onChange={(e) => setInvoiceShippingAmount(e.target.value)} className="w-20 px-2 py-1 border border-white/20 rounded-lg text-right text-sm bg-white/10 text-white focus:outline-none focus:border-white/40" min="0" step="0.01" />
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Payment Method */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Payment Method (Optional)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentMethod !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentMethod: !nh })); saveInvoiceVisDef('vis_paymentMethod', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentMethod === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_paymentMethod === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_paymentMethod === false ? 'Hidden' : 'Visible'}
-                </button>
-              </div>
-              <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Cash">Cash</SelectItem>
-                  <SelectItem value="Card">Card</SelectItem>
-                  <SelectItem value="EFT">EFT</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Payment Details */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <Label>Payment Details (Optional)</Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentDetails !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentDetails: !nh })); saveInvoiceVisDef('vis_paymentDetails', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentDetails === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_paymentDetails === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_paymentDetails === false ? 'Hidden' : 'Visible'}
-                  </button>
+                  <div className="flex justify-between font-bold text-base pt-2 border-t border-white/20">
+                    <span className="text-white">Total Due</span>
+                    <span className="text-white">R{total.toFixed(2)}</span>
+                  </div>
                 </div>
-                {savedPaymentDetails.length > 0 && (
-                  <Select 
-                    value="" 
-                    onValueChange={(id) => {
-                      const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
-                      if (saved) {
-                        setInvoicePaymentDetails(saved.details);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment">
-                      <SelectValue placeholder="Saved Details" />
+              );
+            })()}
+
+            {/* Section: Payment */}
+            {invoiceCardColumns.has('paymentMethod') && (
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</span>
+                </div>
+
+                <div>
+                  <Label className="text-xs text-gray-500 mb-1 block">Payment Method (Optional)</Label>
+                  <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
                     <SelectContent>
-                      {savedPaymentDetails.map((saved: any) => (
-                        <SelectItem key={saved.id} value={saved.id.toString()}>
-                          <div className="flex items-center justify-between w-full">
-                            <span>{saved.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="Cash">Cash</SelectItem>
+                      <SelectItem value="Card">Card</SelectItem>
+                      <SelectItem value="EFT">EFT</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
-              </div>
-              <textarea
-                value={invoicePaymentDetails}
-                onChange={(e) => setInvoicePaymentDetails(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows={2}
-                placeholder="Bank details, payment instructions, etc..."
-              />
-              {invoicePaymentDetails.trim() && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 text-xs"
-                  onClick={() => setIsSavePaymentDialogOpen(true)}
-                  data-testid="button-save-payment-details"
-                >
-                  <PlusCircle className="w-3 h-3 mr-1" />
-                  Save as Template
-                </Button>
-              )}
-            </div>
-
-            {/* Notes & Terms - Side by Side */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label>Notes (Optional) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_notes !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_notes: !nh })); saveInvoiceVisDef('vis_notes', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_notes === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_notes === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_notes === false ? 'Hidden' : 'Visible'}
-                  </button>
                 </div>
-                <textarea
-                  value={invoiceNotes}
-                  onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
-                  maxLength={300}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={3}
-                  placeholder="Additional notes..."
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label>Terms & Conditions (Optional) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_terms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_terms: !nh })); saveInvoiceVisDef('vis_terms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_terms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_terms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_terms === false ? 'Hidden' : 'Visible'}
-                  </button>
-                </div>
-                <textarea
-                  value={invoiceTerms}
-                  onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
-                  maxLength={500}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={3}
-                  placeholder="Enter payment terms and conditions..."
-                />
-              </div>
-            </div>
 
-            {/* Document Options */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label className="text-xs text-gray-500">Payment Details (Optional)</Label>
+                    {savedPaymentDetails.length > 0 && (
+                      <Select
+                        value=""
+                        onValueChange={(id) => {
+                          const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
+                          if (saved) {
+                            setInvoicePaymentDetails(saved.details);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-[160px] h-7 text-xs">
+                          <SelectValue placeholder="Saved Details" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {savedPaymentDetails.map((saved: any) => (
+                            <SelectItem key={saved.id} value={saved.id.toString()}>
+                              {saved.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                  <textarea
+                    value={invoicePaymentDetails}
+                    onChange={(e) => setInvoicePaymentDetails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                    rows={2}
+                    placeholder="Bank details, payment instructions, etc..."
+                  />
+                  {invoicePaymentDetails.trim() && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 text-xs"
+                      onClick={() => setIsSavePaymentDialogOpen(true)}
+                    >
+                      <PlusCircle className="w-3 h-3 mr-1" />
+                      Save as Template
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Section: Notes & Terms */}
+            {(invoiceCardColumns.has('notes') || true) && (
+              <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes & Terms</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {invoiceCardColumns.has('notes') && (
+                    <div>
+                      <Label className="text-xs text-gray-500 mb-1 block">Notes (Optional) <span className="text-gray-400">({invoiceNotes.length}/300)</span></Label>
+                      <textarea
+                        value={invoiceNotes}
+                        onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
+                        maxLength={300}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                        rows={3}
+                        placeholder="Additional notes..."
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <Label className="text-xs text-gray-500 mb-1 block">Terms & Conditions (Optional) <span className="text-gray-400">({invoiceTerms.length}/500)</span></Label>
+                    <textarea
+                      value={invoiceTerms}
+                      onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
+                      maxLength={500}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                      rows={3}
+                      placeholder="Enter payment terms and conditions..."
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Section: Options */}
             {(() => {
               const invoiceCfSettings = mergeReceiptSettings(currentUser?.receiptSettings);
               const invoiceCfs = (invoiceCfSettings as any).invoiceSettings?.customFields || [];
               return (
-                <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+                <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3 shadow-sm">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-1.5 h-4 rounded-full bg-[hsl(217,90%,40%)] inline-block" />
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Options</span>
+                  </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium">Show Business Information</p>
-                      <p className="text-xs text-gray-500">Display your company details in the top-right of the PDF</p>
+                      <p className="text-sm font-medium text-gray-700">Show Business Information</p>
+                      <p className="text-xs text-gray-400">Display your company details in the PDF</p>
                     </div>
                     <button
                       type="button"
@@ -9474,28 +9435,22 @@ export default function PosSystem() {
                           : 'bg-white text-gray-500 border-gray-300'
                       }`}
                     >
-                      {invoiceShowBusinessInfo ? (
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      ) : (
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                      )}
                       {invoiceShowBusinessInfo ? 'Visible' : 'Hidden'}
                     </button>
                   </div>
-
                   {invoiceCfs.length > 0 && (
-                    <div className="space-y-3 pt-2 border-t">
-                      <p className="text-xs font-medium text-gray-600">Custom Fields</p>
+                    <div className="space-y-3 pt-2 border-t border-gray-100">
+                      <p className="text-xs font-medium text-gray-500">Custom Fields</p>
                       {invoiceCfs.map((field: any) => (
                         <div key={field.id} className="flex items-center gap-2">
                           <div className="flex-1">
-                            <Label className="text-xs text-gray-600">{field.label}</Label>
+                            <Label className="text-xs text-gray-500">{field.label}</Label>
                             <input
                               type="text"
                               value={invoiceCustomFieldValues[`cf_${field.id}`] || ''}
                               onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))}
                               placeholder={field.placeholder || field.label}
-                              className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
+                              className="w-full mt-1 px-2 py-1.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]"
                             />
                           </div>
                           <button
@@ -9504,7 +9459,7 @@ export default function PosSystem() {
                               ...prev,
                               [`vis_${field.id}`]: prev[`vis_${field.id}`] === false ? true : false
                             }))}
-                            className="mt-5 p-1.5 rounded border text-gray-400 hover:text-gray-600"
+                            className="mt-5 p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-[hsl(217,90%,40%)] hover:border-[hsl(217,90%,40%)]"
                             title={invoiceCustomFieldValues[`vis_${field.id}`] === false ? 'Show on PDF' : 'Hide from PDF'}
                           >
                             {invoiceCustomFieldValues[`vis_${field.id}`] === false ? (
@@ -9521,19 +9476,17 @@ export default function PosSystem() {
               );
             })()}
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
+          </div>{/* end scrollable body */}
+
+          {/* Sticky Footer */}
+          <div className="flex items-center justify-end gap-3 px-5 sm:px-6 py-4 border-t border-gray-100 bg-white shrink-0">
+            <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)} className="px-5">
+              Cancel
+            </Button>
+            <Button
                 onClick={() => {
-                  // Trim custom client name
                   const trimmedCustomClient = invoiceCustomClient.trim();
-                  
-                  // Mode-specific validation to prevent stale state leaks
                   if (isCustomClient) {
-                    // In custom mode: require custom client name
                     if (!trimmedCustomClient) {
                       toast({
                         title: "Missing Information",
@@ -9543,7 +9496,6 @@ export default function PosSystem() {
                       return;
                     }
                   } else {
-                    // In list mode: require client selection from dropdown
                     if (!invoiceClientId) {
                       toast({
                         title: "Missing Information",
@@ -9553,7 +9505,6 @@ export default function PosSystem() {
                       return;
                     }
                   }
-                  
                   if (invoiceItems.length === 0) {
                     toast({
                       title: "No Line Items",
@@ -9562,24 +9513,19 @@ export default function PosSystem() {
                     });
                     return;
                   }
-                  
                   const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                   const discountPercent = invoiceDiscountType === 'percent' ? (parseFloat(invoiceDiscountPercent) || 0) : 0;
-                  const discountAmountValue = invoiceDiscountType === 'amount' 
+                  const discountAmountValue = invoiceDiscountType === 'amount'
                     ? (parseFloat(invoiceDiscountAmount) || 0)
                     : subtotal * (discountPercent / 100);
                   const afterDiscount = subtotal - discountAmountValue;
                   const taxAmount = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
                   const shipping = parseFloat(invoiceShippingAmount) || 0;
                   const total = afterDiscount + taxAmount + shipping;
-                  
-                  // Determine client name based ONLY on current mode (prevents stale state leaks)
                   let clientName: string;
                   if (isCustomClient) {
-                    // Custom mode: use trimmed custom name
                     clientName = trimmedCustomClient;
                   } else {
-                    // List mode: resolve customer name from dropdown selection
                     const selectedCustomer = customers.find(c => c.id === invoiceClientId);
                     if (!selectedCustomer) {
                       toast({
@@ -9591,7 +9537,6 @@ export default function PosSystem() {
                     }
                     clientName = selectedCustomer.name;
                   }
-                  
                   const invoiceData = {
                     documentType: invoiceType,
                     status: editingInvoice ? editingInvoice.status : 'draft',
@@ -9624,7 +9569,6 @@ export default function PosSystem() {
                     showBusinessInfo: invoiceShowBusinessInfo,
                     customFieldValues: invoiceCustomFieldValues,
                   };
-                  
                   if (editingInvoice) {
                     updateInvoiceMutation.mutate({
                       invoiceId: editingInvoice.id,
@@ -9637,15 +9581,14 @@ export default function PosSystem() {
                 className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
                 disabled={createInvoiceMutation.isPending || updateInvoiceMutation.isPending}
               >
-                {createInvoiceMutation.isPending || updateInvoiceMutation.isPending 
-                  ? (editingInvoice ? 'Updating...' : 'Creating...') 
-                  : editingInvoice 
-                    ? `Update ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}` 
+                {createInvoiceMutation.isPending || updateInvoiceMutation.isPending
+                  ? (editingInvoice ? 'Updating...' : 'Creating...')
+                  : editingInvoice
+                    ? `Update ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}`
                     : `Create ${invoiceType === 'invoice' ? 'Invoice' : 'Quote'}`
                 }
               </Button>
             </div>
-          </div>
         </DialogContent>
       </Dialog>
       {/* Invoice Detail/View Modal */}

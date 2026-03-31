@@ -379,7 +379,7 @@ export default function PosSystemAfrikaans() {
       const saved = localStorage.getItem(`invoiceCardCols_${u?.id || 'guest'}`);
       if (saved) return new Set(JSON.parse(saved));
     } catch {}
-    return new Set(['dueDate']);
+    return new Set(['dueDate','clientEmail','clientPhone','poNumber','dueTerms','paymentMethod','notes','discount']);
   });
   const [isColumnMenuOpen, setIsColumnMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -4774,11 +4774,11 @@ ${dateFilteredSales.map(sale =>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-white/20 text-white hover:bg-white/10 transition-all duration-200">
                         <SlidersHorizontal className="h-4 w-4 mr-2" />
-                        Kolomme
+                        Instellings
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 bg-[#111] border border-white/20 text-white">
-                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Standaard Velde</div>
+                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Veld Instellings</div>
                       {([
                         { key: 'dueDate', label: 'Vervaldatum' },
                         { key: 'clientEmail', label: 'Kliënt E-pos' },
@@ -4820,7 +4820,7 @@ ${dateFilteredSales.map(sale =>
                       )}
                       <DropdownMenuSeparator className="bg-white/10" />
                       <DropdownMenuItem
-                        onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
+                        onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate','clientEmail','clientPhone','poNumber','dueTerms','paymentMethod','notes','discount']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
                         className="text-xs text-gray-400 hover:bg-white/10 focus:bg-white/10 cursor-pointer"
                       >Herstel na verstek</DropdownMenuItem>
                     </DropdownMenuContent>
@@ -8149,237 +8149,209 @@ ${dateFilteredSales.map(sale =>
           }
         }}
       >
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Document Type Selection */}
+        <DialogContent className="w-[calc(100vw-0.5rem)] sm:w-auto sm:max-w-3xl max-h-[94vh] overflow-hidden flex flex-col p-0 gap-0">
+          {/* Sticky Header */}
+          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
-              <Label>Dokumenttipe</Label>
-              <Select 
-                value={invoiceType} 
-                onValueChange={(value: 'invoice' | 'quote') => setInvoiceType(value)}
-                disabled={!!editingInvoice}
-              >
-                <SelectTrigger disabled={!!editingInvoice}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="invoice">Faktuur</SelectItem>
-                  <SelectItem value="quote">Kwotasie</SelectItem>
-                </SelectContent>
-              </Select>
-              {editingInvoice && (
-                <p className="text-xs text-gray-500 mt-1">Dokumenttipe kan nie verander word wanneer jy wysig nie</p>
-              )}
+              <DialogTitle className="text-lg font-bold text-gray-900">
+                {editingInvoice ? 'Wysig' : 'Skep'} {invoiceType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
+              </DialogTitle>
+              <p className="text-xs text-gray-500 mt-0.5">Vul die besonderhede hieronder in</p>
             </div>
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-0.5">
+              <button
+                type="button"
+                onClick={() => { if (!editingInvoice) setInvoiceType('invoice'); }}
+                disabled={!!editingInvoice}
+                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${invoiceType === 'invoice' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                Faktuur
+              </button>
+              <button
+                type="button"
+                onClick={() => { if (!editingInvoice) setInvoiceType('quote'); }}
+                disabled={!!editingInvoice}
+                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${invoiceType === 'quote' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                Kwotasie
+              </button>
+            </div>
+          </div>
 
-            {/* Client Selection */}
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
-                <Label>Kliënt</Label>
+          {/* Scrollable Body */}
+          <div className="overflow-y-auto flex-1 px-5 sm:px-6 py-5 space-y-5">
+
+            {/* Section: Client */}
+            <div className="rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                  <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </div>
+                <h3 className="font-semibold text-gray-800 text-sm">Kliëntbesonderhede</h3>
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsCustomClient(!isCustomClient);
-                    if (!isCustomClient) {
-                      setInvoiceClientId(null);
-                    } else {
-                      setInvoiceCustomClient("");
-                    }
-                  }}
-                  className="text-xs text-blue-600 hover:text-blue-700 underline"
+                  onClick={() => { setIsCustomClient(!isCustomClient); if (!isCustomClient) { setInvoiceClientId(null); } else { setInvoiceCustomClient(""); } }}
+                  className="ml-auto text-xs text-[hsl(217,90%,40%)] hover:underline font-medium"
                   data-testid="button-toggle-custom-client"
                 >
-                  {isCustomClient ? "Kies uit lys" : "Voer pasgemaakte kliënt in"}
+                  {isCustomClient ? "Kies uit lys" : "Pasgemaakte kliënt"}
                 </button>
               </div>
-              {isCustomClient ? (
-                <Input
-                  type="text"
-                  value={invoiceCustomClient}
-                  onChange={(e) => setInvoiceCustomClient(e.target.value)}
-                  placeholder="Voer kliëntnaam in"
-                  className="w-full"
-                  data-testid="input-custom-client"
-                />
-              ) : (
-                <Select 
-                  value={invoiceClientId?.toString() || ""} 
-                  onValueChange={(value) => setInvoiceClientId(parseInt(value))}
-                  data-testid="select-client"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies kliënt" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id.toString()}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-
-            {/* Kliënt E-pos */}
-            <div>
-              <Label>Kliënt E-pos (Opsioneel)</Label>
-              <input
-                type="email"
-                value={invoiceClientEmail}
-                onChange={(e) => setInvoiceClientEmail(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="klient@voorbeeld.com"
-              />
-            </div>
-
-            {/* Kliënt Telefoon */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Kliënt Telefoon (Opsioneel)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_clientPhone !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_clientPhone: !nh })); saveInvoiceVisDef('vis_clientPhone', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_clientPhone === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_clientPhone === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_clientPhone === false ? 'Verberg' : 'Sigbaar'}
-                </button>
-              </div>
-              <input
-                type="tel"
-                value={invoiceClientPhone}
-                onChange={(e) => setInvoiceClientPhone(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="+27 12 345 6789"
-              />
-            </div>
-
-            {/* PO Number */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>PO Nommer (Opsioneel)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_poNumber !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_poNumber: !nh })); saveInvoiceVisDef('vis_poNumber', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_poNumber === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_poNumber === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_poNumber === false ? 'Verberg' : 'Sigbaar'}
-                </button>
-              </div>
-              <input
-                type="text"
-                value={invoicePoNumber}
-                onChange={(e) => setInvoicePoNumber(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                placeholder="Aankooporder nommer"
-              />
-            </div>
-
-            {/* Payment Terms */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Betalingsvoorwaardes</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueTerms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueTerms: !nh })); saveInvoiceVisDef('vis_dueTerms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueTerms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_dueTerms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_dueTerms === false ? 'Verberg' : 'Sigbaar'}
-                </button>
-              </div>
-              <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Geen</SelectItem>
-                  <SelectItem value="7 dae">7 Dae</SelectItem>
-                  <SelectItem value="14 dae">14 Dae</SelectItem>
-                  <SelectItem value="30 dae">30 Dae</SelectItem>
-                  <SelectItem value="60 dae">60 Dae</SelectItem>
-                  <SelectItem value="90 dae">90 Dae</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Due Date */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Vervaldatum (Opsioneel)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_dueDate !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_dueDate: !nh })); saveInvoiceVisDef('vis_dueDate', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_dueDate === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_dueDate === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_dueDate === false ? 'Verberg' : 'Sigbaar'}
-                </button>
-              </div>
-              <input
-                type="date"
-                value={invoiceDueDate}
-                onChange={(e) => setInvoiceDueDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </div>
-
-            {/* Add Products */}
-            <div>
-              <Label>Voeg Produkte By</Label>
-              <div className="space-y-2 mt-2">
-                {invoiceItems.map((item, index) => {
-                  const product = item.productId ? products.find(p => p.id === item.productId) : null;
-                  const itemName = item.customName || product?.name || 'Onbekende Produk';
-                  return (
-                    <div key={index} className="p-2 border rounded space-y-1.5">
-                      {/* Ry 1: Produknaam + verwyder */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 min-w-0">
-                          <input
-                            type="text"
-                            value={itemName}
-                            onChange={(e) => {
-                              const updated = [...invoiceItems];
-                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
-                              setInvoiceItems(updated);
-                            }}
-                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
-                          />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
-                          className="shrink-0 h-7 w-7 p-0 text-gray-400 hover:text-red-500"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+              <div className="p-4 space-y-4 bg-white">
+                <div>
+                  <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Kliënt *</Label>
+                  {isCustomClient ? (
+                    <Input type="text" value={invoiceCustomClient} onChange={(e) => setInvoiceCustomClient(e.target.value)} placeholder="Voer kliëntnaam in" data-testid="input-custom-client" />
+                  ) : (
+                    <Select value={invoiceClientId?.toString() || ""} onValueChange={(v) => setInvoiceClientId(parseInt(v))} data-testid="select-client">
+                      <SelectTrigger><SelectValue placeholder="Kies kliënt..." /></SelectTrigger>
+                      <SelectContent>{customers.map((c) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {(invoiceCardColumns.has('clientEmail') || invoiceCardColumns.has('clientPhone')) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {invoiceCardColumns.has('clientEmail') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">E-posadres</Label>
+                        <Input type="email" value={invoiceClientEmail} onChange={(e) => setInvoiceClientEmail(e.target.value)} placeholder="klient@voorbeeld.com" />
                       </div>
-                      {/* Ry 2: Hv x Prys = Totaal */}
-                      <div className="flex items-center gap-1.5 text-sm">
-                        <span className="text-xs text-gray-400">Hv</span>
-                        <input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const updated = [...invoiceItems];
-                            updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
-                            setInvoiceItems(updated);
-                          }}
-                          className="w-12 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
-                        />
-                        <span className="text-gray-400">x</span>
-                        <span className="text-xs text-gray-400">R</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={item.price}
-                          onChange={(e) => {
-                            const updated = [...invoiceItems];
-                            updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
-                            setInvoiceItems(updated);
-                          }}
-                          className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
-                        />
-                        <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
+                    )}
+                    {invoiceCardColumns.has('clientPhone') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Telefoonnommer</Label>
+                        <Input type="tel" value={invoiceClientPhone} onChange={(e) => setInvoiceClientPhone(e.target.value)} placeholder="+27 12 345 6789" />
                       </div>
-                    </div>
-                  );
-                })}
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section: Document Details */}
+            {(invoiceCardColumns.has('poNumber') || invoiceCardColumns.has('dueTerms') || invoiceCardColumns.has('dueDate')) && (
+              <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                  <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                    <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
+                  <h3 className="font-semibold text-gray-800 text-sm">Dokumentbesonderhede</h3>
+                </div>
+                <div className="p-4 bg-white">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {invoiceCardColumns.has('poNumber') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">PO Nommer</Label>
+                        <Input type="text" value={invoicePoNumber} onChange={(e) => setInvoicePoNumber(e.target.value)} placeholder="PO-0001" />
+                      </div>
+                    )}
+                    {invoiceCardColumns.has('dueTerms') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Betalingsvoorwaardes</Label>
+                        <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Geen</SelectItem>
+                            <SelectItem value="7 dae">7 Dae</SelectItem>
+                            <SelectItem value="14 dae">14 Dae</SelectItem>
+                            <SelectItem value="30 dae">30 Dae</SelectItem>
+                            <SelectItem value="60 dae">60 Dae</SelectItem>
+                            <SelectItem value="90 dae">90 Dae</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {invoiceCardColumns.has('dueDate') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Vervaldatum</Label>
+                        <Input type="date" value={invoiceDueDate} onChange={(e) => setInvoiceDueDate(e.target.value)} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Section: Line Items */}
+            <div className="rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                  <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                </div>
+                <h3 className="font-semibold text-gray-800 text-sm">Lynitemme</h3>
+                <span className="ml-auto text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{invoiceItems.length} {invoiceItems.length === 1 ? 'item' : 'items'}</span>
+              </div>
+              <div className="bg-white p-4 space-y-3">
+                {/* Items table */}
+                {invoiceItems.length > 0 && (
+                  <div className="border border-gray-200 rounded-xl overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="text-left px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Item</th>
+                          <th className="text-center px-2 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-14">Hv</th>
+                          <th className="text-right px-2 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Prys</th>
+                          <th className="text-right px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Totaal</th>
+                          <th className="w-8"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {invoiceItems.map((item, index) => {
+                          const product = item.productId ? products.find(p => p.id === item.productId) : null;
+                          const itemName = item.customName || product?.name || '';
+                          return (
+                            <tr key={index} className="group hover:bg-[hsl(217,90%,40%)]/5 transition-colors">
+                              <td className="px-4 py-2.5">
+                                <input
+                                  type="text"
+                                  value={itemName}
+                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],customName:e.target.value,productId:undefined}; setInvoiceItems(u); }}
+                                  className="w-full bg-transparent text-sm font-medium text-gray-900 focus:outline-none border-b border-transparent focus:border-[hsl(217,90%,40%)] py-0.5 transition-colors placeholder:text-gray-300"
+                                />
+                              </td>
+                              <td className="px-2 py-2.5 text-center">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.quantity}
+                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],quantity:Math.max(1,parseInt(e.target.value)||1)}; setInvoiceItems(u); }}
+                                  className="w-12 text-center text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[hsl(217,90%,40%)] py-1"
+                                />
+                              </td>
+                              <td className="px-2 py-2.5">
+                                <div className="flex items-center justify-end gap-0.5">
+                                  <span className="text-gray-400 text-xs">R</span>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={item.price}
+                                    onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],price:parseFloat(e.target.value)||0}; setInvoiceItems(u); }}
+                                    className="w-20 text-right text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[hsl(217,90%,40%)] py-1 px-1.5"
+                                  />
+                                </div>
+                              </td>
+                              <td className="px-3 py-2.5 text-right">
+                                <span className="text-sm font-bold text-gray-900">R{(item.price * item.quantity).toFixed(2)}</span>
+                              </td>
+                              <td className="pr-2 py-2.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
+                                  className="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <div className="space-y-2">
                 
                 {/* Enterprise Product Picker */}
                 <div className="relative">
@@ -8577,303 +8549,200 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   )}
                 </div>
-                
-                {/* Totals */}
-                {invoiceItems.length > 0 && (
-                  <div className="border-t pt-2 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Subtotaal:</span>
-                      <span>R{invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
-                    </div>
-                    
-                    {/* Discount Input */}
-                    <div className="flex justify-between items-center text-sm">
-                      <div className="flex items-center gap-2">
-                        <span>Afslag:</span>
-                        <select
-                          value={invoiceDiscountType}
-                          onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')}
-                          className="px-2 py-1 border rounded text-xs"
-                        >
-                          <option value="percent">%</option>
-                          <option value="amount">R</option>
-                        </select>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {invoiceDiscountType === 'amount' && <span>R</span>}
-                        <input
-                          type="number"
-                          value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount}
-                          onChange={(e) => {
-                            if (invoiceDiscountType === 'percent') {
-                              setInvoiceDiscountPercent(e.target.value);
-                            } else {
-                              setInvoiceDiscountAmount(e.target.value);
-                            }
-                          }}
-                          className="w-20 px-2 py-1 border rounded text-right"
-                          min="0"
-                          max={invoiceDiscountType === 'percent' ? "100" : undefined}
-                          step="0.01"
-                        />
-                        {invoiceDiscountType === 'percent' && <span>%</span>}
-                      </div>
-                    </div>
-                    {((invoiceDiscountType === 'percent' && parseFloat(invoiceDiscountPercent) > 0) || 
-                      (invoiceDiscountType === 'amount' && parseFloat(invoiceDiscountAmount) > 0)) && (
-                      <div className="flex justify-between text-sm text-red-600">
-                        <span>Afslag Bedrag:</span>
-                        <span>-R{invoiceDiscountType === 'percent' 
-                          ? (invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) * (parseFloat(invoiceDiscountPercent) / 100)).toFixed(2)
-                          : parseFloat(invoiceDiscountAmount).toFixed(2)
-                        }</span>
-                      </div>
-                    )}
-                    
-                    {/* Tax Toggle */}
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Voeg BTW by (15%):</span>
-                      <Switch
-                        checked={invoiceTaxEnabled}
-                        onCheckedChange={setInvoiceTaxEnabled}
-                      />
-                    </div>
-                    
-                    {invoiceTaxEnabled && (
-                      <div className="flex justify-between text-sm">
-                        <span>BTW (15%):</span>
-                        <span>R{(() => {
-                          const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                          const discount = invoiceDiscountType === 'percent' 
-                            ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
-                            : parseFloat(invoiceDiscountAmount) || 0;
-                          return ((subtotal - discount) * 0.15).toFixed(2);
-                        })()}</span>
-                      </div>
-                    )}
-                    
-                    {/* Shipping Input */}
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Versending:</span>
-                      <div className="flex items-center gap-1">
-                        <span>R</span>
-                        <input
-                          type="number"
-                          value={invoiceShippingAmount}
-                          onChange={(e) => setInvoiceShippingAmount(e.target.value)}
-                          className="w-20 px-2 py-1 border rounded text-right"
-                          min="0"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between font-bold text-base border-t pt-2">
-                      <span>Totaal:</span>
-                      <span>R{(() => {
-                        const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                        const discount = invoiceDiscountType === 'percent' 
-                          ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
-                          : parseFloat(invoiceDiscountAmount) || 0;
-                        const afterDiscount = subtotal - discount;
-                        const tax = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
-                        const shipping = parseFloat(invoiceShippingAmount) || 0;
-                        return (afterDiscount + tax + shipping).toFixed(2);
-                      })()}</span>
-                    </div>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Payment Method */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label>Betaalmetode (Opsioneel)</Label>
-                <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentMethod !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentMethod: !nh })); saveInvoiceVisDef('vis_paymentMethod', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentMethod === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                  {invoiceCustomFieldValues.vis_paymentMethod === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  {invoiceCustomFieldValues.vis_paymentMethod === false ? 'Verberg' : 'Sigbaar'}
-                </button>
-              </div>
-              <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Kies betaalmetode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Kontant">Kontant</SelectItem>
-                  <SelectItem value="Kaart">Kaart</SelectItem>
-                  <SelectItem value="EFT">EFT</SelectItem>
-                  <SelectItem value="Ander">Ander</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Payment Details */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <Label>Betalingsbesonderhede (Opsioneel)</Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_paymentDetails !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_paymentDetails: !nh })); saveInvoiceVisDef('vis_paymentDetails', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_paymentDetails === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_paymentDetails === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_paymentDetails === false ? 'Verberg' : 'Sigbaar'}
-                  </button>
+                  </div>
                 </div>
-                {savedPaymentDetails.length > 0 && (
-                  <Select 
-                    value="" 
-                    onValueChange={(id) => {
-                      const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
-                      if (saved) {
-                        setInvoicePaymentDetails(saved.details);
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="w-[180px] h-8 text-xs" data-testid="select-saved-payment-af">
-                      <SelectValue placeholder="Gestoorde Besonderhede" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {savedPaymentDetails.map((saved: any) => (
-                        <SelectItem key={saved.id} value={saved.id.toString()}>
-                          <div className="flex items-center justify-between w-full">
-                            <span>{saved.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
               </div>
-              <textarea
-                value={invoicePaymentDetails}
-                onChange={(e) => setInvoicePaymentDetails(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows={2}
-                placeholder="Bankbesonderhede, betalingsinstruksies, ens..."
-              />
-              {invoicePaymentDetails.trim() && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 text-xs"
-                  onClick={() => setIsSavePaymentDialogOpen(true)}
-                  data-testid="button-save-payment-details-af"
-                >
-                  <PlusCircle className="w-3 h-3 mr-1" />
-                  Stoor
-                </Button>
-              )}
-            </div>
 
-            {/* Notes & Terms - Side by Side */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label>Notas (Opsioneel) <span className="text-xs text-gray-500">({invoiceNotes.length}/300)</span></Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_notes !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_notes: !nh })); saveInvoiceVisDef('vis_notes', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_notes === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_notes === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_notes === false ? 'Verberg' : 'Sigbaar'}
-                  </button>
-                </div>
-                <textarea
-                  value={invoiceNotes}
-                  onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
-                  maxLength={300}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={3}
-                  placeholder="Addisionele notas..."
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label>Terme & Voorwaardes (Opsioneel) <span className="text-xs text-gray-500">({invoiceTerms.length}/500)</span></Label>
-                  <button type="button" onClick={() => { const nh = invoiceCustomFieldValues.vis_terms !== false; setInvoiceCustomFieldValues((prev: any) => ({ ...prev, vis_terms: !nh })); saveInvoiceVisDef('vis_terms', nh); }} className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all ${invoiceCustomFieldValues.vis_terms === false ? 'bg-red-50 border-red-300 text-red-600 hover:bg-red-100' : 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'}`}>
-                    {invoiceCustomFieldValues.vis_terms === false ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {invoiceCustomFieldValues.vis_terms === false ? 'Verberg' : 'Sigbaar'}
-                  </button>
-                </div>
-                <textarea
-                  value={invoiceTerms}
-                  onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
-                  maxLength={500}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  rows={3}
-                  placeholder="Voer betalingsvoorwaardes en -terme in..."
-                />
-              </div>
-            </div>
-
-            {/* Dokument Opsies */}
-            {(() => {
-              const invoiceCfSettings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
-              const invoiceCfs = (invoiceCfSettings as any).invoiceSettings?.customFields || [];
+            {/* Section: Totals */}
+            {invoiceItems.length > 0 && (() => {
+              const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+              const discountAmt = invoiceDiscountType === 'percent'
+                ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
+                : parseFloat(invoiceDiscountAmount) || 0;
+              const afterDiscount = subtotal - discountAmt;
+              const taxAmt = invoiceTaxEnabled ? afterDiscount * 0.15 : 0;
+              const shipping = parseFloat(invoiceShippingAmount) || 0;
+              const total = afterDiscount + taxAmt + shipping;
               return (
-                <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">Wys Besigheidsinligting</p>
-                      <p className="text-xs text-gray-500">Vertoon u maatskappybesonderhede bo-regs op die PDF</p>
+                <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setInvoiceShowBusinessInfo(!invoiceShowBusinessInfo)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                        invoiceShowBusinessInfo
-                          ? 'bg-[hsl(217,90%,40%)] text-white border-[hsl(217,90%,40%)]'
-                          : 'bg-white text-gray-500 border-gray-300'
-                      }`}
-                    >
-                      {invoiceShowBusinessInfo ? (
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                      ) : (
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                      )}
-                      {invoiceShowBusinessInfo ? 'Sigbaar' : 'Versteek'}
-                    </button>
+                    <h3 className="font-semibold text-gray-800 text-sm">Totale</h3>
                   </div>
-                  {invoiceCfs.length > 0 && (
-                    <div className="space-y-3 pt-2 border-t">
-                      <p className="text-xs font-medium text-gray-600">Pasgemaakte Velde</p>
-                      {invoiceCfs.map((field: any) => (
-                        <div key={field.id} className="flex items-center gap-2">
-                          <div className="flex-1">
-                            <Label className="text-xs text-gray-600">{field.label}</Label>
-                            <input
-                              type="text"
-                              value={invoiceCustomFieldValues[`cf_${field.id}`] || ''}
-                              onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))}
-                              placeholder={field.placeholder || field.label}
-                              className="w-full mt-1 px-2 py-1.5 border rounded text-sm"
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setInvoiceCustomFieldValues((prev: any) => ({
-                              ...prev,
-                              [`vis_${field.id}`]: prev[`vis_${field.id}`] === false ? true : false
-                            }))}
-                            className="mt-5 p-1.5 rounded border text-gray-400 hover:text-gray-600"
-                          >
-                            {invoiceCustomFieldValues[`vis_${field.id}`] === false ? (
-                              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                            ) : (
-                              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            )}
-                          </button>
-                        </div>
-                      ))}
+                  <div className="bg-white px-5 py-4 space-y-3">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Subtotaal</span>
+                      <span className="font-medium text-gray-900">R{subtotal.toFixed(2)}</span>
                     </div>
-                  )}
+                    {invoiceCardColumns.has('discount') && (
+                      <div className="flex justify-between items-center text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <span>Afslag</span>
+                          <select value={invoiceDiscountType} onChange={(e) => setInvoiceDiscountType(e.target.value as 'percent' | 'amount')} className="px-2 py-0.5 border border-gray-200 rounded-lg text-xs bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]">
+                            <option value="percent">%</option>
+                            <option value="amount">R</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {invoiceDiscountType === 'amount' && <span className="text-xs text-gray-400">R</span>}
+                          <input type="number" value={invoiceDiscountType === 'percent' ? invoiceDiscountPercent : invoiceDiscountAmount} onChange={(e) => { if (invoiceDiscountType === 'percent') { setInvoiceDiscountPercent(e.target.value); } else { setInvoiceDiscountAmount(e.target.value); } }} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-right text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]" min="0" max={invoiceDiscountType === 'percent' ? "100" : undefined} step="0.01" />
+                          {invoiceDiscountType === 'percent' && <span className="text-xs text-gray-400">%</span>}
+                        </div>
+                      </div>
+                    )}
+                    {discountAmt > 0 && (
+                      <div className="flex justify-between text-sm text-red-500">
+                        <span>Afslag Bedrag</span>
+                        <span>-R{discountAmt.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-sm text-gray-600">
+                      <span>BTW (15%)</span>
+                      <Switch checked={invoiceTaxEnabled} onCheckedChange={setInvoiceTaxEnabled} />
+                    </div>
+                    {invoiceTaxEnabled && (
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>BTW Bedrag</span>
+                        <span className="font-medium text-gray-900">R{taxAmt.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-sm text-gray-600">
+                      <span>Versending</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-400">R</span>
+                        <input type="number" value={invoiceShippingAmount} onChange={(e) => setInvoiceShippingAmount(e.target.value)} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-right text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]" min="0" step="0.01" />
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                      <span className="font-bold text-gray-900 text-base">Totaal</span>
+                      <span className="font-bold text-xl text-[hsl(217,90%,40%)]">R{total.toFixed(2)}</span>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)}>
-                Kanselleer
-              </Button>
-              <Button 
+            {/* Section: Payment */}
+            {invoiceCardColumns.has('paymentMethod') && (
+              <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                  <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                    <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                  </div>
+                  <h3 className="font-semibold text-gray-800 text-sm">Betaling</h3>
+                </div>
+                <div className="bg-white p-4 space-y-3">
+                  <div>
+                    <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Betaalmetode</Label>
+                    <Select value={invoicePaymentMethod} onValueChange={setInvoicePaymentMethod}>
+                      <SelectTrigger><SelectValue placeholder="Kies betaalmetode" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kontant">Kontant</SelectItem>
+                        <SelectItem value="Kaart">Kaart</SelectItem>
+                        <SelectItem value="EFT">EFT</SelectItem>
+                        <SelectItem value="Ander">Ander</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Betalingsbesonderhede</Label>
+                      {savedPaymentDetails.length > 0 && (
+                        <Select value="" onValueChange={(id) => { const s = savedPaymentDetails.find((x: any) => x.id.toString() === id); if (s) setInvoicePaymentDetails(s.details); }}>
+                          <SelectTrigger className="w-40 h-7 text-xs" data-testid="select-saved-payment-af"><SelectValue placeholder="Gestoorde..." /></SelectTrigger>
+                          <SelectContent>{savedPaymentDetails.map((s: any) => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                    <textarea value={invoicePaymentDetails} onChange={(e) => setInvoicePaymentDetails(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={2} placeholder="Bankbesonderhede, betalingsinstruksies..." />
+                    {invoicePaymentDetails.trim() && (
+                      <Button type="button" variant="outline" size="sm" className="mt-2 text-xs h-7" onClick={() => setIsSavePaymentDialogOpen(true)} data-testid="button-save-payment-details-af">
+                        <PlusCircle className="w-3 h-3 mr-1" />Stoor Besonderhede
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Section: Notes & Terms */}
+            {(invoiceCardColumns.has('notes') || true) && (
+              <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                  <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                    <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </div>
+                  <h3 className="font-semibold text-gray-800 text-sm">Notas & Terme</h3>
+                </div>
+                <div className="bg-white p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {invoiceCardColumns.has('notes') && (
+                      <div>
+                        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Notas <span className="normal-case text-gray-400 font-normal">({invoiceNotes.length}/300)</span></Label>
+                        <textarea value={invoiceNotes} onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))} maxLength={300} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={3} placeholder="Addisionele notas..." />
+                      </div>
+                    )}
+                    <div>
+                      <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Terme & Voorwaardes <span className="normal-case text-gray-400 font-normal">({invoiceTerms.length}/500)</span></Label>
+                      <textarea value={invoiceTerms} onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))} maxLength={500} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={3} placeholder="Betalingsvoorwaardes en -terme..." />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Section: Document Options + Custom Fields */}
+            {(() => {
+              const invoiceCfSettings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
+              const invoiceCfs = (invoiceCfSettings as any).invoiceSettings?.customFields || [];
+              return (
+                <div className="rounded-2xl border border-gray-200 overflow-hidden">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                    <div className="w-7 h-7 rounded-lg bg-[hsl(217,90%,40%)]/10 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 text-sm">Dokumentopsies</h3>
+                  </div>
+                  <div className="bg-white p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">Wys Besigheidsinligting</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Vertoon maatskappybesonderhede op die PDF</p>
+                      </div>
+                      <button type="button" onClick={() => setInvoiceShowBusinessInfo(!invoiceShowBusinessInfo)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${invoiceShowBusinessInfo ? 'bg-[hsl(217,90%,40%)] text-white border-[hsl(217,90%,40%)]' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}>
+                        {invoiceShowBusinessInfo ? <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> : <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>}
+                        {invoiceShowBusinessInfo ? 'Sigbaar' : 'Versteek'}
+                      </button>
+                    </div>
+                    {invoiceCfs.length > 0 && (
+                      <div className="space-y-3 pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pasgemaakte Velde</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {invoiceCfs.map((field: any) => (
+                            <div key={field.id}>
+                              <Label className="text-xs font-medium text-gray-600 mb-1 block">{field.label}</Label>
+                              <Input type="text" value={invoiceCustomFieldValues[`cf_${field.id}`] || ''} onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))} placeholder={field.placeholder || field.label} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
+          </div>
+
+          {/* Sticky Footer */}
+          <div className="flex items-center justify-end gap-3 px-5 sm:px-6 py-4 border-t border-gray-100 bg-white shrink-0">
+            <Button variant="outline" onClick={() => setIsInvoiceDialogOpen(false)} className="px-5">
+              Kanselleer
+            </Button>
+            <Button 
                 onClick={() => {
                   const trimmedCustomClient = invoiceCustomClient.trim();
                   
@@ -8985,7 +8854,6 @@ ${dateFilteredSales.map(sale =>
                 }
               </Button>
             </div>
-          </div>
         </DialogContent>
       </Dialog>
       {/* Invoice Detail/View Modal */}
