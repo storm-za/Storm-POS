@@ -152,22 +152,11 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
 
 // Download/Open PDF
 // Tauri Android: saves PDF to device cache then opens with native PDF viewer (in-app, no browser)
-// Mobile browser: navigator.share with file attachment
-// Desktop fallback: anchor download
+// Always triggers a direct file download — never opens the share sheet
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
     await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
     return;
-  }
-  if (navigator.share) {
-    try {
-      const blob: Blob = doc.output('blob');
-      const file = new File([blob], fileName, { type: 'application/pdf' });
-      await navigator.share({ files: [file], title: fileName });
-      return;
-    } catch (e: any) {
-      if (e.name === 'AbortError') return;
-    }
   }
   const tempUrl = await getTempPdfUrl(doc, fileName);
   if (tempUrl) {
