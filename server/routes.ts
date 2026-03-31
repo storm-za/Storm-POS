@@ -382,6 +382,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/pos/user/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { userEmail } = req.query as { userEmail?: string };
+      const user = await storage.getPosUser(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      if (userEmail && user.email !== userEmail) return res.status(403).json({ message: "Unauthorized" });
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          paid: user.paid,
+          companyLogo: user.companyLogo,
+          companyName: user.companyName,
+          tutorialCompleted: user.tutorialCompleted,
+          trialStartDate: user.trialStartDate,
+          preferredLanguage: user.preferredLanguage,
+          selectedStaffAccountId: user.selectedStaffAccountId,
+          receiptSettings: user.receiptSettings,
+          paymentOptionSelected: user.paymentOptionSelected,
+          paymentPlan: user.paymentPlan,
+          planSavingAmount: computePlanSavingAmount(user)
+        }
+      });
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to get user" });
+    }
+  });
+
   app.put("/api/pos/user/:id/logo", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);

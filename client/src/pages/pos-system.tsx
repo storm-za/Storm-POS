@@ -247,6 +247,19 @@ export default function PosSystem() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string; receiptSettings?: any; paymentPlan?: string; planSavingAmount?: number | null; preferredLanguage?: string} | null>(null);
+
+  const refreshUserProfile = useCallback(async (userId: number, userEmail: string) => {
+    try {
+      const res = await fetch(`/api/pos/user/${userId}?userEmail=${encodeURIComponent(userEmail)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.user) {
+        setCurrentUser(prev => prev ? { ...prev, ...data.user } : data.user);
+        localStorage.setItem('posUser', JSON.stringify({ ...(JSON.parse(localStorage.getItem('posUser') || '{}')), ...data.user }));
+      }
+    } catch {}
+  }, []);
+
   const [managementPasswordDialog, setManagementPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [managementPassword, setManagementPassword] = useState("");
@@ -459,6 +472,18 @@ export default function PosSystem() {
       try {
         const parsedUser = JSON.parse(userData);
         setCurrentUser(parsedUser);
+        // Refresh profile on boot so planSavingAmount is always current
+        if (parsedUser.id && parsedUser.email) {
+          fetch(`/api/pos/user/${parsedUser.id}?userEmail=${encodeURIComponent(parsedUser.email)}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+              if (data?.user) {
+                setCurrentUser((prev: typeof parsedUser | null) => prev ? { ...prev, ...data.user } : data.user);
+                localStorage.setItem('posUser', JSON.stringify({ ...parsedUser, ...data.user }));
+              }
+            })
+            .catch(() => {});
+        }
         console.log('Current user loaded:', parsedUser);
       } catch (error) {
         console.error('Error parsing user data:', error);
@@ -2121,6 +2146,8 @@ export default function PosSystem() {
         // Refresh data
         queryClient.invalidateQueries({ queryKey: ["/api/pos/sales", currentUser?.id] });
         queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
+        // Refresh user profile so planSavingAmount banner updates immediately
+        if (currentUser) refreshUserProfile(currentUser.id, currentUser.email);
       } else if (result.type === 'add-to-account') {
         toast({
           title: "Items added to account",
