@@ -139,7 +139,7 @@ export default function POS() {
 
             {/* Left */}
             <motion.div initial={{ opacity:0, x:-40 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.8 }} className="space-y-6">
-              <img src={stormLogo} alt="Storm POS" className="h-28 w-auto" />
+              <img src={stormLogo} alt="Storm POS" className="h-28 w-auto block -ml-3" />
 
               <div>
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full mb-4">
