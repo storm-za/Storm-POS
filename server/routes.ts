@@ -968,13 +968,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const saleTotal = parseFloat(validatedData.total);
             const usageAmount = (saleTotal * 0.005).toFixed(2); // 0.5% of sale total
             await storage.incrementUserUsage(userIdToUse, usageAmount);
+            // Increment sales count separately (only for sales, not invoices)
+            await storage.incrementSalesCount(userIdToUse);
 
             // Upsell check: if % plan user's cost now exceeds flat plan cost, send one email per month
+            // Only sale fees (currentUsage from sales) compared against salesCount * R1.00
             if (user.paymentPlan === 'percent') {
-              const newUsage = parseFloat(user.currentUsage || '0') + parseFloat(usageAmount);
+              const newSaleFee = parseFloat(user.currentUsage || '0') + parseFloat(usageAmount);
               const newCount = (user.currentSalesCount || 0) + 1;
               const flatCost = newCount * 1.0;
-              const saving = newUsage - flatCost;
+              const saving = newSaleFee - flatCost;
               const billingMonth = currentBillingMonth();
               if (saving > 0.005 && user.upsellEmailSentMonth !== billingMonth) {
                 // Mark first so duplicate sends are avoided even if email throws
@@ -1156,8 +1159,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invoice = await storage.createPosInvoice(validatedData);
       
-      // Add R0.50 to user's usage for each invoice created
-      await storage.incrementUserUsage(userIdToUse, '0.50');
+      // Invoice fees (R0.50 per invoice) apply equally on all plans;
+      // they are NOT tracked in currentUsage to keep the sales-fee upsell comparison clean.
       
       res.json(invoice);
     } catch (error) {

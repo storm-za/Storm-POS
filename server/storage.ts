@@ -136,6 +136,7 @@ export interface IStorage {
 
   // Usage tracking
   incrementUserUsage(userId: number, amount: string): Promise<void>;
+  incrementSalesCount(userId: number): Promise<void>;
   resetAllUsersUsage(): Promise<void>;
   getUserUsage(userId: number): Promise<string>;
   markUpsellEmailSent(userId: number, month: string): Promise<void>;
@@ -682,6 +683,10 @@ export class MemStorage implements IStorage {
     // No-op in MemStorage
   }
 
+  async incrementSalesCount(userId: number): Promise<void> {
+    // No-op in MemStorage
+  }
+
   async resetAllUsersUsage(): Promise<void> {
     // No-op in MemStorage
   }
@@ -1208,9 +1213,15 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(posUsers)
       .set({ 
-        currentUsage: sql`current_usage + ${amount}`,
-        currentSalesCount: sql`current_sales_count + 1`
+        currentUsage: sql`current_usage + ${amount}`
       })
+      .where(eq(posUsers.id, userId));
+  }
+
+  async incrementSalesCount(userId: number): Promise<void> {
+    await db
+      .update(posUsers)
+      .set({ currentSalesCount: sql`current_sales_count + 1` })
       .where(eq(posUsers.id, userId));
   }
 
