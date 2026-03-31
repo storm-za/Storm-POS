@@ -332,6 +332,34 @@ html:not(.dark) .pos-app .text-gray-500 {
 }
 /* Keep gray-600 readable as-is in light mode */
 
+/* --- Preserve white text/icons on colored (non-grey) backgrounds ---
+   These override the broad text-white→dark rule above for any element
+   that intentionally sits ON a blue, green, amber or red background.
+   Covers: icon squares, buttons, banners, badges, avatars.            */
+html:not(.dark) .pos-app [class*="from-[hsl(217"].text-white,
+html:not(.dark) .pos-app [class*="from-[hsl(217"] .text-white,
+html:not(.dark) .pos-app [class*="bg-[hsl(217"].text-white,
+html:not(.dark) .pos-app [class*="bg-[hsl(217"] .text-white,
+html:not(.dark) .pos-app [class*="via-[hsl(217"] .text-white,
+html:not(.dark) .pos-app [class*="from-green"].text-white,
+html:not(.dark) .pos-app [class*="from-green"] .text-white,
+html:not(.dark) .pos-app [class*="from-emerald"].text-white,
+html:not(.dark) .pos-app [class*="from-emerald"] .text-white,
+html:not(.dark) .pos-app [class*="from-amber"].text-white,
+html:not(.dark) .pos-app [class*="from-amber"] .text-white,
+html:not(.dark) .pos-app [class*="from-red"].text-white,
+html:not(.dark) .pos-app [class*="from-red"] .text-white,
+html:not(.dark) .pos-app [class*="from-rose"].text-white,
+html:not(.dark) .pos-app [class*="from-rose"] .text-white,
+html:not(.dark) .pos-app [class*="bg-green"].text-white,
+html:not(.dark) .pos-app [class*="bg-green"] .text-white,
+html:not(.dark) .pos-app [class*="bg-amber"].text-white,
+html:not(.dark) .pos-app [class*="bg-amber"] .text-white,
+html:not(.dark) .pos-app [class*="bg-red"].text-white,
+html:not(.dark) .pos-app [class*="bg-red"] .text-white {
+  color: #ffffff !important;
+}
+
 /* --- Borders --- */
 html:not(.dark) .pos-app .border-gray-700,
 html:not(.dark) .pos-app .border-gray-800 {
