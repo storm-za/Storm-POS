@@ -386,9 +386,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const { userEmail } = req.query as { userEmail?: string };
+      if (!userEmail) return res.status(400).json({ message: "userEmail query parameter is required." });
       const user = await storage.getPosUser(userId);
       if (!user) return res.status(404).json({ message: "User not found" });
-      if (userEmail && user.email !== userEmail) return res.status(403).json({ message: "Unauthorized" });
+      if (user.email !== userEmail) return res.status(403).json({ message: "Unauthorized" });
       res.json({
         success: true,
         user: {
