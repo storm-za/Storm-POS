@@ -337,7 +337,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           selectedStaffAccountId: updatedUser.selectedStaffAccountId,
           receiptSettings: updatedUser.receiptSettings,
           paymentOptionSelected: updatedUser.paymentOptionSelected,
-          paymentPlan: updatedUser.paymentPlan
+          paymentPlan: updatedUser.paymentPlan,
+          planSavingAmount: computePlanSavingAmount(updatedUser)
         }
       });
     } catch (error) {
