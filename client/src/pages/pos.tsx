@@ -1,12 +1,12 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { 
-  Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap, ArrowLeft,
+  Check, Smartphone, Cloud, TrendingUp, Users, Shield, Zap,
   FileSpreadsheet, FileText, Receipt, BarChart3, Package, CreditCard, 
   Globe, Calculator, PieChart, UserCheck, Languages,
-  Wallet, MessageSquare, Share2, Monitor, Star, X
+  Wallet, MessageSquare, Share2, Monitor, Star, X, Menu
 } from "lucide-react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
@@ -15,7 +15,24 @@ import MultiDeviceSync from "@/components/illustrations/MultiDeviceSync";
 import InvoicePreview from "@/components/illustrations/InvoicePreview";
 import ReportingDashboard from "@/components/illustrations/ReportingDashboard";
 
+const NAV_LINKS = [
+  { label: "Home",    href: "/" },
+  { label: "Pricing", href: "/pos#pricing" },
+  { label: "Web Dev", href: "/web-development" },
+  { label: "Contact", href: "/contact" },
+  { label: "About",   href: "/#about" },
+];
+
 export default function POS() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     updatePageSEO({
       title: 'Storm POS - Cloud Point of Sale System | 7 Days Free, Pay Only 0.5% Per Sale',
@@ -121,15 +138,93 @@ export default function POS() {
   return (
     <div className="min-h-screen overflow-x-hidden w-full bg-white">
 
-      {/* Back button */}
-      <div className="fixed top-5 left-5 z-50">
-        <Button asChild variant="ghost" className="bg-white/90 backdrop-blur-sm hover:bg-white shadow border border-gray-200 text-gray-700 hover:text-[hsl(217,90%,40%)]">
-          <Link href="/"><ArrowLeft className="w-4 h-4 mr-1.5" />Home</Link>
-        </Button>
-      </div>
+      {/* ── TOP NAVBAR ─────────────────────────────────────────── */}
+      <header className={`fixed top-0 inset-x-0 z-50 transition-shadow duration-300 bg-white ${scrolled ? "shadow-md" : "shadow-sm border-b border-gray-100"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/pos">
+            <img src={stormLogo} alt="Storm POS" className="h-10 w-auto block cursor-pointer -ml-1" />
+          </Link>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map(({ label, href }) => (
+              <a key={label} href={href}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[hsl(217,90%,40%)] rounded-lg hover:bg-[hsl(217,90%,40%)]/6 transition-colors">
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Desktop CTAs */}
+          <div className="hidden md:flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm" className="text-gray-700 hover:text-[hsl(217,90%,40%)] font-medium">
+              <Link href="/pos/login">Log In</Link>
+            </Button>
+            <Button asChild size="sm" className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold px-5 rounded-full border-0">
+              <Link href="/pos/signup"><Zap className="w-3.5 h-3.5 mr-1.5" />Free Trial</Link>
+            </Button>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden p-2 rounded-lg text-gray-600 hover:text-[hsl(217,90%,40%)] hover:bg-gray-100 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
+
+      {/* ── MOBILE SIDE DRAWER ─────────────────────────────────── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+              onClick={() => setMobileOpen(false)}
+            />
+            {/* Drawer */}
+            <motion.aside
+              key="drawer"
+              initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed top-0 left-0 z-[70] h-full w-72 bg-white shadow-2xl flex flex-col"
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <img src={stormLogo} alt="Storm POS" className="h-9 w-auto block -ml-1" />
+                <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                {NAV_LINKS.map(({ label, href }) => (
+                  <a key={label} href={href} onClick={() => setMobileOpen(false)}
+                    className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:text-[hsl(217,90%,40%)] rounded-xl hover:bg-[hsl(217,90%,40%)]/8 transition-colors">
+                    {label}
+                  </a>
+                ))}
+              </nav>
+              <div className="px-4 py-5 border-t border-gray-100 space-y-3">
+                <Button asChild variant="outline" className="w-full border-[hsl(217,90%,40%)] text-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,40%)]/5 font-semibold rounded-full">
+                  <Link href="/pos/login">Log In to POS</Link>
+                </Button>
+                <Button asChild className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold rounded-full border-0">
+                  <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
+                </Button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative pt-16 pb-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50/40 to-white overflow-hidden">
+      <section className="relative pt-28 pb-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-blue-50/40 to-white overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
         <motion.div className="absolute -top-24 -right-24 w-96 h-96 bg-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
           animate={{ scale:[1,1.15,1] }} transition={{ duration:10, repeat:Infinity }} />
@@ -139,8 +234,6 @@ export default function POS() {
 
             {/* Left */}
             <motion.div initial={{ opacity:0, x:-40 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.8 }} className="space-y-6">
-              <img src={stormLogo} alt="Storm POS" className="h-28 w-auto block -ml-3" />
-
               <div>
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full mb-4">
                   Next-Gen Cloud POS
@@ -284,7 +377,7 @@ export default function POS() {
       </section>
 
       {/* ── PRICING ───────────────────────────────────────────── */}
-      <section className="py-14 px-4 sm:px-6 lg:px-8 bg-white">
+      <section id="pricing" className="py-14 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-5xl mx-auto">
           <motion.div className="text-center mb-10"
             initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
