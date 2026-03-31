@@ -117,6 +117,43 @@ const LABELS = {
   },
 } as const;
 
+// ─── Shared label type (used in all step component props) ─────────────────────
+interface LabelSet {
+  step: (n: number) => string;
+  skip: string;
+  next: string;
+  back: string;
+  recommended: string;
+  s1Title: string;
+  s1Sub: string;
+  bizTypes: ReadonlyArray<{ id: string; label: string; sub: string }>;
+  s2Title: string;
+  s2Sub: string;
+  volumes: ReadonlyArray<{ id: string; label: string; sub: string }>;
+  s3MicroTitle: string;
+  s3MicroBody: string;
+  s3GrowthTitle: string;
+  s3GrowthBody: string;
+  s3HighTitle: string;
+  s3HighBody: string;
+  pctLabel: string;
+  pctRate: string;
+  pctPitch: string;
+  flatLabel: string;
+  flatRate: string;
+  flatPitch: string;
+  invoiceFee: string;
+  trialNote: string;
+  confirmPlan: string;
+  saving: string;
+  s4Title: string;
+  s4Sub: string;
+  checklist: ReadonlyArray<{ id: string; label: string; sub: string }>;
+  doneTitle: string;
+  doneBody: string;
+  goToPOS: string;
+}
+
 // ─── SVG Icons — monoline black outlines, white fills, brand-blue spot ────────
 const SL = { strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
@@ -359,7 +396,7 @@ export default function PosOnboarding() {
     try { return JSON.parse(localStorage.getItem("posUser") ?? "null"); } catch { return null; }
   })();
   const lang: "en" | "af" = user?.preferredLanguage === "af" ? "af" : "en";
-  const L = LABELS[lang];
+  const L: LabelSet = LABELS[lang];
 
   // ── State ──
   const [step,     setStep]     = useState<Step>(0);
@@ -528,7 +565,7 @@ const BIZ_ICONS: Record<string, () => JSX.Element> = {
 };
 
 function Step1({ L, selected, onSelect, onNext, onSkip }: {
-  L: (typeof LABELS)["en"];
+  L: LabelSet;
   selected: string | null;
   onSelect: (v: BizType) => void;
   onNext: () => void;
@@ -594,7 +631,7 @@ const VOL_ICONS: Record<string, () => JSX.Element> = {
 };
 
 function Step2({ L, selected, onSelect, onNext, onBack, onSkip }: {
-  L: (typeof LABELS)["en"];
+  L: LabelSet;
   selected: string | null;
   onSelect: (v: Volume) => void;
   onNext: () => void;
@@ -675,7 +712,7 @@ function PlanCard({
   pitch: string;
   invoiceFee: string;
   label: string;
-  L: (typeof LABELS)["en"];
+  L: LabelSet;
 }) {
   const Icon = isRecommended
     ? (plan === "percent" ? SafeNetIcon : RocketIcon)
@@ -710,7 +747,7 @@ function PlanCard({
 }
 
 function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm, onBack, onSkip }: {
-  L: (typeof LABELS)["en"];
+  L: LabelSet;
   volume: Volume;
   recommendedPlan: Plan;
   secondaryPlan: Plan;
@@ -779,7 +816,7 @@ const CHECKLIST_ICONS: Record<string, () => JSX.Element> = {
 };
 
 function Step4({ L, checked, allDone, onToggle, onGo }: {
-  L: (typeof LABELS)["en"];
+  L: LabelSet;
   checked: Set<string>;
   allDone: boolean;
   onToggle: (id: string) => void;

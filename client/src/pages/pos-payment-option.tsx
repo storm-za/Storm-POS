@@ -86,6 +86,8 @@ export default function PosPaymentOption() {
     });
   }, []);
 
+  const isLegacyAccess = new URLSearchParams(window.location.search).has("legacy");
+
   useEffect(() => {
     if (!user) {
       setLocation("/pos/login");
@@ -97,7 +99,7 @@ export default function PosPaymentOption() {
       } else {
         setLocation("/pos/inactive");
       }
-    } else {
+    } else if (!isLegacyAccess) {
       setLocation("/pos/onboarding");
     }
   }, []);
