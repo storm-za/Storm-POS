@@ -207,8 +207,8 @@ export default function Pricing() {
         <motion.div className="absolute -top-32 -right-32 w-96 h-96 bg-[hsl(217,90%,40%)]/8 rounded-full blur-3xl"
           animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 8, repeat: Infinity }} />
 
-        <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
+        <div className="relative max-w-4xl mx-auto text-center">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full mb-5">
               Transparent Pricing
             </span>
@@ -241,10 +241,7 @@ export default function Pricing() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.15 }}>
-            <PricingSVG />
-          </motion.div>
-        </div>
+          </div>
       </section>
 
       {/* ── PLAN CARDS ─────────────────────────────────────────────── */}
