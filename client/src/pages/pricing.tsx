@@ -180,9 +180,13 @@ export default function Pricing() {
           {/* Heading */}
           <motion.div className="text-center mb-10"
             initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-5 py-1.5 rounded-full mb-5">
-              Pricing Calculator
-            </span>
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <span className="block h-px w-10 bg-[hsl(217,90%,40%)]" />
+              <span className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rotate-45 inline-block shrink-0" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(217,90%,40%)]">Pricing Calculator</span>
+              <span className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rotate-45 inline-block shrink-0" />
+              <span className="block h-px w-10 bg-[hsl(217,90%,40%)]" />
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
               Find your perfect plan
             </h1>
