@@ -5432,56 +5432,45 @@ ${dateFilteredSales.map(sale =>
 
           {/* Reports Tab */}
           <TabsContent value="verslae">
-            <div className="space-y-6">
-              {/* Date Filter */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-white">
-                    <Calendar className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                    Verkope Analise
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-4">
-                      <div className="flex flex-col gap-1">
-                        <Label htmlFor="date-filter" className="text-white text-xs sm:text-sm">Kies Datum:</Label>
-                        <Input
-                          id="date-filter"
-                          type="date"
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full sm:w-auto"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <Label htmlFor="staff-filter" className="text-white text-xs sm:text-sm">Filter volgens Personeel:</Label>
-                        <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                          <SelectTrigger className="w-full sm:w-48">
-                            <SelectValue placeholder="Alle Personeel" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Alle Verkope</SelectItem>
-                            <SelectItem value="0">Bestuur</SelectItem>
-                            {staffAccounts.map((staff) => (
-                              <SelectItem key={staff.id} value={staff.id.toString()}>
-                                {staff.username || `Personeel #${staff.id}`}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => handlePrintReport()}
-                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Druk
-                    </Button>
+            <div className="space-y-4">
+              {/* Compact Filter Bar */}
+              <div className={`rounded-xl px-4 py-3 flex flex-wrap items-center gap-3 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+                <div className="flex items-center gap-2 mr-auto">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]">
+                    <BarChart3 className="w-4 h-4 text-white" />
                   </div>
-                </CardContent>
-              </Card>
+                  <span className={`font-bold text-base ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Verkope Analise</span>
+                </div>
+                <Input
+                  id="date-filter"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className={`h-8 text-sm w-auto ${posTheme === 'dark' ? '' : 'border-gray-200'}`}
+                />
+                <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                  <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? '' : 'border-gray-200'}`}>
+                    <SelectValue placeholder="Alle Personeel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Verkope</SelectItem>
+                    <SelectItem value="0">Bestuur</SelectItem>
+                    {staffAccounts.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id.toString()}>
+                        {staff.username || `Personeel #${staff.id}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={() => handlePrintReport()}
+                  size="sm"
+                  className="h-8 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-md"
+                >
+                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                  Druk
+                </Button>
+              </div>
 
               {(() => {
                 // Filter sales for selected date and staff
@@ -5554,47 +5543,22 @@ ${dateFilteredSales.map(sale =>
 
                 return (
                   <>
-                    {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                            <span className="text-sm font-medium text-gray-300">Totale Omset</span>
+                    {/* Summary Cards — 2×2 on mobile, 4 across on desktop */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {[
+                        { icon: DollarSign, label: 'Totale Omset', value: `R${totalRevenue.toFixed(2)}` },
+                        { icon: TrendingUp, label: 'Totale Wins', value: `R${totalProfit.toFixed(2)}` },
+                        { icon: Receipt, label: 'Transaksies', value: totalTransactions },
+                        { icon: TrendingUp, label: 'Gem. Transaksie', value: `R${avgTransactionValue.toFixed(2)}` },
+                      ].map(({ icon: Icon, label, value }) => (
+                        <div key={label} className={`rounded-xl p-3 flex flex-col gap-1 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
+                          <div className="flex items-center gap-1.5">
+                            <Icon className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
+                            <span className={`text-xs font-medium truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
                           </div>
-                          <div className="text-2xl font-bold text-blue-400">R{totalRevenue.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                            <span className="text-sm font-medium text-gray-300">Totale Wins</span>
-                          </div>
-                          <div className="text-2xl font-bold text-blue-400">R{totalProfit.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <Receipt className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                            <span className="text-sm font-medium text-gray-300">Transaksies</span>
-                          </div>
-                          <div className="text-2xl font-bold text-blue-400">{totalTransactions}</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                            <span className="text-sm font-medium text-gray-300">Gem. Transaksie</span>
-                          </div>
-                          <div className="text-2xl font-bold text-blue-400">R{avgTransactionValue.toFixed(2)}</div>
-                        </CardContent>
-                      </Card>
+                          <div className="text-xl font-bold text-[hsl(217,90%,50%)] leading-tight">{value}</div>
+                        </div>
+                      ))}
                     </div>
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
