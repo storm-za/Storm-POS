@@ -14,6 +14,7 @@ Preferred communication style: Simple, everyday language.
 - **Animations**: Framer Motion for smooth transitions.
 - **Responsive Design**: Optimized for smartphones, tablets, and desktops.
 - **Language Support**: Full Afrikaans translation available for the POS system.
+- **Theme**: Dark/light mode toggle in POS Settings tab (both EN and AF). Preference saved to localStorage. Toggle applies `dark` class to `html` element for shadcn CSS variables and portaled components; CSS overrides in `index.css` handle hardcoded Tailwind dark classes within `.pos-app`.
 
 ### Technical Implementation
 - **Full-Stack**: TypeScript-based with React (Vite) for frontend and Express.js for backend.

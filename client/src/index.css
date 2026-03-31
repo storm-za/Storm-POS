@@ -256,3 +256,131 @@
 .content-bottom-safe {
   padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
 }
+
+/* ================================================================
+   POS LIGHT MODE OVERRIDES
+   Activated when html does NOT have the .dark class (light mode).
+   Scoped to .pos-app for static POS content; global for portals.
+   ================================================================ */
+
+/* --- Card / container backgrounds --- */
+html:not(.dark) .pos-app .bg-gray-800\/50,
+html:not(.dark) .pos-app .bg-gray-800\/30 {
+  background-color: #ffffff !important;
+  border-color: hsl(220, 14%, 90%) !important;
+}
+html:not(.dark) .pos-app .bg-gray-900\/40,
+html:not(.dark) .pos-app .bg-gray-900\/60,
+html:not(.dark) .pos-app .bg-gray-900\/50 {
+  background-color: rgba(248, 250, 252, 0.9) !important;
+}
+html:not(.dark) .pos-app .bg-gray-900\/80,
+html:not(.dark) .pos-app .bg-gray-900\/95,
+html:not(.dark) .pos-app .bg-gray-900 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) .pos-app .bg-gray-950 {
+  background-color: #f8fafc !important;
+}
+html:not(.dark) .pos-app .bg-gray-800 {
+  background-color: #f1f5f9 !important;
+}
+/* Glassmorphism cards → solid white */
+html:not(.dark) .pos-app .bg-white\/10,
+html:not(.dark) .pos-app .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* --- Gradient backgrounds (card inners / headers) → light --- */
+html:not(.dark) .pos-app .from-gray-900\/80,
+html:not(.dark) .pos-app .from-gray-900\/95,
+html:not(.dark) .pos-app .from-gray-800\/80,
+html:not(.dark) .pos-app .from-gray-800\/95 {
+  --tw-gradient-from: #ffffff var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position) !important;
+}
+html:not(.dark) .pos-app .via-gray-800\/95 {
+  --tw-gradient-stops: var(--tw-gradient-from), #f8fafc var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+html:not(.dark) .pos-app .to-gray-800\/80,
+html:not(.dark) .pos-app .to-gray-800\/95,
+html:not(.dark) .pos-app .to-gray-900\/80,
+html:not(.dark) .pos-app .to-gray-900\/95 {
+  --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
+}
+
+/* --- Text --- */
+html:not(.dark) .pos-app .text-white {
+  color: hsl(220, 20%, 10%) !important;
+}
+html:not(.dark) .pos-app .text-gray-300 {
+  color: hsl(220, 14%, 35%) !important;
+}
+html:not(.dark) .pos-app .text-gray-400 {
+  color: hsl(220, 12%, 42%) !important;
+}
+html:not(.dark) .pos-app .text-gray-500 {
+  color: hsl(220, 12%, 48%) !important;
+}
+/* Keep gray-600 readable as-is in light mode */
+
+/* --- Borders --- */
+html:not(.dark) .pos-app .border-gray-700,
+html:not(.dark) .pos-app .border-gray-800 {
+  border-color: hsl(220, 14%, 88%) !important;
+}
+html:not(.dark) .pos-app .border-gray-700\/50 {
+  border-color: rgba(203, 213, 225, 0.7) !important;
+}
+html:not(.dark) .pos-app .border-gray-700\/30 {
+  border-color: rgba(203, 213, 225, 0.5) !important;
+}
+html:not(.dark) .pos-app .border-gray-600\/50 {
+  border-color: rgba(203, 213, 225, 0.6) !important;
+}
+html:not(.dark) .pos-app .border-gray-600\/30 {
+  border-color: rgba(203, 213, 225, 0.4) !important;
+}
+html:not(.dark) .pos-app .border-white\/10 {
+  border-color: rgba(226, 232, 240, 0.9) !important;
+}
+html:not(.dark) .pos-app .border-white\/20 {
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
+/* --- Form inputs / textareas / selects --- */
+html:not(.dark) .pos-app input.bg-gray-900\/40,
+html:not(.dark) .pos-app textarea.bg-gray-900\/40,
+html:not(.dark) .pos-app .bg-gray-900\/40 {
+  background-color: #ffffff !important;
+  color: hsl(220, 20%, 10%) !important;
+  border-color: hsl(220, 14%, 82%) !important;
+}
+
+/* --- Dividers inside cards --- */
+html:not(.dark) .pos-app .divide-gray-700\/50 > * + * {
+  border-color: hsl(220, 14%, 88%) !important;
+}
+
+/* --- Portaled components (dropdowns, select menus, dialogs) ---
+   These render outside .pos-app so need broader scoping.
+   Safe: marketing site does not use these dark utility classes. */
+html:not(.dark) .bg-gray-950 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) [role="listbox"] .bg-gray-950,
+html:not(.dark) [data-radix-popper-content-wrapper] .bg-gray-950,
+html:not(.dark) [data-radix-popper-content-wrapper] .bg-gray-900 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) [data-radix-popper-content-wrapper] .text-gray-200,
+html:not(.dark) [data-radix-popper-content-wrapper] .text-white {
+  color: hsl(220, 20%, 12%) !important;
+}
+html:not(.dark) [data-radix-popper-content-wrapper] .border-gray-700\/50 {
+  border-color: hsl(220, 14%, 88%) !important;
+}
+html:not(.dark) [role="dialog"] .bg-gray-950,
+html:not(.dark) [role="dialog"] .bg-gray-900 {
+  background-color: #ffffff !important;
+}

@@ -31,7 +31,7 @@ import {
   GridNine as Grid3X3, ListBullets as LayoutList, CaretLeft as ChevronLeft,
   Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
   CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2,
-  Bell, ListChecks
+  Bell, ListChecks, Moon, Sun
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -321,6 +321,9 @@ export default function PosSystem() {
   const [invoiceClientEmail, setInvoiceClientEmail] = useState("");
   const [invoiceClientPhone, setInvoiceClientPhone] = useState("");
   const [isCustomClient, setIsCustomClient] = useState(true);
+  const [posTheme, setPosTheme] = useState<'dark' | 'light'>(() => {
+    try { const s = localStorage.getItem('posTheme'); return s === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
+  });
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
   const [invoicePoNumber, setInvoicePoNumber] = useState("");
@@ -726,6 +729,17 @@ export default function PosSystem() {
       }
     }
   }, [staffAccounts, currentUser?.selectedStaffAccountId, currentStaff, isStaffSwitchMode]);
+
+  // Apply dark/light theme class to document (affects shadcn CSS vars + portaled popups/dialogs)
+  useEffect(() => {
+    const root = document.documentElement;
+    if (posTheme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    return () => { root.classList.remove('dark'); };
+  }, [posTheme]);
 
   // Fetch invoices
   const { data: invoices = [] } = useQuery<any[]>({
@@ -3884,7 +3898,7 @@ export default function PosSystem() {
   };
 
   return (
-    <div className="min-h-screen bg-black relative">
+    <div className={`pos-app min-h-screen relative${posTheme === 'dark' ? ' bg-gray-950' : ' bg-slate-50'}`}>
 
       {/* ── Enterprise Sale Success Dialog ── */}
       {saleCompleteData && (
@@ -6924,6 +6938,39 @@ export default function PosSystem() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Appearance Card */}
+              <Card className={posTheme === 'dark' ? "bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20" : "bg-white border-gray-200 shadow-lg"}>
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    {posTheme === 'dark' ? <Moon className="w-5 h-5 text-[hsl(217,90%,50%)]" /> : <Sun className="w-5 h-5 text-[hsl(217,90%,40%)]" />}
+                    Appearance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-5 pb-5">
+                  <div className={`flex items-center justify-between p-4 rounded-xl border ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50' : 'bg-slate-50 border-gray-200'}`}>
+                    <div>
+                      <p className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Interface Theme</p>
+                      <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{posTheme === 'dark' ? 'Dark mode is active' : 'Light mode is active'}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Sun className={`w-4 h-4 transition-colors ${posTheme === 'light' ? 'text-[hsl(217,90%,40%)]' : 'text-gray-500'}`} />
+                      <button
+                        onClick={() => {
+                          const next = posTheme === 'dark' ? 'light' : 'dark';
+                          setPosTheme(next);
+                          try { localStorage.setItem('posTheme', next); } catch {}
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors ${posTheme === 'dark' ? 'bg-[hsl(217,90%,40%)]' : 'bg-gray-300'}`}
+                        aria-label="Toggle theme"
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${posTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
+                      </button>
+                      <Moon className={`w-4 h-4 transition-colors ${posTheme === 'dark' ? 'text-[hsl(217,90%,50%)]' : 'text-gray-400'}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Account & Preferences Section */}
               <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
