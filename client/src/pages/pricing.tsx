@@ -16,35 +16,6 @@ import { useEffect } from "react";
 
 const BLUE = "hsl(217,90%,40%)";
 
-function PricingSVG() {
-  return (
-    <svg viewBox="0 0 480 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto max-w-lg mx-auto">
-      <rect x="80" y="30" width="320" height="240" rx="20" fill="white" stroke="#e5e7eb" strokeWidth="1.5"/>
-      <rect x="80" y="30" width="320" height="52" rx="20" fill={BLUE} />
-      <rect x="80" y="62" width="320" height="20" fill={BLUE} />
-      <text x="240" y="63" textAnchor="middle" fill="white" fontFamily="system-ui" fontSize="13" fontWeight="700">Storm POS - Pricing Calculator</text>
-      <rect x="108" y="104" width="264" height="36" rx="8" fill="#f0f7ff" stroke={BLUE} strokeWidth="1"/>
-      <text x="124" y="127" fill={BLUE} fontFamily="system-ui" fontSize="11" fontWeight="600">Monthly Sales: 200 x R500 avg</text>
-      <rect x="108" y="152" width="120" height="72" rx="10" fill={BLUE} />
-      <text x="168" y="178" textAnchor="middle" fill="white" fontFamily="system-ui" fontSize="10">0.5% Plan</text>
-      <text x="168" y="197" textAnchor="middle" fill="white" fontFamily="system-ui" fontSize="18" fontWeight="700">R500</text>
-      <text x="168" y="213" textAnchor="middle" fill="white" fontFamily="system-ui" fontSize="10">/month</text>
-      <rect x="252" y="152" width="120" height="72" rx="10" fill="white" stroke="#e5e7eb" strokeWidth="1.5"/>
-      <text x="312" y="178" textAnchor="middle" fill="#6b7280" fontFamily="system-ui" fontSize="10">R1 Flat Plan</text>
-      <text x="312" y="197" textAnchor="middle" fill="#111827" fontFamily="system-ui" fontSize="18" fontWeight="700">R200</text>
-      <text x="312" y="213" textAnchor="middle" fill="#6b7280" fontFamily="system-ui" fontSize="10">/month</text>
-      <rect x="148" y="243" width="184" height="18" rx="9" fill="#dcfce7" />
-      <text x="240" y="256" textAnchor="middle" fill="#166534" fontFamily="system-ui" fontSize="10" fontWeight="600">Switch to Flat - Save R300/mo</text>
-      <circle cx="420" cy="50" r="24" fill="white" stroke={BLUE} strokeWidth="2"/>
-      <text x="420" y="44" textAnchor="middle" fill={BLUE} fontFamily="system-ui" fontSize="9">NO</text>
-      <text x="420" y="57" textAnchor="middle" fill={BLUE} fontFamily="system-ui" fontSize="9">MONTHLY</text>
-      <text x="420" y="63" textAnchor="middle" fill={BLUE} fontFamily="system-ui" fontSize="9">FEES</text>
-      <circle cx="60" cy="260" r="18" fill="#fef9c3" stroke="#ca8a04" strokeWidth="1.5"/>
-      <text x="60" y="264" textAnchor="middle" fill="#92400e" fontFamily="system-ui" fontSize="9" fontWeight="700">7 DAY</text>
-      <text x="60" y="275" textAnchor="middle" fill="#92400e" fontFamily="system-ui" fontSize="7">FREE TRIAL</text>
-    </svg>
-  );
-}
 
 function BreakevenSVG({ breakeven }: { breakeven: number }) {
   const w = 300, h = 160, pad = 30;
@@ -201,47 +172,132 @@ export default function Pricing() {
     <div className="min-h-screen bg-white">
       <Navigation />
 
-      {/* ── HERO ──────────────────────────────────────────────────── */}
-      <section className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-br from-white via-blue-50/40 to-white">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
-        <motion.div className="absolute -top-32 -right-32 w-96 h-96 bg-[hsl(217,90%,40%)]/8 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 8, repeat: Infinity }} />
+      {/* ── HERO + CALCULATOR ──────────────────────────────────────── */}
+      <section className="relative pt-28 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gray-50/60">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:56px_56px]" />
 
-        <div className="relative max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full mb-5">
-              Transparent Pricing
+        <div className="relative max-w-5xl mx-auto">
+          {/* Heading */}
+          <motion.div className="text-center mb-10"
+            initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-5 py-1.5 rounded-full mb-5">
+              Pricing Calculator
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-5">
-              Pay only<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,55%)]">when you sell</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+              Find your perfect plan
             </h1>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg">
-              No monthly subscription. No setup fees. No hardware costs. Two simple plans - pick the one that fits your business.
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Adjust the sliders to match your business and see exactly what you would pay each month on each plan.
             </p>
-            <div className="flex flex-wrap gap-4 mb-8">
-              {[
-                { icon: <ShieldCheck className="w-4 h-4 text-green-500" />, label: "No monthly fee" },
-                { icon: <Star className="w-4 h-4 text-amber-500" />, label: "7-day free trial" },
-                { icon: <Zap className="w-4 h-4 text-[hsl(217,90%,40%)]" />, label: "No credit card" },
-                { icon: <Globe className="w-4 h-4 text-blue-400" />, label: "Any device" },
-              ].map(({ icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-sm text-gray-600 bg-white border border-gray-200 px-3.5 py-1.5 rounded-full shadow-sm">
-                  {icon}{label}
+          </motion.div>
+
+          {/* Calculator card */}
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}
+            className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden">
+            <div className="grid lg:grid-cols-2 gap-0">
+              {/* Sliders side */}
+              <div className="p-8 lg:border-r border-gray-100">
+                <div className="flex items-center gap-2 mb-7">
+                  <Calculator className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  <h3 className="font-bold text-gray-900 text-lg">Your business</h3>
                 </div>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <Button asChild size="lg" className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold px-8 rounded-full border-0 shadow-xl shadow-blue-500/20 hover:scale-105 transition-all">
-                <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-[hsl(217,90%,40%)] text-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,40%)]/5 font-semibold px-8 rounded-full hover:scale-105 transition-all">
-                <Link href="/pos/login">Log In</Link>
-              </Button>
+
+                <div className="mb-7">
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-sm font-semibold text-gray-700">Monthly sales</label>
+                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">{salesCount} <span className="text-sm font-medium text-gray-400">sales</span></span>
+                  </div>
+                  <input type="range" min={1} max={1000} value={salesCount}
+                    onChange={e => setSalesCount(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>1</span><span>500</span><span>1,000</span></div>
+                </div>
+
+                <div className="mb-7">
+                  <div className="flex justify-between items-baseline mb-2">
+                    <label className="text-sm font-semibold text-gray-700">Average sale value</label>
+                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">R{avgSale} <span className="text-sm font-medium text-gray-400">avg</span></span>
+                  </div>
+                  <input type="range" min={10} max={5000} step={10} value={avgSale}
+                    onChange={e => setAvgSale(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>R10</span><span>R2,500</span><span>R5,000</span></div>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl px-4 py-3 flex justify-between items-center mb-6">
+                  <span className="text-sm text-gray-500">Estimated monthly turnover</span>
+                  <span className="font-bold text-gray-900">{fmt(salesCount * avgSale)}</span>
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cost curve</div>
+                  <BreakevenSVG breakeven={breakeven} />
+                  <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-[hsl(217,90%,40%)] inline-block rounded" />0.5% plan</span>
+                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-green-500 inline-block rounded" />Flat R1 plan</span>
+                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />Break-even</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Results side */}
+              <div className="p-8 bg-gradient-to-br from-gray-50/60 to-white">
+                <div className="flex items-center gap-2 mb-7">
+                  <ChartBar className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                  <h3 className="font-bold text-gray-900 text-lg">Your monthly cost</h3>
+                </div>
+
+                <div className={`rounded-2xl p-5 mb-4 border-2 transition-all ${cheaper === "pct" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">0.5% per-sale plan</div>
+                      <div className="text-4xl font-black text-gray-900">{fmt(pctCost)}</div>
+                      <div className="text-xs text-gray-400 mt-0.5">sales fees only, excl. invoices</div>
+                    </div>
+                    {cheaper === "pct" && <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">Best for you</div>}
+                  </div>
+                  {pctSaves > 0 && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                      <TrendUp className="w-4 h-4 shrink-0" />
+                      <span>You save <strong>{fmt(pctSaves)}/month</strong> vs the flat plan</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className={`rounded-2xl p-5 mb-6 border-2 transition-all ${cheaper === "flat" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">R1.00 flat plan</div>
+                      <div className="text-4xl font-black text-gray-900">{fmt(flatCost)}</div>
+                      <div className="text-xs text-gray-400 mt-0.5">sales fees only, excl. invoices</div>
+                    </div>
+                    {cheaper === "flat" && <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">Best for you</div>}
+                  </div>
+                  {flatSaves > 0 && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
+                      <TrendUp className="w-4 h-4 shrink-0" />
+                      <span>You save <strong>{fmt(flatSaves)}/month</strong> vs the % plan</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
+                  <div className="text-xs font-bold uppercase tracking-wide text-amber-700 mb-1">Break-even point</div>
+                  <div className="text-sm text-amber-800">
+                    At <strong>R{avgSale} average</strong> sale value, the plans are equal at <strong>{breakeven} sales/month</strong>.
+                    {salesCount < breakeven ? " Below this volume, the 0.5% plan is cheaper." : " Above this volume, the flat R1.00 plan wins."}
+                  </div>
+                </div>
+
+                <Button asChild className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold py-3.5 rounded-xl text-base border-0 hover:scale-105 transition-all">
+                  <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free - Choose Plan Later</Link>
+                </Button>
+                <p className="text-center text-xs text-gray-400 mt-2">Pick your plan after the 7-day trial. No card needed.</p>
+              </div>
             </div>
           </motion.div>
 
-          </div>
+        </div>
       </section>
 
       {/* ── PLAN CARDS ─────────────────────────────────────────────── */}
@@ -351,145 +407,6 @@ export default function Pricing() {
             <Button asChild className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 border-0 shrink-0 rounded-full">
               <Link href="/pos/signup"><ArrowRight className="w-4 h-4 mr-1.5" />Get Started Free</Link>
             </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── INTERACTIVE CALCULATOR ─────────────────────────────────── */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div className="text-center mb-10"
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full mb-4">
-              Pricing Calculator
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Find your perfect plan</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">Adjust the sliders to match your business and see exactly what you would pay each month on each plan.</p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
-              {/* Sliders side */}
-              <div className="p-8 lg:border-r border-gray-100">
-                <div className="flex items-center gap-2 mb-7">
-                  <Calculator className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                  <h3 className="font-bold text-gray-900 text-lg">Your business</h3>
-                </div>
-
-                {/* Sales count */}
-                <div className="mb-7">
-                  <div className="flex justify-between items-baseline mb-2">
-                    <label className="text-sm font-semibold text-gray-700">Monthly sales</label>
-                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">{salesCount} <span className="text-sm font-medium text-gray-400">sales</span></span>
-                  </div>
-                  <input type="range" min={1} max={1000} value={salesCount}
-                    onChange={e => setSalesCount(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>1</span><span>500</span><span>1,000</span></div>
-                </div>
-
-                {/* Avg sale */}
-                <div className="mb-7">
-                  <div className="flex justify-between items-baseline mb-2">
-                    <label className="text-sm font-semibold text-gray-700">Average sale value</label>
-                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">R{avgSale} <span className="text-sm font-medium text-gray-400">avg</span></span>
-                  </div>
-                  <input type="range" min={10} max={5000} step={10} value={avgSale}
-                    onChange={e => setAvgSale(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>R10</span><span>R2,500</span><span>R5,000</span></div>
-                </div>
-
-                {/* Monthly turnover */}
-                <div className="bg-gray-50 rounded-xl px-4 py-3 flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Estimated monthly turnover</span>
-                  <span className="font-bold text-gray-900">{fmt(salesCount * avgSale)}</span>
-                </div>
-
-                {/* Break-even chart */}
-                <div className="mt-6">
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cost curve</div>
-                  <BreakevenSVG breakeven={breakeven} />
-                  <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-[hsl(217,90%,40%)] inline-block rounded" />0.5% plan</span>
-                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-green-500 border-dashed inline-block rounded" />Flat R1 plan</span>
-                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />Break-even</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Results side */}
-              <div className="p-8 bg-gradient-to-br from-gray-50/60 to-white">
-                <div className="flex items-center gap-2 mb-7">
-                  <ChartBar className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                  <h3 className="font-bold text-gray-900 text-lg">Your monthly cost</h3>
-                </div>
-
-                {/* 0.5% result */}
-                <div className={`rounded-2xl p-5 mb-4 border-2 transition-all ${cheaper === "pct" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">0.5% per-sale plan</div>
-                      <div className="text-4xl font-black text-gray-900">{fmt(pctCost)}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">sales fees only, excl. invoices</div>
-                    </div>
-                    {cheaper === "pct" && (
-                      <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-                        Best for you
-                      </div>
-                    )}
-                  </div>
-                  {pctSaves > 0 && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
-                      <TrendUp className="w-4 h-4 shrink-0" />
-                      <span>You save <strong>{fmt(pctSaves)}/month</strong> vs the flat plan</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* R1 flat result */}
-                <div className={`rounded-2xl p-5 mb-6 border-2 transition-all ${cheaper === "flat" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">R1.00 flat plan</div>
-                      <div className="text-4xl font-black text-gray-900">{fmt(flatCost)}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">sales fees only, excl. invoices</div>
-                    </div>
-                    {cheaper === "flat" && (
-                      <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-                        Best for you
-                      </div>
-                    )}
-                  </div>
-                  {flatSaves > 0 && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
-                      <TrendUp className="w-4 h-4 shrink-0" />
-                      <span>You save <strong>{fmt(flatSaves)}/month</strong> vs the % plan</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Break-even callout */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
-                  <div className="text-xs font-bold uppercase tracking-wide text-amber-700 mb-1">Break-even point</div>
-                  <div className="text-sm text-amber-800">
-                    At <strong>R{avgSale} average</strong> sale value, the plans are equal at <strong>{breakeven} sales/month</strong>.
-                    {salesCount < breakeven
-                      ? " Below this volume, the 0.5% plan is cheaper."
-                      : " Above this volume, the flat R1.00 plan wins."}
-                  </div>
-                </div>
-
-                <Button asChild className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold py-3.5 rounded-xl text-base border-0 hover:scale-105 transition-all">
-                  <Link href="/pos/signup">
-                    <Zap className="w-4 h-4 mr-2" />
-                    Start Free - Choose Plan Later
-                  </Link>
-                </Button>
-                <p className="text-center text-xs text-gray-400 mt-2">Pick your plan after the 7-day trial. No card needed.</p>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
