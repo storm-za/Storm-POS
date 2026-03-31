@@ -248,6 +248,7 @@ export default function PosSystemAfrikaans() {
   const [isStaffDialogOpen, setIsStaffDialogOpen] = useState(false);
   const [selectedStaffForAuth, setSelectedStaffForAuth] = useState<StaffAccount | null>(null);
   const [isStaffPasswordDialogOpen, setIsStaffPasswordDialogOpen] = useState(false);
+  const [mobileStaffPickerOpen, setMobileStaffPickerOpen] = useState(false);
   const [staffPassword, setStaffPassword] = useState("");
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
@@ -3571,8 +3572,12 @@ ${dateFilteredSales.map(sale =>
                 </button>
               ))}
             </nav>
-            <div className="p-3 border-t border-gray-100 space-y-2 sidebar-bottom-safe">
-              <div className="flex items-center gap-3 px-3 py-2.5">
+            <div className="p-3 border-t border-gray-100 space-y-1 sidebar-bottom-safe">
+              {/* Gebruiker-wisselaar knoppie */}
+              <button
+                onClick={() => setMobileStaffPickerOpen(prev => !prev)}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-colors text-left"
+              >
                 <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
                   {currentUser?.companyLogo ? (
                     <img src={currentUser.companyLogo} alt="" className="w-full h-full rounded-lg object-cover" />
@@ -3584,12 +3589,63 @@ ${dateFilteredSales.map(sale =>
                   <span className="text-xs text-gray-400 leading-tight block">Aangemeld as</span>
                   <span className="text-sm font-semibold text-gray-900 leading-tight truncate block">{currentStaff ? currentStaff.username : 'Kies Gebruiker'}</span>
                 </div>
-              </div>
+                <ChevronDown className={`h-4 w-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${mobileStaffPickerOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {/* Personeellys */}
+              {mobileStaffPickerOpen && (
+                <div className="mx-1 mb-1 bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                  {staffAccounts.length === 0 ? (
+                    <p className="text-xs text-gray-400 px-3 py-2.5">Geen personeelrekeninge bygevoeg nie.</p>
+                  ) : (
+                    staffAccounts.map((staff) => {
+                      const isCurrent = currentStaff?.id === staff.id;
+                      return (
+                        <button
+                          key={staff.id}
+                          onClick={() => {
+                            if (!isCurrent) {
+                              setMobileStaffPickerOpen(false);
+                              setIsMobileMenuOpen(false);
+                              setSelectedStaffForAuth(staff);
+                              setIsStaffPasswordDialogOpen(true);
+                            }
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-all ${
+                            isCurrent ? 'bg-[hsl(217,90%,40%)]/8 cursor-default' : 'hover:bg-gray-100 cursor-pointer'
+                          }`}
+                        >
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                            isCurrent ? 'bg-[hsl(217,90%,40%)] text-white' : 'bg-gray-200 text-gray-600'
+                          }`}>
+                            {staff.username.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className={`font-medium block truncate ${isCurrent ? 'text-[hsl(217,90%,40%)]' : 'text-gray-700'}`}>{staff.username}</span>
+                            <span className="text-[10px] text-gray-400 capitalize">{staff.userType === 'management' ? 'Bestuur' : 'Personeel'}</span>
+                          </div>
+                          {isCurrent && <Check className="h-3.5 w-3.5 text-[hsl(217,90%,40%)] flex-shrink-0" />}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+              {/* Kennisgewings-klokkie */}
               <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setIsLogoutDialogOpen(true);
-                }}
+                onClick={() => { setIsMobileMenuOpen(false); setNotifOpen(o => !o); }}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all"
+              >
+                <div className="relative flex-shrink-0">
+                  <Bell className="h-5 w-5" />
+                  {!currentUser?.tutorialCompleted && (
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-white text-[8px] font-bold flex items-center justify-center leading-none">1</span>
+                  )}
+                </div>
+                <span>Kennisgewings</span>
+              </button>
+              {/* Teken uit */}
+              <button
+                onClick={() => { setIsMobileMenuOpen(false); setIsLogoutDialogOpen(true); }}
                 className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-all"
                 data-testid="menu-item-logout-af"
               >
@@ -3843,16 +3899,6 @@ ${dateFilteredSales.map(sale =>
             </button>
             <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
             <div className="ml-auto flex items-center gap-2">
-              <button
-                onClick={() => setNotifOpen(o => !o)}
-                className="relative p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation"
-                aria-label="Kennisgewings"
-              >
-                <Bell className="h-5 w-5" />
-                {!currentUser?.tutorialCompleted && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[9px] font-bold flex items-center justify-center leading-none">1</span>
-                )}
-              </button>
               <span className="text-gray-900 text-sm font-semibold capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
             </div>
           </div>
