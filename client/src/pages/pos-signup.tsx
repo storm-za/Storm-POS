@@ -47,7 +47,7 @@ export default function PosSignup() {
     onSuccess: (data) => {
       localStorage.setItem('posUser', JSON.stringify(data.user));
       localStorage.setItem('posLoginTimestamp', Date.now().toString());
-      setLocation("/pos/payment-option");
+      setLocation("/pos/onboarding");
     },
     onError: (error: Error) => {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });

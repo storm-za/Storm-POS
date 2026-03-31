@@ -27,7 +27,7 @@ export default function PosSignupSuccess() {
       const parsed = JSON.parse(storedUser);
       setUser(parsed);
       if (!parsed.paymentOptionSelected) {
-        setLocation("/pos/payment-option");
+        setLocation("/pos/onboarding");
         return;
       }
     }

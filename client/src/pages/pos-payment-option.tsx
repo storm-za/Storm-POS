@@ -97,6 +97,8 @@ export default function PosPaymentOption() {
       } else {
         setLocation("/pos/inactive");
       }
+    } else {
+      setLocation("/pos/onboarding");
     }
   }, []);
 
