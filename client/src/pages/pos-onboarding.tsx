@@ -476,33 +476,29 @@ export default function PosOnboarding() {
         <div className="bg-white rounded-xl p-2 shadow-md">
           <img src="/storm-logo.png" alt="Storm POS" className="h-8 w-auto block"/>
         </div>
-        {step < 3 && (
-          <div className="flex items-center gap-2">
-            {([0, 1, 2, 3] as Step[]).map(s => (
-              <div
-                key={s}
-                className={`transition-all rounded-full ${
-                  s === step ? "w-6 h-2.5 bg-[hsl(217,90%,50%)]"
-                  : s < step  ? "w-2.5 h-2.5 bg-[hsl(217,90%,50%)]/60"
-                  : "w-2.5 h-2.5 bg-white/15"
-                }`}
-              />
-            ))}
-            <span className="ml-2 text-xs text-gray-400">{L.step(step + 1)}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {([0, 1, 2, 3] as Step[]).map(s => (
+            <div
+              key={s}
+              className={`transition-all rounded-full ${
+                s === step ? "w-6 h-2.5 bg-[hsl(217,90%,50%)]"
+                : s < step  ? "w-2.5 h-2.5 bg-[hsl(217,90%,50%)]/60"
+                : "w-2.5 h-2.5 bg-white/15"
+              }`}
+            />
+          ))}
+          <span className="ml-2 text-xs text-gray-400">{L.step(step + 1)}</span>
+        </div>
       </div>
 
-      {step < 3 && (
-        <div className="relative z-10 w-full max-w-2xl h-0.5 bg-white/10 rounded-full mb-8">
-          <motion.div
-            className="h-full bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,60%)] rounded-full"
-            initial={false}
-            animate={{ width: `${((step + 1) / 4) * 100}%` }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-          />
-        </div>
-      )}
+      <div className="relative z-10 w-full max-w-2xl h-0.5 bg-white/10 rounded-full mb-8">
+        <motion.div
+          className="h-full bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,60%)] rounded-full"
+          initial={false}
+          animate={{ width: `${((step + 1) / 4) * 100}%` }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        />
+      </div>
 
       <AnimatePresence mode="wait">
         <motion.div

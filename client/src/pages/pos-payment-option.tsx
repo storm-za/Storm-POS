@@ -86,6 +86,8 @@ export default function PosPaymentOption() {
     });
   }, []);
 
+  // Legacy access: /pos/payment-option?legacy renders the old plan selector (for support use).
+  // New signups go through /pos/onboarding instead.
   const isLegacyAccess = new URLSearchParams(window.location.search).has("legacy");
 
   useEffect(() => {
