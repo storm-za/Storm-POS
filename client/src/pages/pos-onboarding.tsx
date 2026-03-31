@@ -448,10 +448,14 @@ export default function PosOnboarding() {
       canonical: window.location.origin + "/pos/onboarding",
     });
     if (!user) { setLocation("/pos/login"); return; }
-    if (user.paymentOptionSelected) {
+    if (user.paymentOptionSelected && user.tutorialCompleted) {
       setLocation(user.paid
         ? (user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system")
         : "/pos/inactive");
+      return;
+    }
+    if (user.paymentOptionSelected && !user.tutorialCompleted) {
+      setStep(3);
     }
   }, []);
 
