@@ -542,7 +542,7 @@ export default function Pricing() {
               <Button asChild size="lg" className="bg-white text-[hsl(217,90%,40%)] hover:bg-blue-50 font-bold px-10 py-6 text-base rounded-full border-0 hover:scale-105 transition-all shadow-xl">
                 <Link href="/pos/signup"><Zap className="w-5 h-5 mr-2" />Start 7-Day Free Trial</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 font-semibold px-10 py-6 text-base rounded-full hover:scale-105 transition-all">
+              <Button asChild size="lg" className="bg-transparent border-2 border-white text-white hover:bg-white/15 font-semibold px-10 py-6 text-base rounded-full hover:scale-105 transition-all shadow-none">
                 <Link href="/pos">Learn More</Link>
               </Button>
             </div>
