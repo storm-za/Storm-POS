@@ -333,31 +333,49 @@ html:not(.dark) .pos-app .text-gray-500 {
 /* Keep gray-600 readable as-is in light mode */
 
 /* --- Preserve white text/icons on colored (non-grey) backgrounds ---
-   These override the broad text-white→dark rule above for any element
-   that intentionally sits ON a blue, green, amber or red background.
-   Covers: icon squares, buttons, banners, badges, avatars.            */
+   Only applies when the element ITSELF has the coloured bg, or is a
+   DIRECT CHILD of one.  Using ">" instead of " " stops the rule from
+   cascading into nested white sub-cards inside blue banners.          */
 html:not(.dark) .pos-app [class*="from-[hsl(217"].text-white,
-html:not(.dark) .pos-app [class*="from-[hsl(217"] .text-white,
+html:not(.dark) .pos-app [class*="from-[hsl(217"] > .text-white,
 html:not(.dark) .pos-app [class*="bg-[hsl(217"].text-white,
-html:not(.dark) .pos-app [class*="bg-[hsl(217"] .text-white,
-html:not(.dark) .pos-app [class*="via-[hsl(217"] .text-white,
+html:not(.dark) .pos-app [class*="bg-[hsl(217"] > .text-white,
+html:not(.dark) .pos-app [class*="via-[hsl(217"] > .text-white,
 html:not(.dark) .pos-app [class*="from-green"].text-white,
-html:not(.dark) .pos-app [class*="from-green"] .text-white,
+html:not(.dark) .pos-app [class*="from-green"] > .text-white,
 html:not(.dark) .pos-app [class*="from-emerald"].text-white,
-html:not(.dark) .pos-app [class*="from-emerald"] .text-white,
+html:not(.dark) .pos-app [class*="from-emerald"] > .text-white,
 html:not(.dark) .pos-app [class*="from-amber"].text-white,
-html:not(.dark) .pos-app [class*="from-amber"] .text-white,
+html:not(.dark) .pos-app [class*="from-amber"] > .text-white,
 html:not(.dark) .pos-app [class*="from-red"].text-white,
-html:not(.dark) .pos-app [class*="from-red"] .text-white,
+html:not(.dark) .pos-app [class*="from-red"] > .text-white,
 html:not(.dark) .pos-app [class*="from-rose"].text-white,
-html:not(.dark) .pos-app [class*="from-rose"] .text-white,
+html:not(.dark) .pos-app [class*="from-rose"] > .text-white,
 html:not(.dark) .pos-app [class*="bg-green"].text-white,
-html:not(.dark) .pos-app [class*="bg-green"] .text-white,
+html:not(.dark) .pos-app [class*="bg-green"] > .text-white,
 html:not(.dark) .pos-app [class*="bg-amber"].text-white,
-html:not(.dark) .pos-app [class*="bg-amber"] .text-white,
+html:not(.dark) .pos-app [class*="bg-amber"] > .text-white,
 html:not(.dark) .pos-app [class*="bg-red"].text-white,
-html:not(.dark) .pos-app [class*="bg-red"] .text-white {
+html:not(.dark) .pos-app [class*="bg-red"] > .text-white {
   color: #ffffff !important;
+}
+
+/* --- Nested near-white sub-cards inside blue sections ---
+   bg-white/10, /15, /20 become opaque-white in light mode; force the
+   text colour back to dark so descendants don't inherit white from a
+   blue-banner ancestor.                                               */
+html:not(.dark) .pos-app [class*="bg-white\/1"],
+html:not(.dark) .pos-app [class*="bg-white\/2"] {
+  color: hsl(220, 20%, 10%);
+}
+/* Light-blue text classes also become unreadable on near-white; darken them */
+html:not(.dark) .pos-app [class*="bg-white\/1"] .text-blue-100,
+html:not(.dark) .pos-app [class*="bg-white\/1"] .text-blue-200,
+html:not(.dark) .pos-app [class*="bg-white\/1"] .text-white,
+html:not(.dark) .pos-app [class*="bg-white\/2"] .text-blue-100,
+html:not(.dark) .pos-app [class*="bg-white\/2"] .text-blue-200,
+html:not(.dark) .pos-app [class*="bg-white\/2"] .text-white {
+  color: hsl(220, 14%, 40%) !important;
 }
 
 /* --- Borders --- */
@@ -417,8 +435,20 @@ html:not(.dark) [data-radix-popper-content-wrapper] .border-gray-700\/50 {
   border-color: hsl(220, 14%, 88%) !important;
 }
 html:not(.dark) [role="dialog"] .bg-gray-950,
-html:not(.dark) [role="dialog"] .bg-gray-900 {
-  background-color: #ffffff !important;
+html:not(.dark) [role="dialog"] .bg-gray-900,
+html:not(.dark) [role="dialog"] [class*="bg-gray-900"],
+html:not(.dark) [role="dialog"] [class~="bg-black"],
+html:not(.dark) [role="dialog"] [class*="bg-[#000"] {
+  background-color: #f8fafc !important;
+}
+html:not(.dark) [role="dialog"] .text-white,
+html:not(.dark) [role="dialog"] .text-gray-300,
+html:not(.dark) [role="dialog"] .text-gray-400 {
+  color: hsl(220, 20%, 12%) !important;
+}
+html:not(.dark) [role="alertdialog"] .text-white,
+html:not(.dark) [role="alertdialog"] .text-gray-300 {
+  color: hsl(220, 20%, 12%) !important;
 }
 
 /* ================================================================
