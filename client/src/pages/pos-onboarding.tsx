@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, ArrowRight, ArrowLeft, Sparkle as Sparkles, ShieldCheck as Shield, CaretRight as ChevronRight } from "@phosphor-icons/react";
+import { Check, ArrowRight, ArrowLeft, Sparkle as Sparkles, ShieldCheck as Shield, CaretRight as ChevronRight, Plus } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
 
 const B = "hsl(217,90%,40%)";
@@ -48,17 +48,27 @@ const LABELS = {
     trialNote:  "7-day free trial on both plans — no credit card needed",
     confirmPlan: "Confirm This Plan",
     saving: "Saving...",
-    s4Title: "Complete these 4 steps to process your first sale!",
+    s4Title: "Complete these 2 steps to process your first sale!",
     s4Sub:   "Tick each step as you go — we'll celebrate when you're done.",
     checklist: [
-      { id: "logo",    label: "Upload Your Logo",          sub: "Personalise receipts and invoices" },
-      { id: "product", label: "Add Your First Product",    sub: "Set up your inventory" },
-      { id: "sale",    label: "Create a Test Sale",        sub: "See Storm POS in action" },
-      { id: "payment", label: "Connect Payment Methods",   sub: "Cash, card and EFT ready" },
+      { id: "logo",    label: "Upload Your Logo",       sub: "Personalise receipts and invoices" },
+      { id: "product", label: "Add Your First Product", sub: "Set up your inventory" },
     ],
     doneTitle: "Congratulations!",
     doneBody:  "Your first 5 invoices are completely fee-free. Enjoy the headstart!",
     goToPOS:   "Go to My POS",
+    logoPreviewTitle: "Logo Preview",
+    logoPreviewSub:   "This is how your logo will appear on receipts and invoices.",
+    logoConfirm:      "Looks Good — Save Logo",
+    logoRetake:       "Choose a Different Image",
+    prodName:   "Product Name",
+    prodPrice:  "Retail Price (R)",
+    prodSku:    "SKU (auto-generated if blank)",
+    prodStock:  "Stock Quantity",
+    prodAdd:    "Add Product",
+    prodAdding: "Adding...",
+    prodCancel: "Cancel",
+    prodAlready: "Product already added",
   },
   af: {
     step: (n: number) => `Stap ${n} van 4`,
@@ -97,17 +107,27 @@ const LABELS = {
     trialNote:  "7-dag gratis proeftydperk op beide planne - geen kredietkaart nodig nie",
     confirmPlan: "Bevestig Hierdie Plan",
     saving: "Stoor...",
-    s4Title: "Voltooi hierdie 4 stappe om jou eerste verkoop te verwerk!",
+    s4Title: "Voltooi hierdie 2 stappe om jou eerste verkoop te verwerk!",
     s4Sub:   "Merk elke stap soos jy gaan - ons vier wanneer jy klaar is.",
     checklist: [
       { id: "logo",    label: "Laai Jou Logo Op",           sub: "Personaliseer kwitansies en fakture" },
       { id: "product", label: "Voeg Jou Eerste Produk By",  sub: "Stel jou inventaris op" },
-      { id: "sale",    label: "Skep 'n Toetsverkoop",       sub: "Sien Storm POS in aksie" },
-      { id: "payment", label: "Koppel Betaalmetodes",        sub: "Kontant, kaart en EFT gereed" },
     ],
     doneTitle: "Geluk!",
     doneBody:  "Jou eerste 5 fakture is heeltemal fooi-vry. Geniet die voorsprong!",
     goToPOS:   "Gaan na My POS",
+    logoPreviewTitle: "Logo Voorskou",
+    logoPreviewSub:   "So sal jou logo op kwitansies en fakture verskyn.",
+    logoConfirm:      "Lyk Goed - Stoor Logo",
+    logoRetake:       "Kies 'n Ander Prent",
+    prodName:   "Produknaam",
+    prodPrice:  "Kleinhandelprys (R)",
+    prodSku:    "SKU (outomaties gegenereer as leeg)",
+    prodStock:  "Voorraad Hoeveelheid",
+    prodAdd:    "Voeg Produk By",
+    prodAdding: "Byvoeg...",
+    prodCancel: "Kanselleer",
+    prodAlready: "Produk reeds bygevoeg",
   },
 } as const;
 
@@ -145,6 +165,18 @@ interface LabelSet {
   doneTitle: string;
   doneBody: string;
   goToPOS: string;
+  logoPreviewTitle: string;
+  logoPreviewSub: string;
+  logoConfirm: string;
+  logoRetake: string;
+  prodName: string;
+  prodPrice: string;
+  prodSku: string;
+  prodStock: string;
+  prodAdd: string;
+  prodAdding: string;
+  prodCancel: string;
+  prodAlready: string;
 }
 
 const SL = { strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -389,18 +421,25 @@ export default function PosOnboarding() {
   const lang: "en" | "af" = user?.preferredLanguage === "af" ? "af" : "en";
   const L: LabelSet = LABELS[lang];
 
-  const [step,          setStep]         = useState<Step>(0);
-  const [bizType,       setBizType]      = useState<BizType | null>(null);
-  const [volume,        setVolume]       = useState<Volume | null>(null);
-  const [logoUploading, setLogoUploading] = useState(false);
-  const [checked,       setChecked]      = useState<Set<string>>(() => {
+  const [step,           setStep]          = useState<Step>(0);
+  const [bizType,        setBizType]       = useState<BizType | null>(null);
+  const [volume,         setVolume]        = useState<Volume | null>(null);
+  const [logoUploading,  setLogoUploading] = useState(false);
+  const [logoPreview,    setLogoPreview]   = useState<string | null>(null);
+  const [productFormOpen, setProductFormOpen] = useState(false);
+  const [prodName,       setProdName]      = useState("");
+  const [prodPrice,      setProdPrice]     = useState("");
+  const [prodSku,        setProdSku]       = useState("");
+  const [prodStock,      setProdStock]     = useState("0");
+  const [prodAdding,     setProdAdding]    = useState(false);
+  const [checked,        setChecked]       = useState<Set<string>>(() => {
     try {
       const raw = localStorage.getItem(`storm-checklist-${user?.id}`);
       return raw ? new Set(JSON.parse(raw)) : new Set();
     } catch { return new Set(); }
   });
 
-  const allDone = checked.size === 4;
+  const allDone = checked.size === 2;
 
   useEffect(() => {
     updatePageSEO({
@@ -415,6 +454,23 @@ export default function PosOnboarding() {
         : "/pos/inactive");
     }
   }, []);
+
+  useEffect(() => {
+    if (!user?.id || checked.has("product")) return;
+    fetch(`/api/pos/products?userId=${user.id}`)
+      .then(r => r.json())
+      .then((products: unknown[]) => {
+        if (Array.isArray(products) && products.length > 0) {
+          setChecked(prev => {
+            const next = new Set(prev);
+            next.add("product");
+            try { localStorage.setItem(`storm-checklist-${user?.id}`, JSON.stringify([...next])); } catch {}
+            return next;
+          });
+        }
+      })
+      .catch(() => {});
+  }, [user?.id]);
 
   const recommendedPlan: Plan = volume === "high" ? "flat" : "percent";
   const secondaryPlan:   Plan = recommendedPlan === "flat" ? "percent" : "flat";
@@ -433,52 +489,90 @@ export default function PosOnboarding() {
       logoInputRef.current?.click();
       return;
     }
-    setChecked(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      try { localStorage.setItem(`storm-checklist-${user?.id}`, JSON.stringify([...next])); } catch {}
-      return next;
+    if (id === "product") {
+      setProductFormOpen(prev => !prev);
+      return;
+    }
+  }, []);
+
+  const processLogoFile = useCallback(async (file: File): Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 400;
+          const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+          const canvas = document.createElement("canvas");
+          canvas.width  = Math.round(img.width  * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = reject;
+        img.src = ev.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
-  }, [user?.id]);
+  }, []);
 
   const handleLogoFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    try {
+      const base64 = await processLogoFile(file);
+      setLogoPreview(base64);
+    } catch {
+      toast({ title: lang === "af" ? "Fout" : "Error", description: lang === "af" ? "Kon nie prent verwerk nie." : "Could not process image.", variant: "destructive" });
+    } finally {
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }, [user, lang, processLogoFile, toast]);
+
+  const handleLogoConfirm = useCallback(async () => {
+    if (!logoPreview || !user) return;
     setLogoUploading(true);
     try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = new Image();
-          img.onload = () => {
-            const maxDim = 200;
-            const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
-            const canvas = document.createElement("canvas");
-            canvas.width  = Math.round(img.width  * scale);
-            canvas.height = Math.round(img.height * scale);
-            canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL("image/jpeg", 0.8));
-          };
-          img.onerror = reject;
-          img.src = ev.target?.result as string;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      const res = await apiRequest("PUT", `/api/pos/user/${user.id}/logo`, { logo: base64, userEmail: user.email });
+      const res = await apiRequest("PUT", `/api/pos/user/${user.id}/logo`, { logo: logoPreview, userEmail: user.email });
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
-      const updated = { ...user, companyLogo: data.user?.companyLogo ?? base64 };
+      const updated = { ...user, companyLogo: data.user?.companyLogo ?? logoPreview };
       localStorage.setItem("posUser", JSON.stringify(updated));
       markItemChecked("logo");
+      setLogoPreview(null);
       toast({ title: lang === "af" ? "Logo opgelaai!" : "Logo uploaded!", description: lang === "af" ? "Jou logo is gestoor." : "Your logo has been saved." });
     } catch {
       toast({ title: lang === "af" ? "Fout" : "Error", description: lang === "af" ? "Kon nie logo oplaai nie. Probeer asseblief weer." : "Could not upload logo. Please try again.", variant: "destructive" });
     } finally {
       setLogoUploading(false);
-      if (logoInputRef.current) logoInputRef.current.value = "";
     }
-  }, [user, lang, markItemChecked, toast]);
+  }, [logoPreview, user, lang, markItemChecked, toast]);
+
+  const handleAddProduct = useCallback(async () => {
+    if (!prodName.trim() || !prodPrice || !user) return;
+    setProdAdding(true);
+    try {
+      const autoSku = prodSku.trim() || `PRD-${Date.now().toString(36).toUpperCase()}`;
+      const res = await apiRequest("POST", "/api/pos/products", {
+        userId: user.id,
+        name: prodName.trim(),
+        retailPrice: prodPrice,
+        costPrice: "0",
+        sku: autoSku,
+        quantity: parseInt(prodStock) || 0,
+      });
+      if (!res.ok) throw new Error("Failed to add product");
+      markItemChecked("product");
+      setProductFormOpen(false);
+      setProdName(""); setProdPrice(""); setProdSku(""); setProdStock("0");
+      toast({ title: lang === "af" ? "Produk bygevoeg!" : "Product added!", description: `${prodName.trim()} ${lang === "af" ? "is bygevoeg." : "has been added to your inventory."}` });
+    } catch {
+      toast({ title: lang === "af" ? "Fout" : "Error", description: lang === "af" ? "Kon nie produk byvoeg nie." : "Could not add product. Please try again.", variant: "destructive" });
+    } finally {
+      setProdAdding(false);
+    }
+  }, [prodName, prodPrice, prodSku, prodStock, user, lang, markItemChecked, toast]);
 
   const confirmMutation = useMutation({
     mutationFn: async (plan: Plan) => {
@@ -594,7 +688,27 @@ export default function PosOnboarding() {
               onSkip={handleSkip}
             />
           )}
-          {step === 3 && <Step4 L={L} checked={checked} allDone={allDone} logoUploading={logoUploading} onToggle={toggleCheck} onGo={goPOS}/>}
+          {step === 3 && (
+            <Step4
+              L={L}
+              checked={checked}
+              allDone={allDone}
+              logoUploading={logoUploading}
+              logoPreview={logoPreview}
+              onToggle={toggleCheck}
+              onLogoConfirm={handleLogoConfirm}
+              onLogoRetake={() => { setLogoPreview(null); logoInputRef.current?.click(); }}
+              productFormOpen={productFormOpen}
+              prodName={prodName} setProdName={setProdName}
+              prodPrice={prodPrice} setProdPrice={setProdPrice}
+              prodSku={prodSku} setProdSku={setProdSku}
+              prodStock={prodStock} setProdStock={setProdStock}
+              prodAdding={prodAdding}
+              onAddProduct={handleAddProduct}
+              onCancelProduct={() => setProductFormOpen(false)}
+              onGo={goPOS}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -856,14 +970,34 @@ const CHECKLIST_ICONS: Record<string, () => JSX.Element> = {
   payment: PaymentCheckIcon,
 };
 
-function Step4({ L, checked, allDone, logoUploading, onToggle, onGo }: {
+function Step4({
+  L, checked, allDone, logoUploading, logoPreview, onToggle,
+  onLogoConfirm, onLogoRetake,
+  productFormOpen, prodName, setProdName, prodPrice, setProdPrice,
+  prodSku, setProdSku, prodStock, setProdStock, prodAdding,
+  onAddProduct, onCancelProduct, onGo,
+}: {
   L: LabelSet;
   checked: Set<string>;
   allDone: boolean;
   logoUploading: boolean;
+  logoPreview: string | null;
   onToggle: (id: string) => void;
+  onLogoConfirm: () => void;
+  onLogoRetake: () => void;
+  productFormOpen: boolean;
+  prodName: string; setProdName: (v: string) => void;
+  prodPrice: string; setProdPrice: (v: string) => void;
+  prodSku: string; setProdSku: (v: string) => void;
+  prodStock: string; setProdStock: (v: string) => void;
+  prodAdding: boolean;
+  onAddProduct: () => void;
+  onCancelProduct: () => void;
   onGo: () => void;
 }) {
+  const totalItems = L.checklist.length;
+  const doneCount  = [...L.checklist].filter(i => checked.has(i.id)).length;
+
   return (
     <div>
       <AnimatePresence>
@@ -893,33 +1027,171 @@ function Step4({ L, checked, allDone, logoUploading, onToggle, onGo }: {
           const Icon = CHECKLIST_ICONS[item.id];
           const isDone = checked.has(item.id);
           const isLogoLoading = item.id === "logo" && logoUploading;
+          const isProductOpen = item.id === "product" && productFormOpen;
+
           return (
-            <button
-              key={item.id}
-              onClick={() => onToggle(item.id)}
-              disabled={isLogoLoading}
-              className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group ${
-                isDone
-                  ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/12"
-                  : "border-white/10 bg-white/5 hover:border-white/25"
-              } ${isLogoLoading ? "opacity-70 cursor-wait" : ""}`}
-            >
-              <div className={`w-12 h-12 rounded-xl p-1.5 flex-shrink-0 transition-all ${isDone ? "bg-white/15" : "bg-white/8 group-hover:bg-white/12"}`}>
-                <Icon/>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-sm transition-colors ${isDone ? "text-white" : "text-gray-200"}`}>{item.label}</p>
-                <p className="text-gray-400 text-xs mt-0.5">{item.sub}</p>
-              </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                isDone ? "bg-[hsl(217,90%,50%)] border-[hsl(217,90%,50%)]" : "border-white/30"
-              }`}>
-                {isLogoLoading
-                  ? <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"/>
-                  : isDone && <Check className="w-3.5 h-3.5 text-white"/>
-                }
-              </div>
-            </button>
+            <div key={item.id} className="flex flex-col gap-0">
+              <button
+                onClick={() => !isDone && onToggle(item.id)}
+                disabled={isLogoLoading || (isDone && item.id !== "product")}
+                className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group ${
+                  isDone
+                    ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/12"
+                    : isProductOpen
+                      ? "border-[hsl(217,90%,50%)]/60 bg-white/8 rounded-b-none border-b-0"
+                      : "border-white/10 bg-white/5 hover:border-white/25"
+                } ${isLogoLoading ? "opacity-70 cursor-wait" : ""}`}
+              >
+                <div className={`w-12 h-12 rounded-xl p-1.5 flex-shrink-0 transition-all ${isDone ? "bg-white/15" : "bg-white/8 group-hover:bg-white/12"}`}>
+                  <Icon/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-semibold text-sm transition-colors ${isDone ? "text-white" : "text-gray-200"}`}>{item.label}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">
+                    {isDone && item.id === "product" ? L.prodAlready : item.sub}
+                  </p>
+                </div>
+                <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+                  isDone ? "bg-[hsl(217,90%,50%)] border-[hsl(217,90%,50%)]" : "border-white/30"
+                }`}>
+                  {isLogoLoading
+                    ? <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"/>
+                    : isDone
+                      ? <Check className="w-3.5 h-3.5 text-white"/>
+                      : item.id === "product"
+                        ? <ChevronRight className={`w-3.5 h-3.5 text-white/50 transition-transform ${isProductOpen ? "rotate-90" : ""}`}/>
+                        : null
+                  }
+                </div>
+              </button>
+
+              {/* Logo Preview Panel */}
+              {item.id === "logo" && logoPreview && !isDone && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border-2 border-t-0 border-[hsl(217,90%,50%)]/60 rounded-b-2xl bg-white/5 overflow-hidden"
+                >
+                  <div className="p-4">
+                    <p className="text-white font-semibold text-sm mb-1">{L.logoPreviewTitle}</p>
+                    <p className="text-gray-400 text-xs mb-3">{L.logoPreviewSub}</p>
+                    <div className="bg-white rounded-xl p-4 mb-4 flex items-center gap-3 shadow-lg max-w-xs">
+                      <img src={logoPreview} alt="Logo preview" className="w-14 h-14 object-contain rounded-lg border border-gray-200"/>
+                      <div>
+                        <p className="text-gray-800 font-bold text-sm">{(() => { try { return JSON.parse(localStorage.getItem("posUser") ?? "{}").companyName || "Your Business"; } catch { return "Your Business"; } })()}</p>
+                        <p className="text-gray-500 text-xs">Receipt / Invoice Header</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        onClick={onLogoConfirm}
+                        disabled={logoUploading}
+                        size="sm"
+                        className="bg-[hsl(217,90%,42%)] hover:bg-[hsl(217,90%,48%)] text-white text-xs font-semibold"
+                      >
+                        {logoUploading
+                          ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5"/>Saving...</>
+                          : <><Check className="w-3.5 h-3.5 mr-1"/>{L.logoConfirm}</>
+                        }
+                      </Button>
+                      <Button
+                        onClick={onLogoRetake}
+                        disabled={logoUploading}
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-gray-300 hover:text-white hover:border-white/40 text-xs"
+                      >
+                        {L.logoRetake}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Product Inline Form Panel */}
+              {item.id === "product" && isProductOpen && !isDone && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="border-2 border-t-0 border-[hsl(217,90%,50%)]/60 rounded-b-2xl bg-white/5 overflow-hidden"
+                >
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="col-span-2">
+                        <label className="text-gray-400 text-xs mb-1 block">{L.prodName} *</label>
+                        <input
+                          type="text"
+                          value={prodName}
+                          onChange={e => setProdName(e.target.value)}
+                          placeholder="e.g. Coffee - Large"
+                          className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-gray-400 text-xs mb-1 block">{L.prodPrice} *</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">R</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={prodPrice}
+                            onChange={e => setProdPrice(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full bg-black/30 border border-white/15 rounded-lg pl-7 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-gray-400 text-xs mb-1 block">{L.prodStock}</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={prodStock}
+                          onChange={e => setProdStock(e.target.value)}
+                          placeholder="0"
+                          className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-gray-400 text-xs mb-1 block">{L.prodSku}</label>
+                        <input
+                          type="text"
+                          value={prodSku}
+                          onChange={e => setProdSku(e.target.value)}
+                          placeholder="e.g. COFFEE-LG"
+                          className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={onAddProduct}
+                        disabled={prodAdding || !prodName.trim() || !prodPrice}
+                        size="sm"
+                        className="bg-[hsl(217,90%,42%)] hover:bg-[hsl(217,90%,48%)] text-white text-xs font-semibold disabled:opacity-50"
+                      >
+                        {prodAdding
+                          ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5"/>{L.prodAdding}</>
+                          : <><Plus className="w-3.5 h-3.5 mr-1"/>{L.prodAdd}</>
+                        }
+                      </Button>
+                      <Button
+                        onClick={onCancelProduct}
+                        disabled={prodAdding}
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-gray-300 hover:text-white hover:border-white/40 text-xs"
+                      >
+                        {L.prodCancel}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
           );
         })}
       </div>
@@ -928,11 +1200,11 @@ function Step4({ L, checked, allDone, logoUploading, onToggle, onGo }: {
         <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-[hsl(217,90%,50%)] rounded-full"
-            animate={{ width: `${(checked.size / 4) * 100}%` }}
+            animate={{ width: `${(doneCount / totalItems) * 100}%` }}
             transition={{ duration: 0.4 }}
           />
         </div>
-        <span className="text-xs text-gray-400">{checked.size}/4</span>
+        <span className="text-xs text-gray-400">{doneCount}/{totalItems}</span>
       </div>
 
       <div className="flex flex-col items-center gap-3">

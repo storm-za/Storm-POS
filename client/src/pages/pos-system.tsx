@@ -4122,7 +4122,7 @@ export default function PosSystem() {
             <div className="p-2">
               {!currentUser?.tutorialCompleted ? (
                 <button
-                  onClick={() => { handleTabChange('settings'); setNotifOpen(false); }}
+                  onClick={() => { setNotifOpen(false); window.location.href = "/pos/onboarding"; }}
                   className="w-full text-left flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                 >
                   <div className="w-9 h-9 rounded-full bg-[hsl(217,90%,40%)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -4130,7 +4130,7 @@ export default function PosSystem() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900">Complete your account setup</p>
-                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">Upload your logo, add products, and more. Tap to go to Settings.</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">Upload your logo, add your first product, and more.</p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1 group-hover:text-[hsl(217,90%,40%)] transition-colors" />
                 </button>

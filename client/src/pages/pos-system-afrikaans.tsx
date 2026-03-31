@@ -3619,7 +3619,7 @@ ${dateFilteredSales.map(sale =>
             <div className="p-2">
               {!currentUser?.tutorialCompleted ? (
                 <button
-                  onClick={() => { handleTabChange('instellings'); setNotifOpen(false); }}
+                  onClick={() => { setNotifOpen(false); window.location.href = "/pos/onboarding"; }}
                   className="w-full text-left flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                 >
                   <div className="w-9 h-9 rounded-full bg-[hsl(217,90%,40%)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -3627,7 +3627,7 @@ ${dateFilteredSales.map(sale =>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900">Voltooi jou rekeningopstelling</p>
-                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">Laai jou logo op, voeg produkte by, en meer. Tik vir Instellings.</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">Laai jou logo op, voeg jou eerste produk by, en meer.</p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1 group-hover:text-[hsl(217,90%,40%)] transition-colors" />
                 </button>
