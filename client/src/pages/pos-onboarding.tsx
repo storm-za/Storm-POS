@@ -431,7 +431,11 @@ export default function PosOnboarding() {
         const res = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan: "percent", userEmail: user.email });
         const data = await res.json();
         localStorage.setItem("posUser", JSON.stringify(data.user));
-      } catch {}
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Could not save your plan. Please check your connection and try again.";
+        toast({ title: lang === "af" ? "Fout" : "Error", description: msg, variant: "destructive" });
+        return;
+      }
     }
     setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
   };
@@ -715,8 +719,8 @@ function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm
   onBack: () => void;
   onSkip: () => void;
 }) {
-  const titleKey  = volume === "micro" ? "s3MicroTitle"  : volume === "growth" ? "s3GrowthTitle"  : "s3HighTitle";
-  const bodyKey   = volume === "micro" ? "s3MicroBody"   : volume === "growth" ? "s3GrowthBody"   : "s3HighBody";
+  const title = volume === "micro" ? L.s3MicroTitle : volume === "growth" ? L.s3GrowthTitle : L.s3HighTitle;
+  const body  = volume === "micro" ? L.s3MicroBody  : volume === "growth" ? L.s3GrowthBody  : L.s3HighBody;
 
   const planData = (p: Plan, recommended: boolean) => ({
     plan: p,
@@ -730,8 +734,8 @@ function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm
   return (
     <div>
       <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{(L as any)[titleKey]}</h1>
-        <p className="text-gray-400 text-sm max-w-md mx-auto">{(L as any)[bodyKey]}</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{title}</h1>
+        <p className="text-gray-400 text-sm max-w-md mx-auto">{body}</p>
       </div>
 
       <div className={`grid gap-4 mb-4 ${volume === "growth" ? "grid-cols-2" : "grid-cols-1 max-w-sm mx-auto"}`}>
