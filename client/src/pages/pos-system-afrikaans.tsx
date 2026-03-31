@@ -4296,7 +4296,7 @@ ${dateFilteredSales.map(sale =>
               {/* Main Products Card */}
               <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
-                <CardHeader className="relative border-b border-white/10 pb-4 bg-[#000000]">
+                <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
@@ -4443,7 +4443,7 @@ ${dateFilteredSales.map(sale =>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-6 relative bg-[#000000]">
+                <CardContent className={`px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-6 relative ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="space-y-4">
                     {/* Enhanced Search Bar */}
                     <div className="relative">
@@ -4844,7 +4844,7 @@ ${dateFilteredSales.map(sale =>
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6 px-3 sm:px-6 bg-[#000000]">
+              <CardContent className={`pt-6 px-3 sm:px-6 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
                   <div className="flex flex-col gap-3">
@@ -5065,8 +5065,8 @@ ${dateFilteredSales.map(sale =>
           {/* Aankoopbestellings Tab */}
           <TabsContent value="aankoopbestellings">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className="border-gray-800 bg-black shadow-2xl">
-                <CardHeader className="border-b border-gray-800 bg-black">
+              <Card className={`border-gray-800 shadow-2xl ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+                <CardHeader className={`border-b border-gray-800 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <CardTitle className="text-white text-lg sm:text-xl font-bold flex items-center gap-2">
                       <ClipboardList className="h-5 w-5 text-blue-400" />
@@ -5098,7 +5098,7 @@ ${dateFilteredSales.map(sale =>
                     </Select>
                   </div>
                 </CardHeader>
-                <CardContent className="p-0 bg-black">
+                <CardContent className={`p-0 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   {isPOLoading ? (
                     <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
                   ) : filteredPurchaseOrders.length === 0 ? (
@@ -5345,7 +5345,7 @@ ${dateFilteredSales.map(sale =>
                     Oop Rekeninge
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 bg-black">
+                <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
                       <div className="text-center py-8 text-gray-400">

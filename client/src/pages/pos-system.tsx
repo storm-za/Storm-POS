@@ -4822,7 +4822,7 @@ export default function PosSystem() {
               {/* Main Products Card */}
               <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
-                <CardHeader className="relative border-b border-white/10 pb-4 bg-[#000000]">
+                <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
@@ -5213,7 +5213,7 @@ export default function PosSystem() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-6 relative bg-[#000000]">
+              <CardContent className={`px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-6 relative ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="space-y-4">
                     {/* Enhanced Search Bar */}
                     <div className="relative">
@@ -5452,7 +5452,7 @@ export default function PosSystem() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-6 bg-black">
+              <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                 <div className="mb-5 p-4 bg-white/5 border border-white/10 rounded-lg">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Filter Spend by Date Range</p>
                   <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
@@ -5630,7 +5630,7 @@ export default function PosSystem() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6 bg-black">
+              <CardContent className={`pt-4 sm:pt-6 px-3 sm:px-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                 {/* Search and Filter Controls */}
                 <div className="mb-6 space-y-4">
                   <div className="space-y-3">
@@ -5973,7 +5973,7 @@ export default function PosSystem() {
                     Open Accounts
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 bg-black">
+                <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
                       <div className="text-center py-8 text-gray-400">

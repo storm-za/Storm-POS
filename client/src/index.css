@@ -387,68 +387,51 @@ html:not(.dark) [role="dialog"] .bg-gray-900 {
 
 /* ================================================================
    POS LIGHT MODE - EXTENDED OVERRIDES
-   Covers bg-black, explicit hex blacks, and other missed patterns
+   Uses [class*=] attribute selectors to reliably match Tailwind's
+   JIT-generated class names without needing CSS escape sequences.
    ================================================================ */
 
-/* --- Pure black and near-black hex backgrounds (CardHeader/CardContent) --- */
-html:not(.dark) .pos-app .bg-black {
+/* --- Pure black and near-black hex backgrounds --- */
+html:not(.dark) .pos-app [class~="bg-black"] {
   background-color: #ffffff !important;
 }
-html:not(.dark) .pos-app .bg-\[\#000000\] {
+html:not(.dark) .pos-app [class*="bg-[#000"] {
   background-color: #ffffff !important;
 }
-html:not(.dark) .pos-app .bg-\[\#080d1a\] {
+html:not(.dark) .pos-app [class*="bg-[#080d"] {
   background-color: #f8fafc !important;
 }
 
-/* --- bg-black/opacity variants (skip fixed overlays) --- */
-html:not(.dark) .pos-app .bg-black\/20,
-html:not(.dark) .pos-app .bg-black\/30 {
-  background-color: rgba(241, 245, 249, 0.6) !important;
-}
-
-/* --- Borders on formerly-black cards --- */
-html:not(.dark) .pos-app .border-gray-800 {
+/* --- Borders on formerly-black / dark-gray cards --- */
+html:not(.dark) .pos-app [class~="border-gray-800"] {
   border-color: hsl(220, 14%, 88%) !important;
 }
 
-/* --- CardContent / section inner areas that sit on formerly-black cards --- */
-html:not(.dark) .pos-app .bg-gray-900\/30 {
+/* --- Gray-900/30 and gray-800/20 inner panels --- */
+html:not(.dark) .pos-app [class*="bg-gray-900/30"],
+html:not(.dark) .pos-app [class*="bg-gray-900\/30"] {
   background-color: rgba(248, 250, 252, 0.7) !important;
 }
-html:not(.dark) .pos-app .bg-gray-800\/20 {
+html:not(.dark) .pos-app [class*="bg-gray-800/20"],
+html:not(.dark) .pos-app [class*="bg-gray-800\/20"] {
   background-color: rgba(248, 250, 252, 0.5) !important;
 }
 
-/* --- Hover states on list rows --- */
-html:not(.dark) .pos-app .hover\:bg-gray-900\/30:hover {
-  background-color: rgba(241, 245, 249, 0.8) !important;
-}
-html:not(.dark) .pos-app .hover\:bg-gray-800\/30:hover {
-  background-color: rgba(241, 245, 249, 0.8) !important;
-}
-
-/* --- Portaled dropdowns from Radix (bg-gray-950, bg-black) --- */
-html:not(.dark) [data-radix-popper-content-wrapper] .bg-black,
-html:not(.dark) [data-radix-popper-content-wrapper] .bg-\[\#000000\] {
-  background-color: #ffffff !important;
-}
-html:not(.dark) [role="dialog"] .bg-black,
-html:not(.dark) [role="dialog"] .bg-\[\#000000\] {
-  background-color: #ffffff !important;
-}
-html:not(.dark) [role="alertdialog"] .bg-gray-950,
-html:not(.dark) [role="alertdialog"] .bg-gray-900 {
-  background-color: #ffffff !important;
-}
-
 /* --- Text colors inside formerly-black card sections --- */
-html:not(.dark) .pos-app .text-gray-200 {
+html:not(.dark) .pos-app [class~="text-gray-200"] {
   color: hsl(220, 14%, 25%) !important;
 }
 
-/* --- Custom gradient bg used in expanded invoice/po rows --- */
-html:not(.dark) .pos-app .from-\[hsl\(217\,30\%\,15\%\)\]\/80 {
-  --tw-gradient-from: rgba(241, 245, 249, 0.8) var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: rgba(241, 245, 249, 0) var(--tw-gradient-to-position) !important;
+/* --- Portaled dropdowns / dialogs: bg-black and hex blacks --- */
+html:not(.dark) [data-radix-popper-content-wrapper] [class~="bg-black"],
+html:not(.dark) [data-radix-popper-content-wrapper] [class*="bg-[#000"] {
+  background-color: #ffffff !important;
+}
+html:not(.dark) [role="dialog"] [class~="bg-black"],
+html:not(.dark) [role="dialog"] [class*="bg-[#000"] {
+  background-color: #ffffff !important;
+}
+html:not(.dark) [role="alertdialog"] [class~="bg-gray-950"],
+html:not(.dark) [role="alertdialog"] [class~="bg-gray-900"] {
+  background-color: #ffffff !important;
 }
