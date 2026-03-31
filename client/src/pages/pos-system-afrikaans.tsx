@@ -6279,7 +6279,7 @@ ${dateFilteredSales.map(sale =>
                 <CardContent className="pt-5 pb-5">
                   <div className={`flex items-center justify-between p-4 rounded-xl border ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50' : 'bg-slate-50 border-gray-200'}`}>
                     <div>
-                      <p className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Koppelvlak-tema</p>
+                      <p className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tema</p>
                       <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{posTheme === 'dark' ? 'Donkermodus is aktief' : 'Ligte modus is aktief'}</p>
                     </div>
                     <div className="flex items-center gap-3">
