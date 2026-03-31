@@ -3532,7 +3532,7 @@ ${dateFilteredSales.map(sale =>
             className="fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-gray-200 z-50 shadow-2xl flex flex-col"
           >
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <a href="/"><img src={stormLogo} alt="Storm POS" className="h-12 w-auto cursor-pointer" /></a>
+              <img src={stormLogo} alt="Storm POS" className="h-12 w-auto" />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
@@ -3702,7 +3702,7 @@ ${dateFilteredSales.map(sale =>
       <div className="flex min-h-screen relative z-10 pos-mobile-safe">
         <aside className={`hidden md:flex fixed left-0 top-0 bottom-0 flex-col bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out overflow-visible ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
           <div className={`border-b border-gray-100 flex items-center ${sidebarCollapsed ? 'p-3 justify-center' : 'p-5'}`}>
-            <a href="/"><img src={stormLogo} alt="Storm POS" className={`transition-all duration-300 cursor-pointer ${sidebarCollapsed ? 'h-8 w-auto' : 'h-12 w-auto'}`} /></a>
+            <img src={stormLogo} alt="Storm POS" className={`transition-all duration-300 ${sidebarCollapsed ? 'h-8 w-auto' : 'h-12 w-auto'}`} />
           </div>
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {[
@@ -3897,7 +3897,7 @@ ${dateFilteredSales.map(sale =>
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 touch-action-manipulation">
               <Menu className="h-6 w-6" />
             </button>
-            <a href="/"><img src={stormLogo} alt="Storm POS" className="h-8 w-auto cursor-pointer" /></a>
+            <img src={stormLogo} alt="Storm POS" className="h-8 w-auto" />
             <div className="ml-auto flex items-center gap-2">
               <span className="text-gray-900 text-sm font-semibold capitalize">{currentTab === 'verkope' ? 'Verkope' : currentTab === 'produkte' ? 'Produkte' : currentTab === 'kliente' ? 'Kliente' : currentTab === 'fakturen' ? 'Fakture' : currentTab === 'aankoopbestellings' ? 'Bestellings' : currentTab === 'oop-rekeninge' ? 'Rekeninge' : currentTab === 'verslae' ? 'Verslae' : currentTab === 'gebruik' ? 'Gebruik' : 'Instellings'}</span>
             </div>

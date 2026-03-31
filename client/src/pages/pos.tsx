@@ -145,7 +145,7 @@ export default function POS() {
       <header className={`fixed top-0 inset-x-0 z-50 transition-shadow duration-300 bg-white ${scrolled ? "shadow-md" : "shadow-sm border-b border-gray-100"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/pos">
+          <Link href="/">
             <img src={stormLogo} alt="Storm POS" className="h-10 w-auto block cursor-pointer -ml-1" />
           </Link>
 
@@ -200,7 +200,7 @@ export default function POS() {
               className="fixed top-0 right-0 z-[70] h-full w-72 bg-white shadow-2xl flex flex-col"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <img src={stormLogo} alt="Storm POS" className="h-9 w-auto block -ml-1" />
+                <Link href="/"><img src={stormLogo} alt="Storm POS" className="h-9 w-auto block -ml-1 cursor-pointer" /></Link>
                 <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
