@@ -428,7 +428,7 @@ export default function Pricing() {
                 <span className="inline-block bg-[hsl(217,90%,40%)] text-white text-xs font-bold px-3 py-1 rounded-full">Storm POS</span>
               </div>
               <div className="text-center">
-                <span className="inline-block bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1 rounded-full">Traditional POS</span>
+                <span className="inline-block bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1 rounded-full">Others</span>
               </div>
             </div>
           </div>
