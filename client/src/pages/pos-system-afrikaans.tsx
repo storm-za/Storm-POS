@@ -6280,7 +6280,6 @@ ${dateFilteredSales.map(sale =>
                   <div className={`flex items-center justify-between p-4 rounded-xl border ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50' : 'bg-slate-50 border-gray-200'}`}>
                     <div>
                       <p className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Tema</p>
-                      <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{posTheme === 'dark' ? 'Donkermodus is aktief' : 'Ligte modus is aktief'}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Sun className={`w-4 h-4 transition-colors ${posTheme === 'light' ? 'text-[hsl(217,90%,40%)]' : 'text-gray-500'}`} />
