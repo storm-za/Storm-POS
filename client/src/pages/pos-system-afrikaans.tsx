@@ -3936,7 +3936,7 @@ ${dateFilteredSales.map(sale =>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {categories.length > 0 && (
                             <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
-                              <SelectTrigger className="w-[90px] sm:w-[120px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="w-[90px] sm:w-[120px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Rooster</span></SelectItem>
                                 <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Oortjies</span></SelectItem>
@@ -3944,7 +3944,7 @@ ${dateFilteredSales.map(sale =>
                             </Select>
                           )}
                           <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
-                            <SelectTrigger className="w-[100px] sm:w-[140px] h-8 text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="w-[100px] sm:w-[140px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="name-asc">Naam A-Z</SelectItem>
                               <SelectItem value="name-desc">Naam Z-A</SelectItem>
