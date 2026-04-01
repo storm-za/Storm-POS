@@ -9583,52 +9583,51 @@ ${dateFilteredSales.map(sale =>
         setSelectedItemsForPrint([]);
         setOpenAccountTipEnabled(false);
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[680px] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 border border-gray-700/60 shadow-2xl shadow-black/60 p-0 overflow-hidden rounded-2xl">
-          <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
-            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10"></div>
-            <div className="relative flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <DialogTitle className="text-white font-bold text-base sm:text-lg leading-tight truncate">
-                  {selectedOpenAccount?.accountName}
-                </DialogTitle>
-                <DialogDescription className="text-[hsl(217,90%,70%)] text-xs mt-0.5">
-                  Rekening Besonderhede & Vereffening
-                </DialogDescription>
-              </div>
+        <DialogContent className={`w-[calc(100vw-2rem)] sm:w-auto sm:max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden p-0 rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
+          <div className="bg-gradient-to-r from-[hsl(217,90%,35%)] to-[hsl(217,90%,25%)] px-5 py-4 flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 flex-shrink-0">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-white font-bold text-base sm:text-lg leading-tight truncate">
+                {selectedOpenAccount?.accountName}
+              </DialogTitle>
+              <DialogDescription className="text-blue-200 text-xs mt-0.5">
+                Rekening Besonderhede & Vereffening
+              </DialogDescription>
             </div>
           </div>
 
           {selectedOpenAccount && (
-            <div className="px-5 py-4 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div className="px-5 py-4 space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-800/60 border border-gray-700/40 rounded-xl p-3">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">Rekening Tipe</p>
+                <div className={`rounded-xl p-3.5 border ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                  <p className={`text-[10px] uppercase tracking-wider font-bold mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Rekening Tipe</p>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${selectedOpenAccount.accountType === 'table' ? 'bg-[hsl(217,90%,50%)]' : 'bg-emerald-400'}`}></div>
-                    <span className="text-white font-semibold text-sm capitalize">{selectedOpenAccount.accountType === 'table' ? 'Tafel' : 'Klient'}</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${selectedOpenAccount.accountType === 'table' ? 'bg-indigo-500' : 'bg-teal-500'}`} />
+                    <span className={`font-semibold text-sm capitalize ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{selectedOpenAccount.accountType === 'table' ? 'Tafel' : 'Klient'}</span>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/10 border border-[hsl(217,90%,40%)]/30 rounded-xl p-3">
-                  <p className="text-[10px] text-[hsl(217,90%,60%)] uppercase tracking-wider font-semibold mb-1">Totale Bedrag</p>
-                  <p className="text-2xl font-bold text-white tracking-tight">R{selectedOpenAccount.total}</p>
+                <div className={`rounded-xl p-3.5 border ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                  <p className={`text-[10px] uppercase tracking-wider font-bold mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Totale Bedrag</p>
+                  <p className="text-2xl font-bold text-[hsl(217,90%,50%)] tracking-tight">R{selectedOpenAccount.total}</p>
                 </div>
               </div>
 
               {selectedOpenAccount.notes && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2.5 flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-amber-300 text-sm">{selectedOpenAccount.notes}</p>
+                <div className={`rounded-xl px-3 py-2.5 border flex items-start gap-2 ${posTheme === 'dark' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-amber-50 border-amber-200'}`}>
+                  <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <p className={`text-sm ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-700'}`}>{selectedOpenAccount.notes}</p>
                 </div>
               )}
 
               <div>
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                    <p className="text-white font-semibold text-sm">Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})</p>
+                    <p className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                      Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})
+                    </p>
                   </div>
                   {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.length > 0 && (
                     <button
@@ -9637,32 +9636,32 @@ ${dateFilteredSales.map(sale =>
                         const allSelected = allIndices.every((index: number) => selectedItemsForPrint.includes(index));
                         setSelectedItemsForPrint(allSelected ? [] : allIndices);
                       }}
-                      className="text-[11px] font-medium text-[hsl(217,90%,60%)] hover:text-[hsl(217,90%,70%)] transition-colors px-2 py-1 rounded-lg hover:bg-[hsl(217,90%,40%)]/10"
+                      className="text-xs font-semibold text-[hsl(217,90%,50%)] hover:text-[hsl(217,90%,40%)] transition-colors px-2 py-1 rounded-lg"
                     >
                       {selectedItemsForPrint.length === selectedOpenAccount.items.length ? 'Deselecteer Alles' : 'Kies Alles'}
                     </button>
                   )}
                 </div>
-                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                <div className="space-y-1.5 max-h-52 overflow-y-auto">
                   {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.map((item: any, index: number) => (
-                    <div key={index} className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-150 ${selectedItemsForPrint.includes(index) ? 'bg-[hsl(217,90%,40%)]/15 border-[hsl(217,90%,40%)]/40' : 'bg-gray-800/40 border-gray-700/30 hover:border-gray-600/50'}`}>
+                    <div key={index} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${selectedItemsForPrint.includes(index) ? (posTheme === 'dark' ? 'bg-[hsl(217,90%,40%)]/15 border-[hsl(217,90%,40%)]/40' : 'bg-blue-50 border-blue-200') : (posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700 hover:border-gray-600' : 'bg-gray-50 border-gray-200 hover:border-gray-300')}`}>
                       <input
                         type="checkbox"
                         checked={selectedItemsForPrint.includes(index)}
                         onChange={(e) => handleAfrikaansItemCheckboxChange(index, e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,40%)] focus:ring-offset-0 flex-shrink-0"
+                        className="h-4 w-4 rounded accent-[hsl(217,90%,50%)] flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium text-sm truncate">{item.name}</p>
-                        <p className="text-gray-400 text-xs">R{item.price} elk</p>
+                        <p className={`font-medium text-sm truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</p>
+                        <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>R{item.price} elk</p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-xs font-semibold text-gray-300 bg-gray-700/60 px-2 py-0.5 rounded-lg">×{item.quantity}</span>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${posTheme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-700 bg-gray-200'}`}>×{item.quantity}</span>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleAfrikaansDeleteItemClick(selectedOpenAccount.id, index)}
-                          className="h-7 w-7 p-0 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg"
+                          className="h-7 w-7 p-0 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
                           disabled={removeItemFromOpenAccountMutation.isPending}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -9673,40 +9672,42 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </div>
 
-              <div className="bg-gray-800/40 border border-gray-700/40 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+              <div className={`rounded-xl px-4 py-3 border flex items-center justify-between gap-3 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
                 <div>
-                  <p className="text-white text-sm font-medium">Fooie Opsie</p>
-                  <p className="text-gray-400 text-xs mt-0.5">{openAccountTipEnabled ? 'Fooie lyne sal op kwitansie verskyn' : 'Voeg fooie opsie by kwitansie'}</p>
+                  <p className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Fooie Opsie</p>
+                  <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{openAccountTipEnabled ? 'Fooie lyne sal op kwitansie verskyn' : 'Voeg fooie opsie by kwitansie'}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpenAccountTipEnabled(!openAccountTipEnabled)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${openAccountTipEnabled ? 'bg-[hsl(217,90%,40%)]' : 'bg-gray-600'}`}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${openAccountTipEnabled ? 'bg-[hsl(217,90%,45%)]' : (posTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-300')}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${openAccountTipEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${openAccountTipEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                <Button
-                  variant="outline"
-                  disabled={selectedItemsForPrint.length === 0}
-                  className="flex-1 border-orange-500/40 text-orange-400 hover:bg-orange-500/10 hover:border-orange-500/60 bg-orange-500/5 h-10 disabled:opacity-40"
-                >
-                  <Printer className="w-4 h-4 mr-2" />
-                  Vinnig Druk ({selectedItemsForPrint.length})
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedOpenAccount(null);
-                    setSelectedItemsForPrint([]);
-                    setOpenAccountTipEnabled(false);
-                  }}
-                  className="flex-1 border-gray-600/60 text-gray-300 hover:bg-gray-700/50 bg-transparent h-10"
-                >
-                  Kanselleer
-                </Button>
+              <div className="flex flex-col gap-2 pt-1">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    disabled={selectedItemsForPrint.length === 0}
+                    className={`flex-1 h-10 font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'} disabled:opacity-40`}
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    Vinnig Druk ({selectedItemsForPrint.length})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedOpenAccount(null);
+                      setSelectedItemsForPrint([]);
+                      setOpenAccountTipEnabled(false);
+                    }}
+                    className={`flex-1 h-10 font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+                  >
+                    Kanselleer
+                  </Button>
+                </div>
                 <Button
                   onClick={() => {
                     closeOpenAccountMutation.mutate({
@@ -9719,7 +9720,7 @@ ${dateFilteredSales.map(sale =>
                     setOpenAccountTipEnabled(false);
                   }}
                   disabled={closeOpenAccountMutation.isPending}
-                  className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white shadow-lg shadow-emerald-900/30 h-10 font-semibold"
+                  className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base shadow-lg shadow-blue-900/20"
                 >
                   <Receipt className="w-4 h-4 mr-2" />
                   {closeOpenAccountMutation.isPending ? 'Sluit...' : 'Sluit & Betaal'}
