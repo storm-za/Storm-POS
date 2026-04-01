@@ -4163,7 +4163,7 @@ export default function PosSystem() {
       {notifOpen && (
         <div className="fixed inset-0 z-50" onClick={() => setNotifOpen(false)}>
           <div
-            className="fixed top-16 right-3 md:top-auto md:bottom-32 md:left-72 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+            className="fixed bottom-4 left-4 right-4 md:bottom-32 md:left-72 md:right-auto md:w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
