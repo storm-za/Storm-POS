@@ -5882,7 +5882,7 @@ export default function PosSystem() {
                   { label: "Received", count: purchaseOrders.filter((p: any) => p.status === 'received').length, color: "from-green-900 to-green-800" },
                 ].map((stat) => (
                   <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-3 border border-gray-700/50`}>
-                    <p className="text-gray-400 text-xs">{stat.label}</p>
+                    <p className="text-white/80 text-xs font-medium">{stat.label}</p>
                     <p className="text-white text-xl font-bold">{stat.count}</p>
                   </div>
                 ))}
