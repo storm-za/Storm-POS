@@ -32,7 +32,7 @@ import {
   GridNine as Grid3X3, ListBullets as LayoutList, Folder, FolderSimplePlus as FolderPlus,
   Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
   CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2,
-  Bell, ListChecks, Moon, Sun
+  Bell, ListChecks, Moon, Sun, Copy, Envelope as Mail
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -7883,88 +7883,98 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Bank Details Dialog - Afrikaans */}
       <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
-        <DialogContent className="sm:max-w-[560px] max-w-[95vw] max-h-[90vh] overflow-y-auto bg-gray-950 border border-[hsl(217,90%,40%)]/30 shadow-2xl shadow-blue-900/30 p-0">
-          <div className="relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(217,90%,50%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)]"></div>
-            
-            <DialogHeader className="px-6 pt-6 pb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <CreditCard className="w-7 h-7 text-white" />
+        <DialogContent className={`w-[calc(100vw-2rem)] sm:w-auto sm:max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden p-0 rounded-2xl border shadow-2xl ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
+          {/* Header */}
+          <div className="bg-gradient-to-r from-[hsl(217,90%,35%)] to-[hsl(217,90%,22%)] px-6 py-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+              <CreditCard className="w-6 h-6 text-white" />
+            </div>
+            <div className="min-w-0">
+              <DialogTitle className="text-white font-bold text-lg leading-tight">Betalingsbesonderhede</DialogTitle>
+              <DialogDescription className="text-blue-200 text-xs mt-0.5">Bankrekening vir Storm POS diensfooi betalings</DialogDescription>
+            </div>
+          </div>
+
+          <div className="px-5 py-5 space-y-4">
+            {/* Bank card */}
+            <div className={`rounded-xl border overflow-hidden ${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-sm'}`}>
+              {/* Card header */}
+              <div className={`px-4 py-3 flex items-center gap-3 border-b ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="w-9 h-9 rounded-lg bg-[hsl(217,90%,50%)] flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-[18px] h-[18px] text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-bold text-white">Betalingsbesonderhede</DialogTitle>
-                  <DialogDescription className="text-gray-400 mt-0.5">
-                    Bankrekeningbesonderhede vir Storm POS diensfooi betalings
-                  </DialogDescription>
+                  <p className={`font-bold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Nedbank Rekening</p>
+                  <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Vir Storm POS diensfooi betalings</p>
                 </div>
+                <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">GEVERIFIEER</span>
               </div>
-            </DialogHeader>
-          
-            <div className="px-6 pb-6 space-y-5">
-              <div className="bg-gray-900/80 rounded-xl border border-[hsl(217,90%,40%)]/20 p-5">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 bg-[hsl(217,90%,40%)]/15 rounded-lg flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
-                    <CreditCard className="w-5 h-5 text-[hsl(217,90%,50%)]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">Nedbank Rekening</h3>
-                    <p className="text-xs text-gray-500">Vir Storm POS diensfooi betalings</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-0">
-                  {[
-                    { label: 'Rekeninghouer', value: 'Storm', mono: false },
-                    { label: 'Rekeningnommer', value: '1229368612', mono: true },
-                    { label: 'Rekeningtipe', value: 'Lopende Rekening', mono: false },
-                    { label: 'Banknaam', value: 'Nedbank', mono: false },
-                    { label: 'Takkode', value: '198765', mono: true },
-                  ].map((item, i) => (
-                    <div key={i} className={`flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-0 py-3.5 ${i < 4 ? 'border-b border-white/5' : ''}`}>
-                      <span className="text-sm text-gray-400">{item.label}</span>
-                      <span className={`font-semibold text-white ${item.mono ? 'font-mono bg-[hsl(217,90%,40%)]/10 px-3 py-1 rounded-md border border-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : ''}`}>{item.value}</span>
+
+              {/* Fields */}
+              <div className={`divide-y ${posTheme === 'dark' ? 'divide-gray-800' : 'divide-gray-100'}`}>
+                {[
+                  { label: 'Rekeninghouer', value: 'Storm', copy: false },
+                  { label: 'Rekeningnommer', value: '1229368612', copy: true },
+                  { label: 'Rekeningtipe', value: 'Lopende Rekening', copy: false },
+                  { label: 'Banknaam', value: 'Nedbank', copy: false },
+                  { label: 'Takkode', value: '198765', copy: true },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between px-4 py-3 gap-3">
+                    <div className="min-w-0">
+                      <p className={`text-[10px] font-semibold uppercase tracking-wider mb-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{item.label}</p>
+                      <p className={`font-bold text-sm ${item.copy ? 'font-mono' : ''} ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.value}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-500/20">
-                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    {item.copy && (
+                      <button
+                        onClick={() => navigator.clipboard.writeText(item.value)}
+                        className={`flex-shrink-0 p-2 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
+                        title={`Kopieer ${item.label}`}
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-amber-300 text-sm mb-2">Betalingsinstruksies</h4>
-                    <ul className="text-sm text-amber-200/70 space-y-1.5">
-                      <li className="flex items-start gap-2">
-                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                        Gebruik jou geregistreerde besigheidsnaam as betalingsverwysing
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                        Betaal maandelikse diensfooie teen die laaste dag van elke maand
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <div className="w-1 h-1 rounded-full bg-amber-400 mt-2 flex-shrink-0"></div>
-                        Hou bewys van betaling vir jou rekords
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+                ))}
               </div>
-
-              <div className="bg-gray-900/50 rounded-xl border border-white/5 p-4 text-center">
-                <p className="text-sm text-gray-400">Vrae oor fakturering of betalings?</p>
-                <p className="font-medium text-[hsl(217,90%,50%)] mt-1 text-sm">
-                  softwarebystorm@gmail.com
-                </p>
-              </div>
-
-              <Button onClick={() => setIsBankDetailsOpen(false)} className="w-full h-11 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 rounded-lg">
-                Sluit
-              </Button>
             </div>
+
+            {/* Payment Instructions */}
+            <div className={`rounded-xl border p-4 ${posTheme === 'dark' ? 'bg-amber-950/30 border-amber-800/40' : 'bg-amber-50 border-amber-200'}`}>
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                <h4 className={`font-bold text-sm ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Betalingsinstruksies</h4>
+              </div>
+              <ul className="space-y-2">
+                {[
+                  'Gebruik jou geregistreerde besigheidsnaam as betalingsverwysing',
+                  'Betaal maandelikse diensfooie teen die laaste dag van elke maand',
+                  'Hou bewys van betaling vir jou rekords',
+                ].map((instruction, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5 ${posTheme === 'dark' ? 'bg-amber-800/60 text-amber-300' : 'bg-amber-200 text-amber-700'}`}>{i + 1}</span>
+                    <span className={`text-sm leading-snug ${posTheme === 'dark' ? 'text-amber-200/80' : 'text-amber-800'}`}>{instruction}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support contact */}
+            <div className={`rounded-xl border px-4 py-3.5 flex items-center gap-3 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+              <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,50%)] flex items-center justify-center flex-shrink-0">
+                <Mail className="w-4 h-4 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Vrae oor fakturering of betalings?</p>
+                <a href="mailto:softwarebystorm@gmail.com" className="text-[hsl(217,90%,50%)] font-semibold text-sm hover:underline">softwarebystorm@gmail.com</a>
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setIsBankDetailsOpen(false)}
+              className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base rounded-xl shadow-lg shadow-blue-900/20"
+            >
+              Klaar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
