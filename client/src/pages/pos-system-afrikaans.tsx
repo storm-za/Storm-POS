@@ -4377,6 +4377,14 @@ ${dateFilteredSales.map(sale =>
                             {productCategoryFilter !== 'all' && <span className="w-5" />}
                             Alle Kategoriee
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setProductCategoryFilter(0 as any)}
+                            className={`text-sm rounded-md transition-colors ${productCategoryFilter === 0 ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                          >
+                            {productCategoryFilter === 0 && <Check className="h-3 w-3 mr-2 text-[hsl(217,90%,50%)]" />}
+                            {productCategoryFilter !== 0 && <span className="w-5" />}
+                            Ongekategoriseerd
+                          </DropdownMenuItem>
                           {categories.map((cat) => (
                             <DropdownMenuItem
                               key={cat.id}
@@ -5641,7 +5649,7 @@ ${dateFilteredSales.map(sale =>
                     {/* Detailed Sales List */}
                     <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
                       <CardHeader>
-                        <CardTitle className="text-white">Gedetailleerde Verkope Lys</CardTitle>
+                        <CardTitle className="text-white">Verkopebesonderhede vir {new Date(selectedDate).toLocaleDateString('af-ZA')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
