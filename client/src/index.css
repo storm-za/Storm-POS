@@ -460,9 +460,11 @@ html:not(.dark) [role="alertdialog"] .text-gray-300 {
 /* --- Pure black and near-black hex backgrounds --- */
 html:not(.dark) .pos-app [class~="bg-black"] {
   background-color: #ffffff !important;
+  color: hsl(220, 14%, 15%) !important;
 }
 html:not(.dark) .pos-app [class*="bg-[#000"] {
   background-color: #ffffff !important;
+  color: hsl(220, 14%, 15%) !important;
 }
 html:not(.dark) .pos-app [class*="bg-[#080d"] {
   background-color: #f8fafc !important;
