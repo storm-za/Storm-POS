@@ -3975,7 +3975,7 @@ ${dateFilteredSales.map(sale =>
                       )}
                     </div>
                     <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-[hsl(217,90%,40%)]/20 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 to-transparent">
-                      <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
+                      <h2 className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2] text-[#000000]">Kies 'n produk om te begin verkoop</h2>
                       <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
                     <div className="relative">
