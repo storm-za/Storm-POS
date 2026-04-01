@@ -5357,58 +5357,48 @@ ${dateFilteredSales.map(sale =>
                       </div>
                     ) : (
                       openAccounts.map((account) => (
-                        <motion.div
+                        <div
                           key={account.id}
-                          className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm group overflow-hidden w-full"
-                          whileHover={{ scale: 1.01, y: -2 }}
-                          transition={{ duration: 0.2 }}
+                          className={`rounded-xl border p-4 space-y-3 transition-colors ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700 hover:bg-gray-800' : 'bg-white border-gray-200 shadow-sm hover:border-gray-300'}`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-1">
-                                {account.accountType === 'table' ? (
-                                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                ) : (
-                                  <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                                )}
-                                <h3 className="font-semibold text-lg text-white">{account.accountName}</h3>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setEditingOpenAccount(account); setEditOpenAccountName(account.accountName); }}
-                                  className="p-1 rounded-md text-gray-500 hover:text-white hover:bg-white/10 transition-all"
-                                  title="Hernoem rekening"
-                                >
-                                  <Edit className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                              <Badge variant={account.accountType === 'table' ? 'default' : 'outline'} className="bg-blue-600/20 text-blue-300 border-blue-500/30">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${account.accountType === 'table' ? 'bg-indigo-500' : 'bg-teal-500'}`} />
+                              <h3 className={`font-semibold text-base ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{account.accountName}</h3>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setEditingOpenAccount(account); setEditOpenAccountName(account.accountName); }}
+                                className={`p-1 rounded-md transition-colors flex-shrink-0 ${posTheme === 'dark' ? 'text-gray-500 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
+                                title="Hernoem rekening"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${account.accountType === 'table' ? (posTheme === 'dark' ? 'bg-indigo-900/60 text-indigo-300 border-indigo-700' : 'bg-indigo-100 text-indigo-700 border-indigo-200') : (posTheme === 'dark' ? 'bg-teal-900/60 text-teal-300 border-teal-700' : 'bg-teal-100 text-teal-700 border-teal-200')}`}>
                                 {account.accountType === 'table' ? 'Tafel' : 'Klient'}
-                              </Badge>
+                              </span>
                             </div>
-                            <div className="text-right">
-                              <p className="text-2xl font-bold text-blue-400">R{account.total}</p>
-                              <p className="text-sm text-gray-300">
-                                {Array.isArray(account.items) ? account.items.length : 0} items
-                              </p>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-xl font-bold text-[hsl(217,90%,50%)]">R{account.total}</p>
+                              <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{Array.isArray(account.items) ? account.items.length : 0} items</p>
                             </div>
                           </div>
 
                           {account.notes && (
-                            <p className="text-sm text-gray-300 italic">{account.notes}</p>
+                            <p className={`text-sm italic ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{account.notes}</p>
                           )}
 
-                          <div className="text-xs text-gray-400">
+                          <div className={`text-xs space-y-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                             <p>Geskep: {new Date(account.createdAt).toLocaleDateString()} om {new Date(account.createdAt).toLocaleTimeString()}</p>
                             {account.lastUpdated && (
                               <p>Opgedateer: {new Date(account.lastUpdated).toLocaleDateString()} om {new Date(account.lastUpdated).toLocaleTimeString()}</p>
                             )}
                           </div>
 
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex gap-2">
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => setSelectedOpenAccount(account)}
-                              className="flex-1 bg-transparent border-blue-500/30 text-white hover:bg-blue-500/20 hover:text-blue-200"
+                              className={`flex-1 font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:text-gray-900 hover:bg-gray-50'}`}
                             >
                               <Eye className="w-4 h-4 mr-2" />
                               Bekyk Besonderhede
@@ -5418,14 +5408,14 @@ ${dateFilteredSales.map(sale =>
                               onClick={() => {
                                 closeOpenAccountMutation.mutate({ accountId: account.id, paymentType: 'cash' });
                               }}
-                              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                              className="flex-1 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-md"
                               disabled={closeOpenAccountMutation.isPending}
                             >
                               <Receipt className="w-4 h-4 mr-2" />
                               {closeOpenAccountMutation.isPending ? 'Sluit...' : 'Sluit & Betaal'}
                             </Button>
                           </div>
-                        </motion.div>
+                        </div>
                       ))
                     )}
                   </div>
