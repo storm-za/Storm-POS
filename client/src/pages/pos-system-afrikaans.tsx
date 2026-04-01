@@ -4002,19 +4002,44 @@ ${dateFilteredSales.map(sale =>
                         </div>
                       ) : salesDisplayMode === 'grid' && categories.length > 0 && selectedSalesCategory === null ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          <div onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group">
+                          {/* Alle Produkte card */}
+                          <div
+                            onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all group ${
+                              posTheme === 'dark'
+                                ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40 hover:bg-blue-50/30'
+                            }`}
+                          >
                             <div className="flex flex-col items-center gap-2">
-                              <div className="w-11 h-11 rounded-xl bg-gray-600/40 flex items-center justify-center group-hover:scale-110 transition-transform"><Package className="w-5 h-5 text-gray-300" /></div>
-                              <span className="font-medium text-white text-sm">Alle Produkte</span>
-                              <span className="text-xs text-gray-400">{products.length} items</span>
+                              <div className={`w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${
+                                posTheme === 'dark' ? 'bg-gray-600/40' : 'bg-[hsl(217,90%,50%)]/10'
+                              }`}>
+                                <Package className={`w-5 h-5 ${posTheme === 'dark' ? 'text-gray-300' : 'text-[hsl(217,90%,45%)]'}`} />
+                              </div>
+                              <span className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Alle Produkte</span>
+                              <span className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{products.length} items</span>
                             </div>
                           </div>
+                          {/* Kategorie cards */}
                           {categories.map((cat) => (
-                            <div key={cat.id} onClick={() => { setSelectedSalesCategory(cat.id); }} className="p-4 rounded-xl border border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40 cursor-pointer transition-all group" style={{ borderColor: `${cat.color}30` }}>
+                            <div
+                              key={cat.id}
+                              onClick={() => { setSelectedSalesCategory(cat.id); }}
+                              className={`p-4 rounded-xl border cursor-pointer transition-all group ${
+                                posTheme === 'dark'
+                                  ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                  : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:bg-gray-50'
+                              }`}
+                              style={posTheme === 'dark' ? { borderColor: `${cat.color}30` } : { borderColor: `${cat.color}50` }}
+                            >
                               <div className="flex flex-col items-center gap-2">
-                                <div className="w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: `${cat.color}30` }}><Folder className="w-5 h-5" style={{ color: cat.color || '#3b82f6' }} /></div>
-                                <span className="font-medium text-white text-sm">{cat.name}</span>
-                                <span className="text-xs text-gray-400">{products.filter(p => p.categoryId === cat.id).length} items</span>
+                                <div className="w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
+                                  style={{ backgroundColor: posTheme === 'dark' ? `${cat.color}30` : `${cat.color}18` }}>
+                                  <Folder className="w-5 h-5" style={{ color: cat.color || '#3b82f6' }} />
+                                </div>
+                                <span className={`font-semibold text-sm text-center leading-tight ${posTheme === 'dark' ? 'text-white' : 'text-gray-800'}`}>{cat.name}</span>
+                                <span className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{products.filter(p => p.categoryId === cat.id).length} items</span>
                               </div>
                             </div>
                           ))}
