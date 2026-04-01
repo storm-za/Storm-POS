@@ -6987,139 +6987,199 @@ export default function PosSystem() {
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="space-y-8">
-                    {/* XERO Integration Section */}
-                    <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-lg">X</span>
+                    {/* XERO Integration Section — redesigned */}
+                    <div className={`rounded-xl border overflow-hidden ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+
+                      {/* Hero SVG illustration */}
+                      <div className={`w-full px-4 pt-5 pb-3 ${posTheme === 'dark' ? 'bg-gray-900/60' : 'bg-slate-50'}`}>
+                        <svg viewBox="0 0 360 110" className="w-full max-h-28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <defs>
+                            <linearGradient id="en-xero-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#13B5EA"/>
+                              <stop offset="100%" stopColor="#0a8ab5"/>
+                            </linearGradient>
+                            <linearGradient id="en-pos-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#6366f1"/>
+                              <stop offset="100%" stopColor="#4f46e5"/>
+                            </linearGradient>
+                            <filter id="en-glow">
+                              <feGaussianBlur stdDeviation="2" result="blur"/>
+                              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                          </defs>
+                          <rect width="360" height="110" fill={posTheme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)'}/>
+                          {[0,40,80,120,160,200,240,280,320,360].map(x => (
+                            <line key={x} x1={x} y1="0" x2={x} y2="110" stroke={posTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'} strokeWidth="1"/>
+                          ))}
+                          {[0,28,56,84].map(y => (
+                            <line key={y} x1="0" y1={y} x2="360" y2={y} stroke={posTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'} strokeWidth="1"/>
+                          ))}
+
+                          {/* === POS Terminal (left) === */}
+                          <g transform="translate(28,14)">
+                            <rect x="0" y="0" width="58" height="42" rx="5" fill="url(#en-pos-grad)" opacity="0.9"/>
+                            <rect x="3" y="3" width="52" height="30" rx="3" fill="rgba(255,255,255,0.15)"/>
+                            <rect x="7" y="8" width="30" height="3" rx="1.5" fill="rgba(255,255,255,0.6)"/>
+                            <rect x="7" y="15" width="44" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+                            <rect x="7" y="20" width="38" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+                            <rect x="7" y="25" width="20" height="2" rx="1" fill="rgba(255,255,255,0.3)"/>
+                            <rect x="14" y="42" width="30" height="6" rx="2" fill="rgba(99,102,241,0.5)"/>
+                            <rect x="22" y="48" width="14" height="5" rx="1" fill="rgba(99,102,241,0.4)"/>
+                            <rect x="12" y="53" width="34" height="4" rx="2" fill="rgba(99,102,241,0.35)"/>
+                            <text x="29" y="74" textAnchor="middle" fill={posTheme === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'} fontSize="8.5" fontFamily="system-ui, sans-serif" fontWeight="500">Storm POS</text>
+                          </g>
+
+                          {/* === Data flow arrows (middle) === */}
+                          <g transform="translate(105,28)">
+                            {[0,14,28].map((y, i) => (
+                              <g key={y}>
+                                <line x1="0" y1={y} x2="145" y2={y} stroke="#13B5EA" strokeWidth={i === 0 ? 2 : 1.2} strokeDasharray="6,4" opacity={i === 0 ? 0.8 : i === 1 ? 0.5 : 0.3}/>
+                                <polygon points={`140,${y-4} 145,${y} 140,${y+4}`} fill="#13B5EA" opacity={i === 0 ? 0.9 : i === 1 ? 0.55 : 0.35}/>
+                              </g>
+                            ))}
+                            <circle cx="36" cy="0" r="3.5" fill="#13B5EA" opacity="0.7" filter="url(#en-glow)"/>
+                            <circle cx="72" cy="14" r="2.5" fill="#13B5EA" opacity="0.5"/>
+                            <circle cx="108" cy="0" r="3" fill="#13B5EA" opacity="0.6" filter="url(#en-glow)"/>
+                            <text x="72" y="52" textAnchor="middle" fill="#13B5EA" fontSize="8" fontFamily="system-ui, sans-serif" fontWeight="600" opacity="0.7" letterSpacing="1">SYNCHRONISE</text>
+                          </g>
+
+                          {/* === Xero circle (right) === */}
+                          <g transform="translate(264,14)">
+                            <circle cx="36" cy="36" r="36" fill="url(#en-xero-grad)" opacity="0.95"/>
+                            <circle cx="36" cy="36" r="36" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                            <text x="36" y="41" textAnchor="middle" fill="white" fontSize="17" fontFamily="system-ui, sans-serif" fontWeight="300" letterSpacing="1.5">xero</text>
+                            <text x="36" y="88" textAnchor="middle" fill={posTheme === 'dark' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'} fontSize="8.5" fontFamily="system-ui, sans-serif" fontWeight="500">Accounting</text>
+                          </g>
+                        </svg>
+                      </div>
+
+                      {/* Card header */}
+                      <div className={`px-4 py-4 border-b ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-md flex-shrink-0" style={{ background: 'linear-gradient(135deg,#13B5EA,#0a8ab5)' }}>
+                              <svg viewBox="0 0 40 20" className="w-8 h-4" xmlns="http://www.w3.org/2000/svg">
+                                <text x="20" y="15" textAnchor="middle" fill="white" fontSize="14" fontFamily="system-ui, sans-serif" fontWeight="300" letterSpacing="1">xero</text>
+                              </svg>
+                            </div>
+                            <div>
+                              <h3 className={`text-base font-semibold leading-tight ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>XERO Accounting</h3>
+                              <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Connect your XERO account for seamless accounting</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-white">XERO Accounting</h3>
-                            <p className="text-sm text-gray-400">Connect your XERO account for seamless accounting</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
                           {(currentUser as any)?.xeroConnected ? (
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              <Check className="w-3 h-3 mr-1" />
+                            <Badge className="self-start sm:self-auto bg-green-500/15 text-green-500 border-green-500/30 flex items-center gap-1 px-2.5 py-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block"/>
                               Connected
                             </Badge>
                           ) : (
-                            <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
+                            <Badge className="self-start sm:self-auto bg-gray-500/15 text-gray-400 border-gray-500/25 px-2.5 py-1">
                               Not Connected
                             </Badge>
                           )}
                         </div>
+
+                        {(currentUser as any)?.xeroLastSync && (
+                          <div className={`mt-3 flex items-center gap-2 text-xs px-3 py-2 rounded-lg ${posTheme === 'dark' ? 'bg-gray-900/50 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
+                            <Clock className="w-3.5 h-3.5 flex-shrink-0"/>
+                            Last synced: {new Date((currentUser as any).xeroLastSync).toLocaleString()}
+                          </div>
+                        )}
                       </div>
 
-                      {(currentUser as any)?.xeroLastSync && (
-                        <div className="mb-4 p-3 bg-gray-900/50 rounded-lg">
-                          <p className="text-sm text-gray-400">
-                            <Clock className="w-4 h-4 inline mr-2" />
-                            Last synced: {new Date((currentUser as any).xeroLastSync).toLocaleString()}
-                          </p>
+                      {/* Setup steps */}
+                      <div className={`px-4 py-4 ${posTheme === 'dark' ? 'bg-gray-800/40' : 'bg-gray-50/80'}`}>
+                        <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Setup instructions</p>
+                        <div className="space-y-2">
+                          {[
+                            "Go to the XERO Developer Portal and create a new app",
+                            "Set the OAuth 2.0 redirect URI to your app's callback URL",
+                            "Copy your Client ID and Client Secret",
+                            "Click Connect to XERO below to authenticate",
+                          ].map((step, i) => (
+                            <div key={i} className={`flex items-start gap-3 rounded-lg px-3 py-2.5 ${posTheme === 'dark' ? 'bg-gray-900/40' : 'bg-white border border-gray-100'}`}>
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white mt-0.5" style={{ background: 'linear-gradient(135deg,#13B5EA,#0a8ab5)' }}>
+                                {i + 1}
+                              </div>
+                              <span className={`text-sm leading-snug ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{step}</span>
+                            </div>
+                          ))}
                         </div>
-                      )}
-
-                      <div className="mb-6">
-                        <h4 className="text-sm font-medium text-gray-300 mb-2">Setup Instructions</h4>
-                        <ul className="space-y-2 text-sm text-gray-400">
-                          <li className="flex items-start gap-2">
-                            <span className="text-[hsl(217,90%,40%)] font-medium">1.</span>
-                            Go to the XERO Developer Portal and create a new app
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-[hsl(217,90%,40%)] font-medium">2.</span>
-                            Set the OAuth 2.0 redirect URI to your app's callback URL
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-[hsl(217,90%,40%)] font-medium">3.</span>
-                            Copy your Client ID and Client Secret
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-[hsl(217,90%,40%)] font-medium">4.</span>
-                            Click Connect to XERO below to authenticate
-                          </li>
-                        </ul>
-                        <a 
-                          href="https://developer.xero.com/myapps/" 
-                          target="_blank" 
+                        <a
+                          href="https://developer.xero.com/myapps/"
+                          target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[hsl(217,90%,40%)] hover:text-[hsl(217,90%,50%)] text-sm mt-3 transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[#13B5EA] hover:text-[#0a8ab5] text-sm mt-3 transition-colors font-medium"
                         >
-                          <Globe className="w-4 h-4" />
+                          <Globe className="w-3.5 h-3.5"/>
                           XERO Developer Portal →
                         </a>
                       </div>
 
-                      <div className="flex flex-wrap gap-3">
+                      {/* Action buttons */}
+                      <div className={`px-4 py-4 border-t ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
                         {(currentUser as any)?.xeroConnected ? (
-                          <>
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <Button
                               onClick={handleSyncXero}
                               disabled={isSyncingXero}
-                              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                              className="flex-1 sm:flex-none h-10 font-medium text-white"
+                              style={{ background: 'linear-gradient(135deg,#13B5EA,#0a8ab5)' }}
                             >
-                              <RefreshCw className={`w-4 h-4 mr-2 ${isSyncingXero ? 'animate-spin' : ''}`} />
+                              <RefreshCw className={`w-4 h-4 mr-2 ${isSyncingXero ? 'animate-spin' : ''}`}/>
                               {isSyncingXero ? 'Syncing...' : 'Sync Now'}
                             </Button>
                             <Button
                               onClick={handleDisconnectXero}
                               disabled={isConnectingXero}
                               variant="outline"
-                              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                              className="flex-1 sm:flex-none h-10 border-red-500/40 text-red-400 hover:bg-red-500/10"
                             >
                               {isConnectingXero ? 'Disconnecting...' : 'Disconnect'}
                             </Button>
-                          </>
+                          </div>
                         ) : (
                           <Button
                             onClick={handleConnectXero}
                             disabled={isConnectingXero}
-                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                            className="w-full h-10 font-semibold text-white shadow-md"
+                            style={{ background: 'linear-gradient(135deg,#13B5EA,#0a8ab5)' }}
                           >
-                            <Link2 className="w-4 h-4 mr-2" />
+                            <Link2 className="w-4 h-4 mr-2"/>
                             {isConnectingXero ? 'Connecting...' : 'Connect to XERO'}
                           </Button>
                         )}
                       </div>
                     </div>
 
-                    {/* Data Flow Section */}
-                    <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6">
-                      <h4 className="text-lg font-semibold text-white mb-4">Data Flow</h4>
-                      <p className="text-sm text-gray-400 mb-4">
-                        When connected to XERO, the following data is synchronized:
-                      </p>
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Users className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                            <span className="font-medium text-white">Customers</span>
+                    {/* Data Sync Section — redesigned */}
+                    <div className={`rounded-xl border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/40' : 'border-gray-200 bg-white'}`}>
+                      <div className={`px-4 py-3 border-b flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <svg viewBox="0 0 20 20" className="w-4 h-4 flex-shrink-0" style={{ color: '#13B5EA' }} fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd"/>
+                        </svg>
+                        <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Data Synchronisation</span>
+                        <span className={`text-xs ml-1 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>— when connected</span>
+                      </div>
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[
+                          { icon: Users, label: 'Customers', xeroLabel: 'Contacts', dir: '↔', dirLabel: 'Two-way sync' },
+                          { icon: Package, label: 'Products', xeroLabel: 'Items', dir: '↔', dirLabel: 'Two-way sync' },
+                          { icon: Receipt, label: 'Invoices', xeroLabel: 'XERO', dir: '→', dirLabel: 'One-way push' },
+                        ].map(({ icon: Icon, label, xeroLabel, dir, dirLabel }) => (
+                          <div key={label} className={`rounded-lg p-3 border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-900/40' : 'border-gray-100 bg-gray-50'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: '#13B5EA' }}/>
+                              <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{label}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${posTheme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-white border border-gray-200 text-gray-600'}`}>{label}</span>
+                              <span className="text-xs font-bold" style={{ color: '#13B5EA' }}>{dir}</span>
+                              <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${posTheme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-white border border-gray-200 text-gray-600'}`}>{xeroLabel}</span>
+                            </div>
+                            <p className={`text-xs mt-1.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{dirLabel}</p>
                           </div>
-                          <p className="text-sm text-gray-400">
-                            <span className="text-[hsl(217,90%,40%)]">↔</span> Contacts (two-way sync)
-                          </p>
-                        </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Package className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                            <span className="font-medium text-white">Products</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            <span className="text-[hsl(217,90%,40%)]">↔</span> Items (two-way sync)
-                          </p>
-                        </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Receipt className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                            <span className="font-medium text-white">Invoices</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            <span className="text-[hsl(217,90%,40%)]">→</span> XERO (one-way push)
-                          </p>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
