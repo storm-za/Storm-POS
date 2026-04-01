@@ -3550,7 +3550,7 @@ ${dateFilteredSales.map(sale =>
                 { id: 'aankoopbestellings', label: 'Aankoopbestellings', icon: ClipboardList },
                 { id: 'oop-rekeninge', label: 'Oop Rekeninge', icon: FileText },
                 { id: 'verslae', label: 'Verslae', icon: BarChart3 },
-                { id: 'gebruik', label: 'Gebruik & Fakturering', icon: CreditCard },
+                { id: 'gebruik', label: 'Rekening', icon: CreditCard },
                 { id: 'instellings', label: 'Instellings', icon: Settings },
               ].map((item) => (
                 <button
@@ -5847,353 +5847,138 @@ ${dateFilteredSales.map(sale =>
               };
 
               return (
-                <div className="space-y-6">
-                  {/* 7-Day Trial Banner */}
+                <div className="space-y-4">
+                  {/* Trial notice — compact amber bar */}
                   {isInTrial && (
-                    <div className="bg-gradient-to-br from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,50%)] rounded-xl p-8 text-white shadow-xl border border-blue-400/30 relative overflow-hidden" data-testid="trial-banner">
-                      {/* Background decoration */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
-                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
-                      
-                      <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-                        <div className="flex-1 space-y-4">
-                          {/* Header with icon */}
-                          <div className="flex items-center gap-4">
-                            <div className="bg-white/20 backdrop-blur-lg rounded-xl p-3 shadow-lg">
-                              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <h3 className="text-2xl font-bold">Gratis Proeftydperk Aktief</h3>
-                              <p className="text-blue-100 text-sm font-medium">{daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor</p>
-                            </div>
-                          </div>
-                          
-                          {/* Benefits */}
-                          <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 space-y-3 shadow-inner">
-                            <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="font-medium">Geen gebruiksfooie tydens proeftydperk</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="font-medium">Onbeperkte verkope teen R0.00 koste</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0 w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-[hsl(217,90%,40%)]" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="font-medium">Volle toegang tot alle funksies</span>
-                            </div>
-                          </div>
-                          
-                          {/* Footer message */}
-                          <p className="text-blue-100 text-sm leading-relaxed">
-                            Na jou proeftydperk begin ons eenvoudige 0.5% per verkoop pryse outomaties. Jy sal jou eerste gebruiksgeld op dag 8 sien.
-                          </p>
-                        </div>
-                        
-                        {/* Countdown card */}
-                        <div className="text-center bg-white/15 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-white/20 min-w-[140px]">
-                          <div className="text-5xl font-bold mb-2">{daysRemaining}</div>
-                          <div className="text-blue-100 text-sm font-semibold uppercase tracking-wide">
-                            {daysRemaining === 1 ? 'Dag Oor' : 'Dae Oor'}
-                          </div>
-                          <div className="mt-4 pt-4 border-t border-white/20">
-                            <div className="text-xs text-blue-200">Proeftydperk eindig</div>
-                            <div className="text-sm font-medium mt-1">
-                              {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}
-                            </div>
-                          </div>
-                        </div>
+                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${posTheme === 'dark' ? 'border-amber-700/40 bg-amber-900/20' : 'border-amber-200 bg-amber-50'}`} data-testid="trial-banner">
+                      <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${posTheme === 'dark' ? 'bg-amber-900/40' : 'bg-amber-100'}`}>
+                        <svg className={`w-4 h-4 ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Gratis Proeftydperk Aktief</span>
+                        <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
+                        <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
+                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: 0.5% per verkoop + R0.50 per faktuur.
+                        </span>
+                      </div>
+                      <div className="flex-shrink-0 text-right">
+                        <div className={`text-2xl font-bold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-700'}`}>{daysRemaining}</div>
+                        <div className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-amber-500' : 'text-amber-600'}`}>{daysRemaining === 1 ? 'dag oor' : 'dae oor'}</div>
                       </div>
                     </div>
                   )}
-                  {/* Header */}
-                  <div className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-xl p-5 text-white">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <h2 className="text-xl sm:text-2xl font-bold">Gebruik & Fakturering</h2>
-                        <p className="text-blue-100 mt-1 text-sm">{formatMonthYear(now)} faktuurperiode</p>
+
+                  {/* Page header */}
+                  <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                    <div>
+                      <h2 className={`text-xl font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Rekening</h2>
+                      <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{formatMonthYear(now)} faktuurperiode</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className={`text-xs uppercase tracking-wide font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Verskuldig</div>
+                        <div className={`text-2xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{stormFee.toFixed(2)}</div>
                       </div>
-                      <div className="sm:text-right">
-                        <div className="text-2xl sm:text-3xl font-bold">R{stormFee.toFixed(2)}</div>
-                        <div className="text-blue-100 text-sm">Bedrag verskuldig aan Storm</div>
+                      <Button
+                        onClick={() => setIsBankDetailsOpen(true)}
+                        size="sm"
+                        className={`h-9 font-medium ${posTheme === 'dark' ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-700'}`}
+                      >
+                        <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                        Betaal Nou
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Summary stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} transaksies` },
+                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : '0.5% van omset' },
+                      { label: 'Fakture', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fooie` },
+                      { label: 'Periode', value: `${Math.round(progressPercentage)}%`, sub: `Dag ${daysCompleted} van ${daysInMonth}` },
+                    ].map(({ label, value, sub }) => (
+                      <div key={label} className={`rounded-lg border p-3 ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
+                        <div className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</div>
+                        <div className={`mt-1 text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</div>
+                        <div className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{sub}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Fee statement + billing info */}
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    {/* Fee statement */}
+                    <div className={`rounded-lg border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
+                      <div className={`px-4 py-3 border-b text-sm font-semibold flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
+                        <DollarSign className="w-4 h-4" />
+                        Fooi-staat — {formatMonthYear(now)}
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="space-y-1.5">
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Verkope (0.5%)</div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Bruto Omset</span><span className="font-medium">R{currentMonthRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Verkoopsfooi</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
+                        <div className="space-y-1.5">
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fakture (R0.50 elk)</div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Geskep</span><span className="font-medium">{currentMonthInvoices.length}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Faktuurfooi</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className={`border-t ${posTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`} />
+                        <div className="flex justify-between items-center">
+                          <span className={`font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Totaal Verskuldig</span>
+                          <span className={`text-lg font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{stormFee.toFixed(2)}</span>
+                        </div>
                         <Button
                           onClick={() => setIsBankDetailsOpen(true)}
-                          variant="outline"
-                          size="sm"
-                          className="mt-3 bg-blue-500/20 border-blue-300 text-white hover:bg-blue-600 hover:border-blue-400 shadow-sm backdrop-blur-sm w-full sm:w-auto"
+                          className={`w-full h-9 font-medium text-sm ${posTheme === 'dark' ? 'bg-white text-gray-900 hover:bg-gray-100' : 'bg-gray-900 text-white hover:bg-gray-700'}`}
                         >
-                          <CreditCard className="w-4 h-4 mr-2 shrink-0" />
+                          <CreditCard className="w-4 h-4 mr-2" />
                           Bekyk Betalingsbesonderhede
                         </Button>
                       </div>
                     </div>
-                  </div>
-                  {/* Key Metrics */}
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                          Huidige Maand Omset
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-blue-400">R{currentMonthRevenue.toFixed(2)}</div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          {currentMonthSales.length} transaksies
-                        </div>
-                      </CardContent>
-                    </Card>
 
-                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                          <CreditCard className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                          Storm Diensfooi
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-blue-400">R{stormFee.toFixed(2)}</div>
-                        <div className="text-xs text-gray-400 mt-1 space-y-0.5">
-                          <div>Verkope: R{salesFee.toFixed(2)} (0.5%)</div>
-                          <div>Fakture: R{invoiceFee.toFixed(2)} ({currentMonthInvoices.length} × R0.50)</div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-l-4 border-l-blue-500 bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-[hsl(217,90%,40%)]" />
-                          Faktuurperiode
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-bold text-blue-400">{Math.round(progressPercentage)}%</div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          Dag {daysCompleted} van {daysInMonth}
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                          <div 
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${progressPercentage}%` }}
-                          ></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  {/* Billing Breakdown */}
-                  <div className="grid lg:grid-cols-2 gap-6">
-                    {/* Fee Calculation */}
-                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
-                          <DollarSign className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                          Fooi Uiteensetting
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
-                          <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Verkoopsfooi (0.5%)</div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-300">Bruto Omset</span>
-                            <span className="font-semibold text-white">R{currentMonthRevenue.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-300">Verkoopsfooi (0.5%)</span>
-                            <span className="font-semibold text-blue-400">R{salesFee.toFixed(2)}</span>
-                          </div>
-                          
-                          <div className="border-t border-white/10 pt-3 mt-3">
-                            <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Faktuurfooi (R0.50 elk)</div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-300">Fakture Geskep</span>
-                              <span className="font-semibold text-white">{currentMonthInvoices.length}</span>
+                    {/* Billing info + contact */}
+                    <div className={`rounded-lg border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
+                      <div className={`px-4 py-3 border-b text-sm font-semibold flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
+                        <FileText className="w-4 h-4" />
+                        Rekeninginligting
+                      </div>
+                      <div className="p-4 space-y-4">
+                        <div className="space-y-2">
+                          {[
+                            { label: 'Faktuurperiode', value: 'Maandeliks — 1ste tot laaste dag' },
+                            { label: 'Verkooptyns', value: '0.5% van bruto maandelikse omset' },
+                            { label: 'Faktuurkoers', value: 'R0.50 per faktuur geskep' },
+                            { label: 'Betaling verskuldig', value: 'Einde van elke faktuurmaand' },
+                            { label: 'Opstellingsfooi', value: 'Geen' },
+                          ].map(({ label, value }) => (
+                            <div key={label} className="flex justify-between items-start gap-4 text-sm">
+                              <span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>{label}</span>
+                              <span className={`font-medium text-right ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>{value}</span>
                             </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-300">Faktuurfooi</span>
-                              <span className="font-semibold text-blue-400">R{invoiceFee.toFixed(2)}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="border-t-2 border-blue-500/30 pt-3 mt-3">
-                            <div className="flex justify-between items-center">
-                              <span className="font-bold text-white">Totaal Verskuldig aan Storm</span>
-                              <span className="text-xl font-bold text-blue-400">R{stormFee.toFixed(2)}</span>
-                            </div>
-                          </div>
-
-                          <Button
-                            onClick={() => setIsBankDetailsOpen(true)}
-                            className="w-full mt-4 h-12 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-semibold text-base shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 rounded-lg"
-                          >
-                            <CreditCard className="w-5 h-5 mr-2" />
-                            Betaal Nou
-                          </Button>
+                          ))}
                         </div>
-                        
-                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <CreditCard className="w-5 h-5 text-blue-400 mt-0.5" />
-                            <div>
-                              <h4 className="font-medium text-blue-300">Hoe Pryse Werk</h4>
-                              <ul className="text-sm text-gray-300 mt-2 space-y-1">
-                                <li>• <strong>Verkope:</strong> 0.5% van jou maandelikse omset</li>
-                                <li>• <strong>Fakture:</strong> R0.50 per faktuur geskep</li>
-                                <li className="text-gray-400 text-xs mt-2">Voorbeeld: 100 fakture/maand = R50 in faktuurfooie</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Revenue Trend */}
-                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-white">
-                          <BarChart3 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                          Onlangse Prestasie
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {Object.keys(dailyBreakdown).length > 0 ? (
-                          <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <div className="text-gray-400">Gem. Daaglikse Omset</div>
-                                <div className="font-semibold text-white">
-                                  R{(currentMonthRevenue / Math.max(daysCompleted, 1)).toFixed(2)}
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-gray-400">Beste Dag</div>
-                                <div className="font-semibold text-white">
-                                  R{Math.max(...Object.values(dailyBreakdown)).toFixed(2)}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <div className="text-sm font-medium text-gray-300">Daaglikse Omset Tendens</div>
-                              <div className="space-y-1">
-                                {Object.entries(dailyBreakdown)
-                                  .sort(([a], [b]) => b.localeCompare(a))
-                                  .slice(0, 7)
-                                  .map(([date, revenue]) => {
-                                    const percentage = (revenue / Math.max(...Object.values(dailyBreakdown))) * 100;
-                                    return (
-                                      <div key={date} className="flex items-center gap-3">
-                                        <div className="w-16 text-xs text-gray-400">
-                                          {new Date(date).toLocaleDateString('af-ZA', { day: 'numeric', month: 'short' })}
-                                        </div>
-                                        <div className="flex-1 bg-gray-700 rounded-full h-2">
-                                          <div 
-                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                            style={{ width: `${percentage}%` }}
-                                          ></div>
-                                        </div>
-                                        <div className="w-20 text-xs text-right font-medium text-white">
-                                          R{revenue.toFixed(2)}
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-8 text-gray-400">
-                            <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                            <p>Nog geen verkoopdata vir hierdie maand nie.</p>
-                            <p className="text-sm">Begin verkoop om jou omset tendense te sien!</p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                  {/* Payment Information */}
-                  <Card className="bg-gray-900/60 backdrop-blur-xl border border-[hsl(217,90%,40%)]/20 shadow-2xl shadow-blue-900/10">
-                    <CardHeader className="border-b border-white/10 pb-4">
-                      <CardTitle className="flex items-center gap-2 text-white">
-                        <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/15 flex items-center justify-center border border-[hsl(217,90%,40%)]/30">
-                          <Receipt className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                        </div>
-                        Betaalinligting
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-gray-900/80 rounded-xl border border-white/5 p-5">
-                          <h4 className="font-semibold mb-4 text-white flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                            Hoe Fakturering Werk
-                          </h4>
-                          <ul className="space-y-3 text-sm text-gray-300">
-                            <li className="flex items-start gap-3">
-                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
-                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">1</span>
-                              </div>
-                              Maandelikse faktureringssiklus: 1ste tot laaste dag van maand
-                            </li>
-                            <li className="flex items-start gap-3">
-                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
-                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">2</span>
-                              </div>
-                              Diensfooi: 0.5% van bruto maandelikse omset
-                            </li>
-                            <li className="flex items-start gap-3">
-                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
-                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">3</span>
-                              </div>
-                              Betaling verskuldig: Einde van elke maand
-                            </li>
-                            <li className="flex items-start gap-3">
-                              <div className="w-5 h-5 rounded-full bg-[hsl(217,90%,40%)]/15 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[hsl(217,90%,40%)]/30">
-                                <span className="text-[10px] font-bold text-[hsl(217,90%,50%)]">4</span>
-                              </div>
-                              Geen opstellingsfooi of versteekte koste nie
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="bg-gray-900/80 rounded-xl border border-white/5 p-5 flex flex-col justify-between">
-                          <div>
-                            <h4 className="font-semibold mb-4 text-white flex items-center gap-2">
-                              <HelpCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                              Kontak & Ondersteuning
-                            </h4>
-                            <div className="space-y-2 text-sm text-gray-300">
-                              <p>Vrae oor jou fakturering?</p>
-                              <p className="font-medium text-[hsl(217,90%,50%)]">
-                                softwarebystorm@gmail.com
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => setIsBankDetailsOpen(true)}
-                            className="mt-5 h-10 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300"
-                          >
-                            <CreditCard className="w-4 h-4 mr-2" />
-                            Sien Betalingsbesonderhede
-                          </Button>
+                        <div className={`border-t pt-4 ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`}>
+                          <div className={`text-xs font-semibold uppercase tracking-wider mb-1.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Rekeningondersteuning</div>
+                          <div className={`text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>softwarebystorm@gmail.com</div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
