@@ -4715,44 +4715,50 @@ ${dateFilteredSales.map(sale =>
                     )}
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {customers.map((customer) => {
                     const spend = customerSpendMap[customer.id];
                     return (
-                    <div key={customer.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-gray-700/30">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-semibold text-white">{customer.name}</h3>
-                          <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="text-xs text-[#ffffff]">
-                            {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
-                          </Badge>
-                          {spend !== undefined && (
-                            <Badge className="bg-green-600/20 text-green-300 border border-green-500/30 text-xs">
-                              Totale Besteding: R{spend.toFixed(2)}
-                            </Badge>
-                          )}
+                      <div
+                        key={customer.id}
+                        className={`flex items-start justify-between gap-3 px-4 py-3 rounded-xl border transition-colors ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700 hover:bg-gray-800' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'}`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{customer.name}</h3>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${customer.customerType === 'trade' ? (posTheme === 'dark' ? 'bg-amber-900/50 text-amber-300 border-amber-700' : 'bg-amber-100 text-amber-800 border-amber-200') : (posTheme === 'dark' ? 'bg-slate-700 text-slate-200 border-slate-600' : 'bg-slate-100 text-slate-700 border-slate-200')}`}>
+                              {customer.customerType === 'trade' ? 'Groothandel' : 'Kleinhandel'}
+                            </span>
+                            {spend !== undefined && (
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${posTheme === 'dark' ? 'bg-emerald-900/50 text-emerald-300 border-emerald-700' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                                R{spend.toFixed(2)} besteding
+                              </span>
+                            )}
+                          </div>
+                          <div className={`space-y-0.5 text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {customer.phone && <p>📞 {customer.phone}</p>}
+                            {customer.notes && <p className="italic truncate max-w-xs">{customer.notes}</p>}
+                          </div>
                         </div>
-                        {customer.phone && <p className="text-sm text-gray-400">Telefoon: {customer.phone}</p>}
-                        {customer.notes && <p className="text-sm text-gray-400 italic">{customer.notes}</p>}
+                        <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                          <button
+                            onClick={() => openCustomerDialog(customer)}
+                            className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
+                            title="Wysig kliënt"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCustomer(customer.id)}
+                            className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-red-500 hover:text-red-400 hover:bg-red-900/20' : 'text-red-400 hover:text-red-600 hover:bg-red-50'}`}
+                            title="Skrap kliënt"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openCustomerDialog(customer)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteCustomer(customer.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ); })}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

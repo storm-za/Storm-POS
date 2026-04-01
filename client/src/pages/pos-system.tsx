@@ -5488,53 +5488,52 @@ export default function PosSystem() {
                     )}
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {customers.map((customer) => {
                     const spend = customerSpendMap[customer.id];
                     return (
-                    <motion.div 
-                      key={customer.id} 
-                      className="p-4 bg-white/5 border border-white/10 rounded-lg flex items-center justify-between hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
-                      whileHover={{ scale: 1.01, y: -2 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-medium text-white">{customer.name}</h3>
-                          <Badge variant={customer.customerType === 'trade' ? 'default' : 'outline'} className="bg-blue-600/20 text-blue-300 border-blue-500/30">
-                            {customer.customerType === 'trade' ? 'Trade' : 'Retail'}
-                          </Badge>
-                          {spend !== undefined && (
-                            <Badge className="bg-green-600/20 text-green-300 border border-green-500/30 text-xs">
-                              Total Spend: R{spend.toFixed(2)}
-                            </Badge>
-                          )}
+                      <div
+                        key={customer.id}
+                        className={`flex items-start justify-between gap-3 px-4 py-3 rounded-xl border transition-colors ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700 hover:bg-gray-800' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'}`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{customer.name}</h3>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${customer.customerType === 'trade' ? (posTheme === 'dark' ? 'bg-amber-900/50 text-amber-300 border-amber-700' : 'bg-amber-100 text-amber-800 border-amber-200') : (posTheme === 'dark' ? 'bg-slate-700 text-slate-200 border-slate-600' : 'bg-slate-100 text-slate-700 border-slate-200')}`}>
+                              {customer.customerType === 'trade' ? 'Trade' : 'Retail'}
+                            </span>
+                            {spend !== undefined && (
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${posTheme === 'dark' ? 'bg-emerald-900/50 text-emerald-300 border-emerald-700' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                                R{spend.toFixed(2)} spent
+                              </span>
+                            )}
+                          </div>
+                          <div className={`space-y-0.5 text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {customer.phone && <p>📞 {customer.phone}</p>}
+                            {customer.notes && <p className="italic truncate max-w-xs">{customer.notes}</p>}
+                          </div>
                         </div>
-                        {customer.phone && <p className="text-sm text-gray-300">Phone: {customer.phone}</p>}
-                        {customer.notes && <p className="text-sm text-gray-300">Notes: {customer.notes}</p>}
+                        <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+                          <button
+                            onClick={() => openCustomerDialog(customer)}
+                            className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
+                            title="Edit customer"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteCustomerMutation.mutate(customer.id)}
+                            className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-red-500 hover:text-red-400 hover:bg-red-900/20' : 'text-red-400 hover:text-red-600 hover:bg-red-50'}`}
+                            title="Delete customer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openCustomerDialog(customer)}
-                          className="bg-transparent border-blue-500/30 text-white hover:bg-blue-500/20 hover:text-blue-200"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteCustomerMutation.mutate(customer.id)}
-                          className="border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ); })}
+                    );
+                  })}
                   {customers.length === 0 && (
-                    <div className="text-center py-8 text-gray-400">
+                    <div className={`text-center py-8 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                       No customers found. Add your first customer to get started.
                     </div>
                   )}
