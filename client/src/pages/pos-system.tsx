@@ -5744,32 +5744,24 @@ export default function PosSystem() {
                     )}
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {filteredInvoices.map((invoice) => (
-                      <motion.div
+                      <div
                         key={invoice.id}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4 hover:bg-white/10 transition-all duration-300 backdrop-blur-sm cursor-pointer"
-                        whileHover={{ scale: 1.01, y: -2 }}
-                        transition={{ duration: 0.2 }}
+                        className={`px-4 py-3 rounded-xl border cursor-pointer transition-colors ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700 hover:bg-gray-800' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'}`}
                         onClick={() => {
                           setSelectedInvoice(invoice);
                           setIsInvoiceViewOpen(true);
                         }}
                         data-testid={`invoice-card-${invoice.id}`}
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                              <Badge 
-                                variant={invoice.documentType === 'invoice' ? 'default' : 'outline'}
-                                className={`text-xs sm:text-sm ${invoice.documentType === 'invoice' 
-                                  ? 'bg-blue-600/20 text-blue-300 border-blue-500/30' 
-                                  : 'bg-purple-600/20 text-purple-300 border-purple-500/30'
-                                }`}
-                              >
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${invoice.documentType === 'invoice' ? (posTheme === 'dark' ? 'bg-indigo-900/60 text-indigo-300 border-indigo-700' : 'bg-indigo-100 text-indigo-700 border-indigo-200') : (posTheme === 'dark' ? 'bg-violet-900/60 text-violet-300 border-violet-700' : 'bg-violet-100 text-violet-700 border-violet-200')}`}>
                                 {invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'}
-                              </Badge>
-                              <span className="text-white font-semibold text-sm sm:text-base truncate">{invoice.documentNumber}</span>
+                              </span>
+                              <span className={`font-semibold text-sm sm:text-base truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{invoice.documentNumber}</span>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -5777,14 +5769,14 @@ export default function PosSystem() {
                                   setNewDocumentNumber(invoice.documentNumber || '');
                                   setIsEditDocNumberDialogOpen(true);
                                 }}
-                                className="p-1 hover:bg-white/10 rounded transition-colors flex-shrink-0"
+                                className={`p-1 rounded transition-colors flex-shrink-0 ${posTheme === 'dark' ? 'text-gray-500 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
                                 title="Edit document number"
                               >
-                                <Edit className="w-3 h-3 text-gray-400 hover:text-white" />
+                                <Edit className="w-3 h-3" />
                               </button>
                             </div>
                             <div className="flex items-center gap-2 mb-2" onClick={(e) => e.stopPropagation()}>
-                              <span className="text-gray-300 text-xs sm:text-sm">Paid</span>
+                              <span className={`text-xs sm:text-sm font-medium ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Paid</span>
                               <Switch
                                 checked={invoice.status === 'paid'}
                                 onCheckedChange={(checked) => {
@@ -5793,52 +5785,50 @@ export default function PosSystem() {
                                     status: checked ? 'paid' : 'draft'
                                   });
                                 }}
-                                className="data-[state=checked]:bg-[hsl(217,90%,40%)] data-[state=unchecked]:bg-gray-600"
+                                className="data-[state=checked]:bg-[hsl(217,90%,40%)] data-[state=unchecked]:bg-gray-400"
                               />
                             </div>
-                            <p className="text-gray-300 text-xs sm:text-sm truncate">
-                              Client: {customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}
-                            </p>
-                            {invoiceCardColumns.has('dueDate') && invoice.dueDate && (
-                              <p className="text-gray-400 text-xs sm:text-sm">Due: {new Date(invoice.dueDate).toLocaleDateString()}</p>
-                            )}
-                            {invoiceCardColumns.has('clientEmail') && (invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email) && (
-                              <p className="text-gray-400 text-xs sm:text-sm truncate">Email: {invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email}</p>
-                            )}
-                            {invoiceCardColumns.has('clientPhone') && (invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone) && (
-                              <p className="text-gray-400 text-xs sm:text-sm">Phone: {invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone}</p>
-                            )}
-                            {invoiceCardColumns.has('poNumber') && invoice.poNumber && (
-                              <p className="text-gray-400 text-xs sm:text-sm">PO: {invoice.poNumber}</p>
-                            )}
-                            {invoiceCardColumns.has('dueTerms') && invoice.dueTerms && (
-                              <p className="text-gray-400 text-xs sm:text-sm">Terms: {invoice.dueTerms}</p>
-                            )}
-                            {invoiceCardColumns.has('paymentMethod') && invoice.paymentMethod && (
-                              <p className="text-gray-400 text-xs sm:text-sm">Payment: {invoice.paymentMethod}</p>
-                            )}
-                            {invoiceCardColumns.has('notes') && invoice.notes && (
-                              <p className="text-gray-400 text-xs sm:text-sm truncate">Notes: {invoice.notes}</p>
-                            )}
-                            {invoiceCardColumns.has('discount') && (parseFloat(invoice.discountAmount || '0') > 0 || parseFloat(invoice.discountPercent || '0') > 0) && (
-                              <p className="text-gray-400 text-xs sm:text-sm">
-                                Discount: {invoice.discountType === 'percent' ? `${invoice.discountPercent}%` : `R${parseFloat(invoice.discountAmount || '0').toFixed(2)}`}
-                              </p>
-                            )}
-                            {invoiceCustomFieldDefs.filter(f => invoiceCardColumns.has(`cf_${f.id}`)).map(field => {
-                              const val = (invoice.customFieldValues as any)?.[`cf_${field.id}`];
-                              return val ? (
-                                <p key={field.id} className="text-gray-400 text-xs sm:text-sm truncate">{field.label}: {val}</p>
-                              ) : null;
-                            })}
+                            <div className={`space-y-0.5 text-xs sm:text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              <p>Client: <span className={`font-medium ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{customers.find(c => c.id === invoice.clientId)?.name || invoice.clientName || 'N/A'}</span></p>
+                              {invoiceCardColumns.has('dueDate') && invoice.dueDate && (
+                                <p>Due: {new Date(invoice.dueDate).toLocaleDateString()}</p>
+                              )}
+                              {invoiceCardColumns.has('clientEmail') && (invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email) && (
+                                <p className="truncate">Email: {invoice.clientEmail || customers.find(c => c.id === invoice.clientId)?.email}</p>
+                              )}
+                              {invoiceCardColumns.has('clientPhone') && (invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone) && (
+                                <p>Phone: {invoice.clientPhone || customers.find(c => c.id === invoice.clientId)?.phone}</p>
+                              )}
+                              {invoiceCardColumns.has('poNumber') && invoice.poNumber && (
+                                <p>PO: {invoice.poNumber}</p>
+                              )}
+                              {invoiceCardColumns.has('dueTerms') && invoice.dueTerms && (
+                                <p>Terms: {invoice.dueTerms}</p>
+                              )}
+                              {invoiceCardColumns.has('paymentMethod') && invoice.paymentMethod && (
+                                <p>Payment: {invoice.paymentMethod}</p>
+                              )}
+                              {invoiceCardColumns.has('notes') && invoice.notes && (
+                                <p className="truncate">Notes: {invoice.notes}</p>
+                              )}
+                              {invoiceCardColumns.has('discount') && (parseFloat(invoice.discountAmount || '0') > 0 || parseFloat(invoice.discountPercent || '0') > 0) && (
+                                <p>Discount: {invoice.discountType === 'percent' ? `${invoice.discountPercent}%` : `R${parseFloat(invoice.discountAmount || '0').toFixed(2)}`}</p>
+                              )}
+                              {invoiceCustomFieldDefs.filter(f => invoiceCardColumns.has(`cf_${f.id}`)).map(field => {
+                                const val = (invoice.customFieldValues as any)?.[`cf_${field.id}`];
+                                return val ? (
+                                  <p key={field.id} className="truncate">{field.label}: {val}</p>
+                                ) : null;
+                              })}
+                            </div>
                           </div>
                           <div className="text-left sm:text-right flex-shrink-0">
-                            <p className="text-white font-bold text-base sm:text-lg">
+                            <p className={`font-bold text-base sm:text-lg ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                               R{typeof invoice.total === 'number' ? invoice.total.toFixed(2) : invoice.total}
                             </p>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
