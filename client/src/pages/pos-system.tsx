@@ -7927,6 +7927,7 @@ export default function PosSystem() {
         currentUser={currentUser}
         setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
         toast={toast}
+        posTheme={posTheme}
       />
       <ReceiptCustomizerDialog
         isOpen={isInvoiceSetupOpen}
@@ -7935,6 +7936,7 @@ export default function PosSystem() {
         setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
         toast={toast}
         invoiceSetupOnly={true}
+        posTheme={posTheme}
       />
       {/* Staff Password Verification Dialog */}
       <Dialog open={isStaffPasswordDialogOpen} onOpenChange={(open) => {

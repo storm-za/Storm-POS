@@ -7317,6 +7317,7 @@ ${dateFilteredSales.map(sale =>
         currentUser={currentUser}
         setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
         toast={toast}
+        posTheme={posTheme}
         labels={{
           title: "Personaliseer Jou Kwitansie",
           description: "Personaliseer jou kwitansie met jou besigheidsinligting en pas die uitleg aan.",
@@ -7414,6 +7415,7 @@ ${dateFilteredSales.map(sale =>
         setCurrentUser={(u) => { setCurrentUser(u); localStorage.setItem('posUser', JSON.stringify(u)); }}
         toast={toast}
         invoiceSetupOnly={true}
+        posTheme={posTheme}
         labels={{
           invoiceSetupTitle: "Faktuur & Kwotasie Opstelling",
           invoiceSetupDesc: "Skep pasgemaakte velde wat op u fakture en kwotasies verskyn.",
