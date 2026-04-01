@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { defaultReceiptSettings, type ReceiptSettings, type InvoiceCustomField } from "@shared/schema";
 import { CaretUp as ChevronUp, CaretDown as ChevronDown, FileText, Plus, Trash as Trash2, Eye, EyeSlash as EyeOff, WarningCircle as AlertCircle } from "@phosphor-icons/react";
@@ -237,237 +236,243 @@ export function ReceiptCustomizerDialog({
 
   const updatedToday = lastBusinessInfoUpdate === TODAY();
 
-  const dialogBg = dk ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200';
-  const cardBg = dk ? 'bg-gray-800/60 border-gray-700' : 'bg-gray-50 border-gray-200';
-  const cardTitle = dk ? 'text-white' : 'text-gray-900';
-  const labelText = dk ? 'text-gray-200' : 'text-gray-700';
-  const inputCls = dk
-    ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-500'
+  /* ── Derived theme tokens ── */
+  const dialogBg   = dk ? '#0a0f1e'  : '#ffffff';
+  const cardBg     = dk ? '#1e2535'  : '#f8fafc';
+  const cardBorder = dk ? '#2d3748'  : '#e2e8f0';
+  const rowBg      = dk ? '#252d3d'  : '#ffffff';
+  const rowBorder  = dk ? '#374151'  : '#e5e7eb';
+  const headBg     = dk ? '#1a2233'  : '#f1f5f9';
+  const textMain   = dk ? '#f3f4f6'  : '#111827';
+  const textSub    = dk ? '#9ca3af'  : '#6b7280';
+  const inputStyle = dk
+    ? { background: '#2d3748', borderColor: '#4b5563', color: '#f3f4f6' }
+    : { background: '#ffffff', borderColor: '#d1d5db', color: '#111827' };
+  const addFieldBg     = dk ? '#1e2a3d' : '#eff6ff';
+  const addFieldBorder = dk ? 'rgba(59,130,246,.3)' : '#bfdbfe';
+  const footerBorder   = dk ? '#2d3748' : '#e5e7eb';
+
+  const inputClassName = dk
+    ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500'
     : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400';
-  const sectionRowBg = dk ? 'bg-gray-700/50 border-gray-600' : 'bg-white border-gray-200 shadow-sm';
-  const sectionRowText = dk ? 'text-white' : 'text-gray-800';
-  const addFieldBg = dk ? 'bg-gray-700/50 border-[hsl(217,90%,40%)]/40' : 'bg-blue-50 border-blue-200';
-  const addFieldLabel = dk ? 'text-gray-300' : 'text-gray-600';
-  const addFieldInput = dk ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900';
-  const customFieldRow = dk ? 'bg-gray-700/40 border-gray-600' : 'bg-white border-gray-200 shadow-sm';
-  const customFieldText = dk ? 'text-white' : 'text-gray-800';
-  const customFieldSub = dk ? 'text-gray-400' : 'text-gray-500';
-  const footerBorder = dk ? 'border-gray-700' : 'border-gray-200';
+  const btnOutline = dk
+    ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+    : 'border-gray-300 text-gray-700 hover:bg-gray-100';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`sm:max-w-4xl max-h-[90vh] overflow-y-auto border ${dialogBg}`}>
+      <DialogContent
+        style={{ background: dialogBg, maxHeight: '90vh', overflowY: 'auto', border: `1px solid ${cardBorder}` }}
+        className="sm:max-w-4xl p-6 rounded-xl"
+      >
         <DialogHeader>
-          <DialogTitle className={`flex items-center gap-2 ${dk ? 'text-white' : 'text-gray-900'}`}>
+          <DialogTitle style={{ color: textMain }} className="flex items-center gap-2 text-base font-semibold">
             <FileText className="h-5 w-5 text-[hsl(217,90%,40%)]" />
             {invoiceSetupOnly ? (labels.invoiceSetupTitle || "Invoice & Quote Setup") : (labels.title || "Customize Your Receipt")}
           </DialogTitle>
-          <DialogDescription className={dk ? 'text-gray-300' : 'text-gray-500'}>
+          <DialogDescription style={{ color: textSub }} className="text-sm">
             {invoiceSetupOnly
               ? (labels.invoiceSetupDesc || "Create custom fields that appear on your invoices and quotes.")
               : (labels.description || "Personalize your receipt with your business information and customize the layout.")}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-5 mt-2">
           {!invoiceSetupOnly && (<>
-          {/* Section Ordering */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <CardTitle className={`text-sm ${cardTitle}`}>{labels.sectionOrderTitle || "Receipt Section Order"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {settings.sections.map((section, index) => (
-                  <motion.div key={section} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${sectionRowBg}`}>
-                    <span className={`font-medium ${sectionRowText}`}>{sectionLabels[section]}</span>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => moveSection(index, 'up')} disabled={index === 0}
-                        className={`h-8 w-8 p-0 ${dk ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}`}>
-                        <ChevronUp className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => moveSection(index, 'down')} disabled={index === settings.sections.length - 1}
-                        className={`h-8 w-8 p-0 ${dk ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}`}>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Logo Upload */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <CardTitle className={`text-sm ${cardTitle}`}>{labels.logoTitle || "Receipt Logo"}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* ── Section Ordering ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.sectionOrderTitle || "Receipt Section Order"}</p>
+            </div>
+            <div className="p-4 space-y-2">
+              {settings.sections.map((section, index) => (
+                <motion.div key={section} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  style={{ background: rowBg, borderColor: rowBorder }}
+                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border">
+                  <span style={{ color: textMain }} className="font-medium text-sm">{sectionLabels[section]}</span>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => moveSection(index, 'up')} disabled={index === 0}
+                      className={`h-8 w-8 p-0 ${btnOutline}`}>
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => moveSection(index, 'down')} disabled={index === settings.sections.length - 1}
+                      className={`h-8 w-8 p-0 ${btnOutline}`}>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Logo Upload ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.logoTitle || "Receipt Logo"}</p>
+            </div>
+            <div className="p-4 space-y-4">
               {currentUser?.companyLogo && (
                 <div className="text-center">
-                  <p className={`text-sm mb-2 ${dk ? 'text-gray-300' : 'text-gray-600'}`}>{labels.currentLogo || "Current Logo:"}</p>
-                  <img src={currentUser.companyLogo} alt="Current Logo" className={`h-20 w-20 object-contain rounded-lg mx-auto border ${dk ? 'border-gray-600' : 'border-gray-200'}`} />
+                  <p style={{ color: textSub }} className="text-sm mb-2">{labels.currentLogo || "Current Logo:"}</p>
+                  <img src={currentUser.companyLogo} alt="Current Logo" className="h-20 w-20 object-contain rounded-lg mx-auto" style={{ border: `1px solid ${cardBorder}` }} />
                 </div>
               )}
               <div>
-                <Label htmlFor="receiptLogoUpload" className={labelText}>{labels.uploadLogoLabel || "Upload Custom Logo (Optional)"}</Label>
+                <Label style={{ color: textMain }} htmlFor="receiptLogoUpload" className="text-sm font-medium">{labels.uploadLogoLabel || "Upload Custom Logo (Optional)"}</Label>
                 <Input id="receiptLogoUpload" type="file" accept="image/*" onChange={handleLogoUpload}
-                  className={`mt-2 ${dk ? 'bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white' : 'bg-white border-gray-300 text-gray-900 file:bg-gray-100 file:text-gray-700'} file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded`} />
-                <p className={`text-xs mt-2 ${dk ? 'text-gray-400' : 'text-gray-500'}`}>{labels.logoHelp || "Upload a custom logo for receipts. Recommended: Square images work best (PNG, JPG, max 2MB)"}</p>
+                  className={`mt-2 ${inputClassName} file:border-0 file:mr-4 file:py-2 file:px-4 file:rounded`}
+                  style={dk ? { '--file-bg': '#4b5563' } as any : {}} />
+                <p style={{ color: textSub }} className="text-xs mt-2">{labels.logoHelp || "Upload a custom logo for receipts. Recommended: Square images work best (PNG, JPG, max 2MB)"}</p>
               </div>
               {logoPreview && (
                 <div className="text-center">
-                  <p className={`text-sm mb-2 ${dk ? 'text-gray-300' : 'text-gray-600'}`}>{labels.newLogoPreview || "New Logo Preview:"}</p>
-                  <img src={logoPreview} alt="New Logo Preview" className={`h-20 w-20 object-contain rounded-lg mx-auto border ${dk ? 'border-gray-600' : 'border-gray-200'}`} />
-                  <Button size="sm" variant="outline" onClick={() => setLogoPreview(null)}
-                    className={`mt-2 ${dk ? 'text-gray-300 border-gray-600 hover:bg-gray-700' : 'text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                  <p style={{ color: textSub }} className="text-sm mb-2">{labels.newLogoPreview || "New Logo Preview:"}</p>
+                  <img src={logoPreview} alt="New Logo Preview" className="h-20 w-20 object-contain rounded-lg mx-auto" style={{ border: `1px solid ${cardBorder}` }} />
+                  <Button size="sm" variant="outline" onClick={() => setLogoPreview(null)} className={`mt-2 ${btnOutline}`}>
                     {labels.removeButton || "Remove"}
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Business Information */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className={`text-sm ${cardTitle}`}>{labels.businessInfoTitle || "Business Information"}</CardTitle>
-                {updatedToday && (
-                  <div className="flex items-center gap-1.5 text-amber-500 text-xs">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    <span>{labels.updatedToday || "Updated today – next update available tomorrow"}</span>
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* ── Business Information ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b flex items-center justify-between">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.businessInfoTitle || "Business Information"}</p>
+              {updatedToday && (
+                <div className="flex items-center gap-1.5 text-amber-500 text-xs">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>{labels.updatedToday || "Updated today – next update available tomorrow"}</span>
+                </div>
+              )}
+            </div>
+            <div className="p-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.businessName || "Business Name"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.businessName || "Business Name"}</Label>
                     <Switch checked={settings.toggles.showBusinessName} onCheckedChange={(v) => updateToggle('showBusinessName', v)} />
                   </div>
                   <Input value={settings.businessInfo.name || ''} onChange={(e) => updateBusinessInfo('name', e.target.value)}
                     placeholder={currentUser?.companyName || labels.businessNamePlaceholder || "Your Business Name"}
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.phoneNumber || "Phone Number"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.phoneNumber || "Phone Number"}</Label>
                     <Switch checked={settings.toggles.showBusinessPhone} onCheckedChange={(v) => updateToggle('showBusinessPhone', v)} />
                   </div>
                   <Input value={settings.businessInfo.phone || ''} onChange={(e) => updateBusinessInfo('phone', e.target.value)}
                     placeholder={labels.phonePlaceholder || "+27 123 456 7890"}
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className={labelText}>{labels.addressLine1 || "Address Line 1"}</Label>
+                  <Label style={{ color: textMain }} className="text-sm">{labels.addressLine1 || "Address Line 1"}</Label>
                   <Switch checked={settings.toggles.showBusinessAddress} onCheckedChange={(v) => updateToggle('showBusinessAddress', v)} />
                 </div>
                 <Input value={settings.businessInfo.addressLine1 || ''} onChange={(e) => updateBusinessInfo('addressLine1', e.target.value)}
                   placeholder={labels.addressLine1Placeholder || "123 Main Street"}
-                  className={inputCls} disabled={updatedToday} />
+                  className={inputClassName} style={inputStyle} disabled={updatedToday} />
               </div>
               <div>
-                <Label className={labelText}>{labels.addressLine2 || "Address Line 2"}</Label>
+                <Label style={{ color: textMain }} className="text-sm">{labels.addressLine2 || "Address Line 2"}</Label>
                 <Input value={settings.businessInfo.addressLine2 || ''} onChange={(e) => updateBusinessInfo('addressLine2', e.target.value)}
                   placeholder={labels.addressLine2Placeholder || "City, Postal Code"}
-                  className={`mt-2 ${inputCls}`} disabled={updatedToday} />
+                  className={`mt-2 ${inputClassName}`} style={inputStyle} disabled={updatedToday} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.email || "Email"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.email || "Email"}</Label>
                     <Switch checked={settings.toggles.showBusinessEmail} onCheckedChange={(v) => updateToggle('showBusinessEmail', v)} />
                   </div>
                   <Input value={settings.businessInfo.email || ''} onChange={(e) => updateBusinessInfo('email', e.target.value)}
                     placeholder={labels.emailPlaceholder || "info@business.com"} type="email"
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.website || "Website"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.website || "Website"}</Label>
                     <Switch checked={settings.toggles.showBusinessWebsite} onCheckedChange={(v) => updateToggle('showBusinessWebsite', v)} />
                   </div>
                   <Input value={settings.businessInfo.website || ''} onChange={(e) => updateBusinessInfo('website', e.target.value)}
                     placeholder={labels.websitePlaceholder || "www.business.com"}
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.registrationNumber || "Registration Number"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.registrationNumber || "Registration Number"}</Label>
                     <Switch checked={settings.toggles.showRegistrationNumber} onCheckedChange={(v) => updateToggle('showRegistrationNumber', v)} />
                   </div>
                   <Input value={settings.businessInfo.registrationNumber || ''} onChange={(e) => updateBusinessInfo('registrationNumber', e.target.value)}
                     placeholder={labels.regNumberPlaceholder || "REG123456"}
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className={labelText}>{labels.vatNumber || "VAT Number"}</Label>
+                    <Label style={{ color: textMain }} className="text-sm">{labels.vatNumber || "VAT Number"}</Label>
                     <Switch checked={settings.toggles.showVATNumber} onCheckedChange={(v) => updateToggle('showVATNumber', v)} />
                   </div>
                   <Input value={settings.businessInfo.vatNumber || ''} onChange={(e) => updateBusinessInfo('vatNumber', e.target.value)}
                     placeholder={labels.vatNumberPlaceholder || "VAT123456"}
-                    className={inputCls} disabled={updatedToday} />
+                    className={inputClassName} style={inputStyle} disabled={updatedToday} />
                 </div>
               </div>
               {updatedToday && (
-                <p className={`text-xs flex items-center gap-1.5 ${dk ? 'text-amber-400/80' : 'text-amber-600'}`}>
+                <p className="text-xs flex items-center gap-1.5 text-amber-500">
                   <AlertCircle className="h-3 w-3" />
                   {labels.businessInfoLocked || "Business information is locked for today. Toggle switches still work."}
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           </>)}
 
-          {/* Invoice / Quote Custom Fields */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className={`text-sm ${cardTitle}`}>{labels.invoiceSetupTitle || "Invoice / Quote Setup"}</CardTitle>
-                <Button size="sm" onClick={() => { setIsAddingField(true); }}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] h-8 text-xs text-white">
-                  <Plus className="h-3.5 w-3.5 mr-1" />
-                  {labels.addField || "Add Field"}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className={`text-xs ${dk ? 'text-gray-400' : 'text-gray-500'}`}>
-                {labels.invoiceSetupDesc || "Create custom fields that appear on invoices and quotes. For example, add a 'Model' field under the client section for a vehicle service business."}
+          {/* ── Invoice / Quote Custom Fields ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b flex items-center justify-between">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.invoiceSetupTitle || "Invoice / Quote Setup"}</p>
+              <Button size="sm" onClick={() => setIsAddingField(true)}
+                className="h-8 text-xs bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white">
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                {labels.addField || "Add Field"}
+              </Button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p style={{ color: textSub }} className="text-xs">
+                {labels.invoiceSetupDesc2 || labels.invoiceSetupDesc || "Create custom fields that appear on invoices and quotes. For example, add a 'Model' field under the client section for a vehicle service business."}
               </p>
 
               <AnimatePresence>
                 {isAddingField && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                    className={`rounded-lg border p-4 space-y-3 ${addFieldBg}`}>
-                    <p className={`text-sm font-medium ${dk ? 'text-white' : 'text-gray-900'}`}>{labels.newField || "New Custom Field"}</p>
+                    style={{ background: addFieldBg, borderColor: addFieldBorder }}
+                    className="rounded-lg border p-4 space-y-3">
+                    <p style={{ color: textMain }} className="text-sm font-medium">{labels.newField || "New Custom Field"}</p>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className={`text-xs ${addFieldLabel}`}>{labels.fieldLabel || "Field Label"} *</Label>
+                        <Label style={{ color: textSub }} className="text-xs">{labels.fieldLabel || "Field Label"} *</Label>
                         <Input value={newFieldLabel} onChange={(e) => setNewFieldLabel(e.target.value)}
                           placeholder={labels.fieldLabelPlaceholder || "e.g. Model, Reference No, Vehicle Reg"}
-                          className={`mt-1 text-sm ${addFieldInput}`} />
+                          className={`mt-1 text-sm ${inputClassName}`} style={inputStyle} />
                       </div>
                       <div>
-                        <Label className={`text-xs ${addFieldLabel}`}>{labels.fieldPlaceholder || "Placeholder (optional)"}</Label>
+                        <Label style={{ color: textSub }} className="text-xs">{labels.fieldPlaceholder || "Placeholder (optional)"}</Label>
                         <Input value={newFieldPlaceholder} onChange={(e) => setNewFieldPlaceholder(e.target.value)}
                           placeholder={labels.fieldPlaceholderEx || "e.g. Toyota Corolla 2020"}
-                          className={`mt-1 text-sm ${addFieldInput}`} />
+                          className={`mt-1 text-sm ${inputClassName}`} style={inputStyle} />
                       </div>
                     </div>
                     <div>
-                      <Label className={`text-xs ${addFieldLabel}`}>{labels.fieldSection || "Section on Invoice"}</Label>
+                      <Label style={{ color: textSub }} className="text-xs">{labels.fieldSection || "Section on Invoice"}</Label>
                       <Select value={newFieldSection} onValueChange={(v: any) => setNewFieldSection(v)}>
-                        <SelectTrigger className={`mt-1 text-sm ${addFieldInput}`}>
+                        <SelectTrigger className={`mt-1 text-sm ${inputClassName}`} style={inputStyle}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -479,11 +484,11 @@ export function ReceiptCustomizerDialog({
                     </div>
                     <div className="flex gap-2 justify-end">
                       <Button size="sm" variant="outline" onClick={() => { setIsAddingField(false); setNewFieldLabel(""); setNewFieldPlaceholder(""); }}
-                        className={`text-xs ${dk ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}`}>
+                        className={`text-xs ${btnOutline}`}>
                         {labels.cancel || "Cancel"}
                       </Button>
                       <Button size="sm" onClick={addField} disabled={!newFieldLabel.trim()}
-                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs text-white">
+                        className="text-xs bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white">
                         {labels.addField || "Add Field"}
                       </Button>
                     </div>
@@ -492,7 +497,7 @@ export function ReceiptCustomizerDialog({
               </AnimatePresence>
 
               {customFields.length === 0 && !isAddingField && (
-                <div className={`text-center py-6 text-sm ${dk ? 'text-gray-500' : 'text-gray-400'}`}>
+                <div style={{ color: textSub }} className="text-center py-6 text-sm">
                   {labels.noCustomFields || "No custom fields yet. Click \"Add Field\" to create one."}
                 </div>
               )}
@@ -500,46 +505,48 @@ export function ReceiptCustomizerDialog({
               <div className="space-y-2">
                 {customFields.map((field) => (
                   <motion.div key={field.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${customFieldRow}`}>
+                    style={{ background: rowBg, borderColor: rowBorder }}
+                    className="flex items-center justify-between px-4 py-3 rounded-lg border">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium truncate ${customFieldText}`}>{field.label}</span>
+                          <span style={{ color: textMain }} className="text-sm font-medium truncate">{field.label}</span>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded border ${sectionBadgeColor[field.section]}`}>
                             {sectionName[field.section]}
                           </span>
                           {!field.visible && (
-                            <span className={`text-[10px] ${dk ? 'text-gray-500' : 'text-gray-400'}`}>{labels.hidden || "(hidden)"}</span>
+                            <span style={{ color: textSub }} className="text-[10px]">{labels.hidden || "(hidden)"}</span>
                           )}
                         </div>
                         {field.placeholder && (
-                          <p className={`text-xs mt-0.5 truncate ${customFieldSub}`}>{labels.fieldPlaceholderLabel || "Placeholder:"} {field.placeholder}</p>
+                          <p style={{ color: textSub }} className="text-xs mt-0.5 truncate">{labels.fieldPlaceholderLabel || "Placeholder:"} {field.placeholder}</p>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 ml-2 shrink-0">
-                      <Button size="sm" variant="ghost" onClick={() => toggleFieldVisibility(field.id)}
-                        className={`h-7 w-7 p-0 ${dk ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}>
+                      <button onClick={() => toggleFieldVisibility(field.id)}
+                        style={{ color: textSub }}
+                        className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-gray-100/10 transition-colors">
                         {field.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => deleteField(field.id)}
-                        className={`h-7 w-7 p-0 text-red-400 hover:text-red-500 ${dk ? 'hover:bg-red-900/20' : 'hover:bg-red-50'}`}>
+                      </button>
+                      <button onClick={() => deleteField(field.id)}
+                        className="h-7 w-7 flex items-center justify-center rounded-lg text-red-400 hover:text-red-500 hover:bg-red-50/10 transition-colors">
                         <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                      </button>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {!invoiceSetupOnly && (<>
-          {/* Display Options */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <CardTitle className={`text-sm ${cardTitle}`}>{labels.displayOptionsTitle || "Display Options"}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          {/* ── Display Options ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.displayOptionsTitle || "Display Options"}</p>
+            </div>
+            <div className="p-4 space-y-3">
               {[
                 { key: 'showLogo', label: labels.showLogo || "Show Logo" },
                 { key: 'showDateTime', label: labels.showDateTime || "Show Date & Time" },
@@ -548,54 +555,51 @@ export function ReceiptCustomizerDialog({
                 { key: 'showPaymentMethod', label: labels.showPaymentMethod || "Show Payment Method" },
               ].map(({ key, label }) => (
                 <div key={key} className="flex items-center justify-between">
-                  <Label className={labelText}>{label}</Label>
+                  <Label style={{ color: textMain }} className="text-sm">{label}</Label>
                   <Switch checked={(settings.toggles as any)[key]} onCheckedChange={(v) => updateToggle(key, v)} />
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Custom Messages */}
-          <Card className={`border ${cardBg}`}>
-            <CardHeader>
-              <CardTitle className={`text-sm ${cardTitle}`}>{labels.customMessagesTitle || "Custom Messages"}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* ── Custom Messages ── */}
+          <div style={{ background: cardBg, borderColor: cardBorder }} className="rounded-xl border overflow-hidden">
+            <div style={{ background: headBg, borderColor: cardBorder }} className="px-5 py-3 border-b">
+              <p style={{ color: textMain }} className="text-sm font-semibold">{labels.customMessagesTitle || "Custom Messages"}</p>
+            </div>
+            <div className="p-4 space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className={labelText}>{labels.headerMessage || "Header Message"}</Label>
+                  <Label style={{ color: textMain }} className="text-sm">{labels.headerMessage || "Header Message"}</Label>
                   <Switch checked={settings.toggles.showCustomHeader} onCheckedChange={(v) => updateToggle('showCustomHeader', v)} />
                 </div>
                 <Textarea value={settings.customMessages.header || ''} onChange={(e) => updateCustomMessage('header', e.target.value)}
-                  placeholder={labels.headerPlaceholder || "Welcome! Special offers today..."} className={inputCls} rows={2} />
+                  placeholder={labels.headerPlaceholder || "Welcome! Special offers today..."} className={inputClassName} style={inputStyle} rows={2} />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className={labelText}>{labels.thankYouMessage || "Thank You Message"}</Label>
+                  <Label style={{ color: textMain }} className="text-sm">{labels.thankYouMessage || "Thank You Message"}</Label>
                   <Switch checked={settings.toggles.showThankYouMessage} onCheckedChange={(v) => updateToggle('showThankYouMessage', v)} />
                 </div>
                 <Input value={settings.customMessages.thankYou || 'Thank you for your business!'}
                   onChange={(e) => updateCustomMessage('thankYou', e.target.value)}
-                  placeholder={labels.thankYouPlaceholder || "Thank you for your business!"} className={inputCls} />
+                  placeholder={labels.thankYouPlaceholder || "Thank you for your business!"} className={inputClassName} style={inputStyle} />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className={labelText}>{labels.footerMessage || "Footer Message"}</Label>
+                  <Label style={{ color: textMain }} className="text-sm">{labels.footerMessage || "Footer Message"}</Label>
                   <Switch checked={settings.toggles.showCustomFooter} onCheckedChange={(v) => updateToggle('showCustomFooter', v)} />
                 </div>
                 <Textarea value={settings.customMessages.footer || ''} onChange={(e) => updateCustomMessage('footer', e.target.value)}
-                  placeholder={labels.footerPlaceholder || "Visit us again! Returns accepted within 30 days..."} className={inputCls} rows={2} />
+                  placeholder={labels.footerPlaceholder || "Visit us again! Returns accepted within 30 days..."} className={inputClassName} style={inputStyle} rows={2} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           </>)}
         </div>
 
-        <div className={`flex justify-end gap-3 pt-4 border-t ${footerBorder}`}>
-          <Button variant="outline" onClick={onClose}
-            className={dk
-              ? 'border-[hsl(217,90%,40%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,40%)] hover:text-white'
-              : 'border-gray-300 text-gray-700 hover:bg-gray-100'}>
+        <div className="flex justify-end gap-3 pt-4 mt-2" style={{ borderTop: `1px solid ${footerBorder}` }}>
+          <Button variant="outline" onClick={onClose} className={btnOutline}>
             {labels.cancel || "Cancel"}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}
