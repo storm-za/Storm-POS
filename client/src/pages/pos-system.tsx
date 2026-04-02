@@ -5657,7 +5657,7 @@ export default function PosSystem() {
                   </Button>
                   <Button 
                     onClick={() => setIsInvoiceDialogOpen(true)}
-                    className="h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold shadow-lg shadow-blue-600/40 hover:shadow-blue-600/60 transition-all duration-300 text-sm gap-2"
+                    className={`h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold transition-all duration-300 text-sm gap-2 ${posTheme === 'dark' ? 'shadow-lg shadow-blue-600/40 hover:shadow-blue-600/60' : 'shadow-sm hover:shadow-md'}`}
                     data-testid="button-create-invoice"
                   >
                     <PlusCircle className="w-4 h-4" />
