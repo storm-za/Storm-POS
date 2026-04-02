@@ -335,7 +335,7 @@ export default function PosSystemAfrikaans() {
   const [invoiceClientPhone, setInvoiceClientPhone] = useState("");
   const [isCustomClient, setIsCustomClient] = useState(true);
   const [posTheme, setPosTheme] = useState<'dark' | 'light'>(() => {
-    try { const s = localStorage.getItem('posTheme'); return s === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
+    try { const s = localStorage.getItem('posTheme'); return s === 'dark' ? 'dark' : 'light'; } catch { return 'light'; }
   });
   const [invoiceDueDate, setInvoiceDueDate] = useState("");
   const [invoiceNotes, setInvoiceNotes] = useState("");
