@@ -3994,7 +3994,7 @@ ${dateFilteredSales.map(sale =>
                           <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Gaan na die Produkvoorraad-oortjie om produkte by te voeg wat jy wil verkoop</p>
                           <Button
                             onClick={() => setCurrentTab('produkte')}
-                            className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                            className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                           >
                             <PlusCircle className="w-4 h-4 mr-2" />
                             Voeg Produk By
@@ -4048,7 +4048,7 @@ ${dateFilteredSales.map(sale =>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <button onClick={() => setSelectedSalesCategory(null)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4" />Terug na Kategoriee</button>
-                            <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white text-xs"><Plus className="w-3 h-3 mr-1" />Voeg Produkte By</Button>
+                            <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 text-xs transition-all duration-300"><Plus className="w-3 h-3 mr-1" />Voeg Produkte By</Button>
                           </div>
                           <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}><Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} /></div>
@@ -4469,7 +4469,7 @@ ${dateFilteredSales.map(sale =>
                         <FolderPlus className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                         Kategoriee
                       </Button>
-                      <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
+                      <Button onClick={() => openProductDialog()} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
                         <PlusCircle className="h-4 w-4 mr-2" />
                         Voeg Produk By
                       </Button>
@@ -4508,7 +4508,7 @@ ${dateFilteredSales.map(sale =>
                             {!productSearchTerm && (
                               <Button
                                 onClick={() => openProductDialog()}
-                                className="mt-2 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                                className="mt-2 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                               >
                                 <PlusCircle className="w-4 h-4 mr-2" />
                                 Voeg Produk By
@@ -4705,7 +4705,7 @@ ${dateFilteredSales.map(sale =>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button onClick={() => openCustomerDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
+                    <Button onClick={() => openCustomerDialog()} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
                       <PlusCircle className="w-4 h-4 mr-2" />
                       Voeg Klient By
                     </Button>
@@ -5086,7 +5086,7 @@ ${dateFilteredSales.map(sale =>
                       <ClipboardList className="h-5 w-5 text-blue-400" />
                       Aankoopbestellings
                     </CardTitle>
-                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/25">
+                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
                       <Plus className="h-4 w-4 mr-2" /> Nuwe Bestelling
                     </Button>
                   </div>
@@ -5351,7 +5351,7 @@ ${dateFilteredSales.map(sale =>
                 <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</Label><Textarea value={poNotes} onChange={(e) => setPONotes(e.target.value)} rows={2} placeholder="Bykomende notas..." className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                 <div className="flex justify-end gap-3 pt-1">
                   <Button variant="outline" onClick={() => { resetPOForm(); setIsPODialogOpen(false); }} className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}>Kanselleer</Button>
-                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-900/30">
+                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
                     {(createPOMutation.isPending || updatePOMutation.isPending) ? 'Stoor...' : editingPO ? 'Dateer Op' : 'Skep Bestelling'}
                   </Button>
                 </div>
@@ -5448,7 +5448,7 @@ ${dateFilteredSales.map(sale =>
                               onClick={() => {
                                 closeOpenAccountMutation.mutate({ accountId: account.id, paymentType: 'cash' });
                               }}
-                              className="flex-1 min-w-[120px] bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-md"
+                              className="flex-1 min-w-[120px] bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-300"
                               disabled={closeOpenAccountMutation.isPending}
                             >
                               <Receipt className="w-4 h-4 mr-2" />
@@ -7155,7 +7155,7 @@ ${dateFilteredSales.map(sale =>
                 </Button>
                 <Button 
                   type="submit" 
-                  className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300 px-6"
+                  className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300 px-6"
                   disabled={createOpenAccountMutation.isPending || currentSale.length === 0}
                 >
                   {createOpenAccountMutation.isPending ? (
@@ -9772,7 +9772,7 @@ ${dateFilteredSales.map(sale =>
                     setOpenAccountTipEnabled(false);
                   }}
                   disabled={closeOpenAccountMutation.isPending}
-                  className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base shadow-lg shadow-blue-900/20"
+                  className="w-full h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-bold text-base transition-all duration-300"
                 >
                   <Receipt className="w-4 h-4 mr-2" />
                   {closeOpenAccountMutation.isPending ? 'Sluit...' : 'Sluit & Betaal'}

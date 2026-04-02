@@ -4498,7 +4498,7 @@ export default function PosSystem() {
                           <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Go to the Product Inventory tab to add products you want to sell</p>
                           <Button
                             onClick={() => setCurrentTab('products')}
-                            className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                            className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                           >
                             <PlusCircle className="w-4 h-4 mr-2" />
                             Add Product
@@ -4573,7 +4573,7 @@ export default function PosSystem() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <button onClick={() => setSelectedSalesCategory(null)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4" />Back to Categories</button>
-                            <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white text-xs"><Plus className="w-3 h-3 mr-1" />Add Products</Button>
+                            <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 text-xs transition-all duration-300"><Plus className="w-3 h-3 mr-1" />Add Products</Button>
                           </div>
                           <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}><Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} /></div>
@@ -5010,7 +5010,7 @@ export default function PosSystem() {
                       </AlertDialog>
                       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button onClick={() => openProductDialog()} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300">
+                          <Button onClick={() => openProductDialog()} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
                             <PlusCircle className="h-4 w-4 mr-2" />
                             Add Product
                           </Button>
@@ -5282,7 +5282,7 @@ export default function PosSystem() {
                             {!productSearchTerm && (
                               <Button
                                 onClick={() => openProductDialog()}
-                                className="mt-2 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                                className="mt-2 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                               >
                                 <PlusCircle className="w-4 h-4 mr-2" />
                                 Add Product
@@ -5482,7 +5482,7 @@ export default function PosSystem() {
                   </DropdownMenu>
                   <Button 
                     onClick={() => openCustomerDialog()}
-                    className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                    className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                   >
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Add Customer
@@ -6044,7 +6044,7 @@ export default function PosSystem() {
                                 const paymentType = 'cash';
                                 closeOpenAccountMutation.mutate({ accountId: account.id, paymentType });
                               }}
-                              className="flex-1 min-w-[120px] bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-md"
+                              className="flex-1 min-w-[120px] bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-300"
                               disabled={closeOpenAccountMutation.isPending}
                             >
                               <Receipt className="w-4 h-4 mr-2" />
@@ -7492,7 +7492,7 @@ export default function PosSystem() {
                 </Button>
                 <Button 
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                   disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
                 >
                   {editingCustomer ? 'Update Customer' : 'Add Customer'}
@@ -7734,7 +7734,7 @@ export default function PosSystem() {
                     setOpenAccountTipEnabled(false);
                   }}
                   disabled={closeOpenAccountMutation.isPending}
-                  className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base shadow-lg shadow-blue-900/20"
+                  className="w-full h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-bold text-base transition-all duration-300"
                 >
                   <Receipt className="w-4 h-4 mr-2" />
                   {closeOpenAccountMutation.isPending ? 'Closing...' : 'Close & Pay'}
