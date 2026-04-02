@@ -4811,9 +4811,8 @@ ${dateFilteredSales.map(sale =>
                   {/* Kolomsigbaarheid keusekys */}
                   <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-white/20 text-white hover:bg-white/10 transition-all duration-200">
-                        <SlidersHorizontal className="h-4 w-4 mr-2" />
-                        Instellings
+                      <Button variant="outline" size="sm" className={posTheme === 'dark' ? 'h-9 w-9 p-0 bg-black border-white/20 text-white hover:bg-white/10 transition-all duration-200' : 'h-9 w-9 p-0 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 transition-all duration-200'}>
+                        <SlidersHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 bg-[#111] border border-white/20 text-white">
@@ -4871,14 +4870,14 @@ ${dateFilteredSales.map(sale =>
                     className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}
                   >
                     <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
-                    Uitvoer na Excel
+                    Excel
                   </Button>
                   <Button 
                     onClick={() => setIsInvoiceDialogOpen(true)}
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg hover:shadow-blue-500/50 transition-all duration-300 text-sm"
+                    className="h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold shadow-lg shadow-blue-600/40 hover:shadow-blue-600/60 transition-all duration-300 text-sm gap-2"
                     data-testid="button-create-invoice"
                   >
-                    <PlusCircle className="w-4 h-4 mr-2" />
+                    <PlusCircle className="w-4 h-4" />
                     Skep Faktuur/Kwotasie
                   </Button>
                 </div>
