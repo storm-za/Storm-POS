@@ -3919,9 +3919,13 @@ ${dateFilteredSales.map(sale =>
           {/* Sales Tab */}
           <TabsContent value="verkope">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="w-full">
+              <div className="px-1 pb-4">
+                <h2 style={{ color: posTheme === 'dark' ? '#ffffff' : '#111827' }} className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
+                <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
+              </div>
               <div className="w-full bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
                 <div className="flex flex-col lg:flex-row w-full">
-                  <div className="flex-1 min-w-0 lg:border-r border-gray-700/30 order-2 lg:order-1">
+                  <div className="flex-1 min-w-0 lg:border-r border-gray-700/30">
                     <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-gray-800/30">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3 min-w-0">
@@ -3973,10 +3977,6 @@ ${dateFilteredSales.map(sale =>
                           ))}
                         </div>
                       )}
-                    </div>
-                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-[hsl(217,90%,40%)]/20 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 to-transparent">
-                      <h2 style={{ color: posTheme === 'dark' ? '#ffffff' : '#111827' }} className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
-                      <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
                     </div>
                     <div className="relative">
                     <div
@@ -4099,7 +4099,7 @@ ${dateFilteredSales.map(sale =>
                     </div>
                     </div>
                   </div>
-                  <div data-testid="current-sale-card" className={`w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto order-1 lg:order-2 ${posTheme === 'dark' ? 'bg-[hsl(217,20%,11%)]/60' : 'bg-white'}`}>
+                  <div data-testid="current-sale-card" className={`w-full lg:w-[420px] xl:w-[460px] flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto ${posTheme === 'dark' ? 'bg-[hsl(217,20%,11%)]/60' : 'bg-white'}`}>
                     <div className={`px-3 py-3 sm:px-5 sm:py-4 border-b ${posTheme === 'dark' ? 'border-gray-700/30 bg-[hsl(217,25%,13%)]/50' : 'border-gray-100 bg-gray-50'}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
