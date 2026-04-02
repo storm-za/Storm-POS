@@ -4134,6 +4134,18 @@ export default function PosSystem() {
                   )}
                 </div>
               )}
+              {/* Add New User - mobile (only management or no staff yet) */}
+              {(currentStaff?.userType === 'management' || staffAccounts.length === 0) && (
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); setMobileStaffPickerOpen(false); setIsUserManagementOpen(true); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[hsl(217,90%,40%)]/10 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 flex-shrink-0">
+                    <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                  </div>
+                  <span className="text-sm font-medium text-[hsl(217,90%,50%)]">Add New User</span>
+                </button>
+              )}
               {/* Notification bell */}
               <button
                 onClick={() => { setIsMobileMenuOpen(false); setNotifOpen(o => !o); }}
