@@ -6221,7 +6221,7 @@ export default function PosSystem() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Payment Methods Pie Chart */}
                       <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                        <CardHeader className="border-b border-white/10 pb-4">
+                        <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                           <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Payment Methods Breakdown</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-6">
@@ -6255,7 +6255,7 @@ export default function PosSystem() {
 
                       {/* 7-Day Trend Line Chart */}
                       <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                        <CardHeader className="border-b border-white/10 pb-4">
+                        <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                           <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>7-Day Sales Trend</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-6">
@@ -6280,7 +6280,7 @@ export default function PosSystem() {
 
                     {/* Detailed Sales List */}
                     <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                      <CardHeader className="border-b border-white/10 pb-4">
+                      <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                         <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
@@ -6724,7 +6724,7 @@ export default function PosSystem() {
 
               {/* Account & Preferences Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Account & Preferences
@@ -6889,7 +6889,7 @@ export default function PosSystem() {
 
               {/* Business Information Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Business Information
@@ -7001,7 +7001,7 @@ export default function PosSystem() {
 
               {/* Integrations Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Integrations

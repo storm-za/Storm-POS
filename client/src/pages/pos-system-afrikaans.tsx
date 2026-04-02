@@ -502,7 +502,7 @@ export default function PosSystemAfrikaans() {
       return;
     }
 
-    const restrictedTabs = ['produkte', 'verslae', 'gebruik'];
+    const restrictedTabs = ['produkte', 'verslae', 'gebruik', 'instellings', 'aankoopbestellings'];
     if (restrictedTabs.includes(tabValue) && (!currentStaff || currentStaff.userType !== 'management')) {
       setPendingTab(tabValue);
       setManagementPasswordDialog(true);
@@ -5501,10 +5501,10 @@ ${dateFilteredSales.map(sale =>
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className={`h-8 text-sm w-auto ${posTheme === 'dark' ? '' : 'border-gray-200'}`}
+                  className={`h-8 text-sm w-auto ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}
                 />
                 <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                  <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? '' : 'border-gray-200'}`}>
+                  <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}>
                     <SelectValue placeholder="Alle Personeel" />
                   </SelectTrigger>
                   <SelectContent>
@@ -5512,7 +5512,7 @@ ${dateFilteredSales.map(sale =>
                     <SelectItem value="0">Bestuur</SelectItem>
                     {staffAccounts.map((staff) => (
                       <SelectItem key={staff.id} value={staff.id.toString()}>
-                        {staff.username || `Personeel #${staff.id}`}
+                        {staff.displayName || staff.username || `Personeel #${staff.id}`}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -6106,7 +6106,7 @@ ${dateFilteredSales.map(sale =>
 
               {/* Account & Preferences Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Rekening & Voorkeure
@@ -6271,7 +6271,7 @@ ${dateFilteredSales.map(sale =>
 
               {/* Business Information Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Besigheidsinligting
@@ -6382,7 +6382,7 @@ ${dateFilteredSales.map(sale =>
 
               {/* Integrations Section */}
               <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                <CardHeader className="border-b border-white/10 pb-4">
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Integrasies
