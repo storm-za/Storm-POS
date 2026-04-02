@@ -5594,8 +5594,9 @@ export default function PosSystem() {
                   <CardTitle className={posTheme === 'dark' ? 'text-white text-lg sm:text-xl font-bold' : 'text-gray-900 text-lg sm:text-xl font-bold'}>Invoices & Quotes</CardTitle>
                   <Button
                     onClick={() => setIsInvoiceDialogOpen(true)}
+                    variant="outline"
                     size="sm"
-                    className={`h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold transition-all duration-200 gap-2 shrink-0 ${posTheme === 'dark' ? 'shadow-md shadow-blue-600/30' : 'shadow-sm'}`}
+                    className="h-9 px-4 bg-transparent border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-200 gap-2 shrink-0"
                     data-testid="button-create-invoice"
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -5671,102 +5672,79 @@ export default function PosSystem() {
                 </div>
               </CardHeader>
               <CardContent className={`pt-4 sm:pt-6 px-3 sm:px-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-                {/* Search and Filter Controls */}
-                <div className="mb-6 space-y-4">
-                  <div className="space-y-3">
-                    <div className="w-full">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          placeholder="Search by document number or client..."
-                          value={invoiceSearchQuery}
-                          onChange={(e) => setInvoiceSearchQuery(e.target.value)}
-                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400 text-sm"
-                          data-testid="input-invoice-search"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
-                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm" data-testid="select-invoice-type-filter">
-                          <SelectValue placeholder="All Types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="invoice">Invoices</SelectItem>
-                          <SelectItem value="quote">Quotes</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
-                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm" data-testid="select-invoice-status-filter">
-                          <SelectValue placeholder="All Statuses" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Statuses</SelectItem>
-                          <SelectItem value="paid">Paid</SelectItem>
-                          <SelectItem value="not_paid">Not Paid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Select value={invoiceSortOrder} onValueChange={(value: any) => setInvoiceSortOrder(value)}>
-                      <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm">
-                        <SelectValue placeholder="Sort By" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="date-desc">Date: Newest First</SelectItem>
-                        <SelectItem value="date-asc">Date: Oldest First</SelectItem>
-                        <SelectItem value="name-asc">Client: A-Z</SelectItem>
-                        <SelectItem value="name-desc">Client: Z-A</SelectItem>
-                        <SelectItem value="amount-desc">Amount: High-Low</SelectItem>
-                        <SelectItem value="amount-asc">Amount: Low-High</SelectItem>
-                        <SelectItem value="number-asc">Doc Number: A-Z</SelectItem>
-                        <SelectItem value="number-desc">Doc Number: Z-A</SelectItem>
-                      </SelectContent>
-                    </Select>
+                {/* Compact Filter Bar */}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="relative flex-1 min-w-[160px]">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                    <Input
+                      placeholder="Search by document number or client..."
+                      value={invoiceSearchQuery}
+                      onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                      className={`pl-8 h-9 text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`}
+                      data-testid="input-invoice-search"
+                    />
                   </div>
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-gray-300 text-xs sm:text-sm mb-1 block">From Date</Label>
-                        <Input
-                          type="date"
-                          value={invoiceDateFrom}
-                          onChange={(e) => setInvoiceDateFrom(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white w-full text-sm"
-                          data-testid="input-invoice-date-from"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-gray-300 text-xs sm:text-sm mb-1 block">To Date</Label>
-                        <Input
-                          type="date"
-                          value={invoiceDateTo}
-                          onChange={(e) => setInvoiceDateTo(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white w-full text-sm"
-                          data-testid="input-invoice-date-to"
-                        />
-                      </div>
-                    </div>
-                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo || invoiceSortOrder !== 'date-desc') && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setInvoiceSearchQuery("");
-                          setInvoiceStatusFilter('all');
-                          setInvoiceTypeFilter('all');
-                          setInvoiceDateFrom("");
-                          setInvoiceDateTo("");
-                          setInvoiceSortOrder('date-desc');
-                        }}
-                        className="border-blue-500/30 hover:bg-blue-500/20 hover:text-blue-200 w-full bg-[#00000033] text-[#ffffff]"
-                        data-testid="button-clear-filters"
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Clear Filters
-                      </Button>
-                    )}
-                  </div>
+                  <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                    <SelectTrigger className={`h-9 w-[120px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`} data-testid="select-invoice-type-filter">
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="invoice">Invoices</SelectItem>
+                      <SelectItem value="quote">Quotes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                    <SelectTrigger className={`h-9 w-[120px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`} data-testid="select-invoice-status-filter">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                      <SelectItem value="not_paid">Not Paid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={invoiceSortOrder} onValueChange={(value: any) => setInvoiceSortOrder(value)}>
+                    <SelectTrigger className={`h-9 w-[150px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}>
+                      <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date-desc">Newest First</SelectItem>
+                      <SelectItem value="date-asc">Oldest First</SelectItem>
+                      <SelectItem value="name-asc">Client: A-Z</SelectItem>
+                      <SelectItem value="name-desc">Client: Z-A</SelectItem>
+                      <SelectItem value="amount-desc">Amount: High-Low</SelectItem>
+                      <SelectItem value="amount-asc">Amount: Low-High</SelectItem>
+                      <SelectItem value="number-asc">Doc Nr: A-Z</SelectItem>
+                      <SelectItem value="number-desc">Doc Nr: Z-A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="date"
+                    value={invoiceDateFrom}
+                    onChange={(e) => setInvoiceDateFrom(e.target.value)}
+                    className={`h-9 w-[130px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}
+                    data-testid="input-invoice-date-from"
+                  />
+                  <Input
+                    type="date"
+                    value={invoiceDateTo}
+                    onChange={(e) => setInvoiceDateTo(e.target.value)}
+                    className={`h-9 w-[130px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}
+                    data-testid="input-invoice-date-to"
+                  />
+                  {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo || invoiceSortOrder !== 'date-desc') && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setInvoiceSearchQuery(""); setInvoiceStatusFilter('all'); setInvoiceTypeFilter('all'); setInvoiceDateFrom(""); setInvoiceDateTo(""); setInvoiceSortOrder('date-desc'); }}
+                      className="h-9 px-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                      data-testid="button-clear-filters"
+                      title="Clear filters"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
 
                 {filteredInvoices.length === 0 ? (

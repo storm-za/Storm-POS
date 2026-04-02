@@ -4811,8 +4811,9 @@ ${dateFilteredSales.map(sale =>
                   <CardTitle className={posTheme === 'dark' ? 'text-white text-lg sm:text-xl font-bold' : 'text-gray-900 text-lg sm:text-xl font-bold'}>Fakture & Kwotasies</CardTitle>
                   <Button
                     onClick={() => setIsInvoiceDialogOpen(true)}
+                    variant="outline"
                     size="sm"
-                    className={`h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold transition-all duration-200 gap-2 shrink-0 ${posTheme === 'dark' ? 'shadow-md shadow-blue-600/30' : 'shadow-sm'}`}
+                    className="h-9 px-4 bg-transparent border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-200 gap-2 shrink-0"
                     data-testid="button-create-invoice"
                   >
                     <PlusCircle className="w-4 h-4" />
@@ -4888,102 +4889,79 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </CardHeader>
               <CardContent className={`pt-6 px-3 sm:px-6 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
-                {/* Search and Filter Controls */}
-                <div className="mb-6 space-y-4">
-                  <div className="flex flex-col gap-3">
-                    <div className="w-full">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          placeholder="Soek op dokumentnommer of kliëntnaam..."
-                          value={invoiceSearchQuery}
-                          onChange={(e) => setInvoiceSearchQuery(e.target.value)}
-                          className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400"
-                          data-testid="input-invoice-search"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
-                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white" data-testid="select-invoice-type-filter">
-                          <SelectValue placeholder="Almal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Alle Tipes</SelectItem>
-                          <SelectItem value="invoice">Slegs Fakturen</SelectItem>
-                          <SelectItem value="quote">Slegs Kwotasies</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
-                        <SelectTrigger className="w-full bg-white/5 border-white/10 text-white" data-testid="select-invoice-status-filter">
-                          <SelectValue placeholder="Alle Statusse" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Alle Statusse</SelectItem>
-                          <SelectItem value="paid">Betaal</SelectItem>
-                          <SelectItem value="not_paid">Nie Betaal</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Select value={invoiceSortOrder} onValueChange={(value: any) => setInvoiceSortOrder(value)}>
-                      <SelectTrigger className="w-full bg-white/5 border-white/10 text-white text-sm">
-                        <SelectValue placeholder="Sorteer Volgens" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="date-desc">Datum: Nuutste Eerste</SelectItem>
-                        <SelectItem value="date-asc">Datum: Oudste Eerste</SelectItem>
-                        <SelectItem value="name-asc">Klient: A-Z</SelectItem>
-                        <SelectItem value="name-desc">Klient: Z-A</SelectItem>
-                        <SelectItem value="amount-desc">Bedrag: Hoog-Laag</SelectItem>
-                        <SelectItem value="amount-asc">Bedrag: Laag-Hoog</SelectItem>
-                        <SelectItem value="number-asc">Dok Nommer: A-Z</SelectItem>
-                        <SelectItem value="number-desc">Dok Nommer: Z-A</SelectItem>
-                      </SelectContent>
-                    </Select>
+                {/* Compact Filter Bar */}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="relative flex-1 min-w-[160px]">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                    <Input
+                      placeholder="Soek dokumentnommer of kliënt..."
+                      value={invoiceSearchQuery}
+                      onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                      className={`pl-8 h-9 text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`}
+                      data-testid="input-invoice-search"
+                    />
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-gray-300 text-sm mb-1 block">Van Datum</Label>
-                        <Input
-                          type="date"
-                          value={invoiceDateFrom}
-                          onChange={(e) => setInvoiceDateFrom(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white w-full"
-                          data-testid="input-invoice-date-from"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-gray-300 text-sm mb-1 block">Tot Datum</Label>
-                        <Input
-                          type="date"
-                          value={invoiceDateTo}
-                          onChange={(e) => setInvoiceDateTo(e.target.value)}
-                          className="bg-white/5 border-white/10 text-white w-full"
-                          data-testid="input-invoice-date-to"
-                        />
-                      </div>
-                    </div>
-                    {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo || invoiceSortOrder !== 'date-desc') && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setInvoiceSearchQuery("");
-                          setInvoiceStatusFilter('all');
-                          setInvoiceTypeFilter('all');
-                          setInvoiceDateFrom("");
-                          setInvoiceDateTo("");
-                          setInvoiceSortOrder('date-desc');
-                        }}
-                        className="border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200 w-full"
-                        data-testid="button-clear-filters"
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Maak Filters Skoon
-                      </Button>
-                    )}
-                  </div>
+                  <Select value={invoiceTypeFilter} onValueChange={(value: any) => setInvoiceTypeFilter(value)}>
+                    <SelectTrigger className={`h-9 w-[120px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`} data-testid="select-invoice-type-filter">
+                      <SelectValue placeholder="Tipe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle Tipes</SelectItem>
+                      <SelectItem value="invoice">Fakturen</SelectItem>
+                      <SelectItem value="quote">Kwotasies</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={invoiceStatusFilter} onValueChange={(value: any) => setInvoiceStatusFilter(value)}>
+                    <SelectTrigger className={`h-9 w-[120px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`} data-testid="select-invoice-status-filter">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle Statusse</SelectItem>
+                      <SelectItem value="paid">Betaal</SelectItem>
+                      <SelectItem value="not_paid">Nie Betaal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={invoiceSortOrder} onValueChange={(value: any) => setInvoiceSortOrder(value)}>
+                    <SelectTrigger className={`h-9 w-[150px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}>
+                      <SelectValue placeholder="Sorteer" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date-desc">Nuutste Eerste</SelectItem>
+                      <SelectItem value="date-asc">Oudste Eerste</SelectItem>
+                      <SelectItem value="name-asc">Klient: A-Z</SelectItem>
+                      <SelectItem value="name-desc">Klient: Z-A</SelectItem>
+                      <SelectItem value="amount-desc">Bedrag: Hoog-Laag</SelectItem>
+                      <SelectItem value="amount-asc">Bedrag: Laag-Hoog</SelectItem>
+                      <SelectItem value="number-asc">Dok Nr: A-Z</SelectItem>
+                      <SelectItem value="number-desc">Dok Nr: Z-A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="date"
+                    value={invoiceDateFrom}
+                    onChange={(e) => setInvoiceDateFrom(e.target.value)}
+                    className={`h-9 w-[130px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}
+                    data-testid="input-invoice-date-from"
+                  />
+                  <Input
+                    type="date"
+                    value={invoiceDateTo}
+                    onChange={(e) => setInvoiceDateTo(e.target.value)}
+                    className={`h-9 w-[130px] text-sm ${posTheme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-200 text-gray-700'}`}
+                    data-testid="input-invoice-date-to"
+                  />
+                  {(invoiceSearchQuery || invoiceStatusFilter !== 'all' || invoiceTypeFilter !== 'all' || invoiceDateFrom || invoiceDateTo || invoiceSortOrder !== 'date-desc') && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setInvoiceSearchQuery(""); setInvoiceStatusFilter('all'); setInvoiceTypeFilter('all'); setInvoiceDateFrom(""); setInvoiceDateTo(""); setInvoiceSortOrder('date-desc'); }}
+                      className="h-9 px-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                      data-testid="button-clear-filters"
+                      title="Maak filters skoon"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
 
                 {filteredInvoices.length === 0 ? (
