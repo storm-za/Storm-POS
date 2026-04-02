@@ -5991,9 +5991,9 @@ export default function PosSystem() {
               className="space-y-6"
             >
               {/* Open Accounts Header */}
-              <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white text-xl font-bold">
+              <Card className={posTheme === 'dark' ? 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl' : 'bg-white border border-gray-200 shadow-sm'}>
+                <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                  <CardTitle className={`flex items-center gap-2 text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <FileText className="w-5 h-5" />
                     Open Accounts
                   </CardTitle>
@@ -6042,12 +6042,12 @@ export default function PosSystem() {
                             )}
                           </div>
 
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => setSelectedOpenAccount(account)}
-                              className={`flex-1 font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:text-gray-900 hover:bg-gray-50'}`}
+                              className={`flex-1 min-w-[120px] font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:text-gray-900 hover:bg-gray-50'}`}
                             >
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
@@ -6058,7 +6058,7 @@ export default function PosSystem() {
                                 const paymentType = 'cash';
                                 closeOpenAccountMutation.mutate({ accountId: account.id, paymentType });
                               }}
-                              className="flex-1 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-md"
+                              className="flex-1 min-w-[120px] bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-md"
                               disabled={closeOpenAccountMutation.isPending}
                             >
                               <Receipt className="w-4 h-4 mr-2" />
