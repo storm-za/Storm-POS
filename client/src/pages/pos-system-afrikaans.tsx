@@ -4335,7 +4335,7 @@ ${dateFilteredSales.map(sale =>
                     <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                          <Button variant="outline" size="sm" className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}>
                             <SlidersHorizontal className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                             Filters
                             <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
@@ -4402,7 +4402,7 @@ ${dateFilteredSales.map(sale =>
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                          <Button variant="outline" size="sm" className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}>
                             <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                             Invoer / Uitvoer
                             <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
@@ -4464,7 +4464,7 @@ ${dateFilteredSales.map(sale =>
                         onClick={() => openCategoryDialog()} 
                         variant="outline" 
                         size="sm"
-                        className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200"
+                        className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}
                       >
                         <FolderPlus className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                         Kategoriee
@@ -4676,7 +4676,7 @@ ${dateFilteredSales.map(sale =>
                   <div className="flex flex-wrap items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200">
+                        <Button variant="outline" size="sm" className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}>
                           <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                           Invoer / Uitvoer
                           <ChevronDown className="h-3 w-3 ml-2 text-gray-400" />
@@ -4868,7 +4868,7 @@ ${dateFilteredSales.map(sale =>
                     variant="outline"
                     size="sm"
                     onClick={handleExportInvoices}
-                    className="h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200"
+                    className={posTheme === 'dark' ? 'h-9 px-3 bg-black border-[hsl(217,90%,40%)]/40 text-white hover:bg-[hsl(217,90%,40%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-200' : 'h-9 px-3 bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200'}
                   >
                     <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                     Uitvoer na Excel
