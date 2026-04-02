@@ -3913,7 +3913,7 @@ export default function PosSystem() {
             initial={{ scale: 0.88, y: 24, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-            className="bg-[#080d1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
+            className={`rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-[#080d1a] border border-white/10' : 'bg-white border border-gray-200'}`}
           >
             <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
             <div className="relative p-7">
@@ -3937,7 +3937,7 @@ export default function PosSystem() {
               </div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-                <h2 className="text-xl font-bold text-white text-center mb-0.5">Sale Complete</h2>
+                <h2 className={`text-xl font-bold text-center mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sale Complete</h2>
                 <p className="text-gray-500 text-sm text-center mb-5">Transaction processed successfully</p>
               </motion.div>
 
@@ -3946,12 +3946,12 @@ export default function PosSystem() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Total Charged</p>
-                    <p className="text-3xl font-bold text-white">R{saleCompleteData.total}</p>
+                    <p className={`text-3xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{saleCompleteData.total}</p>
                     {saleCompleteData.customerName && <p className="text-gray-400 text-xs mt-0.5">{saleCompleteData.customerName}</p>}
                   </div>
                   <div className="text-right">
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Method</p>
-                    <p className="text-white text-sm font-semibold capitalize">{saleCompleteData.paymentType || 'Cash'}</p>
+                    <p className={`text-sm font-semibold capitalize ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{saleCompleteData.paymentType || 'Cash'}</p>
                     <p className="text-gray-500 text-[11px] mt-1">{saleCompleteData.items.length} item{saleCompleteData.items.length !== 1 ? 's' : ''}</p>
                   </div>
                 </div>
@@ -3959,11 +3959,11 @@ export default function PosSystem() {
 
               {/* Action buttons */}
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all disabled:opacity-60">
+                <Button onClick={handleDownloadSaleReceipt} disabled={receiptPdfBusy} className={`h-11 font-semibold rounded-xl transition-all disabled:opacity-60 ${posTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 border border-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700'}`}>
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
                   {receiptPdfBusy ? 'Preparing...' : 'Download'}
                 </Button>
-                <Button onClick={handleShareSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all disabled:opacity-60">
+                <Button onClick={handleShareSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold rounded-xl transition-all disabled:opacity-60">
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
                   {receiptPdfBusy ? 'Preparing...' : 'Share'}
                 </Button>
@@ -3984,7 +3984,7 @@ export default function PosSystem() {
         >
           <div className="relative max-w-sm md:max-w-none mx-auto md:mx-0">
             <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-xl md:rounded-2xl blur-xl"></div>
-            <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 border border-gray-600/50 md:min-w-[320px] overflow-hidden">
+            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-xl md:rounded-2xl"
                 animate={{ x: ['-100%', '200%'] }}
@@ -4301,7 +4301,7 @@ export default function PosSystem() {
                   align="end" 
                   className="w-72 p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-black/50 rounded-xl overflow-hidden"
                 >
-                  <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-4 py-3 border-b border-gray-700/50">
+                  <div className={`px-4 py-3 border-b ${posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] border-gray-700/50' : 'bg-gray-50 border-gray-200'}`}>
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                       <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Team Members</span>
@@ -4365,7 +4365,7 @@ export default function PosSystem() {
                     )}
                   </div>
                   {(currentStaff?.userType === 'management' || staffAccounts.length === 0) && (
-                    <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
+                    <div className={`p-2 border-t ${posTheme === 'dark' ? 'border-gray-700/50 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
                       <button
                         onClick={() => setIsUserManagementOpen(true)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
@@ -4427,24 +4427,24 @@ export default function PosSystem() {
                 <h2 style={{ color: posTheme === 'dark' ? '#ffffff' : '#111827' }} className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2]">Choose a product to start selling</h2>
                 <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
               </div>
-              <div className="w-full bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+              <div className={`w-full rounded-2xl shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 shadow-black/20' : 'bg-white border border-gray-200 shadow-gray-200/80'}`}>
                 <div className="flex flex-col lg:flex-row w-full">
-                  <div className="flex-1 min-w-0 lg:border-r border-gray-700/30">
-                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-gray-800/30">
+                  <div className={`flex-1 min-w-0 ${posTheme === 'dark' ? 'lg:border-r border-gray-700/30' : 'lg:border-r border-gray-200'}`}>
+                    <div className={`px-3 py-3 sm:px-5 sm:py-4 border-b ${posTheme === 'dark' ? 'border-gray-700/30 bg-gray-800/30' : 'border-gray-200 bg-gray-50'}`}>
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 flex-shrink-0">
                             <Package className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                           </div>
                           <div className="min-w-0">
-                            <h3 className="text-sm font-semibold text-white">Products</h3>
+                            <h3 className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Products</h3>
                             <p className="text-xs text-gray-500">{products.length} available</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {categories.length > 0 && (
                             <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
-                              <SelectTrigger className="w-[90px] sm:w-[110px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className={`w-[90px] sm:w-[110px] h-8 text-[10px] sm:text-xs ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Grid</span></SelectItem>
                                 <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Tabs</span></SelectItem>
@@ -4452,7 +4452,7 @@ export default function PosSystem() {
                             </Select>
                           )}
                           <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
-                            <SelectTrigger className="w-[100px] sm:w-[130px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className={`w-[100px] sm:w-[130px] h-8 text-[10px] sm:text-xs ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="name-asc">Name A-Z</SelectItem>
                               <SelectItem value="name-desc">Name Z-A</SelectItem>
@@ -4468,7 +4468,7 @@ export default function PosSystem() {
                       </div>
                       <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500 h-9" />
+                        <Input placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`pl-10 h-9 ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
                       </div>
                       {salesDisplayMode === 'tabs' && categories.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -4495,7 +4495,7 @@ export default function PosSystem() {
                           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
                             <PlusCircle className="w-10 h-10 text-white" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">Add your first product</h3>
+                          <h3 className={`text-lg font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Add your first product</h3>
                           <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Go to the Product Inventory tab to add products you want to sell</p>
                           <Button
                             onClick={() => setCurrentTab('products')}
@@ -4576,18 +4576,18 @@ export default function PosSystem() {
                             <button onClick={() => setSelectedSalesCategory(null)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4" />Back to Categories</button>
                             <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 text-xs transition-all duration-300"><Plus className="w-3 h-3 mr-1" />Add Products</Button>
                           </div>
-                          <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
+                          <div className={`flex items-center gap-3 py-2 border-b ${posTheme === 'dark' ? 'border-gray-700/50' : 'border-gray-200'}`}>
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}><Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} /></div>
                             <div>
-                              <h3 className="text-lg font-semibold text-white">{categories.find(c => c.id === selectedSalesCategory)?.name || 'Category'}</h3>
+                              <h3 className={`text-lg font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{categories.find(c => c.id === selectedSalesCategory)?.name || 'Category'}</h3>
                               <p className="text-xs text-gray-400">{products.filter(p => p.categoryId === selectedSalesCategory).length} products</p>
                             </div>
                           </div>
                           <div className="grid gap-1">
                             {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
-                              <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                              <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
                                 <div>
-                                  <p className="font-medium text-white text-sm">{product.name}</p>
+                                  <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
                                   <p className="text-xs text-gray-500">SKU: {product.sku} · Stock: {product.quantity}</p>
                                 </div>
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
@@ -4598,9 +4598,9 @@ export default function PosSystem() {
                       ) : (
                         <div className="grid gap-1">
                           {filteredSalesProducts.map((product) => (
-                            <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                            <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
                               <div>
-                                <p className="font-medium text-white text-sm">{product.name}</p>
+                                <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
                                 <p className="text-xs text-gray-500">SKU: {product.sku} · Stock: {product.quantity}</p>
                               </div>
                               <div className="text-right">
@@ -4631,7 +4631,7 @@ export default function PosSystem() {
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
                           <div>
-                            <h3 className="text-sm font-semibold text-white">Current Sale</h3>
+                            <h3 className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Current Sale</h3>
                             <p className="text-xs text-gray-500">{currentSale.length === 0 ? 'No items yet' : `${currentSale.reduce((acc, item) => acc + item.quantity, 0)} items`}</p>
                           </div>
                         </div>
@@ -4643,26 +4643,26 @@ export default function PosSystem() {
                         {currentSale.length === 0 ? (
                           <div className="text-center py-8 text-gray-500"><ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Tap a product to start</p></div>
                         ) : currentSale.map((item) => (
-                          <div key={item.productId} className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30">
+                          <div key={item.productId} className={`flex items-center gap-3 p-2.5 rounded-lg ${posTheme === 'dark' ? 'bg-gray-800/40 border border-gray-700/30' : 'bg-gray-50 border border-gray-200'}`}>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-white text-sm truncate">{item.name}</p>
+                              <p className={`font-medium text-sm truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</p>
                               <p className="text-xs text-gray-500">R{item.price} × {item.quantity} = R{(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
                             </div>
                             <div className="flex items-center gap-1">
-                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
-                              <span className="w-7 text-center text-white text-sm font-medium">{item.quantity}</span>
-                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className={`h-8 w-8 sm:h-7 sm:w-7 p-0 ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`} onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
+                              <span className={`w-7 text-center text-sm font-medium ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.quantity}</span>
+                              <Button size="sm" variant="ghost" className={`h-8 w-8 sm:h-7 sm:w-7 p-0 ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`} onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
                               <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 ml-1" onClick={() => updateQuantity(item.productId, 0)}><Trash2 className="h-3 w-3" /></Button>
                             </div>
                           </div>
                         ))}
                       </div>
-                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                      <div className={`space-y-3 pt-3 border-t ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Customer</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Customer</Label>
                             <Select value={selectedCustomerId?.toString() || "none"} onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="No customer" /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue placeholder="No customer" /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="none">No customer</SelectItem>
                                 {customers.map((customer) => (
@@ -4677,9 +4677,9 @@ export default function PosSystem() {
                             </Select>
                           </div>
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Payment</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Payment</Label>
                             <Select value={paymentType} onValueChange={setPaymentType}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="cash">Cash</SelectItem>
                                 <SelectItem value="card">Card</SelectItem>
@@ -4702,17 +4702,17 @@ export default function PosSystem() {
                           ) : null;
                         })()}
                         <div>
-                          <Label className="text-xs text-gray-400 mb-1 block">Notes</Label>
-                          <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Sale notes..." rows={1} className="bg-gray-900/40 border-gray-700/50 text-white text-xs placeholder:text-gray-600 resize-none" />
+                          <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notes</Label>
+                          <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Sale notes..." rows={1} className={`text-xs resize-none ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white placeholder:text-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-400 mb-1.5 block">Discount</Label>
+                          <Label className={`text-xs mb-1.5 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Discount</Label>
                           <div className="flex flex-wrap gap-1.5 touch-action-manipulation">
                             {[0, 5, 10, 20, 50].map((percentage) => (
-                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:bg-accent rounded-md h-9 sm:h-7 text-xs px-3 sm:px-2.5 border-gray-700/50 hover:text-white text-[#000000]">{percentage === 0 ? "None" : `${percentage}%`}</Button>
+                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className={`h-9 sm:h-7 text-xs px-3 sm:px-2.5 ${discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-600 hover:text-gray-900'}`}>{percentage === 0 ? "None" : `${percentage}%`}</Button>
                             ))}
                             <div className="flex items-center gap-1 ml-1">
-                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-9 sm:h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
+                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className={`w-14 h-9 sm:h-7 text-center text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                               <span className="text-xs text-gray-500">%</span>
                             </div>
                           </div>
@@ -4724,24 +4724,24 @@ export default function PosSystem() {
                           </button>
                         </div>
                       </div>
-                      <div className="pt-3 border-t border-gray-700/30 space-y-1.5">
-                        <div className="flex justify-between text-sm"><span className="text-gray-400">Subtotal</span><span className="text-white">R{calculateSubtotal().toFixed(2)}</span></div>
+                      <div className={`pt-3 border-t space-y-1.5 ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
+                        <div className="flex justify-between text-sm"><span className={posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}>Subtotal</span><span className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{calculateSubtotal().toFixed(2)}</span></div>
                         {discountPercentage > 0 && <div className="flex justify-between text-sm text-green-400"><span>Discount ({discountPercentage}%)</span><span>-R{calculateDiscount().toFixed(2)}</span></div>}
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-600/30">
-                          <span className="text-base font-bold text-white">Total</span>
+                        <div className={`flex justify-between items-center pt-2 border-t ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`}>
+                          <span className={`text-base font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Total</span>
                           <span className="text-xl font-bold text-[hsl(217,90%,50%)]">R{calculateTotal()}</span>
                         </div>
                       </div>
-                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                      <div className={`space-y-3 pt-3 border-t ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
                         <div className="flex flex-wrap gap-1.5">
-                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'open-account' ? 'complete' : 'open-account')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Open Account</Button>
-                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'add-to-account' ? 'complete' : 'add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Add to Account</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'open-account' ? 'complete' : 'open-account')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400' : 'border-gray-200 text-gray-600'}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Open Account</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'add-to-account' ? 'complete' : 'add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400' : 'border-gray-200 text-gray-600'}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Add to Account</Button>
                         </div>
                         {checkoutOption === 'add-to-account' && (
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Select Open Account</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Select Open Account</Label>
                             <Select value={selectedOpenAccountId?.toString() || ""} onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="Choose an open account" /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue placeholder="Choose an open account" /></SelectTrigger>
                               <SelectContent>
                                 {openAccounts.map((account) => (
                                   <SelectItem key={account.id} value={account.id.toString()}>
@@ -4858,7 +4858,7 @@ export default function PosSystem() {
               </div>
 
               {/* Main Products Card */}
-              <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
+              <Card className={`${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10 overflow-hidden`}>
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
                 <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -4867,7 +4867,7 @@ export default function PosSystem() {
                         <Package className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-xl font-bold">Product Inventory</CardTitle>
+                        <CardTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Product Inventory</CardTitle>
                         <p className="text-gray-400 text-sm">Manage your product catalog</p>
                       </div>
                     </div>
@@ -5025,7 +5025,7 @@ export default function PosSystem() {
                               <Package className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                              <DialogTitle className="text-xl font-bold text-white">
+                              <DialogTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                                 {editingProduct ? 'Edit Product' : 'Add New Product'}
                               </DialogTitle>
                               <p id="product-dialog-description" className="text-sm text-gray-400 mt-0.5">
@@ -5262,7 +5262,7 @@ export default function PosSystem() {
                           placeholder="Search products by name or SKU..."
                           value={productSearchTerm}
                           onChange={(e) => setProductSearchTerm(e.target.value)}
-                          className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
+                          className={`pl-12 h-12 ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl`}
                         />
                       </div>
                     </div>
@@ -5448,7 +5448,7 @@ export default function PosSystem() {
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
-                <CardTitle className="text-white text-xl font-bold">Customer Directory</CardTitle>
+                <CardTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Customer Directory</CardTitle>
                 <div className="flex flex-wrap items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -5886,7 +5886,7 @@ export default function PosSystem() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Purchase Orders</h2>
+                  <h2 className={`text-2xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Purchase Orders</h2>
                   <p className="text-gray-400 text-sm mt-1">Manage supplier orders and track deliveries</p>
                 </div>
                 <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white shadow-lg shadow-blue-900/30">
@@ -5897,19 +5897,19 @@ export default function PosSystem() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input placeholder="Search by PO number or supplier..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className="pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-500" />
+                  <Input placeholder="Search by PO number or supplier..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
                 </div>
                 <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-48 bg-gray-900 border-gray-700 text-white">
+                  <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-48 bg-gray-900 border-gray-700 text-white' : 'w-full sm:w-48 bg-white border-gray-200 text-gray-700'}>
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
-                    <SelectItem value="all" className="text-white">All Statuses</SelectItem>
-                    <SelectItem value="draft" className="text-white">Draft</SelectItem>
-                    <SelectItem value="sent" className="text-white">Sent</SelectItem>
-                    <SelectItem value="partial" className="text-white">Partially Received</SelectItem>
-                    <SelectItem value="received" className="text-white">Received</SelectItem>
-                    <SelectItem value="cancelled" className="text-white">Cancelled</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="partial">Partially Received</SelectItem>
+                    <SelectItem value="received">Received</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                     <SelectItem value="paid" className="text-green-400">Paid</SelectItem>
                     <SelectItem value="not_paid" className="text-red-400">Not Paid</SelectItem>
                   </SelectContent>
@@ -5942,7 +5942,7 @@ export default function PosSystem() {
                   </div>
                 ) : (
                   filteredPurchaseOrders.map((po: any) => (
-                    <motion.div key={po.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-all group">
+                    <motion.div key={po.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`${posTheme === 'dark' ? 'bg-gray-900/80 backdrop-blur-sm border-gray-800 hover:border-gray-700' : 'bg-white border-gray-200 hover:border-gray-300'} border rounded-xl p-4 transition-all group`}>
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-1">
@@ -6222,7 +6222,7 @@ export default function PosSystem() {
                       {/* Payment Methods Pie Chart */}
                       <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
                         <CardHeader className="border-b border-white/10 pb-4">
-                          <CardTitle className="text-white">Payment Methods Breakdown</CardTitle>
+                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Payment Methods Breakdown</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-6">
                           {paymentChartData.length > 0 ? (
@@ -6256,7 +6256,7 @@ export default function PosSystem() {
                       {/* 7-Day Trend Line Chart */}
                       <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
                         <CardHeader className="border-b border-white/10 pb-4">
-                          <CardTitle className="text-white">7-Day Sales Trend</CardTitle>
+                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>7-Day Sales Trend</CardTitle>
                         </CardHeader>
                         <CardContent className="pt-6">
                           <ResponsiveContainer width="100%" height={300}>
@@ -6281,7 +6281,7 @@ export default function PosSystem() {
                     {/* Detailed Sales List */}
                     <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
                       <CardHeader className="border-b border-white/10 pb-4">
-                        <CardTitle className="text-white">Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
+                        <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
                       </CardHeader>
                       <CardContent className="pt-6">
                         <div className="space-y-2">
@@ -6343,7 +6343,7 @@ export default function PosSystem() {
                                             </Badge>
                                           )}
                                         </div>
-                                        <p className="text-sm text-gray-400 mt-0.5">
+                                        <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                           {new Date(sale.createdAt).toLocaleString()} 
                                           {sale.customerName && ` • ${sale.customerName}`}
                                         </p>
@@ -6403,7 +6403,7 @@ export default function PosSystem() {
                                     className="overflow-hidden"
                                   >
                                     <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
-                                      <div className="bg-gray-900/50 rounded-lg border border-gray-700/30 overflow-hidden">
+                                      <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/30' : 'bg-gray-50 border-gray-200'} rounded-lg border overflow-hidden`}>
                                         <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
                                           <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaction Details</span>
                                         </div>
@@ -6691,7 +6691,7 @@ export default function PosSystem() {
               )}
 
               {/* Appearance Card */}
-              <Card className={posTheme === 'dark' ? "bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20" : "bg-white border-gray-200 shadow-lg"}>
+              <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/10' : 'bg-white border-gray-200 shadow-lg'}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {posTheme === 'dark' ? <Moon className="w-5 h-5 text-[hsl(217,90%,50%)]" /> : <Sun className="w-5 h-5 text-[hsl(217,90%,40%)]" />}
@@ -6723,9 +6723,9 @@ export default function PosSystem() {
               </Card>
 
               {/* Account & Preferences Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Account & Preferences
                   </CardTitle>
@@ -6739,7 +6739,7 @@ export default function PosSystem() {
                       onClick={() => setIsLogoDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6761,7 +6761,7 @@ export default function PosSystem() {
                       onClick={() => setIsReceiptCustomizerOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6783,7 +6783,7 @@ export default function PosSystem() {
                       onClick={() => setIsInvoiceSetupOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6805,7 +6805,7 @@ export default function PosSystem() {
                       onClick={() => setIsChangePasswordDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6847,7 +6847,7 @@ export default function PosSystem() {
                       }}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6869,7 +6869,7 @@ export default function PosSystem() {
                       onClick={logout}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-shadow duration-300">
@@ -6888,9 +6888,9 @@ export default function PosSystem() {
               </Card>
 
               {/* Business Information Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Business Information
                   </CardTitle>
@@ -7000,9 +7000,9 @@ export default function PosSystem() {
               </Card>
 
               {/* Integrations Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Integrations
                   </CardTitle>
@@ -7209,7 +7209,7 @@ export default function PosSystem() {
               </Card>
 
               {/* Danger Zone */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-red-900/40 shadow-2xl shadow-red-900/10">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-red-900/40' : 'bg-white border-red-200'} shadow-2xl`}>
                 <CardHeader className="border-b border-red-900/30 pb-4">
                   <CardTitle className="flex items-center gap-2 text-red-400">
                     <Trash2 className="w-5 h-5" />
@@ -7371,7 +7371,7 @@ export default function PosSystem() {
       <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
         <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-lg max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
+            <DialogTitle className={`text-xl font-bold flex items-center gap-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               <span className="text-[hsl(217,90%,60%)] font-mono">{selectedPO?.poNumber}</span>
               {selectedPO && getPOStatusBadge(selectedPO.status)}
             </DialogTitle>
@@ -7436,12 +7436,12 @@ export default function PosSystem() {
       </AlertDialog>
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto" aria-describedby="customer-dialog-description">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`} aria-describedby="customer-dialog-description">
           <DialogHeader>
             <DialogTitle>
               {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
             </DialogTitle>
-            <div id="customer-dialog-description" className="text-sm text-gray-600">
+            <div id="customer-dialog-description" className={`text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
               {editingCustomer ? 'Update the customer information below.' : 'Enter the details for the new customer.'}
             </div>
           </DialogHeader>
@@ -7452,7 +7452,7 @@ export default function PosSystem() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Name *</FormLabel>
+                    <FormLabel className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>Customer Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., John Smith" {...field} />
                     </FormControl>
@@ -7786,7 +7786,7 @@ export default function PosSystem() {
                 value={editOpenAccountName}
                 onChange={(e) => setEditOpenAccountName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && editOpenAccountName.trim() && editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
-                className="bg-gray-800 border-gray-700/50 text-white focus:border-[hsl(217,90%,40%)]/60 h-10"
+                className={`${posTheme === 'dark' ? 'bg-gray-800 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-900'} focus:border-[hsl(217,90%,40%)]/60 h-10`}
                 placeholder="Enter account name"
                 autoFocus
               />
@@ -7844,7 +7844,7 @@ export default function PosSystem() {
                         {isSelected && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <div>
-                        <p className="font-medium text-white">{product.name}</p>
+                        <p className={posTheme === 'dark' ? 'font-medium text-white' : 'font-medium text-gray-900'}>{product.name}</p>
                         <p className="text-xs text-gray-400">SKU: {product.sku}</p>
                       </div>
                     </div>
@@ -7895,7 +7895,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Update Company Logo</DialogTitle>
             <DialogDescription>
@@ -7989,7 +7989,7 @@ export default function PosSystem() {
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Enter Password</DialogTitle>
             <DialogDescription>
@@ -8045,7 +8045,7 @@ export default function PosSystem() {
       </Dialog>
       {/* Simplified Staff Creation Dialog */}
       <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Create New User</DialogTitle>
             <DialogDescription>
@@ -8321,7 +8321,7 @@ export default function PosSystem() {
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-900/50 border-t border-gray-700/50 px-6 py-4 flex justify-end">
+          <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50' : 'bg-gray-50 border-gray-200'} border-t px-6 py-4 flex justify-end`}>
             <Button 
               onClick={() => setIsUserManagementOpen(false)}
               variant="ghost"
@@ -8358,7 +8358,7 @@ export default function PosSystem() {
           setVoidReason("");
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Void Sale</DialogTitle>
             <DialogDescription>
@@ -8412,7 +8412,7 @@ export default function PosSystem() {
           setViewVoidDialog({ open: false, sale: null });
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Void Sale Details</DialogTitle>
             <DialogDescription>

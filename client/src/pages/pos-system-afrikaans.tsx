@@ -3410,7 +3410,7 @@ ${dateFilteredSales.map(sale =>
             initial={{ scale: 0.88, y: 24, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-            className="bg-[#080d1a] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
+            className={`rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-[#080d1a] border border-white/10' : 'bg-white border border-gray-200'}`}
           >
             <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
             <div className="relative p-7">
@@ -3433,7 +3433,7 @@ ${dateFilteredSales.map(sale =>
               </div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-                <h2 className="text-xl font-bold text-white text-center mb-0.5">Verkoop Voltooi</h2>
+                <h2 className={`text-xl font-bold text-center mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Verkoop Voltooi</h2>
                 <p className="text-gray-500 text-sm text-center mb-5">Transaksie suksesvol verwerk</p>
               </motion.div>
 
@@ -3441,12 +3441,12 @@ ${dateFilteredSales.map(sale =>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Totale Bedrag</p>
-                    <p className="text-3xl font-bold text-white">R{saleCompleteData.sale.total}</p>
+                    <p className={`text-3xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{saleCompleteData.sale.total}</p>
                     {saleCompleteData.customer?.name && <p className="text-gray-400 text-xs mt-0.5">{saleCompleteData.customer.name}</p>}
                   </div>
                   <div className="text-right">
                     <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-0.5">Metode</p>
-                    <p className="text-white text-sm font-semibold capitalize">{saleCompleteData.sale.paymentType || 'Kontant'}</p>
+                    <p className={`text-sm font-semibold capitalize ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{saleCompleteData.sale.paymentType || 'Kontant'}</p>
                     {(() => {
                       try {
                         const items = Array.isArray(saleCompleteData.sale.items) ? saleCompleteData.sale.items : JSON.parse(saleCompleteData.sale.items);
@@ -3458,11 +3458,11 @@ ${dateFilteredSales.map(sale =>
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-all disabled:opacity-60">
+                <Button onClick={handleDownloadSaleReceiptAfr} disabled={receiptPdfBusy} className={`h-11 font-semibold rounded-xl transition-all disabled:opacity-60 ${posTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 border border-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700'}`}>
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
                   {receiptPdfBusy ? 'Berei voor...' : 'Aflaai'}
                 </Button>
-                <Button onClick={handleShareSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold border-0 rounded-xl shadow-lg shadow-blue-900/30 transition-all disabled:opacity-60">
+                <Button onClick={handleShareSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold rounded-xl transition-all disabled:opacity-60">
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
                   {receiptPdfBusy ? 'Berei voor...' : 'Deel'}
                 </Button>
@@ -3483,7 +3483,7 @@ ${dateFilteredSales.map(sale =>
         >
           <div className="relative max-w-sm md:max-w-none mx-auto md:mx-0">
             <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-xl md:rounded-2xl blur-xl"></div>
-            <div className="relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 border border-gray-600/50 md:min-w-[320px] overflow-hidden">
+            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-xl md:rounded-2xl"
                 animate={{ x: ['-100%', '200%'] }}
@@ -3798,7 +3798,7 @@ ${dateFilteredSales.map(sale =>
                   align="end" 
                   className="w-72 p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-black/50 rounded-xl overflow-hidden"
                 >
-                  <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-4 py-3 border-b border-gray-700/50">
+                  <div className={`px-4 py-3 border-b ${posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] border-gray-700/50' : 'bg-gray-50 border-gray-200'}`}>
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                       <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Span Lede</span>
@@ -3862,7 +3862,7 @@ ${dateFilteredSales.map(sale =>
                     )}
                   </div>
                   {(currentStaff?.userType === 'management' || staffAccounts.length === 0) && (
-                    <div className="border-t border-gray-700/50 p-2 bg-gray-900/50">
+                    <div className={`p-2 border-t ${posTheme === 'dark' ? 'border-gray-700/50 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
                       <button
                         onClick={() => setIsUserManagementOpen(true)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
@@ -3924,24 +3924,24 @@ ${dateFilteredSales.map(sale =>
                 <h2 style={{ color: posTheme === 'dark' ? '#ffffff' : '#111827' }} className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
                 <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
               </div>
-              <div className="w-full bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
+              <div className={`w-full rounded-2xl shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 shadow-black/20' : 'bg-white border border-gray-200 shadow-gray-200/80'}`}>
                 <div className="flex flex-col lg:flex-row w-full">
-                  <div className="flex-1 min-w-0 lg:border-r border-gray-700/30">
-                    <div className="px-3 py-3 sm:px-5 sm:py-4 border-b border-gray-700/30 bg-gray-800/30">
+                  <div className={`flex-1 min-w-0 ${posTheme === 'dark' ? 'lg:border-r border-gray-700/30' : 'lg:border-r border-gray-200'}`}>
+                    <div className={`px-3 py-3 sm:px-5 sm:py-4 border-b ${posTheme === 'dark' ? 'border-gray-700/30 bg-gray-800/30' : 'border-gray-200 bg-gray-50'}`}>
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 flex-shrink-0">
                             <Package className="h-4 w-4 text-[hsl(217,90%,50%)]" />
                           </div>
                           <div className="min-w-0">
-                            <h3 className="text-sm font-semibold text-white">Produkte</h3>
+                            <h3 className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Produkte</h3>
                             <p className="text-xs text-gray-500">{products.length} beskikbaar</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {categories.length > 0 && (
                             <Select value={salesDisplayMode} onValueChange={(value: 'grid' | 'tabs') => { setSalesDisplayMode(value); if (value === 'grid') setSelectedSalesCategory(null); if (value === 'tabs') setSalesCategoryFilter('all'); }}>
-                              <SelectTrigger className="w-[90px] sm:w-[120px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className={`w-[90px] sm:w-[120px] h-8 text-[10px] sm:text-xs ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="grid"><span className="flex items-center gap-1.5"><Grid3X3 className="w-3 h-3" /> Rooster</span></SelectItem>
                                 <SelectItem value="tabs"><span className="flex items-center gap-1.5"><LayoutList className="w-3 h-3" /> Oortjies</span></SelectItem>
@@ -3949,7 +3949,7 @@ ${dateFilteredSales.map(sale =>
                             </Select>
                           )}
                           <Select value={productSortOrder} onValueChange={(value: typeof productSortOrder) => setProductSortOrder(value)}>
-                            <SelectTrigger className="w-[100px] sm:w-[140px] h-8 text-[10px] sm:text-xs bg-gray-900/50 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className={`w-[100px] sm:w-[140px] h-8 text-[10px] sm:text-xs ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="name-asc">Naam A-Z</SelectItem>
                               <SelectItem value="name-desc">Naam Z-A</SelectItem>
@@ -3965,7 +3965,7 @@ ${dateFilteredSales.map(sale =>
                       </div>
                       <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input placeholder="Soek produkte..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500 h-9" />
+                        <Input placeholder="Soek produkte..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`pl-10 h-9 ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
                       </div>
                       {salesDisplayMode === 'tabs' && categories.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -3991,7 +3991,7 @@ ${dateFilteredSales.map(sale =>
                           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
                             <PlusCircle className="w-10 h-10 text-white" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">Voeg jou eerste produk by</h3>
+                          <h3 className={`text-lg font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Voeg jou eerste produk by</h3>
                           <p className="text-sm text-gray-400 text-center max-w-xs mb-5">Gaan na die Produkvoorraad-oortjie om produkte by te voeg wat jy wil verkoop</p>
                           <Button
                             onClick={() => setCurrentTab('produkte')}
@@ -4051,18 +4051,18 @@ ${dateFilteredSales.map(sale =>
                             <button onClick={() => setSelectedSalesCategory(null)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4" />Terug na Kategoriee</button>
                             <Button size="sm" onClick={() => { setSelectedProductsForCategory(products.filter(p => p.categoryId === selectedSalesCategory).map(p => p.id)); setIsAddProductsToCategoryOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 text-xs transition-all duration-300"><Plus className="w-3 h-3 mr-1" />Voeg Produkte By</Button>
                           </div>
-                          <div className="flex items-center gap-3 py-2 border-b border-gray-700/50">
+                          <div className={`flex items-center gap-3 py-2 border-b ${posTheme === 'dark' ? 'border-gray-700/50' : 'border-gray-200'}`}>
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6'}30` }}><Folder className="w-4 h-4" style={{ color: categories.find(c => c.id === selectedSalesCategory)?.color || '#3b82f6' }} /></div>
                             <div>
-                              <h3 className="text-lg font-semibold text-white">{categories.find(c => c.id === selectedSalesCategory)?.name || 'Kategorie'}</h3>
+                              <h3 className={`text-lg font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{categories.find(c => c.id === selectedSalesCategory)?.name || 'Kategorie'}</h3>
                               <p className="text-xs text-gray-400">{products.filter(p => p.categoryId === selectedSalesCategory).length} produkte</p>
                             </div>
                           </div>
                           <div className="grid gap-1">
                             {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
-                              <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                              <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
                                 <div>
-                                  <p className="font-medium text-white text-sm">{product.name}</p>
+                                  <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
                                   <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
                                 </div>
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
@@ -4073,9 +4073,9 @@ ${dateFilteredSales.map(sale =>
                       ) : (
                         <div className="grid gap-1">
                           {filteredSalesProducts.map((product) => (
-                            <div key={product.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-150 border border-transparent hover:border-gray-700/50" onClick={() => addToSale(product)}>
+                            <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
                               <div>
-                                <p className="font-medium text-white text-sm">{product.name}</p>
+                                <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
                                 <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
                               </div>
                               <div className="text-right">
@@ -4106,7 +4106,7 @@ ${dateFilteredSales.map(sale =>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
                           <div>
-                            <h3 className="text-sm font-semibold text-white">Huidige Verkoop</h3>
+                            <h3 className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Huidige Verkoop</h3>
                             <p className="text-xs text-gray-500">{currentSale.length === 0 ? 'Geen items nog nie' : `${currentSale.reduce((acc, item) => acc + item.quantity, 0)} items`}</p>
                           </div>
                         </div>
@@ -4118,26 +4118,26 @@ ${dateFilteredSales.map(sale =>
                         {currentSale.length === 0 ? (
                           <div className="text-center py-8 text-gray-500"><ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" /><p className="text-sm">Tik op 'n produk om te begin</p></div>
                         ) : currentSale.map((item) => (
-                          <div key={item.productId} className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30">
+                          <div key={item.productId} className={`flex items-center gap-3 p-2.5 rounded-lg ${posTheme === 'dark' ? 'bg-gray-800/40 border border-gray-700/30' : 'bg-gray-50 border border-gray-200'}`}>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-white text-sm truncate">{item.name}</p>
+                              <p className={`font-medium text-sm truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</p>
                               <p className="text-xs text-gray-500">R{item.price} × {item.quantity} = R{(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
                             </div>
                             <div className="flex items-center gap-1">
-                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
-                              <span className="w-7 text-center text-white text-sm font-medium">{item.quantity}</span>
-                              <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-gray-400 hover:text-white hover:bg-gray-700" onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
+                              <Button size="sm" variant="ghost" className={`h-8 w-8 sm:h-7 sm:w-7 p-0 ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`} onClick={() => updateQuantity(item.productId, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
+                              <span className={`w-7 text-center text-sm font-medium ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.quantity}</span>
+                              <Button size="sm" variant="ghost" className={`h-8 w-8 sm:h-7 sm:w-7 p-0 ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`} onClick={() => updateQuantity(item.productId, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
                               <Button size="sm" variant="ghost" className="h-8 w-8 sm:h-7 sm:w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 ml-1" onClick={() => updateQuantity(item.productId, 0)}><Trash2 className="h-3 w-3" /></Button>
                             </div>
                           </div>
                         ))}
                       </div>
-                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                      <div className={`space-y-3 pt-3 border-t ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Klient</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Klient</Label>
                             <Select value={selectedCustomerId?.toString() || "none"} onValueChange={(value) => setSelectedCustomerId(value === "none" ? null : parseInt(value))}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="Geen klient" /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue placeholder="Geen klient" /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="none">Geen klient</SelectItem>
                                 {customers.map((customer) => (
@@ -4152,9 +4152,9 @@ ${dateFilteredSales.map(sale =>
                             </Select>
                           </div>
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Betaling</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Betaling</Label>
                             <Select value={paymentType} onValueChange={setPaymentType}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="kontant">Kontant</SelectItem>
                                 <SelectItem value="kaart">Kaart</SelectItem>
@@ -4164,17 +4164,17 @@ ${dateFilteredSales.map(sale =>
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-400 mb-1 block">Notas</Label>
-                          <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Verkoop notas..." rows={1} className="bg-gray-900/40 border-gray-700/50 text-white text-xs placeholder:text-gray-600 resize-none" />
+                          <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</Label>
+                          <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Verkoop notas..." rows={1} className={`text-xs resize-none ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white placeholder:text-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-400 mb-1.5 block">Afslag</Label>
+                          <Label className={`text-xs mb-1.5 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Afslag</Label>
                           <div className="flex flex-wrap gap-1.5 touch-action-manipulation">
                             {[0, 5, 10, 20, 50].map((percentage) => (
-                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className={`h-9 sm:h-7 text-xs px-3 sm:px-2.5 ${discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : "border-gray-700/50 text-gray-400 hover:text-white"}`}>{percentage === 0 ? "Geen" : `${percentage}%`}</Button>
+                              <Button key={percentage} type="button" size="sm" variant={discountPercentage === percentage ? "default" : "outline"} onClick={() => setDiscountPercentage(percentage)} className={`h-9 sm:h-7 text-xs px-3 sm:px-2.5 ${discountPercentage === percentage ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400 hover:text-white' : 'border-gray-200 text-gray-600 hover:text-gray-900'}`}>{percentage === 0 ? "Geen" : `${percentage}%`}</Button>
                             ))}
                             <div className="flex items-center gap-1 ml-1">
-                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className="w-14 h-9 sm:h-7 text-center text-xs bg-gray-900/40 border-gray-700/50 text-white" />
+                              <Input type="number" min="0" max="100" step="1" placeholder="0" value={discountPercentage || ""} onChange={(e) => { const inputVal = e.target.value; if (inputVal === "") { setDiscountPercentage(0); } else { setDiscountPercentage(Math.min(100, Math.max(0, parseInt(inputVal) || 0))); } }} className={`w-14 h-9 sm:h-7 text-center text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-900'}`} />
                               <span className="text-xs text-gray-500">%</span>
                             </div>
                           </div>
@@ -4186,24 +4186,24 @@ ${dateFilteredSales.map(sale =>
                           </button>
                         </div>
                       </div>
-                      <div className="pt-3 border-t border-gray-700/30 space-y-1.5">
-                        <div className="flex justify-between text-sm"><span className="text-gray-400">Subtotaal</span><span className="text-white">R{calculateSubtotal().toFixed(2)}</span></div>
+                      <div className={`pt-3 border-t space-y-1.5 ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
+                        <div className="flex justify-between text-sm"><span className={posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}>Subtotaal</span><span className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{calculateSubtotal().toFixed(2)}</span></div>
                         {discountPercentage > 0 && <div className="flex justify-between text-sm text-green-400"><span>Afslag ({discountPercentage}%)</span><span>-R{calculateDiscount().toFixed(2)}</span></div>}
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-600/30">
-                          <span className="text-base font-bold text-white">Totaal</span>
+                        <div className={`flex justify-between items-center pt-2 border-t ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`}>
+                          <span className={`text-base font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Totaal</span>
                           <span className="text-xl font-bold text-[hsl(217,90%,50%)]">R{calculateTotal()}</span>
                         </div>
                       </div>
-                      <div className="space-y-3 pt-3 border-t border-gray-700/30">
+                      <div className={`space-y-3 pt-3 border-t ${posTheme === 'dark' ? 'border-gray-700/30' : 'border-gray-200'}`}>
                         <div className="flex flex-wrap gap-1.5">
-                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'open-account' ? 'complete' : 'open-account')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Oop Rekening</Button>
-                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'add-to-account' ? 'complete' : 'add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : "border-gray-700/50 text-gray-400"}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Voeg by Rekening</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'open-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'open-account' ? 'complete' : 'open-account')} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'open-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400' : 'border-gray-200 text-gray-600'}`}><FileText className="h-3.5 w-3.5 mr-1.5" />Oop Rekening</Button>
+                          <Button type="button" size="sm" variant={checkoutOption === 'add-to-account' ? "default" : "outline"} onClick={() => setCheckoutOption(checkoutOption === 'add-to-account' ? 'complete' : 'add-to-account')} disabled={openAccounts.length === 0} className={`flex-1 h-10 sm:h-8 text-xs ${checkoutOption === 'add-to-account' ? "bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] border-0 text-white" : posTheme === 'dark' ? 'border-gray-700/50 text-gray-400' : 'border-gray-200 text-gray-600'}`}><Plus className="h-3.5 w-3.5 mr-1.5" />Voeg by Rekening</Button>
                         </div>
                         {checkoutOption === 'add-to-account' && (
                           <div>
-                            <Label className="text-xs text-gray-400 mb-1 block">Kies Oop Rekening</Label>
+                            <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Kies Oop Rekening</Label>
                             <Select value={selectedOpenAccountId?.toString() || ""} onValueChange={(value) => setSelectedOpenAccountId(value ? parseInt(value) : null)}>
-                              <SelectTrigger className="h-9 text-xs bg-gray-900/40 border-gray-700/50 text-white"><SelectValue placeholder="Kies 'n oop rekening" /></SelectTrigger>
+                              <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue placeholder="Kies 'n oop rekening" /></SelectTrigger>
                               <SelectContent>
                                 {openAccounts.map((account) => (
                                   <SelectItem key={account.id} value={account.id.toString()}>
@@ -4320,7 +4320,7 @@ ${dateFilteredSales.map(sale =>
               </div>
 
               {/* Main Products Card */}
-              <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50 shadow-2xl shadow-blue-900/20 overflow-hidden">
+              <Card className={`${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10 overflow-hidden`}>
                 <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
                 <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -4329,7 +4329,7 @@ ${dateFilteredSales.map(sale =>
                         <Package className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-xl font-bold">Produkvoorraad</CardTitle>
+                        <CardTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Produkvoorraad</CardTitle>
                         <p className="text-gray-400 text-sm">Bestuur jou produkkatalogus</p>
                       </div>
                     </div>
@@ -4488,7 +4488,7 @@ ${dateFilteredSales.map(sale =>
                           placeholder="Soek produkte op naam of SKU..."
                           value={productSearchTerm}
                           onChange={(e) => setProductSearchTerm(e.target.value)}
-                          className="pl-12 h-12 bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl"
+                          className={`pl-12 h-12 ${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl`}
                         />
                       </div>
                     </div>
@@ -4667,10 +4667,10 @@ ${dateFilteredSales.map(sale =>
 
           {/* Customers Tab */}
           <TabsContent value="kliente">
-            <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+            <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
               <CardHeader>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <CardTitle className="flex items-center space-x-2 text-white">
+                  <CardTitle className={`flex items-center space-x-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Users className="h-5 w-5 text-[hsl(217,90%,40%)]" />
                     <span>Klientelys</span>
                   </CardTitle>
@@ -5103,7 +5103,7 @@ ${dateFilteredSales.map(sale =>
               <Card className={`border-gray-800 shadow-2xl ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                 <CardHeader className={`border-b border-gray-800 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <CardTitle className="text-white text-lg sm:text-xl font-bold flex items-center gap-2">
+                    <CardTitle className={`text-lg sm:text-xl font-bold flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                       <ClipboardList className="h-5 w-5 text-blue-400" />
                       Aankoopbestellings
                     </CardTitle>
@@ -5114,19 +5114,19 @@ ${dateFilteredSales.map(sale =>
                   <div className="flex flex-col sm:flex-row gap-3 mt-4">
                     <div className="relative flex-1">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                      <Input placeholder="Soek bestellings..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500" />
+                      <Input placeholder="Soek bestellings..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
                     </div>
                     <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
-                      <SelectTrigger className="w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white">
+                      <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
                         <SelectValue placeholder="Filter Status" />
                       </SelectTrigger>
                       <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
-                        <SelectItem value="all" className="text-white">Alle Status</SelectItem>
-                        <SelectItem value="draft" className="text-white">Konsep</SelectItem>
-                        <SelectItem value="sent" className="text-white">Gestuur</SelectItem>
-                        <SelectItem value="partial" className="text-white">Gedeeltelik</SelectItem>
-                        <SelectItem value="received" className="text-white">Ontvang</SelectItem>
-                        <SelectItem value="cancelled" className="text-white">Gekanselleer</SelectItem>
+                        <SelectItem value="all">Alle Status</SelectItem>
+                        <SelectItem value="draft">Konsep</SelectItem>
+                        <SelectItem value="sent">Gestuur</SelectItem>
+                        <SelectItem value="partial">Gedeeltelik</SelectItem>
+                        <SelectItem value="received">Ontvang</SelectItem>
+                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
                         <SelectItem value="paid" className="text-green-400">Betaal</SelectItem>
                         <SelectItem value="not_paid" className="text-red-400">Nie Betaal</SelectItem>
                       </SelectContent>
@@ -5237,21 +5237,21 @@ ${dateFilteredSales.map(sale =>
                   </div>
                   <div className="border border-gray-800 rounded-lg overflow-hidden">
                     <table className="w-full text-sm">
-                      <thead><tr className="bg-gray-900/80"><th className="text-left p-3 text-gray-400 font-medium">Item</th><th className="text-left p-3 text-gray-400 font-medium">SKU</th><th className="text-center p-3 text-gray-400 font-medium">Hv</th><th className="text-right p-3 text-gray-400 font-medium">Kosprys</th><th className="text-right p-3 text-gray-400 font-medium">Totaal</th></tr></thead>
+                      <thead><tr className={posTheme === 'dark' ? 'bg-gray-900/80' : 'bg-gray-50'}><th className="text-left p-3 text-gray-400 font-medium">Item</th><th className="text-left p-3 text-gray-400 font-medium">SKU</th><th className="text-center p-3 text-gray-400 font-medium">Hv</th><th className="text-right p-3 text-gray-400 font-medium">Kosprys</th><th className="text-right p-3 text-gray-400 font-medium">Totaal</th></tr></thead>
                       <tbody>
                         {(selectedPO.items || []).map((item: any, i: number) => (
-                          <tr key={i} className="border-t border-gray-800/50"><td className="p-3 text-white">{item.name}</td><td className="p-3 text-gray-400">{item.sku || '-'}</td><td className="p-3 text-center text-white">{item.quantity}</td><td className="p-3 text-right text-gray-300">R{parseFloat(item.costPrice || 0).toFixed(2)}</td><td className="p-3 text-right text-white font-medium">R{(item.costPrice * item.quantity).toFixed(2)}</td></tr>
+                          <tr key={i} className={`border-t ${posTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-200'}`}><td className={`p-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</td><td className="p-3 text-gray-500">{item.sku || '-'}</td><td className={`p-3 text-center ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.quantity}</td><td className={`p-3 text-right ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>R{parseFloat(item.costPrice || 0).toFixed(2)}</td><td className={`p-3 text-right font-medium ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{(item.costPrice * item.quantity).toFixed(2)}</td></tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  <div className="flex flex-col items-end gap-1 pt-2 border-t border-gray-800">
-                    <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">Subtotaal:</span><span className="text-white">R{parseFloat(selectedPO.subtotal || 0).toFixed(2)}</span></div>
-                    {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">BTW ({selectedPO.taxPercent}%):</span><span className="text-white">R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
-                    {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between w-48 text-sm"><span className="text-gray-400">Versending:</span><span className="text-white">R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
-                    <div className="flex justify-between w-48 text-sm font-bold border-t border-gray-700 pt-1"><span className="text-blue-400">Totaal:</span><span className="text-blue-400">R{parseFloat(selectedPO.total || 0).toFixed(2)}</span></div>
+                  <div className={`flex flex-col items-end gap-1 pt-2 border-t ${posTheme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
+                    <div className={posTheme === 'dark' ? 'flex justify-between w-48 text-sm' : 'flex justify-between w-48 text-sm'}><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Subtotaal:</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{parseFloat(selectedPO.subtotal || 0).toFixed(2)}</span></div>
+                    {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between w-48 text-sm"><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>BTW ({selectedPO.taxPercent}%):</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
+                    {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between w-48 text-sm"><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Versending:</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
+                    <div className={posTheme === 'dark' ? 'flex justify-between w-48 text-sm font-bold border-t border-gray-700 pt-1' : 'flex justify-between w-48 text-sm font-bold border-t border-gray-200 pt-1'}><span className="text-blue-400">Totaal:</span><span className="text-blue-400">R{parseFloat(selectedPO.total || 0).toFixed(2)}</span></div>
                   </div>
-                  {selectedPO.notes && <div className="bg-gray-900/50 p-3 rounded-lg border border-gray-800"><h4 className="text-sm text-gray-400 mb-1">Notas</h4><p className="text-gray-300 text-sm">{selectedPO.notes}</p></div>}
+                  {selectedPO.notes && <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-200'} p-3 rounded-lg border`}><h4 className={`text-sm mb-1 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</h4><p className={`text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{selectedPO.notes}</p></div>}
                 </div>
               )}
             </DialogContent>
@@ -5618,9 +5618,9 @@ ${dateFilteredSales.map(sale =>
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Payment Methods Pie Chart */}
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                      <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                         <CardHeader>
-                          <CardTitle className="text-white">Betaalmetodes Verdeling</CardTitle>
+                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Betaalmetodes Verdeling</CardTitle>
                         </CardHeader>
                         <CardContent>
                           {paymentChartData.length > 0 ? (
@@ -5652,9 +5652,9 @@ ${dateFilteredSales.map(sale =>
                       </Card>
 
                       {/* 7-Day Trend Line Chart */}
-                      <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                      <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                         <CardHeader>
-                          <CardTitle className="text-white">7-Dag Verkope Tendens</CardTitle>
+                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>7-Dag Verkope Tendens</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <ResponsiveContainer width="100%" height={300}>
@@ -5675,9 +5675,9 @@ ${dateFilteredSales.map(sale =>
                       </Card>
                     </div>
                     {/* Detailed Sales List */}
-                    <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+                    <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                       <CardHeader>
-                        <CardTitle className="text-white">Verkopebesonderhede vir {new Date(selectedDate).toLocaleDateString('af-ZA')}</CardTitle>
+                        <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Verkopebesonderhede vir {new Date(selectedDate).toLocaleDateString('af-ZA')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
@@ -5740,7 +5740,7 @@ ${dateFilteredSales.map(sale =>
                                             </Badge>
                                           )}
                                         </div>
-                                        <p className="text-sm text-gray-400 mt-0.5">
+                                        <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                           {new Date(sale.createdAt).toLocaleString('af-ZA')} • {sale.paymentType === 'kontant' ? 'Kontant' : sale.paymentType === 'kaart' ? 'Kaart' : sale.paymentType === 'eft' ? 'EFT' : sale.paymentType}
                                           {sale.customerName && ` • ${sale.customerName}`}
                                         </p>
@@ -5789,7 +5789,7 @@ ${dateFilteredSales.map(sale =>
                                     className="overflow-hidden"
                                   >
                                     <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
-                                      <div className="bg-gray-900/50 rounded-lg border border-gray-700/30 overflow-hidden">
+                                      <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/30' : 'bg-gray-50 border-gray-200'} rounded-lg border overflow-hidden`}>
                                         <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
                                           <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaksie Besonderhede</span>
                                         </div>
@@ -6073,7 +6073,7 @@ ${dateFilteredSales.map(sale =>
               )}
 
               {/* Voorkoms Kaart */}
-              <Card className={posTheme === 'dark' ? "bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20" : "bg-white border-gray-200 shadow-lg"}>
+              <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/10' : 'bg-white border-gray-200 shadow-lg'}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {posTheme === 'dark' ? <Moon className="w-5 h-5 text-[hsl(217,90%,50%)]" /> : <Sun className="w-5 h-5 text-[hsl(217,90%,40%)]" />}
@@ -6105,9 +6105,9 @@ ${dateFilteredSales.map(sale =>
               </Card>
 
               {/* Account & Preferences Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Rekening & Voorkeure
                   </CardTitle>
@@ -6121,7 +6121,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={() => setIsLogoDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6143,7 +6143,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={() => setIsReceiptCustomizerOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6165,7 +6165,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={() => setIsInvoiceSetupOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6187,7 +6187,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={() => setIsChangePasswordDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6229,7 +6229,7 @@ ${dateFilteredSales.map(sale =>
                       }}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
@@ -6251,7 +6251,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={logout}
                       className="cursor-pointer group"
                     >
-                      <div className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-600/50 rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden">
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-shadow duration-300">
@@ -6270,9 +6270,9 @@ ${dateFilteredSales.map(sale =>
               </Card>
 
               {/* Business Information Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Besigheidsinligting
                   </CardTitle>
@@ -6381,9 +6381,9 @@ ${dateFilteredSales.map(sale =>
               </Card>
 
               {/* Integrations Section */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/20">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
                 <CardHeader className="border-b border-white/10 pb-4">
-                  <CardTitle className="flex items-center gap-2 text-white">
+                  <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                     Integrasies
                   </CardTitle>
@@ -6603,7 +6603,7 @@ ${dateFilteredSales.map(sale =>
               </Card>
 
               {/* Gevaarzone */}
-              <Card className="bg-gray-800/50 backdrop-blur-xl border-red-900/40 shadow-2xl shadow-red-900/10">
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-red-900/40' : 'bg-white border-red-200'} shadow-2xl`}>
                 <CardHeader className="border-b border-red-900/30 pb-4">
                   <CardTitle className="flex items-center gap-2 text-red-400">
                     <Trash2 className="w-5 h-5" />
@@ -6733,10 +6733,10 @@ ${dateFilteredSales.map(sale =>
                   <Package className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-bold text-white">
+                  <DialogTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {editingProduct ? "Redigeer Produk" : "Voeg Nuwe Produk By"}
                   </DialogTitle>
-                  <p className="text-sm text-gray-400 mt-0.5">
+                  <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {editingProduct ? 'Werk die produkinligting hieronder by.' : 'Voer die besonderhede in om \'n nuwe produk by te voeg.'}
                   </p>
                 </div>
@@ -6952,7 +6952,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>
               {editingCustomer ? "Redigeer Klient" : "Voeg Nuwe Klient By"}
@@ -7255,7 +7255,7 @@ ${dateFilteredSales.map(sale =>
                         {isSelected && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <div>
-                        <p className="font-medium text-white">{product.name}</p>
+                        <p className={posTheme === 'dark' ? 'font-medium text-white' : 'font-medium text-gray-900'}>{product.name}</p>
                         <p className="text-xs text-gray-400">SKU: {product.sku}</p>
                       </div>
                     </div>
@@ -7306,7 +7306,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Logo Upload Dialog */}
       <Dialog open={isLogoDialogOpen} onOpenChange={setIsLogoDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Bywerk Maatskappy Logo</DialogTitle>
             <DialogDescription>
@@ -7506,7 +7506,7 @@ ${dateFilteredSales.map(sale =>
           setVoidReason("");
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Kanselleer Verkoop</DialogTitle>
             <DialogDescription>
@@ -7560,7 +7560,7 @@ ${dateFilteredSales.map(sale =>
           setViewVoidDialog({ open: false, sale: null });
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Gekanselleerde Verkoop Besonderhede</DialogTitle>
           </DialogHeader>
@@ -7601,7 +7601,7 @@ ${dateFilteredSales.map(sale =>
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Voer Wagwoord In</DialogTitle>
             <DialogDescription>
@@ -7657,7 +7657,7 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Simplified Staff Creation Dialog */}
       <Dialog open={isStaffDialogOpen} onOpenChange={setIsStaffDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <DialogTitle>Skep Nuwe Gebruiker</DialogTitle>
             <DialogDescription>
@@ -7933,7 +7933,7 @@ ${dateFilteredSales.map(sale =>
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-900/50 border-t border-gray-700/50 px-6 py-4 flex justify-end">
+          <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/50' : 'bg-gray-50 border-gray-200'} border-t px-6 py-4 flex justify-end`}>
             <Button 
               onClick={() => setIsUserManagementOpen(false)}
               variant="ghost"
@@ -9825,7 +9825,7 @@ ${dateFilteredSales.map(sale =>
                 value={editOpenAccountName}
                 onChange={(e) => setEditOpenAccountName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && editOpenAccountName.trim() && editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
-                className="bg-gray-800 border-gray-700/50 text-white focus:border-[hsl(217,90%,40%)]/60 h-10"
+                className={`${posTheme === 'dark' ? 'bg-gray-800 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-900'} focus:border-[hsl(217,90%,40%)]/60 h-10`}
                 placeholder="Voer rekeningnaam in"
                 autoFocus
               />
