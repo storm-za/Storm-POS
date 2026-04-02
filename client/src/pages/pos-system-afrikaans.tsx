@@ -5126,6 +5126,22 @@ ${dateFilteredSales.map(sale =>
                     </Select>
                   </div>
                 </CardHeader>
+                <div className={`px-4 pt-4 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                    {[
+                      { label: "Totaal", count: purchaseOrders.length, color: "from-gray-700 to-gray-800" },
+                      { label: "Konsep", count: purchaseOrders.filter((p: any) => p.status === 'draft').length, color: "from-gray-600 to-gray-700" },
+                      { label: "Gestuur", count: purchaseOrders.filter((p: any) => p.status === 'sent').length, color: "from-blue-900 to-blue-800" },
+                      { label: "Gedeeltelik", count: purchaseOrders.filter((p: any) => p.status === 'partial').length, color: "from-yellow-900 to-yellow-800" },
+                      { label: "Ontvang", count: purchaseOrders.filter((p: any) => p.status === 'received').length, color: "from-green-900 to-green-800" },
+                    ].map((stat) => (
+                      <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-3 border border-gray-700/50`}>
+                        <p className="text-white/80 text-xs font-medium">{stat.label}</p>
+                        <p className="text-white text-xl font-bold">{stat.count}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <CardContent className={`p-0 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   {isPOLoading ? (
                     <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
@@ -5157,15 +5173,21 @@ ${dateFilteredSales.map(sale =>
                               <span className="text-white font-bold text-lg">R{parseFloat(po.total || 0).toFixed(2)}</span>
                               <div className="flex gap-1">
                                 <Button variant="ghost" size="sm" onClick={() => { setSelectedPO(po); setIsPOViewOpen(true); }} className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><Eye className="h-4 w-4" /></Button>
-                                <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 h-8 w-8 p-0"><Edit className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 h-8 w-8 p-0" disabled={po.status === 'received' || po.status === 'cancelled'}><Edit className="h-4 w-4" /></Button>
                                 <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-green-400 hover:bg-green-500/10 h-8 w-8 p-0"><Download className="h-4 w-4" /></Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><ChevronDown className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                   <DropdownMenuContent className="bg-gray-900 border-gray-700">
-                                    {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-gray-300 hover:text-white">Merk as Gestuur</DropdownMenuItem>}
-                                    {(po.status === 'sent' || po.status === 'partial') && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-gray-300 hover:text-white">Gedeeltelik Ontvang</DropdownMenuItem>}
-                                    {(po.status === 'sent' || po.status === 'partial') && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-gray-300 hover:text-white">Volledig Ontvang</DropdownMenuItem>}
-                                    {po.status !== 'cancelled' && po.status !== 'received' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Kanselleer</DropdownMenuItem>}
+                                    {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Merk as Gestuur</DropdownMenuItem>}
+                                    {(po.status === 'sent' || po.status === 'partial') && (
+                                      <>
+                                        <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-yellow-400 hover:text-yellow-300">Gedeeltelik Ontvang</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-green-400 hover:text-green-300">Volledig Ontvang</DropdownMenuItem>
+                                      </>
+                                    )}
+                                    {po.status !== 'cancelled' && po.status !== 'received' && (
+                                      <><DropdownMenuSeparator className="bg-gray-700" /><DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Kanselleer</DropdownMenuItem></>
+                                    )}
                                     <DropdownMenuSeparator className="bg-gray-700" />
                                     <DropdownMenuItem onClick={() => { setDeletingPOId(po.id); setIsDeletePODialogOpen(true); }} className="text-red-400 hover:text-red-300">Verwyder</DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -5232,8 +5254,8 @@ ${dateFilteredSales.map(sale =>
           <Dialog open={isPODialogOpen} onOpenChange={(open) => { if (!open) { resetPOForm(); } setIsPODialogOpen(open); }}>
             <DialogContent className={`w-[calc(100vw-2rem)] sm:w-auto sm:max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
               <DialogHeader>
-                <DialogTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{editingPO ? 'Wysig Aankoopbestelling' : 'Nuwe Aankoopbestelling'}</DialogTitle>
-                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Skep 'n nuwe aankoopbestelling vir 'n verskaffer</DialogDescription>
+                <DialogTitle className={`text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{editingPO ? `Wysig ${editingPO.poNumber}` : 'Nuwe Aankoopbestelling'}</DialogTitle>
+                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>{editingPO ? 'Dateer aankoopbestelling besonderhede op' : "Skep 'n nuwe aankoopbestelling vir 'n verskaffer"}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-2">
                 <div className={`rounded-xl p-4 border space-y-3 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200 shadow-sm'}`}>
