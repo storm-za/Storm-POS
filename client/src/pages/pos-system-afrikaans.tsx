@@ -4806,7 +4806,7 @@ ${dateFilteredSales.map(sale =>
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
-                <CardTitle className="text-white text-lg sm:text-xl font-bold">Fakture & Kwotasies</CardTitle>
+                <CardTitle className={posTheme === 'dark' ? 'text-white text-lg sm:text-xl font-bold' : 'text-gray-900 text-lg sm:text-xl font-bold'}>Fakture & Kwotasies</CardTitle>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                   {/* Kolomsigbaarheid keusekys */}
                   <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
@@ -4815,8 +4815,8 @@ ${dateFilteredSales.map(sale =>
                         <SlidersHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#111] border border-white/20 text-white">
-                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Veld Instellings</div>
+                    <DropdownMenuContent align="end" className={posTheme === 'dark' ? 'w-56 bg-[#111] border border-white/20 text-white' : 'w-56 bg-white border border-gray-200 text-gray-900 shadow-lg'}>
+                      <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider' : 'px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'}>Veld Instellings</div>
                       {([
                         { key: 'dueDate', label: 'Vervaldatum' },
                         { key: 'clientEmail', label: 'Kliënt E-pos' },
@@ -4830,9 +4830,9 @@ ${dateFilteredSales.map(sale =>
                         <DropdownMenuItem
                           key={col.key}
                           onSelect={(e) => { e.preventDefault(); toggleInvoiceColumn(col.key); }}
-                          className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+                          className={posTheme === 'dark' ? 'flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10' : 'flex items-center gap-2 cursor-pointer hover:bg-gray-100 focus:bg-gray-100'}
                         >
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(col.key) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : 'border-white/30'}`}>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(col.key) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : posTheme === 'dark' ? 'border-white/30' : 'border-gray-300'}`}>
                             {invoiceCardColumns.has(col.key) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                           </div>
                           <span className="text-sm">{col.label}</span>
@@ -4840,15 +4840,15 @@ ${dateFilteredSales.map(sale =>
                       ))}
                       {invoiceCustomFieldDefs.length > 0 && (
                         <>
-                          <DropdownMenuSeparator className="bg-white/10" />
-                          <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pasgemaakte Velde</div>
+                          <DropdownMenuSeparator className={posTheme === 'dark' ? 'bg-white/10' : 'bg-gray-100'} />
+                          <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider' : 'px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'}>Pasgemaakte Velde</div>
                           {invoiceCustomFieldDefs.map(field => (
                             <DropdownMenuItem
                               key={field.id}
                               onSelect={(e) => { e.preventDefault(); toggleInvoiceColumn(`cf_${field.id}`); }}
-                              className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+                              className={posTheme === 'dark' ? 'flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10' : 'flex items-center gap-2 cursor-pointer hover:bg-gray-100 focus:bg-gray-100'}
                             >
-                              <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(`cf_${field.id}`) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : 'border-white/30'}`}>
+                              <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${invoiceCardColumns.has(`cf_${field.id}`) ? 'bg-[hsl(217,90%,40%)] border-[hsl(217,90%,40%)]' : posTheme === 'dark' ? 'border-white/30' : 'border-gray-300'}`}>
                                 {invoiceCardColumns.has(`cf_${field.id}`) && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                               </div>
                               <span className="text-sm">{field.label}</span>
@@ -4856,7 +4856,7 @@ ${dateFilteredSales.map(sale =>
                           ))}
                         </>
                       )}
-                      <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuSeparator className={posTheme === 'dark' ? 'bg-white/10' : 'bg-gray-100'} />
                       <DropdownMenuItem
                         onSelect={(e) => { e.preventDefault(); const next = new Set(['dueDate','clientEmail','clientPhone','poNumber','dueTerms','paymentMethod','notes','discount']); setInvoiceCardColumns(next); try { const u = JSON.parse(localStorage.getItem('posUser') || 'null'); localStorage.setItem(`invoiceCardCols_${u?.id || 'guest'}`, JSON.stringify(Array.from(next))); } catch {} }}
                         className="text-xs text-gray-400 hover:bg-white/10 focus:bg-white/10 cursor-pointer"
