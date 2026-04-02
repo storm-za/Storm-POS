@@ -5612,8 +5612,8 @@ export default function PosSystem() {
                         <SlidersHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className={posTheme === 'dark' ? 'w-56 bg-[#111] border border-white/20 text-white' : 'w-56 bg-white border border-gray-200 text-gray-900 shadow-lg'}>
-                      <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider' : 'px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'}>Field Settings</div>
+                    <DropdownMenuContent align="end" className={posTheme === 'dark' ? 'w-64 bg-[#111] border border-white/20 text-white' : 'w-64 bg-white border border-gray-200 text-gray-900 shadow-lg'}>
+                      <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400' : 'px-3 py-2 text-xs font-semibold text-gray-500'}>What should display on your documents?</div>
                       {([
                         { key: 'dueDate', label: 'Due Date' },
                         { key: 'clientEmail', label: 'Client Email' },

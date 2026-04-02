@@ -4829,8 +4829,8 @@ ${dateFilteredSales.map(sale =>
                         <SlidersHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className={posTheme === 'dark' ? 'w-56 bg-[#111] border border-white/20 text-white' : 'w-56 bg-white border border-gray-200 text-gray-900 shadow-lg'}>
-                      <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider' : 'px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'}>Veld Instellings</div>
+                    <DropdownMenuContent align="end" className={posTheme === 'dark' ? 'w-64 bg-[#111] border border-white/20 text-white' : 'w-64 bg-white border border-gray-200 text-gray-900 shadow-lg'}>
+                      <div className={posTheme === 'dark' ? 'px-3 py-2 text-xs font-semibold text-gray-400' : 'px-3 py-2 text-xs font-semibold text-gray-500'}>Wat moet verskyn op jou dokumente?</div>
                       {([
                         { key: 'dueDate', label: 'Vervaldatum' },
                         { key: 'clientEmail', label: 'Kliënt E-pos' },
