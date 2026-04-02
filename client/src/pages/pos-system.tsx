@@ -4989,15 +4989,15 @@ export default function PosSystem() {
                       </Button>
                       
                       <AlertDialog open={showDeleteAllProductsConfirm} onOpenChange={setShowDeleteAllProductsConfirm}>
-                        <AlertDialogContent className="bg-gray-900 border-gray-700">
+                        <AlertDialogContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-white">Delete All Products?</AlertDialogTitle>
-                            <AlertDialogDescription className="text-gray-400">
+                            <AlertDialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Delete All Products?</AlertDialogTitle>
+                            <AlertDialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                               This action cannot be undone. All {products?.length || 0} products will be permanently deleted from your inventory.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700">Cancel</AlertDialogCancel>
+                            <AlertDialogCancel className={posTheme === 'dark' ? 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}>Cancel</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => deleteAllProductsMutation.mutate()}
                               className="bg-red-600 hover:bg-red-700 text-white"
@@ -5015,10 +5015,10 @@ export default function PosSystem() {
                             Add Product
                           </Button>
                         </DialogTrigger>
-                    <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0" aria-describedby="product-dialog-description">
+                    <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/30 p-0`} aria-describedby="product-dialog-description">
                       <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
                       <div className="relative flex flex-col">
-                        <div className="px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0">
+                        <div className={posTheme === 'dark' ? 'px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0' : 'px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0'}>
                           <div className="flex items-center gap-4">
                             <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                               <Package className="w-6 h-6 text-white" />
@@ -5048,7 +5048,7 @@ export default function PosSystem() {
                                 name="sku"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                    <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                                       <Tag className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                                       SKU / Code
                                     </FormLabel>
@@ -5056,7 +5056,7 @@ export default function PosSystem() {
                                       <Input 
                                         placeholder="e.g., PROD001" 
                                         {...field} 
-                                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                       />
                                     </FormControl>
                                     <FormMessage />
@@ -5068,7 +5068,7 @@ export default function PosSystem() {
                                 name="quantity"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                    <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                                       <Hash className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                                       Stock Qty
                                     </FormLabel>
@@ -5077,7 +5077,7 @@ export default function PosSystem() {
                                         type="number" 
                                         placeholder="e.g., 50" 
                                         {...field} 
-                                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                       />
                                     </FormControl>
                                     <FormMessage />
@@ -5091,7 +5091,7 @@ export default function PosSystem() {
                               name="name"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                  <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                                     <Package className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                                     Product Name
                                   </FormLabel>
@@ -5099,7 +5099,7 @@ export default function PosSystem() {
                                     <Input 
                                       placeholder="e.g., Coffee - Espresso" 
                                       {...field} 
-                                      className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                      className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -5110,8 +5110,8 @@ export default function PosSystem() {
                             <div className="pt-2">
                               <div className="flex items-center gap-2 mb-3">
                                 <DollarSign className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                                <span className="text-sm font-medium text-gray-300">Pricing</span>
-                                <div className="flex-1 h-px bg-gray-700/50"></div>
+                                <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Pricing</span>
+                                <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <FormField
@@ -5119,14 +5119,14 @@ export default function PosSystem() {
                                   name="costPrice"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel className="text-gray-400 text-xs font-medium">Cost Price</FormLabel>
+                                      <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Cost Price</FormLabel>
                                       <FormControl>
                                         <div className="relative">
-                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                                           <Input 
                                             placeholder="0.00" 
                                             {...field} 
-                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                            className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                           />
                                         </div>
                                       </FormControl>
@@ -5139,14 +5139,14 @@ export default function PosSystem() {
                                   name="retailPrice"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel className="text-gray-400 text-xs font-medium">Retail Price</FormLabel>
+                                      <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Retail Price</FormLabel>
                                       <FormControl>
                                         <div className="relative">
-                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                                           <Input 
                                             placeholder="0.00" 
                                             {...field} 
-                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                            className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                           />
                                         </div>
                                       </FormControl>
@@ -5159,14 +5159,14 @@ export default function PosSystem() {
                                   name="tradePrice"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel className="text-gray-400 text-xs font-medium">Trade Price</FormLabel>
+                                      <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Trade Price</FormLabel>
                                       <FormControl>
                                         <div className="relative">
-                                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                                          <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                                           <Input 
                                             placeholder="0.00" 
                                             {...field} 
-                                            className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                            className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                                           />
                                         </div>
                                       </FormControl>
@@ -5181,8 +5181,8 @@ export default function PosSystem() {
                             <div className="pt-2">
                               <div className="flex items-center gap-2 mb-3">
                                 <Folder className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                                <span className="text-sm font-medium text-gray-300">Category</span>
-                                <div className="flex-1 h-px bg-gray-700/50"></div>
+                                <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Category</span>
+                                <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
                               </div>
                               <FormField
                                 control={productForm.control}
@@ -5194,10 +5194,10 @@ export default function PosSystem() {
                                         value={field.value?.toString() || "none"} 
                                         onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
                                       >
-                                        <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
+                                        <SelectTrigger className={posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white h-11' : 'bg-white border-gray-300 text-gray-900 h-11'}>
                                           <SelectValue placeholder="Select category (optional)" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-gray-900 border-gray-700">
+                                        <SelectContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                                           <SelectItem value="none" className="text-gray-400">No Category</SelectItem>
                                           {categories.map((cat) => (
                                             <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
@@ -5215,12 +5215,12 @@ export default function PosSystem() {
                               />
                             </div>
                             
-                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                            <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
                               <Button 
                                 type="button" 
                                 variant="outline" 
                                 onClick={() => setIsProductDialogOpen(false)}
-                                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5"
+                                className={posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 px-5'}
                               >
                                 Cancel
                               </Button>
@@ -5896,7 +5896,7 @@ export default function PosSystem() {
                   <SelectTrigger className="w-full sm:w-48 bg-gray-900 border-gray-700 text-white">
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-900 border-gray-700 text-white">
+                  <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
                     <SelectItem value="all" className="text-white">All Statuses</SelectItem>
                     <SelectItem value="draft" className="text-white">Draft</SelectItem>
                     <SelectItem value="sent" className="text-white">Sent</SelectItem>
@@ -5959,7 +5959,7 @@ export default function PosSystem() {
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800"><ChevronDown className="h-4 w-4" /></Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                            <DropdownMenuContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                               {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Mark as Sent</DropdownMenuItem>}
                               {(po.status === 'sent' || po.status === 'partial') && (
                                 <>
@@ -7362,13 +7362,13 @@ export default function PosSystem() {
       </Dialog>
       {/* Purchase Order View Panel */}
       <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-lg max-h-[85vh] overflow-y-auto bg-gray-950 border-gray-800 text-white">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-lg max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
               <span className="text-[hsl(217,90%,60%)] font-mono">{selectedPO?.poNumber}</span>
               {selectedPO && getPOStatusBadge(selectedPO.status)}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">Purchase order details</DialogDescription>
+            <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Purchase order details</DialogDescription>
           </DialogHeader>
           {selectedPO && (
             <div className="space-y-4 mt-2">
@@ -7416,10 +7416,10 @@ export default function PosSystem() {
       </Dialog>
       {/* Delete PO Confirmation */}
       <AlertDialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
-        <AlertDialogContent className="bg-gray-950 border-gray-800">
+        <AlertDialogContent className={`${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Purchase Order</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">Are you sure you want to delete this purchase order? This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Delete Purchase Order</AlertDialogTitle>
+            <AlertDialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Are you sure you want to delete this purchase order? This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700">Cancel</AlertDialogCancel>
@@ -7610,7 +7610,7 @@ export default function PosSystem() {
               <FileText className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <DialogTitle className="text-white font-bold text-base sm:text-lg leading-tight truncate">
+              <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-base sm:text-lg leading-tight truncate' : 'text-gray-900 font-bold text-base sm:text-lg leading-tight truncate'}>
                 {selectedOpenAccount?.accountName}
               </DialogTitle>
               <DialogDescription className="text-blue-200 text-xs mt-0.5">
@@ -7760,14 +7760,14 @@ export default function PosSystem() {
       </Dialog>
       {/* Rename Open Account Dialog */}
       <Dialog open={!!editingOpenAccount} onOpenChange={(open) => { if (!open) { setEditingOpenAccount(null); setEditOpenAccountName(""); } }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-700/60 shadow-2xl rounded-2xl p-0 overflow-hidden">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl rounded-2xl p-0 overflow-hidden`}>
           <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
                 <Edit className="w-4 h-4 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-white font-bold text-base">Rename Account</DialogTitle>
+                <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-base' : 'text-gray-900 font-bold text-base'}>Rename Account</DialogTitle>
                 <DialogDescription className="text-[hsl(217,90%,70%)] text-xs">Update the account display name</DialogDescription>
               </div>
             </div>
@@ -7799,13 +7799,13 @@ export default function PosSystem() {
       </Dialog>
       {/* Add Products to Category Dialog */}
       <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="border-b border-gray-700/50 pb-4">
-            <DialogTitle className="text-white flex items-center gap-2">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl max-h-[85vh] overflow-y-auto`}>
+          <DialogHeader className={posTheme === 'dark' ? 'border-b border-gray-700/50 pb-4' : 'border-b border-gray-200 pb-4'}>
+            <DialogTitle className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
               <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
               Add Products to Category
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
               Select products to add to "{categories.find(c => c.id === selectedSalesCategory)?.name || 'this category'}". Products can belong to multiple categories.
             </DialogDescription>
           </DialogHeader>
@@ -8116,18 +8116,18 @@ export default function PosSystem() {
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
           {/* Header */}
-          <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
+          <div className={posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50' : 'bg-gray-50 px-6 py-5 border-b border-gray-200'}>
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold text-white">
+                <DialogTitle className={posTheme === 'dark' ? 'text-xl font-bold text-white' : 'text-xl font-bold text-gray-900'}>
                   {staffAccounts.length === 0 ? "Create Your First User" : "User Management"}
                 </DialogTitle>
-                <DialogDescription className="text-gray-400 text-sm mt-0.5">
+                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400 text-sm mt-0.5' : 'text-gray-500 text-sm mt-0.5'}>
                   {staffAccounts.length === 0 
                     ? "Set up your first account to get started."
                     : `${staffAccounts.length} user${staffAccounts.length === 1 ? '' : 's'} registered`
@@ -8143,8 +8143,8 @@ export default function PosSystem() {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Team Members</h3>
-                  <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                  <h3 className={posTheme === 'dark' ? 'text-sm font-semibold uppercase tracking-wider text-gray-400' : 'text-sm font-semibold uppercase tracking-wider text-gray-500'}>Team Members</h3>
+                  <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
                 </div>
                 <div className="space-y-3">
                   {staffAccounts.map((staff) => {
@@ -8157,7 +8157,7 @@ export default function PosSystem() {
                         className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
                           isCurrentLoggedIn 
                             ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
-                            : 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50'
+                            : posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50' : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                       >
                         {/* User Avatar */}
@@ -8175,7 +8175,7 @@ export default function PosSystem() {
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white truncate">
+                            <span className={posTheme === 'dark' ? 'font-semibold text-white truncate' : 'font-semibold text-gray-900 truncate'}>
                               {staff.displayName || staff.username}
                             </span>
                             {isCurrentLoggedIn && (
@@ -8232,10 +8232,10 @@ export default function PosSystem() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Add New User</h3>
-                <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                <h3 className={posTheme === 'dark' ? 'text-sm font-semibold uppercase tracking-wider text-gray-400' : 'text-sm font-semibold uppercase tracking-wider text-gray-500'}>Add New User</h3>
+                <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
               </div>
-              <div className="bg-gray-800/30 rounded-xl border border-gray-700/50 p-5">
+              <div className={posTheme === 'dark' ? 'bg-gray-800/30 rounded-xl border border-gray-700/50 p-5' : 'bg-gray-50 rounded-xl border border-gray-200 p-5'}>
                 <form onSubmit={(e) => {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
@@ -8255,37 +8255,37 @@ export default function PosSystem() {
                 }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Username</Label>
+                      <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Username</Label>
                       <Input
                         id="new-username"
                         name="new-username"
                         type="text"
                         required
                         placeholder="Enter name"
-                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20`}
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Password</Label>
+                      <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Password</Label>
                       <Input
                         id="new-password"
                         name="new-password"
                         type="password"
                         required
                         placeholder="Enter password"
-                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20`}
                       />
                     </div>
                   </div>
                   <div className="mb-5">
-                    <Label className="text-gray-300 text-sm font-medium mb-2 block">Role</Label>
+                    <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Role</Label>
                     <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
-                      <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                      <SelectTrigger className={posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20' : 'bg-white border-gray-300 text-gray-900 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20'}>
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Staff</SelectItem>
-                        <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Manager</SelectItem>
+                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}>
+                        <SelectItem value="staff" className={posTheme === 'dark' ? 'text-white hover:bg-gray-700 focus:bg-gray-700' : 'text-gray-900 hover:bg-gray-100 focus:bg-gray-100'}>Staff</SelectItem>
+                        <SelectItem value="management" className={posTheme === 'dark' ? 'text-white hover:bg-gray-700 focus:bg-gray-700' : 'text-gray-900 hover:bg-gray-100 focus:bg-gray-100'}>Manager</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -8449,7 +8449,7 @@ export default function PosSystem() {
               <CreditCard className="w-6 h-6 text-white" />
             </div>
             <div className="min-w-0">
-              <DialogTitle className="text-white font-bold text-lg leading-tight">Payment Details</DialogTitle>
+              <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-lg leading-tight' : 'text-gray-900 font-bold text-lg leading-tight'}>Payment Details</DialogTitle>
               <DialogDescription className="text-blue-200 text-xs mt-0.5">Bank account for Storm POS service fee payments</DialogDescription>
             </div>
           </div>
@@ -8539,25 +8539,25 @@ export default function PosSystem() {
       </Dialog>
       {/* Category Management Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
               <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
               {editingCategory ? 'Edit Category' : 'Create Category'}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
               {editingCategory ? 'Update category details below.' : 'Create a new category to organize your products.'}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div>
-              <Label className="text-gray-300">Category Name</Label>
+              <Label className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>Category Name</Label>
               <Input 
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder="e.g., Beverages, Food, Electronics"
-                className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
+                className={`mt-2 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
               />
             </div>
             
@@ -8572,7 +8572,7 @@ export default function PosSystem() {
                     key={color}
                     type="button"
                     onClick={() => setCategoryColor(color)}
-                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
+                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-100' : 'hover:scale-110'}`}
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -8582,13 +8582,13 @@ export default function PosSystem() {
             {/* Existing Categories List */}
             {categories.length > 0 && !editingCategory && (
               <div>
-                <Label className="text-gray-300 mb-2 block">Existing Categories</Label>
+                <Label className={posTheme === 'dark' ? 'text-gray-300 mb-2 block' : 'text-gray-700 mb-2 block'}>Existing Categories</Label>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {categories.map((cat) => (
-                    <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
+                    <div key={cat.id} className={`flex items-center justify-between ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50' : 'bg-gray-50 border-gray-200'} border rounded-lg px-3 py-2`}>
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                        <span className="text-white">{cat.name}</span>
+                        <span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>{cat.name}</span>
                         <Badge variant="secondary" className="text-xs">
                           {products.filter(p => p.categoryId === cat.id).length} products
                         </Badge>
@@ -8609,7 +8609,7 @@ export default function PosSystem() {
           </div>
           
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className={posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white hover:bg-gray-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}>
               Cancel
             </Button>
             <Button 
@@ -10047,7 +10047,7 @@ export default function PosSystem() {
       </AlertDialog>
       {/* Delete Account Confirmation Dialog */}
       <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
-        <AlertDialogContent className="bg-gray-900 border border-red-900/40">
+        <AlertDialogContent className={posTheme === 'dark' ? 'bg-gray-900 border border-red-900/40' : 'bg-white border border-red-200'}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
@@ -10068,7 +10068,7 @@ export default function PosSystem() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}
               onClick={() => setIsDeleteAccountDialogOpen(false)}
             >
               Cancel

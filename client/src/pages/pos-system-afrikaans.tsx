@@ -4441,15 +4441,15 @@ ${dateFilteredSales.map(sale =>
                       </DropdownMenu>
                       
                       <AlertDialog open={showDeleteAllProductsConfirm} onOpenChange={setShowDeleteAllProductsConfirm}>
-                        <AlertDialogContent className="bg-gray-900 border-gray-700">
+                        <AlertDialogContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-white">Verwyder Alle Produkte?</AlertDialogTitle>
-                            <AlertDialogDescription className="text-gray-400">
+                            <AlertDialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Verwyder Alle Produkte?</AlertDialogTitle>
+                            <AlertDialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
                               Hierdie aksie kan nie ongedaan gemaak word nie. Alle {products?.length || 0} produkte sal permanent van jou voorraad verwyder word.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel className="bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700">Kanselleer</AlertDialogCancel>
+                            <AlertDialogCancel className={posTheme === 'dark' ? 'bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}>Kanselleer</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => deleteAllProductsMutation.mutate()}
                               className="bg-red-600 hover:bg-red-700 text-white"
@@ -5113,7 +5113,7 @@ ${dateFilteredSales.map(sale =>
                       <SelectTrigger className="w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white">
                         <SelectValue placeholder="Filter Status" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-900 border-gray-700 text-white">
+                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
                         <SelectItem value="all" className="text-white">Alle Status</SelectItem>
                         <SelectItem value="draft" className="text-white">Konsep</SelectItem>
                         <SelectItem value="sent" className="text-white">Gestuur</SelectItem>
@@ -5177,7 +5177,7 @@ ${dateFilteredSales.map(sale =>
                                 <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-green-400 hover:bg-green-500/10 h-8 w-8 p-0"><Download className="h-4 w-4" /></Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><ChevronDown className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                                  <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                                  <DropdownMenuContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                                     {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Merk as Gestuur</DropdownMenuItem>}
                                     {(po.status === 'sent' || po.status === 'partial') && (
                                       <>
@@ -5206,8 +5206,8 @@ ${dateFilteredSales.map(sale =>
 
           {/* PO View Dialog */}
           <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
-            <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl bg-black border-gray-700 text-white max-h-[85vh] overflow-y-auto">
-              <DialogHeader><DialogTitle className="text-white text-xl">Aankoopbestelling: {selectedPO?.poNumber}</DialogTitle></DialogHeader>
+            <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} max-h-[85vh] overflow-y-auto`}>
+              <DialogHeader><DialogTitle className={posTheme === 'dark' ? 'text-white text-xl' : 'text-gray-900 text-xl'}>Aankoopbestelling: {selectedPO?.poNumber}</DialogTitle></DialogHeader>
               {selectedPO && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -5375,8 +5375,8 @@ ${dateFilteredSales.map(sale =>
 
           {/* PO Delete Confirmation */}
           <Dialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
-            <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto bg-black border-gray-700 text-white max-h-[85vh] overflow-y-auto">
-              <DialogHeader><DialogTitle className="text-white">Bevestig Verwydering</DialogTitle></DialogHeader>
+            <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} max-h-[85vh] overflow-y-auto`}>
+              <DialogHeader><DialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Bevestig Verwydering</DialogTitle></DialogHeader>
               <p className="text-gray-400">Is jy seker jy wil hierdie aankoopbestelling verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.</p>
               <div className="flex justify-end gap-3 mt-4">
                 <Button variant="outline" onClick={() => setIsDeletePODialogOpen(false)} className="border-gray-600 text-gray-300">Kanselleer</Button>
@@ -6632,25 +6632,25 @@ ${dateFilteredSales.map(sale =>
       {/* For brevity, I'm including the key ones */}
       {/* Category Management Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
               <Folder className="w-5 h-5 text-[hsl(217,90%,50%)]" />
               {editingCategory ? 'Wysig Kategorie' : 'Skep Kategorie'}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
               {editingCategory ? 'Werk kategorie besonderhede hieronder by.' : 'Skep \'n nuwe kategorie om jou produkte te organiseer.'}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div>
-              <Label className="text-gray-300">Kategorienaam</Label>
+              <Label className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>Kategorienaam</Label>
               <Input 
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder="bv. Drankies, Kos, Elektronika"
-                className="mt-2 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500"
+                className={`mt-2 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
               />
             </div>
             
@@ -6665,7 +6665,7 @@ ${dateFilteredSales.map(sale =>
                     key={color}
                     type="button"
                     onClick={() => setCategoryColor(color)}
-                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900' : 'hover:scale-110'}`}
+                    className={`w-8 h-8 rounded-full transition-all ${categoryColor === color ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-100' : 'hover:scale-110'}`}
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -6675,13 +6675,13 @@ ${dateFilteredSales.map(sale =>
             {/* Existing Categories List */}
             {categories.length > 0 && !editingCategory && (
               <div>
-                <Label className="text-gray-300 mb-2 block">Bestaande Kategoriee</Label>
+                <Label className={posTheme === 'dark' ? 'text-gray-300 mb-2 block' : 'text-gray-700 mb-2 block'}>Bestaande Kategoriee</Label>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {categories.map((cat) => (
-                    <div key={cat.id} className="flex items-center justify-between bg-gray-800/50 border border-gray-700/50 rounded-lg px-3 py-2">
+                    <div key={cat.id} className={`flex items-center justify-between ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50' : 'bg-gray-50 border-gray-200'} border rounded-lg px-3 py-2`}>
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color || '#3b82f6' }} />
-                        <span className="text-white">{cat.name}</span>
+                        <span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>{cat.name}</span>
                         <Badge variant="secondary" className="text-xs">
                           {products.filter(p => p.categoryId === cat.id).length} produkte
                         </Badge>
@@ -6702,7 +6702,7 @@ ${dateFilteredSales.map(sale =>
           </div>
           
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">
+            <Button variant="outline" onClick={() => { setIsCategoryDialogOpen(false); setEditingCategory(null); }} className={posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white hover:bg-gray-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}>
               Kanselleer
             </Button>
             <Button 
@@ -6717,10 +6717,10 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700/50 shadow-2xl shadow-blue-900/30 p-0">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/30 p-0`}>
           <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
           <div className="relative">
-            <div className="px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0">
+            <div className={posTheme === 'dark' ? 'px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0' : 'px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0'}>
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                   <Package className="w-6 h-6 text-white" />
@@ -6744,7 +6744,7 @@ ${dateFilteredSales.map(sale =>
                     name="sku"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                        <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                           <Tag className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                           SKU / Kode
                         </FormLabel>
@@ -6752,7 +6752,7 @@ ${dateFilteredSales.map(sale =>
                           <Input 
                             placeholder="bv. PROD001" 
                             {...field} 
-                            className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                            className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -6764,7 +6764,7 @@ ${dateFilteredSales.map(sale =>
                     name="quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                        <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                           <Hash className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                           Voorraad
                         </FormLabel>
@@ -6773,7 +6773,7 @@ ${dateFilteredSales.map(sale =>
                             type="number" 
                             placeholder="bv. 50" 
                             {...field} 
-                            className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                            className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -6787,7 +6787,7 @@ ${dateFilteredSales.map(sale =>
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300 text-sm font-medium flex items-center gap-2">
+                      <FormLabel className={`${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-sm font-medium flex items-center gap-2`}>
                         <Package className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
                         Produknaam
                       </FormLabel>
@@ -6795,7 +6795,7 @@ ${dateFilteredSales.map(sale =>
                         <Input 
                           placeholder="bv. Koffie - Espresso" 
                           {...field} 
-                          className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                          className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -6806,8 +6806,8 @@ ${dateFilteredSales.map(sale =>
                 <div className="pt-2">
                   <div className="flex items-center gap-2 mb-3">
                     <DollarSign className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                    <span className="text-sm font-medium text-gray-300">Pryse</span>
-                    <div className="flex-1 h-px bg-gray-700/50"></div>
+                    <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Pryse</span>
+                    <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <FormField
@@ -6815,14 +6815,14 @@ ${dateFilteredSales.map(sale =>
                       name="costPrice"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400 text-xs font-medium">Kosprys</FormLabel>
+                          <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Kosprys</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                               <Input 
                                 placeholder="0.00" 
                                 {...field} 
-                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                               />
                             </div>
                           </FormControl>
@@ -6835,14 +6835,14 @@ ${dateFilteredSales.map(sale =>
                       name="retailPrice"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400 text-xs font-medium">Kleinhandelprys</FormLabel>
+                          <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Kleinhandelprys</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                               <Input 
                                 placeholder="0.00" 
                                 {...field} 
-                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                               />
                             </div>
                           </FormControl>
@@ -6855,14 +6855,14 @@ ${dateFilteredSales.map(sale =>
                       name="tradePrice"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400 text-xs font-medium">Groothandelprys</FormLabel>
+                          <FormLabel className={posTheme === 'dark' ? 'text-gray-400 text-xs font-medium' : 'text-gray-600 text-xs font-medium'}>Groothandelprys</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R</span>
+                              <span className={posTheme === 'dark' ? 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm' : 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm'}>R</span>
                               <Input 
                                 placeholder="0.00" 
                                 {...field} 
-                                className="pl-7 bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11"
+                                className={`pl-7 ${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-11`}
                               />
                             </div>
                           </FormControl>
@@ -6877,8 +6877,8 @@ ${dateFilteredSales.map(sale =>
                 <div className="pt-2">
                   <div className="flex items-center gap-2 mb-3">
                     <Tag className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                    <span className="text-sm font-medium text-gray-300">Kategorie</span>
-                    <div className="flex-1 h-px bg-gray-700/50"></div>
+                    <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Kategorie</span>
+                    <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
                   </div>
                   <FormField
                     control={productForm.control}
@@ -6890,10 +6890,10 @@ ${dateFilteredSales.map(sale =>
                             value={field.value?.toString() || "none"} 
                             onValueChange={(val) => field.onChange(val === "none" ? null : parseInt(val))}
                           >
-                            <SelectTrigger className="bg-gray-800/50 border-gray-700/50 text-white h-11">
+                            <SelectTrigger className={posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white h-11' : 'bg-white border-gray-300 text-gray-900 h-11'}>
                               <SelectValue placeholder="Kies kategorie (opsioneel)" />
                             </SelectTrigger>
-                            <SelectContent className="bg-gray-900 border-gray-700">
+                            <SelectContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                               <SelectItem value="none" className="text-gray-400">Geen Kategorie</SelectItem>
                               {categories.map((cat) => (
                                 <SelectItem key={cat.id} value={cat.id.toString()} className="text-gray-200">
@@ -6911,12 +6911,12 @@ ${dateFilteredSales.map(sale =>
                   />
                 </div>
                 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => setIsProductDialogOpen(false)}
-                    className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5"
+                    className={posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white hover:bg-gray-700 hover:border-gray-500 px-5' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 px-5'}
                   >
                     Kanselleer
                   </Button>
@@ -7031,14 +7031,14 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Oop Rekening Skep Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-blue-900/30">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/30`}>
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-white text-xl font-bold">Skep Oop Rekening</DialogTitle>
+                <DialogTitle className={posTheme === 'dark' ? 'text-white text-xl font-bold' : 'text-gray-900 text-xl font-bold'}>Skep Oop Rekening</DialogTitle>
                 <p className="text-gray-400 text-sm mt-1">Voeg items by 'n nuwe tafel of klient rekening</p>
               </div>
             </div>
@@ -7083,7 +7083,7 @@ ${dateFilteredSales.map(sale =>
                       <Input 
                         placeholder="bv., Tafel 5, Jan Smit" 
                         {...field} 
-                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl"
+                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl`}
                       />
                     </FormControl>
                     <FormMessage />
@@ -7150,7 +7150,7 @@ ${dateFilteredSales.map(sale =>
                       <Textarea 
                         placeholder="Enige addisionele notas..." 
                         {...field} 
-                        className="bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none"
+                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none`}
                         rows={3}
                       />
                     </FormControl>
@@ -7158,7 +7158,7 @@ ${dateFilteredSales.map(sale =>
                   </FormItem>
                 )}
               />
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+              <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
                 <Button 
                   type="button" 
                   variant="outline" 
@@ -7210,13 +7210,13 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* Add Products to Category Dialog */}
       <Dialog open={isAddProductsToCategoryOpen} onOpenChange={setIsAddProductsToCategoryOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="border-b border-gray-700/50 pb-4">
-            <DialogTitle className="text-white flex items-center gap-2">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[600px] ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl max-h-[85vh] overflow-y-auto`}>
+          <DialogHeader className={posTheme === 'dark' ? 'border-b border-gray-700/50 pb-4' : 'border-b border-gray-200 pb-4'}>
+            <DialogTitle className={`${posTheme === 'dark' ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
               <Plus className="w-5 h-5 text-[hsl(217,90%,50%)]" />
               Voeg Produkte by Kategorie
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
               Kies produkte om by "{categories.find(c => c.id === selectedSalesCategory)?.name || 'hierdie kategorie'}" te voeg. Produkte kan aan meerdere kategoriee behoort.
             </DialogDescription>
           </DialogHeader>
@@ -7728,18 +7728,18 @@ ${dateFilteredSales.map(sale =>
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl overflow-hidden">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
           {/* Header */}
-          <div className="bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50">
+          <div className={posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50' : 'bg-gray-50 px-6 py-5 border-b border-gray-200'}>
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold text-white">
+                <DialogTitle className={posTheme === 'dark' ? 'text-xl font-bold text-white' : 'text-xl font-bold text-gray-900'}>
                   {staffAccounts.length === 0 ? "Skep Jou Eerste Gebruiker" : "Gebruikersbestuur"}
                 </DialogTitle>
-                <DialogDescription className="text-gray-400 text-sm mt-0.5">
+                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400 text-sm mt-0.5' : 'text-gray-500 text-sm mt-0.5'}>
                   {staffAccounts.length === 0 
                     ? "Stel jou eerste rekening op om te begin."
                     : `${staffAccounts.length} gebruiker${staffAccounts.length === 1 ? '' : 's'} geregistreer`
@@ -7755,8 +7755,8 @@ ${dateFilteredSales.map(sale =>
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Span Lede</h3>
-                  <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                  <h3 className={posTheme === 'dark' ? 'text-sm font-semibold uppercase tracking-wider text-gray-400' : 'text-sm font-semibold uppercase tracking-wider text-gray-500'}>Span Lede</h3>
+                  <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
                 </div>
                 <div className="space-y-3">
                   {staffAccounts.map((staff) => {
@@ -7769,7 +7769,7 @@ ${dateFilteredSales.map(sale =>
                         className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
                           isCurrentLoggedIn 
                             ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
-                            : 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50'
+                            : posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50' : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                         }`}
                       >
                         {/* User Avatar */}
@@ -7787,7 +7787,7 @@ ${dateFilteredSales.map(sale =>
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white truncate">
+                            <span className={posTheme === 'dark' ? 'font-semibold text-white truncate' : 'font-semibold text-gray-900 truncate'}>
                               {staff.displayName || staff.username}
                             </span>
                             {isCurrentLoggedIn && (
@@ -7844,10 +7844,10 @@ ${dateFilteredSales.map(sale =>
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Voeg Nuwe Gebruiker By</h3>
-                <div className="flex-1 h-px bg-gray-700/50 ml-2"></div>
+                <h3 className={posTheme === 'dark' ? 'text-sm font-semibold uppercase tracking-wider text-gray-400' : 'text-sm font-semibold uppercase tracking-wider text-gray-500'}>Voeg Nuwe Gebruiker By</h3>
+                <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
               </div>
-              <div className="bg-gray-800/30 rounded-xl border border-gray-700/50 p-5">
+              <div className={posTheme === 'dark' ? 'bg-gray-800/30 rounded-xl border border-gray-700/50 p-5' : 'bg-gray-50 rounded-xl border border-gray-200 p-5'}>
                 <form onSubmit={(e) => {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
@@ -7867,37 +7867,37 @@ ${dateFilteredSales.map(sale =>
                 }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Gebruikersnaam</Label>
+                      <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Gebruikersnaam</Label>
                       <Input
                         id="new-username"
                         name="new-username"
                         type="text"
                         required
                         placeholder="Voer naam in"
-                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20`}
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-300 text-sm font-medium mb-2 block">Wagwoord</Label>
+                      <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Wagwoord</Label>
                       <Input
                         id="new-password"
                         name="new-password"
                         type="password"
                         required
                         placeholder="Voer wagwoord in"
-                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20"
+                        className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20`}
                       />
                     </div>
                   </div>
                   <div className="mb-5">
-                    <Label className="text-gray-300 text-sm font-medium mb-2 block">Rol</Label>
+                    <Label className={posTheme === 'dark' ? 'text-gray-300 text-sm font-medium mb-2 block' : 'text-gray-700 text-sm font-medium mb-2 block'}>Rol</Label>
                     <Select name="user-type" required defaultValue={staffAccounts.length === 0 ? "management" : "staff"}>
-                      <SelectTrigger className="bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20">
+                      <SelectTrigger className={posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700 text-white focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20' : 'bg-white border-gray-300 text-gray-900 focus:border-[hsl(217,90%,50%)] focus:ring-[hsl(217,90%,50%)]/20'}>
                         <SelectValue placeholder="Kies rol" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700">
-                        <SelectItem value="staff" className="text-white hover:bg-gray-700 focus:bg-gray-700">Personeel</SelectItem>
-                        <SelectItem value="management" className="text-white hover:bg-gray-700 focus:bg-gray-700">Bestuur</SelectItem>
+                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}>
+                        <SelectItem value="staff" className={posTheme === 'dark' ? 'text-white hover:bg-gray-700 focus:bg-gray-700' : 'text-gray-900 hover:bg-gray-100 focus:bg-gray-100'}>Personeel</SelectItem>
+                        <SelectItem value="management" className={posTheme === 'dark' ? 'text-white hover:bg-gray-700 focus:bg-gray-700' : 'text-gray-900 hover:bg-gray-100 focus:bg-gray-100'}>Bestuur</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -7946,7 +7946,7 @@ ${dateFilteredSales.map(sale =>
               <CreditCard className="w-6 h-6 text-white" />
             </div>
             <div className="min-w-0">
-              <DialogTitle className="text-white font-bold text-lg leading-tight">Betalingsbesonderhede</DialogTitle>
+              <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-lg leading-tight' : 'text-gray-900 font-bold text-lg leading-tight'}>Betalingsbesonderhede</DialogTitle>
               <DialogDescription className="text-blue-200 text-xs mt-0.5">Bankrekening vir Storm POS diensfooi betalings</DialogDescription>
             </div>
           </div>
@@ -9380,7 +9380,7 @@ ${dateFilteredSales.map(sale =>
       </AlertDialog>
       {/* Skrap Rekening Bevestigingsdialoog */}
       <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
-        <AlertDialogContent className="bg-gray-900 border border-red-900/40">
+        <AlertDialogContent className={posTheme === 'dark' ? 'bg-gray-900 border border-red-900/40' : 'bg-white border border-red-200'}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
@@ -9401,7 +9401,7 @@ ${dateFilteredSales.map(sale =>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
-              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}
               onClick={() => setIsDeleteAccountDialogOpen(false)}
             >
               Kanselleer
@@ -9655,7 +9655,7 @@ ${dateFilteredSales.map(sale =>
               <FileText className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <DialogTitle className="text-white font-bold text-base sm:text-lg leading-tight truncate">
+              <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-base sm:text-lg leading-tight truncate' : 'text-gray-900 font-bold text-base sm:text-lg leading-tight truncate'}>
                 {selectedOpenAccount?.accountName}
               </DialogTitle>
               <DialogDescription className="text-blue-200 text-xs mt-0.5">
@@ -9799,14 +9799,14 @@ ${dateFilteredSales.map(sale =>
 
       {/* Hernoem Oop Rekening Dialog */}
       <Dialog open={!!editingOpenAccount} onOpenChange={(open) => { if (!open) { setEditingOpenAccount(null); setEditOpenAccountName(""); } }}>
-        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm bg-gradient-to-br from-gray-950 to-gray-900 border border-gray-700/60 shadow-2xl rounded-2xl p-0 overflow-hidden">
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl rounded-2xl p-0 overflow-hidden`}>
           <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
                 <Edit className="w-4 h-4 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-white font-bold text-base">Hernoem Rekening</DialogTitle>
+                <DialogTitle className={posTheme === 'dark' ? 'text-white font-bold text-base' : 'text-gray-900 font-bold text-base'}>Hernoem Rekening</DialogTitle>
                 <DialogDescription className="text-[hsl(217,90%,70%)] text-xs">Opdateer die rekening se vertoonnaam</DialogDescription>
               </div>
             </div>
