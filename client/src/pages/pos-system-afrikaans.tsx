@@ -5136,15 +5136,15 @@ ${dateFilteredSales.map(sale =>
                 <div className={`px-4 pt-4 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
                     {[
-                      { label: "Totaal", count: purchaseOrders.length, color: "from-gray-700 to-gray-800" },
-                      { label: "Konsep", count: purchaseOrders.filter((p: any) => p.status === 'draft').length, color: "from-gray-600 to-gray-700" },
-                      { label: "Gestuur", count: purchaseOrders.filter((p: any) => p.status === 'sent').length, color: "from-blue-900 to-blue-800" },
-                      { label: "Gedeeltelik", count: purchaseOrders.filter((p: any) => p.status === 'partial').length, color: "from-yellow-900 to-yellow-800" },
-                      { label: "Ontvang", count: purchaseOrders.filter((p: any) => p.status === 'received').length, color: "from-green-900 to-green-800" },
+                      { label: "Totaal", count: purchaseOrders.length, accent: 'border-l-gray-400' },
+                      { label: "Konsep", count: purchaseOrders.filter((p: any) => p.status === 'draft').length, accent: 'border-l-gray-400' },
+                      { label: "Gestuur", count: purchaseOrders.filter((p: any) => p.status === 'sent').length, accent: 'border-l-blue-500' },
+                      { label: "Gedeeltelik", count: purchaseOrders.filter((p: any) => p.status === 'partial').length, accent: 'border-l-amber-500' },
+                      { label: "Ontvang", count: purchaseOrders.filter((p: any) => p.status === 'received').length, accent: 'border-l-green-500' },
                     ].map((stat) => (
-                      <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-xl p-3 border border-gray-700/50`}>
-                        <p className="text-white/80 text-xs font-medium">{stat.label}</p>
-                        <p className="text-white text-xl font-bold">{stat.count}</p>
+                      <div key={stat.label} className={`rounded-lg p-3 border-l-4 ${stat.accent} ${posTheme === 'dark' ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}>
+                        <p className={`text-2xl font-bold leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stat.count}</p>
+                        <p className={`text-xs font-medium mt-1.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
                       </div>
                     ))}
                   </div>
