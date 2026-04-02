@@ -4805,9 +4805,22 @@ ${dateFilteredSales.map(sale =>
               transition={{ duration: 0.5 }}
             >
             <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
-                <CardTitle className={posTheme === 'dark' ? 'text-white text-lg sm:text-xl font-bold' : 'text-gray-900 text-lg sm:text-xl font-bold'}>Fakture & Kwotasies</CardTitle>
-                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <CardHeader className={`border-b pb-4 space-y-3 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-200'}`}>
+                {/* Row 1: Title + primary CTA */}
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className={posTheme === 'dark' ? 'text-white text-lg sm:text-xl font-bold' : 'text-gray-900 text-lg sm:text-xl font-bold'}>Fakture & Kwotasies</CardTitle>
+                  <Button
+                    onClick={() => setIsInvoiceDialogOpen(true)}
+                    size="sm"
+                    className={`h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold transition-all duration-200 gap-2 shrink-0 ${posTheme === 'dark' ? 'shadow-md shadow-blue-600/30' : 'shadow-sm'}`}
+                    data-testid="button-create-invoice"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    Skep Nuwe
+                  </Button>
+                </div>
+                {/* Row 2: Utility buttons */}
+                <div className="flex items-center gap-2">
                   {/* Kolomsigbaarheid keusekys */}
                   <DropdownMenu open={isColumnMenuOpen} onOpenChange={setIsColumnMenuOpen}>
                     <DropdownMenuTrigger asChild>
@@ -4871,14 +4884,6 @@ ${dateFilteredSales.map(sale =>
                   >
                     <FileSpreadsheet className="h-4 w-4 mr-2 text-[hsl(217,90%,50%)]" />
                     Excel
-                  </Button>
-                  <Button 
-                    onClick={() => setIsInvoiceDialogOpen(true)}
-                    className={`h-9 px-4 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold transition-all duration-300 text-sm gap-2 ${posTheme === 'dark' ? 'shadow-lg shadow-blue-600/40 hover:shadow-blue-600/60' : 'shadow-sm hover:shadow-md'}`}
-                    data-testid="button-create-invoice"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                    Skep Faktuur/Kwotasie
                   </Button>
                 </div>
               </CardHeader>
