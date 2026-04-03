@@ -162,11 +162,24 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
 }
 
 // Laai PDF af / Maak oop
-// Tauri Android: stoor PDF in toepkaskas en maak oop met inheemse PDF-kyker (in-toep, geen blaaier)
-// Laai altyd direk af via plaaslike blob URL -- maak nooit die deel-skerm oop nie
+// Tauri Android: probeer eers inheemse stoor+oop; as dit misluk, val terug op deel-skerm met PDF aangeheg
+// Web: laai direk af via blob
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
-    await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+    try {
+      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      return;
+    } catch {
+      // Inheemse oop misluk — val terug op deel-skerm sodat gebruiker PDF kan stoor/oopmaak
+    }
+    try {
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName });
+        return;
+      }
+    } catch {}
     return;
   }
   const blob: Blob = doc.output('blob');
@@ -182,18 +195,7 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
 // Blaaier/mobiel: navigator.share({ files }) heg die PDF direk aan (WhatsApp, Gmail, ens.)
 // Rekenaar-terugval: stoor PDF plaaslik, maak WhatsApp Web oop met boodskapsteks slegs
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  if (isTauriAndroid()) {
-    try {
-      const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-      await shareText(message);
-      return 'shared';
-    } catch (e: any) {
-      const msg = String(e?.message ?? e ?? '').toLowerCase();
-      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
-      return 'fallback';
-    }
-  }
-  // Mobiel/blaaier: deel werklike PDF-leeer as aanhegsel
+  // Probeer die werklike PDF-leeer deel (werk op Android WebView en mobiele blaaiers)
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -3371,9 +3373,6 @@ ${dateFilteredSales.map(sale =>
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    if (isTauriAndroid()) {
-      try { const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api'); await shareText(message); return; } catch (e) { console.error(e); }
-    }
     if (navigator.share && receiptPdfBlob) {
       try {
         const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });

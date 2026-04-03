@@ -151,11 +151,24 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
 }
 
 // Download/Open PDF
-// Tauri Android: saves PDF to device cache then opens with native PDF viewer (in-app, no browser)
-// Always triggers a direct file download using a local blob URL — never opens the share sheet
+// Tauri Android: tries native save+open first; if that fails falls back to share sheet with PDF attached
+// Web: triggers a direct blob download
 async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   if (isTauriAndroid()) {
-    await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+    try {
+      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      return;
+    } catch {
+      // Native open failed — fall back to share sheet so user can save/open the PDF
+    }
+    try {
+      const blob: Blob = doc.output('blob');
+      const file = new File([blob], fileName, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: fileName });
+        return;
+      }
+    } catch {}
     return;
   }
   const blob: Blob = doc.output('blob');
@@ -171,18 +184,7 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
 // Browser/mobile: navigator.share({ files }) attaches the PDF directly (WhatsApp, Gmail, etc.)
 // Desktop fallback: saves PDF locally then opens WhatsApp Web with message text only
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  if (isTauriAndroid()) {
-    try {
-      const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api');
-      await shareText(message);
-      return 'shared';
-    } catch (e: any) {
-      const msg = String(e?.message ?? e ?? '').toLowerCase();
-      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
-      return 'fallback';
-    }
-  }
-  // Mobile/browser: share actual PDF file as attachment
+  // Try to share the actual PDF file (works on Android WebView and mobile browsers)
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -3874,9 +3876,6 @@ export default function PosSystem() {
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
-    if (isTauriAndroid()) {
-      try { const { shareText } = await import('@choochmeque/tauri-plugin-sharekit-api'); await shareText(message); return; } catch (e) { console.error(e); }
-    }
     if (navigator.share && receiptPdfBlob) {
       try {
         const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
