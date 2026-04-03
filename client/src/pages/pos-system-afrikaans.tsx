@@ -138,17 +138,49 @@ async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null>
   }
 }
 
-// Speur Tauri op Android (nie 'n blaaier of rekenaar nie)
-const isTauriAndroid = (): boolean =>
-  typeof window !== 'undefined' &&
-  '__TAURI_INTERNALS__' in window &&
-  navigator.maxTouchPoints > 0;
+// Speur Tauri op Android via die internals-vlag EN die user-agent string.
+// maxTouchPoints kan 0 wees op sekere Android-toestelle (bv. vouwbare/tablette met muis),
+// dus is die userAgent 'n meer betroubare tweede sein.
+const isTauriAndroid = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hasTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
+  const isAndroid = /android/i.test(navigator.userAgent);
+  return hasTauri && isAndroid;
+};
 
-// Stoor PDF in die toep-kas via Rust-opdrag, maak dan die Android Deel-skerm oop
-// (via sharekit shareFile) sodat die gebruiker die PDF kan oopmaak, stoor of stuur.
-async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+const isAnyMobile = (): boolean =>
+  /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+
+// ─── Android: stoor PDF direk in die openbare Aflaaigids ──────────────────
+// Gebruik tauri-plugin-fs met BaseDirectory.Download sodat die lêer dadelik
+// sigbaar is in die toestel se Lêers / Aflaai-app — geen gebruikeraktiwiteit nodig.
+// Val terug op die deel-skerm (sharePdfAndroid) as die Aflaaipad misluk.
+async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'saved' | 'sheet' | 'failed'> {
+  const arrayBuffer = await blob.arrayBuffer();
+  const data = new Uint8Array(arrayBuffer);
+
+  try {
+    const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+    await writeFile(fileName, data, { baseDir: BaseDirectory.Download });
+    return 'saved';
+  } catch (e) {
+    console.warn('[PDF] BaseDirectory.Download misluk, val terug op deel-skerm:', e);
+  }
+
+  try {
+    await sharePdfAndroid(blob, fileName);
+    return 'sheet';
+  } catch (e) {
+    console.error('[PDF] Deel-skerm het ook misluk:', e);
+  }
+  return 'failed';
+}
+
+// ─── Android: stoor PDF in toep-kas en maak Android Deel-skerm oop ───────
+// Die deel-skerm laat die gebruiker toe om na WhatsApp, Gmail, ens. te stuur,
+// of "Stoor na Lêers" te kies. tauri-plugin-sharekit hanteer die FileProvider.
+async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
-  // Kodeer blob na base64 vir die Rust-opdrag
   const arrayBuffer = await blob.arrayBuffer();
   const uint8 = new Uint8Array(arrayBuffer);
   let binary = '';
@@ -157,34 +189,18 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
     binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
   }
   const base64 = btoa(binary);
-  // Rust-opdrag skryf grepe na toep-kas-gids en gee die absolute pad terug
   const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
-  // Bou 'n file://-URL — sharekit se shareFile hanteer FileProvider intern op Android
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
-// Laai PDF af / Maak oop
-// Tauri Android: probeer eers inheemse stoor+oop; as dit misluk, val terug op deel-skerm met PDF aangeheg
-// Web: laai direk af via blob
-async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
+// ─── downloadOpenPDF ───────────────────────────────────────────────────────
+// Android Tauri : stoor in Aflaaigids; val terug op deel-skerm.
+// Web / Rekenaar : standaard blob <a download> klik.
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob'> {
   if (isTauriAndroid()) {
-    try {
-      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
-      return;
-    } catch {
-      // Inheemse oop misluk — val terug op deel-skerm sodat gebruiker PDF kan stoor/oopmaak
-    }
-    try {
-      const blob: Blob = doc.output('blob');
-      const file = new File([blob], fileName, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: fileName });
-        return;
-      }
-    } catch {}
-    return;
+    return downloadPdfAndroid(doc.output('blob'), fileName);
   }
   const blob: Blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -192,25 +208,26 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   a.href = url; a.download = fileName;
   a.style.display = 'none'; document.body.appendChild(a); a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+  return 'blob';
 }
 
-// Deel PDF via deel-skerm -- stuur altyd die werklike PDF-lêer, nooit 'n skakel nie
-// Tauri Android: skryf PDF met tauri-plugin-fs dan maak Android Deel-skerm oop via sharekit (WhatsApp, Gmail, ens.)
-// Blaaier/mobiel: navigator.share({ files }) heg die PDF direk aan
-// Rekenaar-terugval: stoor PDF plaaslik, maak WhatsApp Web oop met boodskapsteks slegs
+// ─── sharePDFViaSheet ──────────────────────────────────────────────────────
+// Android Tauri : stoor in kas → maak Android Deel-skerm oop met werklike PDF.
+// Mobiele blaaier : navigator.share({ files }) — heg die PDF aan.
+// Rekenaar        : stoor PDF plaaslik + maak WhatsApp Web oop (teks slegs).
+// Maak NOOIT WhatsApp Web oop op 'n mobiele toestel.
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  // Tauri Android: skryf PDF na kas dan maak inheemse Android Deel-skerm oop met die werklike lêer
   if (isTauriAndroid()) {
     try {
-      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      await sharePdfAndroid(doc.output('blob'), fileName);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
-      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      if (msg.includes('cancel') || msg.includes('dismiss') || (e?.name === 'AbortError')) return 'cancelled';
+      console.error('[PDF] Android shareFile misluk:', e);
       return 'fallback';
     }
   }
-  // Blaaier/mobiel: probeer die werklike PDF-lêer aanheg via Web Share API
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -225,9 +242,13 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
-  // Rekenaar-terugval: stoor PDF + maak WhatsApp Web oop met teks slegs (geen skakel nie)
-  doc.save(fileName);
-  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
+  // Rekenaar-terugval slegs — NOOIT op mobiel nie
+  if (!isAnyMobile()) {
+    doc.save(fileName);
+    setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
+  } else {
+    doc.save(fileName);
+  }
   return 'fallback';
 }
 
@@ -1231,11 +1252,15 @@ export default function PosSystemAfrikaans() {
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
-    await downloadOpenPDF(doc, fileName);
+    const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: "PDF Gegenereer",
-      description: `${invoice.documentNumber} is afgelaai`,
+      title: dlResult === 'saved' ? "Gestoor in Aflaaigids" : dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
+      description: dlResult === 'saved'
+        ? `${invoice.documentNumber} is in jou Aflaaigids gestoor`
+        : dlResult === 'sheet'
+        ? `${invoice.documentNumber} - kies "Stoor na Lêers" in die deel-skerm om dit te hou`
+        : `${invoice.documentNumber} is afgelaai`,
     });
   } catch (err: any) {
     console.error('PDF fout:', err);
@@ -3364,14 +3389,19 @@ ${dateFilteredSales.map(sale =>
     if (!saleCompleteData) return;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
     if (isTauriAndroid()) {
-      // In-toep aflaai: stoor in toepkas en maak oop met inheemse PDF-kyker (geen blaaier)
-      try {
-        const blob = receiptPdfBlob || ((): Blob | null => {
-          const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-          return doc ? (doc.output('blob') as Blob) : null;
-        })();
-        if (blob) await saveAndOpenPdfAndroid(blob, fileName);
-      } catch (e) { console.error('save_pdf_to_cache fout:', e); }
+      const blob = receiptPdfBlob || ((): Blob | null => {
+        const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+        return doc ? (doc.output('blob') as Blob) : null;
+      })();
+      if (!blob) return;
+      const result = await downloadPdfAndroid(blob, fileName);
+      if (result === 'saved') {
+        toast({ title: "Gestoor in Aflaaigids", description: `${fileName} is in jou Aflaaigids gestoor` });
+      } else if (result === 'sheet') {
+        toast({ title: "PDF Gereed", description: 'Kies "Stoor na Lêers" in die deel-skerm om dit te hou' });
+      } else {
+        toast({ title: "Aflaai Misluk", description: "Kon nie PDF stoor nie. Probeer asseblief weer.", variant: "destructive" });
+      }
       return;
     }
     // Web: oombliklike anker-aflaai met vooraf-gegenereerde blob-URL
@@ -3388,6 +3418,17 @@ ${dateFilteredSales.map(sale =>
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
+    // Android Tauri: gebruik altyd inheemse deel-skerm met werklike PDF-lêer
+    if (isTauriAndroid()) {
+      const blob = receiptPdfBlob || ((): Blob | null => {
+        const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+        return doc ? (doc.output('blob') as Blob) : null;
+      })();
+      if (!blob) return;
+      try { await sharePdfAndroid(blob, fileName); } catch (e) { console.error('Android deel fout:', e); }
+      return;
+    }
+    // Mobiele/rekenaar-blaaier: Web Share API met lêeraanhegsel
     if (navigator.share && receiptPdfBlob) {
       try {
         const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
@@ -3399,14 +3440,21 @@ ${dateFilteredSales.map(sale =>
         return;
       } catch (e: any) { if (e.name === 'AbortError') return; }
     }
-    // Rekenaar-terugval: stoor PDF + WhatsApp Web teks slegs
-    if (receiptPdfBlob) {
+    // Rekenaar-terugval slegs — NOOIT op mobiel nie
+    if (!isAnyMobile()) {
+      if (receiptPdfBlob) {
+        const url = URL.createObjectURL(receiptPdfBlob);
+        const a = document.createElement('a'); a.href = url; a.download = fileName;
+        a.style.display = 'none'; document.body.appendChild(a); a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      }
+      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+    } else if (receiptPdfBlob) {
       const url = URL.createObjectURL(receiptPdfBlob);
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
     }
-    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

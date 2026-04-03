@@ -127,17 +127,51 @@ async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null>
   }
 }
 
-// Detect Tauri running on Android (not a browser or desktop)
-const isTauriAndroid = (): boolean =>
-  typeof window !== 'undefined' &&
-  '__TAURI_INTERNALS__' in window &&
-  navigator.maxTouchPoints > 0;
+// Detect Tauri Android via both the internals flag AND the user-agent string.
+// maxTouchPoints can be 0 on some Android devices (e.g. foldables / tablets with mouse),
+// so userAgent is a more reliable second signal.
+const isTauriAndroid = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hasTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
+  const isAndroid = /android/i.test(navigator.userAgent);
+  return hasTauri && isAndroid;
+};
 
-// Save a PDF blob to the app cache via Rust command, then open the Android native
-// Share Sheet (via sharekit shareFile) so the user can open, save, or send the PDF.
-async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+const isAnyMobile = (): boolean =>
+  /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+
+// ─── Android: save PDF directly to the public Downloads folder ─────────────
+// Uses tauri-plugin-fs with BaseDirectory.Download so the file is immediately
+// visible in the device's Files / Downloads app — no user action needed.
+// Falls back to the share sheet (sharePdfAndroid) if the Downloads path fails.
+async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'saved' | 'sheet' | 'failed'> {
+  const arrayBuffer = await blob.arrayBuffer();
+  const data = new Uint8Array(arrayBuffer);
+
+  // Primary: write directly to the public Downloads folder
+  try {
+    const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+    await writeFile(fileName, data, { baseDir: BaseDirectory.Download });
+    return 'saved';
+  } catch (e) {
+    console.warn('[PDF] BaseDirectory.Download failed, falling back to share sheet:', e);
+  }
+
+  // Fallback: save to cache + open Android Share Sheet
+  try {
+    await sharePdfAndroid(blob, fileName);
+    return 'sheet';
+  } catch (e) {
+    console.error('[PDF] Share sheet also failed:', e);
+  }
+  return 'failed';
+}
+
+// ─── Android: save PDF to app cache and open Android Share Sheet ───────────
+// The share sheet lets the user send to WhatsApp, Gmail, etc., or "Save to Files".
+// tauri-plugin-sharekit handles the FileProvider conversion from file:// internally.
+async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
-  // Encode blob to base64 for the Rust command
   const arrayBuffer = await blob.arrayBuffer();
   const uint8 = new Uint8Array(arrayBuffer);
   let binary = '';
@@ -146,34 +180,18 @@ async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void
     binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
   }
   const base64 = btoa(binary);
-  // Rust command writes bytes to app cache dir and returns the absolute path
   const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
-  // Build a file:// URL — sharekit's shareFile handles FileProvider internally on Android
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
-// Download/Open PDF
-// Tauri Android: tries native save+open first; if that fails falls back to share sheet with PDF attached
-// Web: triggers a direct blob download
-async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
+// ─── downloadOpenPDF ────────────────────────────────────────────────────────
+// Android Tauri : saves to Downloads folder; falls back to share sheet.
+// Web / Desktop : standard blob <a download> click.
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob'> {
   if (isTauriAndroid()) {
-    try {
-      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
-      return;
-    } catch {
-      // Native open failed — fall back to share sheet so user can save/open the PDF
-    }
-    try {
-      const blob: Blob = doc.output('blob');
-      const file = new File([blob], fileName, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: fileName });
-        return;
-      }
-    } catch {}
-    return;
+    return downloadPdfAndroid(doc.output('blob'), fileName);
   }
   const blob: Blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -181,25 +199,26 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   a.href = url; a.download = fileName;
   a.style.display = 'none'; document.body.appendChild(a); a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+  return 'blob';
 }
 
-// Share PDF via native share sheet — always sends the actual PDF file, never a link
-// Tauri Android: writes PDF with tauri-plugin-fs then opens Android Share Sheet via sharekit (WhatsApp, Gmail, etc.)
-// Browser/mobile: navigator.share({ files }) attaches the PDF directly
-// Desktop fallback: saves PDF locally then opens WhatsApp Web with message text only
+// ─── sharePDFViaSheet ───────────────────────────────────────────────────────
+// Android Tauri : save to cache → open Android Share Sheet with real PDF file.
+// Mobile browser : navigator.share({ files }) — attaches the PDF.
+// Desktop        : save PDF locally + open WhatsApp Web (text only).
+// NEVER opens WhatsApp Web on a mobile device.
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  // Tauri Android: write PDF to cache then open native Android Share Sheet with the real file
   if (isTauriAndroid()) {
     try {
-      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      await sharePdfAndroid(doc.output('blob'), fileName);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
-      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      if (msg.includes('cancel') || msg.includes('dismiss') || (e?.name === 'AbortError')) return 'cancelled';
+      console.error('[PDF] Android shareFile failed:', e);
       return 'fallback';
     }
   }
-  // Browser/mobile: try attaching the actual PDF file via Web Share API
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
@@ -214,9 +233,13 @@ async function sharePDFViaSheet(doc: any, fileName: string, message: string): Pr
       if (e.name === 'AbortError') return 'cancelled';
     }
   }
-  // Desktop fallback: save PDF locally + open WhatsApp Web with text only (no link)
-  doc.save(fileName);
-  setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
+  // Desktop-only fallback — NEVER run on mobile
+  if (!isAnyMobile()) {
+    doc.save(fileName);
+    setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 500);
+  } else {
+    doc.save(fileName);
+  }
   return 'fallback';
 }
 
@@ -3547,11 +3570,15 @@ export default function PosSystem() {
     doc.textWithLink(stormText, stormTextX, footerY + 10, { url: 'https://stormsoftware.co.za/' });
     
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
-    await downloadOpenPDF(doc, fileName);
+    const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: "PDF Generated",
-      description: `${invoice.documentNumber} has been downloaded`,
+      title: dlResult === 'saved' ? "Saved to Downloads" : dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
+      description: dlResult === 'saved'
+        ? `${invoice.documentNumber} has been saved to your Downloads folder`
+        : dlResult === 'sheet'
+        ? `${invoice.documentNumber} - choose "Save to Files" in the share sheet to keep it`
+        : `${invoice.documentNumber} has been downloaded`,
     });
   } catch (err: any) {
     console.error('PDF error:', err);
@@ -3867,14 +3894,19 @@ export default function PosSystem() {
     if (!saleCompleteData) return;
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
     if (isTauriAndroid()) {
-      // In-app download: save to device cache and open with native PDF viewer (no browser)
-      try {
-        const blob = receiptPdfBlob || ((): Blob | null => {
-          const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-          return doc ? (doc.output('blob') as Blob) : null;
-        })();
-        if (blob) await saveAndOpenPdfAndroid(blob, fileName);
-      } catch (e) { console.error('save_pdf_to_cache error:', e); }
+      const blob = receiptPdfBlob || ((): Blob | null => {
+        const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+        return doc ? (doc.output('blob') as Blob) : null;
+      })();
+      if (!blob) return;
+      const result = await downloadPdfAndroid(blob, fileName);
+      if (result === 'saved') {
+        toast({ title: "Saved to Downloads", description: `${fileName} has been saved to your Downloads folder` });
+      } else if (result === 'sheet') {
+        toast({ title: "PDF Ready", description: 'Choose "Save to Files" in the share sheet to keep it' });
+      } else {
+        toast({ title: "Download Failed", description: "Could not save PDF. Please try again.", variant: "destructive" });
+      }
       return;
     }
     // Web: instant anchor download using pre-generated blob URL
@@ -3891,6 +3923,17 @@ export default function PosSystem() {
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
+    // Android Tauri: always use native share sheet with real PDF file
+    if (isTauriAndroid()) {
+      const blob = receiptPdfBlob || ((): Blob | null => {
+        const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+        return doc ? (doc.output('blob') as Blob) : null;
+      })();
+      if (!blob) return;
+      try { await sharePdfAndroid(blob, fileName); } catch (e) { console.error('Android share error:', e); }
+      return;
+    }
+    // Mobile/desktop browser: Web Share API with file attachment
     if (navigator.share && receiptPdfBlob) {
       try {
         const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
@@ -3902,14 +3945,21 @@ export default function PosSystem() {
         return;
       } catch (e: any) { if (e.name === 'AbortError') return; }
     }
-    // Desktop fallback: save PDF + WhatsApp Web text only
-    if (receiptPdfBlob) {
+    // Desktop-only fallback — NEVER on mobile
+    if (!isAnyMobile()) {
+      if (receiptPdfBlob) {
+        const url = URL.createObjectURL(receiptPdfBlob);
+        const a = document.createElement('a'); a.href = url; a.download = fileName;
+        a.style.display = 'none'; document.body.appendChild(a); a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      }
+      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
+    } else if (receiptPdfBlob) {
       const url = URL.createObjectURL(receiptPdfBlob);
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
     }
-    window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
