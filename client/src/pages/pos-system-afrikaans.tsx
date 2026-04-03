@@ -151,27 +151,17 @@ const isTauriAndroid = (): boolean => {
 const isAnyMobile = (): boolean =>
   /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
 
-// ─── Android: stoor PDF direk in die openbare Aflaaigids ──────────────────
-// Gebruik tauri-plugin-fs met BaseDirectory.Download sodat die lêer dadelik
-// sigbaar is in die toestel se Lêers / Aflaai-app — geen gebruikeraktiwiteit nodig.
-// Val terug op die deel-skerm (sharePdfAndroid) as die Aflaaipad misluk.
-async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'saved' | 'sheet' | 'failed'> {
-  const arrayBuffer = await blob.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
-
-  try {
-    const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
-    await writeFile(fileName, data, { baseDir: BaseDirectory.Download });
-    return 'saved';
-  } catch (e) {
-    console.warn('[PDF] BaseDirectory.Download misluk, val terug op deel-skerm:', e);
-  }
-
+// ─── Android: maak die inheemse Deel-skerm oop met die PDF ───────────────
+// tauri-plugin-fs kan nie na die openbare Aflaaigids skryf op Android nie
+// (geen fs:scope-download-write toestemming bestaan in hierdie inprop-weergawe).
+// Die Android Deel-skerm laat die gebruiker toe om "Stoor na Lêers" te kies
+// om die PDF na Aflaaigids te skuif, of dit direk na WhatsApp / Gmail te stuur.
+async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet' | 'failed'> {
   try {
     await sharePdfAndroid(blob, fileName);
     return 'sheet';
   } catch (e) {
-    console.error('[PDF] Deel-skerm het ook misluk:', e);
+    console.error('[PDF] Deel-skerm misluk:', e);
   }
   return 'failed';
 }
@@ -198,7 +188,7 @@ async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
 // ─── downloadOpenPDF ───────────────────────────────────────────────────────
 // Android Tauri : stoor in Aflaaigids; val terug op deel-skerm.
 // Web / Rekenaar : standaard blob <a download> klik.
-async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob'> {
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
     return downloadPdfAndroid(doc.output('blob'), fileName);
   }
@@ -1255,11 +1245,9 @@ export default function PosSystemAfrikaans() {
     const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: dlResult === 'saved' ? "Gestoor in Aflaaigids" : dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
-      description: dlResult === 'saved'
-        ? `${invoice.documentNumber} is in jou Aflaaigids gestoor`
-        : dlResult === 'sheet'
-        ? `${invoice.documentNumber} - kies "Stoor na Lêers" in die deel-skerm om dit te hou`
+      title: dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
+      description: dlResult === 'sheet'
+        ? `${invoice.documentNumber} - tik "Stoor na Lêers" in die deel-skerm om dit te hou`
         : `${invoice.documentNumber} is afgelaai`,
     });
   } catch (err: any) {
@@ -3395,12 +3383,10 @@ ${dateFilteredSales.map(sale =>
       })();
       if (!blob) return;
       const result = await downloadPdfAndroid(blob, fileName);
-      if (result === 'saved') {
-        toast({ title: "Gestoor in Aflaaigids", description: `${fileName} is in jou Aflaaigids gestoor` });
-      } else if (result === 'sheet') {
-        toast({ title: "PDF Gereed", description: 'Kies "Stoor na Lêers" in die deel-skerm om dit te hou' });
+      if (result === 'sheet') {
+        toast({ title: "PDF Gereed", description: 'Tik "Stoor na Lêers" in die deel-skerm om dit te hou' });
       } else {
-        toast({ title: "Aflaai Misluk", description: "Kon nie PDF stoor nie. Probeer asseblief weer.", variant: "destructive" });
+        toast({ title: "Aflaai Misluk", description: "Kon nie PDF oopmaak nie. Probeer asseblief weer.", variant: "destructive" });
       }
       return;
     }

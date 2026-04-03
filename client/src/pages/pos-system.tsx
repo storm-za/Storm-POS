@@ -140,29 +140,17 @@ const isTauriAndroid = (): boolean => {
 const isAnyMobile = (): boolean =>
   /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
 
-// ─── Android: save PDF directly to the public Downloads folder ─────────────
-// Uses tauri-plugin-fs with BaseDirectory.Download so the file is immediately
-// visible in the device's Files / Downloads app — no user action needed.
-// Falls back to the share sheet (sharePdfAndroid) if the Downloads path fails.
-async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'saved' | 'sheet' | 'failed'> {
-  const arrayBuffer = await blob.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
-
-  // Primary: write directly to the public Downloads folder
-  try {
-    const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
-    await writeFile(fileName, data, { baseDir: BaseDirectory.Download });
-    return 'saved';
-  } catch (e) {
-    console.warn('[PDF] BaseDirectory.Download failed, falling back to share sheet:', e);
-  }
-
-  // Fallback: save to cache + open Android Share Sheet
+// ─── Android: open the native Share Sheet with the PDF ────────────────────
+// tauri-plugin-fs cannot write to the public Downloads directory on Android
+// (no fs:scope-download-write permission exists in this plugin version).
+// The Android Share Sheet lets the user tap "Save to Files" to move the PDF
+// to Downloads, or send it directly to WhatsApp / Gmail / etc.
+async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet' | 'failed'> {
   try {
     await sharePdfAndroid(blob, fileName);
     return 'sheet';
   } catch (e) {
-    console.error('[PDF] Share sheet also failed:', e);
+    console.error('[PDF] Share sheet failed:', e);
   }
   return 'failed';
 }
@@ -189,7 +177,7 @@ async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
 // ─── downloadOpenPDF ────────────────────────────────────────────────────────
 // Android Tauri : saves to Downloads folder; falls back to share sheet.
 // Web / Desktop : standard blob <a download> click.
-async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob'> {
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
     return downloadPdfAndroid(doc.output('blob'), fileName);
   }
@@ -3573,11 +3561,9 @@ export default function PosSystem() {
     const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: dlResult === 'saved' ? "Saved to Downloads" : dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
-      description: dlResult === 'saved'
-        ? `${invoice.documentNumber} has been saved to your Downloads folder`
-        : dlResult === 'sheet'
-        ? `${invoice.documentNumber} - choose "Save to Files" in the share sheet to keep it`
+      title: dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
+      description: dlResult === 'sheet'
+        ? `${invoice.documentNumber} - tap "Save to Files" in the share sheet to keep it`
         : `${invoice.documentNumber} has been downloaded`,
     });
   } catch (err: any) {
@@ -3900,12 +3886,10 @@ export default function PosSystem() {
       })();
       if (!blob) return;
       const result = await downloadPdfAndroid(blob, fileName);
-      if (result === 'saved') {
-        toast({ title: "Saved to Downloads", description: `${fileName} has been saved to your Downloads folder` });
-      } else if (result === 'sheet') {
-        toast({ title: "PDF Ready", description: 'Choose "Save to Files" in the share sheet to keep it' });
+      if (result === 'sheet') {
+        toast({ title: "PDF Ready", description: 'Tap "Save to Files" in the share sheet to keep it' });
       } else {
-        toast({ title: "Download Failed", description: "Could not save PDF. Please try again.", variant: "destructive" });
+        toast({ title: "Download Failed", description: "Could not open PDF. Please try again.", variant: "destructive" });
       }
       return;
     }
