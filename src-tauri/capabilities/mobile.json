@@ -18,7 +18,6 @@
     "fs:default",
     "fs:allow-write-file",
     "fs:allow-read-file",
-    "fs:allow-create-dir",
     "fs:scope-app-cache-recursive"
   ],
   "remote": {
