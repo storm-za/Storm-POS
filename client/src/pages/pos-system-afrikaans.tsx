@@ -144,19 +144,23 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
-// Stoor PDF in die toep-kas met tauri-plugin-fs en maak dan die Android Deel-skerm oop
-// via sharekit sodat die gebruiker die PDF kan oopmaak, stoor of stuur.
+// Stoor PDF in die toep-kas via Rust-opdrag, maak dan die Android Deel-skerm oop
+// (via sharekit shareFile) sodat die gebruiker die PDF kan oopmaak, stoor of stuur.
 async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+  const { invoke } = await import('@tauri-apps/api/core');
+  // Kodeer blob na base64 vir die Rust-opdrag
   const arrayBuffer = await blob.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
-  // Skryf PDF-grepe na die toep-kas-gids met die amptelike tauri-plugin-fs
-  const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
-  await writeFile(fileName, data, { baseDir: BaseDirectory.AppCache });
-  // Los die kas-gids op sodat ons 'n file://-URL vir die Deel-voorneme kan bou
-  const { appCacheDir } = await import('@tauri-apps/api/path');
-  const dir = await appCacheDir();
-  const fileUrl = `file://${dir.endsWith('/') ? dir : `${dir}/`}${fileName}`;
-  // Maak Android Deel-skerm oop — gebruiker kan met PDF-kyker oopmaak, na WhatsApp stuur, na Aflaai stoor, ens.
+  const uint8 = new Uint8Array(arrayBuffer);
+  let binary = '';
+  const chunkSize = 65536;
+  for (let i = 0; i < uint8.length; i += chunkSize) {
+    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+  }
+  const base64 = btoa(binary);
+  // Rust-opdrag skryf grepe na toep-kas-gids en gee die absolute pad terug
+  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  // Bou 'n file://-URL — sharekit se shareFile hanteer FileProvider intern op Android
+  const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }

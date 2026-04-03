@@ -133,19 +133,23 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
-// Save a PDF blob to the device's app cache using tauri-plugin-fs, then open the
-// Android native Share Sheet via sharekit so the user can open, save, or send the PDF.
+// Save a PDF blob to the app cache via Rust command, then open the Android native
+// Share Sheet (via sharekit shareFile) so the user can open, save, or send the PDF.
 async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
+  const { invoke } = await import('@tauri-apps/api/core');
+  // Encode blob to base64 for the Rust command
   const arrayBuffer = await blob.arrayBuffer();
-  const data = new Uint8Array(arrayBuffer);
-  // Write PDF bytes to the app cache directory using the official tauri-plugin-fs
-  const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
-  await writeFile(fileName, data, { baseDir: BaseDirectory.AppCache });
-  // Resolve the cache dir so we can build a file:// URL for the Share Intent
-  const { appCacheDir } = await import('@tauri-apps/api/path');
-  const dir = await appCacheDir();
-  const fileUrl = `file://${dir.endsWith('/') ? dir : `${dir}/`}${fileName}`;
-  // Open the Android Share Sheet — user can open with PDF viewer, send to WhatsApp, save to Downloads, etc.
+  const uint8 = new Uint8Array(arrayBuffer);
+  let binary = '';
+  const chunkSize = 65536;
+  for (let i = 0; i < uint8.length; i += chunkSize) {
+    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+  }
+  const base64 = btoa(binary);
+  // Rust command writes bytes to app cache dir and returns the absolute path
+  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  // Build a file:// URL — sharekit's shareFile handles FileProvider internally on Android
+  const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }

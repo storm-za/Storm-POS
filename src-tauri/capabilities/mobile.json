@@ -14,11 +14,7 @@
     "opener:allow-open-url",
     "opener:allow-open-path",
     "sharekit:allow-share-text",
-    "sharekit:allow-share-file",
-    "fs:default",
-    "fs:allow-write-file",
-    "fs:allow-read-file",
-    "fs:scope-app-cache-recursive"
+    "sharekit:allow-share-file"
   ],
   "remote": {
     "urls": [
