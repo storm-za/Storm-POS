@@ -35,7 +35,8 @@ pub fn run() {
     #[cfg(target_os = "android")]
     let builder = builder
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_sharekit::init());
+        .plugin(tauri_plugin_sharekit::init())
+        .plugin(tauri_plugin_fs::init());
 
     builder
         .setup(|app| {

@@ -133,21 +133,21 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
-// Save a PDF blob to the device's app cache folder and open it with the native PDF viewer.
-// Tauri Android only - one-tap in-app download, no browser involved.
+// Save a PDF blob to the device's app cache using tauri-plugin-fs, then open the
+// Android native Share Sheet via sharekit so the user can open, save, or send the PDF.
 async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  const { openPath } = await import('@tauri-apps/plugin-opener');
   const arrayBuffer = await blob.arrayBuffer();
-  const uint8 = new Uint8Array(arrayBuffer);
-  let binary = '';
-  const chunkSize = 65536;
-  for (let i = 0; i < uint8.length; i += chunkSize) {
-    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
-  }
-  const base64 = btoa(binary);
-  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
-  await openPath(path);
+  const data = new Uint8Array(arrayBuffer);
+  // Write PDF bytes to the app cache directory using the official tauri-plugin-fs
+  const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+  await writeFile(fileName, data, { baseDir: BaseDirectory.AppCache });
+  // Resolve the cache dir so we can build a file:// URL for the Share Intent
+  const { appCacheDir } = await import('@tauri-apps/api/path');
+  const dir = await appCacheDir();
+  const fileUrl = `file://${dir.endsWith('/') ? dir : `${dir}/`}${fileName}`;
+  // Open the Android Share Sheet — user can open with PDF viewer, send to WhatsApp, save to Downloads, etc.
+  const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
+  await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
 // Download/Open PDF
@@ -180,11 +180,22 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
 }
 
 // Share PDF via native share sheet — always sends the actual PDF file, never a link
-// Tauri Android: uses tauri-plugin-sharekit to open Android Sharesheet with message text
-// Browser/mobile: navigator.share({ files }) attaches the PDF directly (WhatsApp, Gmail, etc.)
+// Tauri Android: writes PDF with tauri-plugin-fs then opens Android Share Sheet via sharekit (WhatsApp, Gmail, etc.)
+// Browser/mobile: navigator.share({ files }) attaches the PDF directly
 // Desktop fallback: saves PDF locally then opens WhatsApp Web with message text only
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  // Try to share the actual PDF file (works on Android WebView and mobile browsers)
+  // Tauri Android: write PDF to cache then open native Android Share Sheet with the real file
+  if (isTauriAndroid()) {
+    try {
+      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      return 'shared';
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').toLowerCase();
+      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      return 'fallback';
+    }
+  }
+  // Browser/mobile: try attaching the actual PDF file via Web Share API
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');

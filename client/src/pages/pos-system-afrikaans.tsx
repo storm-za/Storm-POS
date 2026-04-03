@@ -144,21 +144,21 @@ const isTauriAndroid = (): boolean =>
   '__TAURI_INTERNALS__' in window &&
   navigator.maxTouchPoints > 0;
 
-// Stoor 'n PDF-blob in die toep se kas-vouer en maak dit oop met die inheemse PDF-kyker.
-// Tauri Android alleen - een-tik in-toep aflaai, geen blaaier betrokke nie.
+// Stoor PDF in die toep-kas met tauri-plugin-fs en maak dan die Android Deel-skerm oop
+// via sharekit sodat die gebruiker die PDF kan oopmaak, stoor of stuur.
 async function saveAndOpenPdfAndroid(blob: Blob, fileName: string): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-  const { openPath } = await import('@tauri-apps/plugin-opener');
   const arrayBuffer = await blob.arrayBuffer();
-  const uint8 = new Uint8Array(arrayBuffer);
-  let binary = '';
-  const chunkSize = 65536;
-  for (let i = 0; i < uint8.length; i += chunkSize) {
-    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
-  }
-  const base64 = btoa(binary);
-  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
-  await openPath(path);
+  const data = new Uint8Array(arrayBuffer);
+  // Skryf PDF-grepe na die toep-kas-gids met die amptelike tauri-plugin-fs
+  const { writeFile, BaseDirectory } = await import('@tauri-apps/plugin-fs');
+  await writeFile(fileName, data, { baseDir: BaseDirectory.AppCache });
+  // Los die kas-gids op sodat ons 'n file://-URL vir die Deel-voorneme kan bou
+  const { appCacheDir } = await import('@tauri-apps/api/path');
+  const dir = await appCacheDir();
+  const fileUrl = `file://${dir.endsWith('/') ? dir : `${dir}/`}${fileName}`;
+  // Maak Android Deel-skerm oop — gebruiker kan met PDF-kyker oopmaak, na WhatsApp stuur, na Aflaai stoor, ens.
+  const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
+  await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
 // Laai PDF af / Maak oop
@@ -190,12 +190,23 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<void> {
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
 }
 
-// Deel PDF via deel-skerm -- stuur altyd die werklike PDF-leeer, nooit 'n skakel nie
-// Tauri Android: gebruik tauri-plugin-sharekit vir Android Deel-skerm (slegs boodskapsteks)
-// Blaaier/mobiel: navigator.share({ files }) heg die PDF direk aan (WhatsApp, Gmail, ens.)
+// Deel PDF via deel-skerm -- stuur altyd die werklike PDF-lêer, nooit 'n skakel nie
+// Tauri Android: skryf PDF met tauri-plugin-fs dan maak Android Deel-skerm oop via sharekit (WhatsApp, Gmail, ens.)
+// Blaaier/mobiel: navigator.share({ files }) heg die PDF direk aan
 // Rekenaar-terugval: stoor PDF plaaslik, maak WhatsApp Web oop met boodskapsteks slegs
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
-  // Probeer die werklike PDF-leeer deel (werk op Android WebView en mobiele blaaiers)
+  // Tauri Android: skryf PDF na kas dan maak inheemse Android Deel-skerm oop met die werklike lêer
+  if (isTauriAndroid()) {
+    try {
+      await saveAndOpenPdfAndroid(doc.output('blob'), fileName);
+      return 'shared';
+    } catch (e: any) {
+      const msg = String(e?.message ?? e ?? '').toLowerCase();
+      if (msg.includes('cancel') || msg.includes('dismiss')) return 'cancelled';
+      return 'fallback';
+    }
+  }
+  // Blaaier/mobiel: probeer die werklike PDF-lêer aanheg via Web Share API
   if (navigator.share) {
     try {
       const blob: Blob = doc.output('blob');
