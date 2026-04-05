@@ -1,6 +1,6 @@
 [package]
 name = "storm-pos"
-version = "1.5.11"
+version = "1.5.12"
 description = "Storm POS - Desktop Application"
 authors = ["Storm"]
 edition = "2021"

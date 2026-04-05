@@ -151,6 +151,7 @@ jobs:
       - name: Install Tauri CLI and cargo-ndk
         run: |
           npm install --no-save @tauri-apps/cli@latest
+          npm pkg set scripts.tauri="tauri"
           cargo install cargo-ndk
 
       - name: Initialize Tauri Android project
