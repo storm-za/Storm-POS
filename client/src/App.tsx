@@ -27,8 +27,16 @@ const PosSystem = lazy(() => import("@/pages/pos-system"));
 const PosSystemAfrikaans = lazy(() => import("@/pages/pos-system-afrikaans"));
 
 function Router() {
-  const [location] = useLocation();
-  
+  const [location, navigate] = useLocation();
+
+  // When running as a bundled Tauri app, start directly at the POS login
+  // instead of the marketing home page.
+  useEffect(() => {
+    if ((window as any).__TAURI_INTERNALS__ && location === "/") {
+      navigate("/pos/login");
+    }
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
