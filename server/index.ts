@@ -18,6 +18,26 @@ process.on("SIGINT", () => {
 });
 
 const app = express();
+
+// Allow requests from Tauri bundled apps (Android: tauri://localhost, Desktop: asset://localhost)
+// These origins appear when the frontend is bundled into the APK/installer rather than loaded remotely.
+app.use((req, res, next) => {
+  const origin = req.headers.origin ?? "";
+  const allowed = [
+    "tauri://localhost",
+    "asset://localhost",
+    "https://stormsoftware.co.za",
+  ];
+  if (allowed.includes(origin) || origin.startsWith("http://localhost")) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 

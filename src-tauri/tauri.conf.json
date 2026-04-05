@@ -1,9 +1,9 @@
 {
   "productName": "Storm POS",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "identifier": "za.storm.pos",
   "build": {
-    "frontendDist": "https://stormsoftware.co.za/pos/login",
+    "frontendDist": "../dist/public",
     "devUrl": "https://stormsoftware.co.za/pos/login",
     "beforeDevCommand": "",
     "beforeBuildCommand": ""
@@ -12,7 +12,6 @@
     "windows": [
       {
         "title": "Storm POS",
-        "url": "https://stormsoftware.co.za/pos/login",
         "width": 1280,
         "height": 800,
         "minWidth": 900,

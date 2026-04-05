@@ -30,6 +30,13 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
+      - name: Install dependencies and build frontend
+        shell: pwsh
+        run: |
+          npm ci
+          npm run build
+          Write-Host "Frontend built to dist/public"
+
       - name: Build Tauri app (signed)
         shell: pwsh
         env:
@@ -135,9 +142,14 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
+      - name: Install dependencies and build frontend
+        run: |
+          npm ci
+          npm run build
+          echo "Frontend built to dist/public"
+
       - name: Install Tauri CLI and cargo-ndk
         run: |
-          echo '{"name":"storm-pos","version":"1.0.0","scripts":{"tauri":"tauri"}}' > package.json
           npm install --no-save @tauri-apps/cli@latest
           cargo install cargo-ndk
 

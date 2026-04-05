@@ -1,5 +1,17 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// When running as a bundled Tauri app (Android/Desktop), the WebView loads from
+// asset://localhost/ so relative /api/... paths won't reach the server.
+// We prefix with the production base URL so all API calls resolve correctly.
+const API_BASE: string =
+  typeof window !== "undefined" && (window as any).__TAURI_INTERNALS__
+    ? "https://stormsoftware.co.za"
+    : "";
+
+function resolveUrl(url: string): string {
+  return url.startsWith("http") ? url : API_BASE + url;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -12,7 +24,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const res = await fetch(resolveUrl(url), {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +41,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const res = await fetch(resolveUrl(queryKey[0] as string), {
       credentials: "include",
     });
 
