@@ -3876,73 +3876,45 @@ export default function PosSystem() {
     }).catch(() => setReceiptPdfBusy(false));
   }, [saleCompleteData]);
 
-  const handleDownloadSaleReceipt = async () => {
+  // Single unified Download & Share handler for the sale receipt dialog.
+  // Android: opens the native Android Share Sheet so the user can send the PDF
+  //          via WhatsApp/email OR tap "Save to Files" to put it in Downloads.
+  // Web    : downloads the PDF directly (works perfectly in the browser).
+  // Desktop: downloads the PDF AND opens WhatsApp Web for text-sharing.
+  const handleDownloadShare = async () => {
     if (!saleCompleteData) return;
     const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
-    if (isTauriAndroid()) {
-      const blob = receiptPdfBlob || ((): Blob | null => {
-        const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-        return doc ? (doc.output('blob') as Blob) : null;
-      })();
-      if (!blob) return;
-      const result = await downloadPdfAndroid(blob, fileName);
-      if (result === 'sheet') {
-        toast({ title: "PDF Ready", description: 'Tap "Save to Files" in the share sheet to keep it' });
-      } else {
-        toast({ title: "Download Failed", description: "Could not open PDF. Please try again.", variant: "destructive" });
-      }
-      return;
-    }
-    // Web: instant anchor download using pre-generated blob URL
-    if (receiptPdfUrl) {
-      const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = fileName;
-      a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
-    }
-    const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) await downloadOpenPDF(doc, fileName);
-  };
-
-  const handleShareSaleReceipt = async () => {
-    if (!saleCompleteData) return;
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
-    const fileName = `receipt-${saleCompleteData.saleId}.pdf`;
-    // Android Tauri: always use native share sheet with real PDF file
-    if (isTauriAndroid()) {
-      const blob = receiptPdfBlob || ((): Blob | null => {
+    setReceiptPdfBusy(true);
+    try {
+      const blob: Blob | null = receiptPdfBlob || (() => {
         const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
         return doc ? (doc.output('blob') as Blob) : null;
       })();
       if (!blob) return;
-      try { await sharePdfAndroid(blob, fileName); } catch (e) { console.error('Android share error:', e); }
-      return;
-    }
-    // Mobile/desktop browser: Web Share API with file attachment
-    if (navigator.share && receiptPdfBlob) {
-      try {
-        const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: fileName, text: message });
-        } else {
-          await navigator.share({ title: fileName, text: message });
+
+      if (isTauriAndroid()) {
+        // Android: share sheet = download + share in one step
+        try {
+          await sharePdfAndroid(blob, fileName);
+        } catch (e) {
+          console.error('[PDF] Android share error:', e);
+          toast({ title: "Could not open share sheet", description: "Please try again.", variant: "destructive" });
         }
-        return;
-      } catch (e: any) { if (e.name === 'AbortError') return; }
-    }
-    // Desktop-only fallback — NEVER on mobile
-    if (!isAnyMobile()) {
-      if (receiptPdfBlob) {
-        const url = URL.createObjectURL(receiptPdfBlob);
+      } else {
+        // Web: instant download via pre-generated URL or blob
+        const url = receiptPdfUrl || URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = fileName;
         a.style.display = 'none'; document.body.appendChild(a); a.click();
-        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+        setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+        // Desktop web: also open WhatsApp Web for sharing
+        if (!isAnyMobile()) {
+          setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
+        }
       }
-      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
-    } else if (receiptPdfBlob) {
-      const url = URL.createObjectURL(receiptPdfBlob);
-      const a = document.createElement('a'); a.href = url; a.download = fileName;
-      a.style.display = 'none'; document.body.appendChild(a); a.click();
-      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    } finally {
+      setReceiptPdfBusy(false);
     }
   };
 
@@ -4005,15 +3977,11 @@ export default function PosSystem() {
                 </div>
               </motion.div>
 
-              {/* Action buttons */}
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceipt} disabled={receiptPdfBusy} className={`h-11 font-semibold rounded-xl transition-all disabled:opacity-60 ${posTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 border border-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700'}`}>
-                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Preparing...' : 'Download'}
-                </Button>
-                <Button onClick={handleShareSaleReceipt} disabled={receiptPdfBusy} className="h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold rounded-xl transition-all disabled:opacity-60">
+              {/* Single Download & Share button */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-2.5">
+                <Button onClick={handleDownloadShare} disabled={receiptPdfBusy} className="w-full h-11 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold rounded-xl transition-all disabled:opacity-60">
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Preparing...' : 'Share'}
+                  {receiptPdfBusy ? 'Preparing...' : 'Download & Share'}
                 </Button>
               </motion.div>
             </div>
@@ -9782,23 +9750,13 @@ export default function PosSystem() {
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs disabled:opacity-60"
-                    data-testid="button-export-pdf"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-3 disabled:opacity-60"
+                    data-testid="button-download-share-invoice"
                     disabled={invoicePdfBusy}
-                    onClick={() => generateInvoicePDF(selectedInvoice)}
-                  >
-                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? '...' : 'PDF'}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2 disabled:opacity-60"
-                    data-testid="button-share-invoice"
-                    disabled={invoicePdfBusy}
-                    onClick={() => shareInvoice(selectedInvoice)}
+                    onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
                   >
                     {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? 'Working...' : 'Share'}
+                    {invoicePdfBusy ? 'Working...' : 'Download & Share'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9889,22 +9847,12 @@ export default function PosSystem() {
                     <Button 
                       size="sm" 
                       className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
-                      data-testid="button-export-pdf-desktop"
+                      data-testid="button-download-share-invoice-desktop"
                       disabled={invoicePdfBusy}
-                      onClick={() => generateInvoicePDF(selectedInvoice)}
-                    >
-                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Generating...' : 'Export PDF'}
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
-                      data-testid="button-share-invoice-desktop"
-                      disabled={invoicePdfBusy}
-                      onClick={() => shareInvoice(selectedInvoice)}
+                      onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
                     >
                       {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Working...' : 'Share'}
+                      {invoicePdfBusy ? 'Working...' : 'Download & Share'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Close

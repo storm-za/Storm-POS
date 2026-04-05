@@ -3373,73 +3373,45 @@ ${dateFilteredSales.map(sale =>
     }).catch(() => setReceiptPdfBusy(false));
   }, [saleCompleteData]);
 
-  const handleDownloadSaleReceiptAfr = async () => {
+  // Enkele verenigde Aflaai & Deel-knoppie vir die verkoopkwitansie-dialoog.
+  // Android: maak die inheemse Android Deel-skerm oop — gebruik "Stoor na Lêers"
+  //          om af te laai, of stuur direk na WhatsApp/e-pos.
+  // Web    : laai die PDF direk af (werk perfek in die blaaier).
+  // Rekenaar: laai die PDF af EN maak WhatsApp Web oop vir teksdeling.
+  const handleDownloadShareAfr = async () => {
     if (!saleCompleteData) return;
     const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    if (isTauriAndroid()) {
-      const blob = receiptPdfBlob || ((): Blob | null => {
-        const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-        return doc ? (doc.output('blob') as Blob) : null;
-      })();
-      if (!blob) return;
-      const result = await downloadPdfAndroid(blob, fileName);
-      if (result === 'sheet') {
-        toast({ title: "PDF Gereed", description: 'Tik "Stoor na Lêers" in die deel-skerm om dit te hou' });
-      } else {
-        toast({ title: "Aflaai Misluk", description: "Kon nie PDF oopmaak nie. Probeer asseblief weer.", variant: "destructive" });
-      }
-      return;
-    }
-    // Web: oombliklike anker-aflaai met vooraf-gegenereerde blob-URL
-    if (receiptPdfUrl) {
-      const a = document.createElement('a'); a.href = receiptPdfUrl; a.download = fileName;
-      a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => document.body.removeChild(a), 200); return;
-    }
-    const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
-    if (doc) await downloadOpenPDF(doc, fileName);
-  };
-
-  const handleShareSaleReceiptAfr = async () => {
-    if (!saleCompleteData) return;
     const companyName = currentUser?.companyName || 'Storm POS';
     const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
-    const fileName = `kwitansie-${saleCompleteData.sale.id}.pdf`;
-    // Android Tauri: gebruik altyd inheemse deel-skerm met werklike PDF-lêer
-    if (isTauriAndroid()) {
-      const blob = receiptPdfBlob || ((): Blob | null => {
+    setReceiptPdfBusy(true);
+    try {
+      const blob: Blob | null = receiptPdfBlob || (() => {
         const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
         return doc ? (doc.output('blob') as Blob) : null;
       })();
       if (!blob) return;
-      try { await sharePdfAndroid(blob, fileName); } catch (e) { console.error('Android deel fout:', e); }
-      return;
-    }
-    // Mobiele/rekenaar-blaaier: Web Share API met lêeraanhegsel
-    if (navigator.share && receiptPdfBlob) {
-      try {
-        const file = new File([receiptPdfBlob], fileName, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: fileName, text: message });
-        } else {
-          await navigator.share({ title: fileName, text: message });
+
+      if (isTauriAndroid()) {
+        // Android: deel-skerm = aflaai + deel in een stap
+        try {
+          await sharePdfAndroid(blob, fileName);
+        } catch (e) {
+          console.error('[PDF] Android deel fout:', e);
+          toast({ title: "Kon nie deel-skerm oopmaak nie", description: "Probeer asseblief weer.", variant: "destructive" });
         }
-        return;
-      } catch (e: any) { if (e.name === 'AbortError') return; }
-    }
-    // Rekenaar-terugval slegs — NOOIT op mobiel nie
-    if (!isAnyMobile()) {
-      if (receiptPdfBlob) {
-        const url = URL.createObjectURL(receiptPdfBlob);
+      } else {
+        // Web: oombliklike aflaai via vooraf-gegenereerde URL of blob
+        const url = receiptPdfUrl || URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = fileName;
         a.style.display = 'none'; document.body.appendChild(a); a.click();
-        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+        setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+        // Rekenaar-web: maak ook WhatsApp Web oop vir deling
+        if (!isAnyMobile()) {
+          setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
+        }
       }
-      window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank');
-    } else if (receiptPdfBlob) {
-      const url = URL.createObjectURL(receiptPdfBlob);
-      const a = document.createElement('a'); a.href = url; a.download = fileName;
-      a.style.display = 'none'; document.body.appendChild(a); a.click();
-      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    } finally {
+      setReceiptPdfBusy(false);
     }
   };
 
@@ -3505,14 +3477,11 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="grid grid-cols-2 gap-3 mb-2.5">
-                <Button onClick={handleDownloadSaleReceiptAfr} disabled={receiptPdfBusy} className={`h-11 font-semibold rounded-xl transition-all disabled:opacity-60 ${posTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 border border-white/10 text-white' : 'bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700'}`}>
-                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Berei voor...' : 'Aflaai'}
-                </Button>
-                <Button onClick={handleShareSaleReceiptAfr} disabled={receiptPdfBusy} className="h-11 bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold rounded-xl transition-all disabled:opacity-60">
+              {/* Enkele Aflaai & Deel-knoppie */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-2.5">
+                <Button onClick={handleDownloadShareAfr} disabled={receiptPdfBusy} className="w-full h-11 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold rounded-xl transition-all disabled:opacity-60">
                   {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Berei voor...' : 'Deel'}
+                  {receiptPdfBusy ? 'Berei voor...' : 'Aflaai & Deel'}
                 </Button>
               </motion.div>
             </div>
@@ -9115,23 +9084,13 @@ ${dateFilteredSales.map(sale =>
                   </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs disabled:opacity-60"
-                    data-testid="button-export-pdf"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-3 disabled:opacity-60"
+                    data-testid="button-download-share-invoice"
                     disabled={invoicePdfBusy}
-                    onClick={() => generateInvoicePDF(selectedInvoice)}
-                  >
-                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? '...' : 'PDF'}
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2 disabled:opacity-60"
-                    data-testid="button-share-invoice"
-                    disabled={invoicePdfBusy}
-                    onClick={() => shareInvoice(selectedInvoice)}
+                    onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
                   >
                     {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? 'Besig...' : 'Deel'}
+                    {invoicePdfBusy ? 'Besig...' : 'Aflaai & Deel'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9222,22 +9181,12 @@ ${dateFilteredSales.map(sale =>
                     <Button 
                       size="sm" 
                       className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
-                      data-testid="button-export-pdf-desktop"
+                      data-testid="button-download-share-invoice-desktop"
                       disabled={invoicePdfBusy}
-                      onClick={() => generateInvoicePDF(selectedInvoice)}
-                    >
-                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Genereer...' : 'Eksporteer PDF'}
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
-                      data-testid="button-share-invoice-desktop"
-                      disabled={invoicePdfBusy}
-                      onClick={() => shareInvoice(selectedInvoice)}
+                      onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
                     >
                       {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Besig...' : 'Deel'}
+                      {invoicePdfBusy ? 'Besig...' : 'Aflaai & Deel'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
