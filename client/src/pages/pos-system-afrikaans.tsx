@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiFetch } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
@@ -125,7 +125,7 @@ const saveInvoiceVisDef = (key: string, hidden: boolean) => {
 async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null> {
   try {
     const base64 = (doc.output('datauristring') as string).split(',')[1];
-    const res = await fetch('/api/pos/pdf-temp', {
+    const res = await apiFetch('/api/pos/pdf-temp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: base64, filename: fileName }),
@@ -294,7 +294,7 @@ export default function PosSystemAfrikaans() {
 
   const refreshUserProfile = useCallback(async (userId: number, userEmail: string) => {
     try {
-      const res = await fetch(`/api/pos/user/${userId}?userEmail=${encodeURIComponent(userEmail)}`);
+      const res = await apiFetch(`/api/pos/user/${userId}?userEmail=${encodeURIComponent(userEmail)}`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.user) {
@@ -692,7 +692,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/products", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/products?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/products?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie produkte laai nie');
       return response.json();
     },
@@ -704,7 +704,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/categories", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/categories?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/categories?userId=${currentUser.id}`);
       if (!response.ok) return [];
       const data = await response.json();
       setCategories(data);
@@ -717,7 +717,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/customers", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/customers?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/customers?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie kliente laai nie');
       return response.json();
     },
@@ -728,7 +728,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/sales", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/sales?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/sales?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie verkope laai nie');
       return response.json();
     },
@@ -739,7 +739,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/open-accounts", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/open-accounts?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/open-accounts?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie oop rekeninge laai nie');
       return response.json();
     },
@@ -750,7 +750,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/staff-accounts", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/staff-accounts?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/staff-accounts?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie personeel laai nie');
       return response.json();
     },
@@ -782,7 +782,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/invoices", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie fakturen laai nie');
       return response.json();
     },
@@ -794,7 +794,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/purchase-orders", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie aankoopbestellings laai nie');
       return response.json();
     },
@@ -805,7 +805,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/suppliers", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/suppliers?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/suppliers?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie verskaffers laai nie');
       return response.json();
     },
@@ -816,7 +816,7 @@ export default function PosSystemAfrikaans() {
     queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Kon nie betalingsbesonderhede laai nie');
       return response.json();
     },
@@ -1554,7 +1554,7 @@ export default function PosSystemAfrikaans() {
     localStorage.removeItem('posUser');
     localStorage.removeItem('posLoginTimestamp');
     try {
-      await fetch('/api/pos/logout', { method: 'POST' });
+      await apiFetch('/api/pos/logout', { method: 'POST' });
     } catch {
     }
     window.location.href = '/pos/login';
@@ -6238,7 +6238,7 @@ ${dateFilteredSales.map(sale =>
                       onClick={async () => {
                         if (!currentUser?.id) return;
                         try {
-                          const response = await fetch(`/api/pos/user/${currentUser.id}/preferred-language`, {
+                          const response = await apiFetch(`/api/pos/user/${currentUser.id}/preferred-language`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ preferredLanguage: 'en' })
@@ -6379,7 +6379,7 @@ ${dateFilteredSales.map(sale =>
                                   },
                                   lastBusinessInfoUpdate: today,
                                 };
-                                const res = await fetch(`/api/pos/user/${currentUser.id}/receipt-settings`, {
+                                const res = await apiFetch(`/api/pos/user/${currentUser.id}/receipt-settings`, {
                                   method: 'PUT',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ settings: newSettings }),
@@ -9429,7 +9429,7 @@ ${dateFilteredSales.map(sale =>
                 if (!currentUser) return;
                 setIsDeletingAccount(true);
                 try {
-                  const res = await fetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
                   if (res.ok) {
                     localStorage.removeItem('posUser');
                     localStorage.removeItem('posToken');
@@ -9583,7 +9583,7 @@ ${dateFilteredSales.map(sale =>
             
             setIsChangingPassword(true);
             try {
-              const response = await fetch(`/api/pos/user/${currentUser.id}/change-password`, {
+              const response = await apiFetch(`/api/pos/user/${currentUser.id}/change-password`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword })

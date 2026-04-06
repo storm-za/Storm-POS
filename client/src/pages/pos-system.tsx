@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiFetch } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount, type PosCategory, type InsertPosCategory } from "@shared/schema";
@@ -114,7 +114,7 @@ const saveInvoiceVisDef = (key: string, hidden: boolean) => {
 async function getTempPdfUrl(doc: any, fileName: string): Promise<string | null> {
   try {
     const base64 = (doc.output('datauristring') as string).split(',')[1];
-    const res = await fetch('/api/pos/pdf-temp', {
+    const res = await apiFetch('/api/pos/pdf-temp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: base64, filename: fileName }),
@@ -272,7 +272,7 @@ export default function PosSystem() {
 
   const refreshUserProfile = useCallback(async (userId: number, userEmail: string) => {
     try {
-      const res = await fetch(`/api/pos/user/${userId}?userEmail=${encodeURIComponent(userEmail)}`);
+      const res = await apiFetch(`/api/pos/user/${userId}?userEmail=${encodeURIComponent(userEmail)}`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.user) {
@@ -682,7 +682,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/products", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/products?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/products?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch products');
       return response.json();
     },
@@ -694,7 +694,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/categories", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/categories?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/categories?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch categories');
       return response.json();
     },
@@ -706,7 +706,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/customers", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/customers?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/customers?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch customers');
       return response.json();
     },
@@ -718,7 +718,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/sales", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/sales?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/sales?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch sales');
       return response.json();
     },
@@ -730,7 +730,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/open-accounts", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/open-accounts?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/open-accounts?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch open accounts');
       return response.json();
     },
@@ -742,7 +742,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/staff-accounts", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/staff-accounts?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/staff-accounts?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch staff accounts');
       return response.json();
     },
@@ -775,7 +775,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/invoices", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/invoices?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/invoices?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch invoices');
       return response.json();
     },
@@ -787,7 +787,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/purchase-orders", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/purchase-orders?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch purchase orders');
       return response.json();
     },
@@ -798,7 +798,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/suppliers", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/suppliers?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/suppliers?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch suppliers');
       return response.json();
     },
@@ -810,7 +810,7 @@ export default function PosSystem() {
     queryKey: ["/api/pos/saved-payment-details", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return [];
-      const response = await fetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
+      const response = await apiFetch(`/api/pos/saved-payment-details?userId=${currentUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch saved payment details');
       return response.json();
     },
@@ -6855,7 +6855,7 @@ export default function PosSystem() {
                       onClick={async () => {
                         if (!currentUser?.id) return;
                         try {
-                          const response = await fetch(`/api/pos/user/${currentUser.id}/preferred-language`, {
+                          const response = await apiFetch(`/api/pos/user/${currentUser.id}/preferred-language`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ preferredLanguage: 'af' })
@@ -6996,7 +6996,7 @@ export default function PosSystem() {
                                   },
                                   lastBusinessInfoUpdate: today,
                                 };
-                                const res = await fetch(`/api/pos/user/${currentUser.id}/receipt-settings`, {
+                                const res = await apiFetch(`/api/pos/user/${currentUser.id}/receipt-settings`, {
                                   method: 'PUT',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ settings: newSettings }),
@@ -10095,7 +10095,7 @@ export default function PosSystem() {
                 if (!currentUser) return;
                 setIsDeletingAccount(true);
                 try {
-                  const res = await fetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
                   if (res.ok) {
                     localStorage.removeItem('posUser');
                     localStorage.removeItem('posToken');
@@ -10249,7 +10249,7 @@ export default function PosSystem() {
             
             setIsChangingPassword(true);
             try {
-              const response = await fetch(`/api/pos/user/${currentUser.id}/change-password`, {
+              const response = await apiFetch(`/api/pos/user/${currentUser.id}/change-password`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword })

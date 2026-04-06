@@ -34,6 +34,12 @@ async function platformFetch(url: string, options?: RequestInit): Promise<Respon
   return fetch(resolved, options);
 }
 
+// Exported so POS components can call any API route (GET or otherwise) with
+// the same platform-aware transport as apiRequest without duplicating logic.
+export async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
+  return platformFetch(url, options);
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
