@@ -5,26 +5,37 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 #[cfg(desktop)]
 use tauri_plugin_updater::UpdaterExt;
 
-// Save a base64-encoded PDF to the app cache directory and return the full path.
-// Called from JavaScript on Tauri Android so the PDF can be opened with the native
-// PDF viewer via openPath() - no browser involved, true in-app download.
+// Save a base64-encoded PDF to the app cache directory (for FileProvider sharing)
+// and also attempt to write a copy to the public Downloads folder so the user
+// can find it in the Files app. The Downloads write is best-effort: on Android 10+
+// with scoped storage it may be silently skipped without affecting sharing.
 #[tauri::command]
-async fn save_pdf_to_cache(data: String, filename: String, app: tauri::AppHandle) -> Result<String, String> {
+async fn save_pdf_to_device(data: String, filename: String, app: tauri::AppHandle) -> Result<String, String> {
     use base64::Engine;
     let bytes = base64::engine::general_purpose::STANDARD
         .decode(&data)
         .map_err(|e| format!("base64 decode: {e}"))?;
+
+    // Primary: write to app cache — always writable, used for FileProvider sharing.
     let cache_dir = app.path().app_cache_dir().map_err(|e| e.to_string())?;
     std::fs::create_dir_all(&cache_dir).ok();
-    let file_path = cache_dir.join(&filename);
-    std::fs::write(&file_path, &bytes).map_err(|e| format!("write error: {e}"))?;
-    Ok(file_path.to_string_lossy().to_string())
+    let cache_path = cache_dir.join(&filename);
+    std::fs::write(&cache_path, &bytes).map_err(|e| format!("cache write error: {e}"))?;
+
+    // Secondary: try to write to public Downloads/StormPOS/ so it appears in Files.
+    // Requires WRITE_EXTERNAL_STORAGE on Android < 10; silently ignored if blocked.
+    let downloads_dir = std::path::PathBuf::from("/storage/emulated/0/Download/StormPOS");
+    if std::fs::create_dir_all(&downloads_dir).is_ok() {
+        let _ = std::fs::write(downloads_dir.join(&filename), &bytes);
+    }
+
+    Ok(cache_path.to_string_lossy().to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![save_pdf_to_cache]);
+        .invoke_handler(tauri::generate_handler![save_pdf_to_device]);
 
     #[cfg(desktop)]
     let builder = builder

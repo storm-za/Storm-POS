@@ -155,20 +155,23 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: save PDF to app cache and open Android Share Sheet ───────────
-// The share sheet lets the user send to WhatsApp, Gmail, etc., or "Save to Files".
-// tauri-plugin-sharekit handles the FileProvider conversion from file:// internally.
+// ─── Android: save PDF to device and open Android Share Sheet ─────────────
+// Uses FileReader.readAsDataURL for reliable blob→base64 on Android WebView.
+// Manual Uint8Array+btoa chunking silently produces empty strings on Android V8.
+// Writes to app cache (for sharing) and attempts Downloads folder (for visibility).
 async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
-  const arrayBuffer = await blob.arrayBuffer();
-  const uint8 = new Uint8Array(arrayBuffer);
-  let binary = '';
-  const chunkSize = 65536;
-  for (let i = 0; i < uint8.length; i += chunkSize) {
-    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
-  }
-  const base64 = btoa(binary);
-  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  const base64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      resolve(dataUrl.split(',')[1] ?? '');
+    };
+    reader.onerror = () => reject(new Error('FileReader failed reading PDF blob'));
+    reader.readAsDataURL(blob);
+  });
+  if (!base64) throw new Error('PDF blob is empty — generation failed');
+  const path = await invoke<string>('save_pdf_to_device', { data: base64, filename: fileName });
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });

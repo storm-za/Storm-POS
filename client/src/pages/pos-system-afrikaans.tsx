@@ -166,20 +166,23 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: stoor PDF in toep-kas en maak Android Deel-skerm oop ───────
-// Die deel-skerm laat die gebruiker toe om na WhatsApp, Gmail, ens. te stuur,
-// of "Stoor na Lêers" te kies. tauri-plugin-sharekit hanteer die FileProvider.
+// ─── Android: stoor PDF op toestel en maak Android Deel-skerm oop ────────
+// Gebruik FileReader.readAsDataURL vir betroubare blob→base64 op Android WebView.
+// Handmatige Uint8Array+btoa-verdeling lewer stil leë stringe op Android V8.
+// Skryf na toep-kas (vir deel) en probeer Aflaaigids (vir sigbaarheid).
 async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
-  const arrayBuffer = await blob.arrayBuffer();
-  const uint8 = new Uint8Array(arrayBuffer);
-  let binary = '';
-  const chunkSize = 65536;
-  for (let i = 0; i < uint8.length; i += chunkSize) {
-    binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
-  }
-  const base64 = btoa(binary);
-  const path = await invoke<string>('save_pdf_to_cache', { data: base64, filename: fileName });
+  const base64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      resolve(dataUrl.split(',')[1] ?? '');
+    };
+    reader.onerror = () => reject(new Error('FileReader het misluk om PDF-blob te lees'));
+    reader.readAsDataURL(blob);
+  });
+  if (!base64) throw new Error('PDF-blob is leeg — generering het misluk');
+  const path = await invoke<string>('save_pdf_to_device', { data: base64, filename: fileName });
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
