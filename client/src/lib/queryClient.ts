@@ -6,12 +6,17 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 // globals slightly after module evaluation.
 function resolveUrl(url: string): string {
   if (url.startsWith("http")) return url;
+  if (typeof window === "undefined") return url;
+  // Tauri v2 Android serves from https://tauri.localhost/ (or https://asset.localhost/ on some builds).
+  // Both end in ".localhost" which is never the real production hostname.
+  // Also catch tauri:// protocol (desktop) and __TAURI_INTERNALS__ global (all Tauri v2 builds).
+  const h = window.location.hostname;
   const isTauri =
-    typeof window !== "undefined" &&
-    ((window as any).__TAURI_INTERNALS__ ||
-      (window as any).__TAURI__ ||
-      window.location.hostname === "tauri.localhost" ||
-      window.location.protocol === "tauri:");
+    (window as any).__TAURI_INTERNALS__ ||
+    (window as any).__TAURI__ ||
+    window.location.protocol === "tauri:" ||
+    window.location.protocol === "asset:" ||
+    (h.endsWith(".localhost") && h !== "localhost");
   return isTauri ? "https://stormsoftware.co.za" + url : url;
 }
 

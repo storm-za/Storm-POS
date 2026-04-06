@@ -32,7 +32,14 @@ function Router() {
   // When running as a bundled Tauri app, start directly at the POS login
   // instead of the marketing home page.
   useEffect(() => {
-    if ((window as any).__TAURI_INTERNALS__ && location === "/") {
+    const h = window.location.hostname;
+    const isTauri =
+      (window as any).__TAURI_INTERNALS__ ||
+      (window as any).__TAURI__ ||
+      window.location.protocol === "tauri:" ||
+      window.location.protocol === "asset:" ||
+      (h.endsWith(".localhost") && h !== "localhost");
+    if (isTauri && location === "/") {
       navigate("/pos/login");
     }
   }, []);
