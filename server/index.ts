@@ -19,17 +19,28 @@ process.on("SIGINT", () => {
 
 const app = express();
 
-// CORS: reflect the request origin back so Tauri Android/Desktop bundled apps
-// can reach the API regardless of which exact scheme/host the WebView uses
-// (https://tauri.localhost, tauri://localhost, asset://localhost, etc.).
-// The API is protected by email+password so open CORS is safe here.
+// CORS: allow known-safe origins only. The API uses Bearer-token auth (no cookies),
+// so Access-Control-Allow-Credentials is not required.
+// Tauri Android WebView origin is https://tauri.localhost; desktop is tauri://localhost.
+const CORS_ALLOWED_EXACT = new Set([
+  "https://stormsoftware.co.za",
+]);
+const CORS_ALLOWED_PATTERNS = [
+  /^tauri:\/\//,                  // Tauri desktop (tauri://localhost)
+  /^https:\/\/tauri\.localhost/,  // Tauri Android WebView
+  /^asset:\/\//,                  // Tauri alternative scheme
+  /^https?:\/\/localhost(:\d+)?$/, // local dev server
+];
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
+  const allowed =
+    origin &&
+    (CORS_ALLOWED_EXACT.has(origin) ||
+      CORS_ALLOWED_PATTERNS.some((p) => p.test(origin)));
+  if (allowed) {
+    res.setHeader("Access-Control-Allow-Origin", origin!);
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Vary", "Origin");
   }
   if (req.method === "OPTIONS") return res.sendStatus(204);
