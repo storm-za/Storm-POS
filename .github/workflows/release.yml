@@ -172,6 +172,22 @@ jobs:
           done
           echo "All custom icons injected."
 
+      - name: Configure Android FileProvider for PDF sharing
+        run: |
+          MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          if ! grep -q "FileProvider" "$MANIFEST"; then
+            sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths" />\n        </provider>\n    </application>|' "$MANIFEST"
+            echo "FileProvider injected into AndroidManifest.xml"
+          else
+            echo "FileProvider already present in manifest, skipping"
+          fi
+          echo "=== FileProvider check ==="
+          grep -A 10 "FileProvider" "$MANIFEST" || echo "WARNING: FileProvider not found in manifest"
+          mkdir -p src-tauri/gen/android/app/src/main/res/xml
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <cache-path name="cache" path="." />\n    <files-path name="files" path="." />\n    <external-cache-path name="external_cache" path="." />\n    <external-files-path name="external_files" path="." />\n</paths>\n' > src-tauri/gen/android/app/src/main/res/xml/file_provider_paths.xml
+          echo "file_provider_paths.xml created:"
+          cat src-tauri/gen/android/app/src/main/res/xml/file_provider_paths.xml
+
       - name: Build Android AAB (release)
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
