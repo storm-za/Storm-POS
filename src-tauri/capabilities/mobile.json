@@ -14,7 +14,15 @@
     "opener:allow-open-url",
     "opener:allow-open-path",
     "sharekit:allow-share-text",
-    "sharekit:allow-share-file"
+    "sharekit:allow-share-file",
+    "http:allow-fetch",
+    "http:allow-fetch-cancel",
+    "http:allow-fetch-read-body",
+    "http:allow-fetch-send",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://stormsoftware.co.za/**" }]
+    }
   ],
   "remote": {
     "urls": [

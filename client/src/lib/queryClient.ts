@@ -1,23 +1,37 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-// When running as a bundled Tauri app (Android/Desktop), the WebView loads from
-// https://tauri.localhost/ so relative /api/... paths won't reach the server.
-// We check lazily (at call time, not module load) in case Tauri injects its
-// globals slightly after module evaluation.
-function resolveUrl(url: string): string {
-  if (url.startsWith("http")) return url;
-  if (typeof window === "undefined") return url;
-  // Tauri v2 Android serves from https://tauri.localhost/ (or https://asset.localhost/ on some builds).
-  // Both end in ".localhost" which is never the real production hostname.
-  // Also catch tauri:// protocol (desktop) and __TAURI_INTERNALS__ global (all Tauri v2 builds).
+// Detect whether we are running inside the Tauri native shell (Android/Desktop).
+// Checked lazily at call time because Tauri may inject its globals slightly after
+// module evaluation on some builds.
+function isTauriNative(): boolean {
+  if (typeof window === "undefined") return false;
   const h = window.location.hostname;
-  const isTauri =
+  return !!(
     (window as any).__TAURI_INTERNALS__ ||
     (window as any).__TAURI__ ||
     window.location.protocol === "tauri:" ||
     window.location.protocol === "asset:" ||
-    (h.endsWith(".localhost") && h !== "localhost");
-  return isTauri ? "https://stormsoftware.co.za" + url : url;
+    (h.endsWith(".localhost") && h !== "localhost")
+  );
+}
+
+// In a bundled Tauri app the WebView origin is https://tauri.localhost/ so
+// relative /api/... paths must be prefixed with the production domain.
+function resolveUrl(url: string): string {
+  if (url.startsWith("http")) return url;
+  return isTauriNative() ? "https://stormsoftware.co.za" + url : url;
+}
+
+// On Android the WebView's native fetch() is subject to full browser CORS.
+// @tauri-apps/plugin-http routes requests through Rust's HTTP client which
+// bypasses WebView CORS entirely — this is the official Tauri v2 solution.
+async function platformFetch(url: string, options?: RequestInit): Promise<Response> {
+  const resolved = resolveUrl(url);
+  if (isTauriNative()) {
+    const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
+    return tauriFetch(resolved, options) as Promise<Response>;
+  }
+  return fetch(resolved, options);
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -32,7 +46,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(resolveUrl(url), {
+  const res = await platformFetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -49,7 +63,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(resolveUrl(queryKey[0] as string), {
+    const res = await platformFetch(queryKey[0] as string, {
       credentials: "include",
     });
 
