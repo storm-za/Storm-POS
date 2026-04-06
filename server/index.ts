@@ -19,20 +19,13 @@ process.on("SIGINT", () => {
 
 const app = express();
 
-// Allow requests from Tauri bundled apps.
-// Android Tauri v2 serves from https://tauri.localhost (custom scheme via WebViewAssetLoader).
-// Desktop Tauri uses tauri://localhost or asset://localhost depending on platform.
+// CORS: reflect the request origin back so Tauri Android/Desktop bundled apps
+// can reach the API regardless of which exact scheme/host the WebView uses
+// (https://tauri.localhost, tauri://localhost, asset://localhost, etc.).
+// The API is protected by email+password so open CORS is safe here.
 app.use((req, res, next) => {
-  const origin = req.headers.origin ?? "";
-  const isTauriOrLocal =
-    origin === "https://stormsoftware.co.za" ||
-    origin === "tauri://localhost" ||
-    origin === "asset://localhost" ||
-    origin === "https://tauri.localhost" ||
-    origin === "https://asset.localhost" ||
-    origin.startsWith("http://localhost") ||
-    origin.startsWith("https://localhost");
-  if (isTauriOrLocal) {
+  const origin = req.headers.origin;
+  if (origin) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");

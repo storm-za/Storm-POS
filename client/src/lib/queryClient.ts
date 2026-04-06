@@ -1,15 +1,18 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 // When running as a bundled Tauri app (Android/Desktop), the WebView loads from
-// asset://localhost/ so relative /api/... paths won't reach the server.
-// We prefix with the production base URL so all API calls resolve correctly.
-const API_BASE: string =
-  typeof window !== "undefined" && (window as any).__TAURI_INTERNALS__
-    ? "https://stormsoftware.co.za"
-    : "";
-
+// https://tauri.localhost/ so relative /api/... paths won't reach the server.
+// We check lazily (at call time, not module load) in case Tauri injects its
+// globals slightly after module evaluation.
 function resolveUrl(url: string): string {
-  return url.startsWith("http") ? url : API_BASE + url;
+  if (url.startsWith("http")) return url;
+  const isTauri =
+    typeof window !== "undefined" &&
+    ((window as any).__TAURI_INTERNALS__ ||
+      (window as any).__TAURI__ ||
+      window.location.hostname === "tauri.localhost" ||
+      window.location.protocol === "tauri:");
+  return isTauri ? "https://stormsoftware.co.za" + url : url;
 }
 
 async function throwIfResNotOk(res: Response) {
