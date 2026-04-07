@@ -166,23 +166,44 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: stoor PDF op toestel en maak Android Deel-skerm oop ────────
-// Gebruik FileReader.readAsDataURL vir betroubare blob→base64 op Android WebView.
-// Handmatige Uint8Array+btoa-verdeling lewer stil leë stringe op Android V8.
-// Skryf na toep-kas (vir deel) en probeer Aflaaigids (vir sigbaarheid).
+// ─── Android: gesegmenteerde PDF-oordrag + Deel-skerm ────────────────────
+//
+// HOOFOORSAAK van 0 KB-lêers: Tauri op Android gebruik postMessage vir IPC
+// (dit kan nie die vinniger rekenaar-protokolpad gebruik nie). postMessage het
+// 'n grens van ~1 MB vir die hele JSON-lading. 'n PDF met 'n maatskappylogo
+// of baie reëlitems kan dit maklik oorskry — die data kom stil en leeg by
+// Rust aan, wat dan 'n 0-byte-lêer skryf sonder enige fout.
+//
+// OPLOSSING: verdeel die base64 in 307 200-karakter-stukke (≡ 0 mod 4, sodat
+// elke stuk selfstandig decodeerbaar is). Elke invoke() is ~300 KB — ver
+// binne die grens. Rust voeg gedecodeerde rou grepe by 'n .part-lêer, dan
+// hernoem pdf_finalize dit en probeer dit na Aflaaigids kopieer.
 async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
+
+  // FileReader is betroubaar vir blob→base64 op Android WebView.
   const base64 = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      resolve(dataUrl.split(',')[1] ?? '');
-    };
+    reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
     reader.onerror = () => reject(new Error('FileReader het misluk om PDF-blob te lees'));
     reader.readAsDataURL(blob);
   });
-  if (!base64) throw new Error('PDF-blob is leeg — generering het misluk');
-  const path = await invoke<string>('save_pdf_to_device', { data: base64, filename: fileName });
+
+  if (!base64) throw new Error('PDF-blob is leeg — jsPDF-generering het geen uitvoer geproduseer nie');
+
+  // Elke stuk moet 'n veelvoud van 4 wees sodat dit geldige selfstandige base64 is.
+  // 307 200 = 300 × 1024, deelbaar deur 4. FileReader-uitvoer is altyd gevoer
+  // (lengte ≡ 0 mod 4), sodat elke sny (insluitend die laaste) ook ≡ 0 mod 4 is.
+  const CHUNK = 307200;
+  for (let i = 0; i < base64.length; i += CHUNK) {
+    await invoke<void>('pdf_write_chunk', {
+      filename: fileName,
+      chunk: base64.slice(i, i + CHUNK),
+      append: i > 0,
+    });
+  }
+
+  const path = await invoke<string>('pdf_finalize', { filename: fileName });
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });

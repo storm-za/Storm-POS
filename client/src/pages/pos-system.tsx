@@ -155,23 +155,44 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: save PDF to device and open Android Share Sheet ─────────────
-// Uses FileReader.readAsDataURL for reliable blob→base64 on Android WebView.
-// Manual Uint8Array+btoa chunking silently produces empty strings on Android V8.
-// Writes to app cache (for sharing) and attempts Downloads folder (for visibility).
+// ─── Android: chunked PDF transfer + Share Sheet ──────────────────────────
+//
+// ROOT CAUSE of 0 KB files: Tauri on Android uses postMessage for IPC (it
+// cannot use the desktop custom-protocol path). postMessage has a ~1 MB limit
+// for the entire JSON payload. A PDF with a company logo or many line items
+// can easily exceed that — the data arrives silently empty at Rust, which
+// writes a 0-byte file with no error thrown.
+//
+// FIX: split the base64 into 307 200-char chunks (≡ 0 mod 4, so each chunk
+// is independently decodable). Each invoke() is ~300 KB — well within the
+// limit. Rust appends decoded raw bytes to a .part file per chunk, then
+// pdf_finalize renames it and (best-effort) copies it to Downloads.
 async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
+
+  // FileReader is reliable for blob→base64 on Android WebView (no spread/btoa issues).
   const base64 = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      resolve(dataUrl.split(',')[1] ?? '');
-    };
+    reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
     reader.onerror = () => reject(new Error('FileReader failed reading PDF blob'));
     reader.readAsDataURL(blob);
   });
-  if (!base64) throw new Error('PDF blob is empty — generation failed');
-  const path = await invoke<string>('save_pdf_to_device', { data: base64, filename: fileName });
+
+  if (!base64) throw new Error('PDF blob is empty — jsPDF generation produced no output');
+
+  // CHUNK must be a multiple of 4 so each slice is valid standalone base64.
+  // 307 200 = 300 × 1024, divisible by 4. FileReader output is always padded
+  // (length ≡ 0 mod 4), so every slice (including the last) is also ≡ 0 mod 4.
+  const CHUNK = 307200;
+  for (let i = 0; i < base64.length; i += CHUNK) {
+    await invoke<void>('pdf_write_chunk', {
+      filename: fileName,
+      chunk: base64.slice(i, i + CHUNK),
+      append: i > 0,
+    });
+  }
+
+  const path = await invoke<string>('pdf_finalize', { filename: fileName });
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
