@@ -152,17 +152,52 @@ const isAnyMobile = (): boolean =>
   /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
 
 // ─── Android: maak die inheemse Deel-skerm oop met die PDF ───────────────
-// tauri-plugin-fs kan nie na die openbare Aflaaigids skryf op Android nie.
-// Die Android Deel-skerm laat die gebruiker toe om "Stoor na Lêers" te kies
-// om die PDF na Aflaaigids te skuif, of dit direk na WhatsApp / Gmail te stuur.
-async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' | 'failed'> {
-  try {
-    await sharePdfAndroid(doc, fileName);
-    return 'sheet';
-  } catch (e) {
-    console.error('[PDF] Deel-skerm misluk:', e);
+// ─── downloadPdfAndroid ──────────────────────────────────────────────────────
+// Stoor die PDF direk in die toestel se openbare Aflaaigids sodat dit sigbaar
+// is in die Lêers-app onder Downloads/StormPOS/.  Gebruik die arraybuffer→base64
+// IPC-gesegmenteerde pad om die PDF na die app-kas te skryf, dan roep
+// pdf_save_to_downloads wat Android MediaStore (tauri-plugin-android-fs) gebruik
+// om dit na openbare Downloads te skuif.  MediaStore benodig geen spesiale
+// toestemming op Android 10+ nie.
+async function downloadPdfAndroid(doc: any, fileName: string): Promise<'saved' | 'failed'> {
+  const { invoke } = await import('@tauri-apps/api/core');
+
+  const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+  const u8 = new Uint8Array(arrayBuffer);
+  if (u8.length === 0) {
+    console.error('[PDF] 0 grepe — jsPDF-generasie het misluk');
+    return 'failed';
   }
-  return 'failed';
+  console.log(`[PDF] aflaai: ${u8.length} grepe`);
+
+  // Skakel Uint8Array → base64 om in 8 KB-snye (stapel-veilig op Android WebView).
+  let binary = '';
+  const BIN_CHUNK = 8192;
+  for (let i = 0; i < u8.length; i += BIN_CHUNK) {
+    binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
+  }
+  const base64 = btoa(binary);
+
+  try {
+    // Stuur in 30 KB IPC-segmente (konserwatief — veilig vir enige Android-limiet).
+    const CHUNK = 30000;
+    for (let i = 0; i < base64.length; i += CHUNK) {
+      await invoke<void>('pdf_write_chunk', {
+        filename: fileName,
+        chunk: base64.slice(i, i + CHUNK),
+        append: i > 0,
+      });
+    }
+    await invoke<string>('pdf_finalize', { filename: fileName });
+
+    // Kopieer van kas → openbare Downloads via Android MediaStore.
+    const savedPath = await invoke<string>('pdf_save_to_downloads', { filename: fileName });
+    console.log(`[PDF] gestoor na: ${savedPath}`);
+    return 'saved';
+  } catch (e: any) {
+    console.error('[PDF] aflaai na Downloads het misluk:', e);
+    return 'failed';
+  }
 }
 
 // ─── Android: PDF → base64 → Rust (gesegmenteerd) → FileProvider → Deel ──
@@ -245,7 +280,7 @@ async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
 // ─── downloadOpenPDF ───────────────────────────────────────────────────────
 // Android Tauri : kas → Deel-skerm (arraybuffer-pad, sien bo).
 // Web / Rekenaar : standaard blob <a download> klik.
-async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
     return downloadPdfAndroid(doc, fileName);
   }
@@ -1302,8 +1337,10 @@ export default function PosSystemAfrikaans() {
     const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
-      description: dlResult === 'sheet'
+      title: dlResult === 'saved' ? "PDF Gestoor" : dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
+      description: dlResult === 'saved'
+        ? `${invoice.documentNumber} gestoor na Downloads/StormPOS/ — maak die Lêers-app oop om dit te sien`
+        : dlResult === 'sheet'
         ? `${invoice.documentNumber} - tik "Stoor na Lêers" in die deel-skerm om dit te hou`
         : `${invoice.documentNumber} is afgelaai`,
     });

@@ -144,14 +144,51 @@ const isAnyMobile = (): boolean =>
 // tauri-plugin-fs cannot write to the public Downloads directory on Android.
 // The Android Share Sheet lets the user tap "Save to Files" to move the PDF
 // to Downloads, or send it directly to WhatsApp / Gmail / etc.
-async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' | 'failed'> {
-  try {
-    await sharePdfAndroid(doc, fileName);
-    return 'sheet';
-  } catch (e) {
-    console.error('[PDF] Share sheet failed:', e);
+// ─── downloadPdfAndroid ─────────────────────────────────────────────────────
+// Saves the PDF directly to the device's public Downloads folder so it appears
+// in the Files app under Downloads/StormPOS/.  Uses the same arraybuffer→base64
+// IPC chunked path to write the PDF to app cache, then calls pdf_save_to_downloads
+// which uses Android MediaStore (tauri-plugin-android-fs) to move it to public
+// Downloads.  MediaStore requires no special permission on Android 10+.
+async function downloadPdfAndroid(doc: any, fileName: string): Promise<'saved' | 'failed'> {
+  const { invoke } = await import('@tauri-apps/api/core');
+
+  const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+  const u8 = new Uint8Array(arrayBuffer);
+  if (u8.length === 0) {
+    console.error('[PDF] 0 bytes — jsPDF generation failed');
+    return 'failed';
   }
-  return 'failed';
+  console.log(`[PDF] download: ${u8.length} bytes`);
+
+  // Convert Uint8Array → base64 in 8 KB slices (stack-safe on Android WebView).
+  let binary = '';
+  const BIN_CHUNK = 8192;
+  for (let i = 0; i < u8.length; i += BIN_CHUNK) {
+    binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
+  }
+  const base64 = btoa(binary);
+
+  try {
+    // Send in 30 KB IPC chunks (conservative — safe for any Android postMessage limit).
+    const CHUNK = 30000;
+    for (let i = 0; i < base64.length; i += CHUNK) {
+      await invoke<void>('pdf_write_chunk', {
+        filename: fileName,
+        chunk: base64.slice(i, i + CHUNK),
+        append: i > 0,
+      });
+    }
+    await invoke<string>('pdf_finalize', { filename: fileName });
+
+    // Copy from cache → public Downloads via Android MediaStore.
+    const savedPath = await invoke<string>('pdf_save_to_downloads', { filename: fileName });
+    console.log(`[PDF] saved to: ${savedPath}`);
+    return 'saved';
+  } catch (e: any) {
+    console.error('[PDF] download to Downloads failed:', e);
+    return 'failed';
+  }
 }
 
 // ─── Android: PDF → base64 → Rust (chunked) → FileProvider → Share Sheet ─
@@ -242,7 +279,7 @@ async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
 // ─── downloadOpenPDF ────────────────────────────────────────────────────────
 // Android Tauri : saves to cache → Share Sheet (arraybuffer path, see above).
 // Web / Desktop : standard blob <a download> click.
-async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
+async function downloadOpenPDF(doc: any, fileName: string): Promise<'saved' | 'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
     return downloadPdfAndroid(doc, fileName);
   }
@@ -3626,8 +3663,10 @@ export default function PosSystem() {
     const dlResult = await downloadOpenPDF(doc, fileName);
 
     toast({
-      title: dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
-      description: dlResult === 'sheet'
+      title: dlResult === 'saved' ? "PDF Saved" : dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
+      description: dlResult === 'saved'
+        ? `${invoice.documentNumber} saved to Downloads/StormPOS/ — open the Files app to view it`
+        : dlResult === 'sheet'
         ? `${invoice.documentNumber} - tap "Save to Files" in the share sheet to keep it`
         : `${invoice.documentNumber} has been downloaded`,
     });

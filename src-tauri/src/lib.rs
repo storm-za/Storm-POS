@@ -56,8 +56,7 @@ async fn pdf_write_chunk(
 }
 
 /// Finalize the PDF after all chunks have been written.
-/// Renames the .part file to its final name, copies to Downloads (best-effort),
-/// and returns the cache path for the FileProvider share.
+/// Renames the .part file to its final name in app cache and returns the path.
 #[tauri::command]
 async fn pdf_finalize(filename: String, app: tauri::AppHandle) -> Result<String, String> {
     let cache_dir = app.path().app_cache_dir().map_err(|e| e.to_string())?;
@@ -67,22 +66,79 @@ async fn pdf_finalize(filename: String, app: tauri::AppHandle) -> Result<String,
     std::fs::rename(&part_path, &final_path)
         .map_err(|e| format!("finalize PDF rename: {e}"))?;
 
-    // Best-effort: copy to public Downloads so the file is visible in Files app.
-    // Requires WRITE_EXTERNAL_STORAGE on Android < 10; silently ignored if blocked.
-    let dl_dir = std::path::PathBuf::from("/storage/emulated/0/Download/StormPOS");
-    if std::fs::create_dir_all(&dl_dir).is_ok() {
-        if let Ok(bytes) = std::fs::read(&final_path) {
-            let _ = std::fs::write(dl_dir.join(&filename), bytes);
-        }
+    Ok(final_path.to_string_lossy().to_string())
+}
+
+/// Save the finalised PDF from app cache to the public Downloads folder.
+/// On Android 10+ (API 29+): uses MediaStore — no permission dialog shown.
+/// On Android ≤ 9  (API 28-): requests WRITE_EXTERNAL_STORAGE via the
+/// legacy_storage_permission feature of tauri-plugin-android-fs.
+/// Returns a display path ("Downloads/StormPOS/<filename>") for toast UI.
+#[tauri::command]
+async fn pdf_save_to_downloads(filename: String, app: tauri::AppHandle) -> Result<String, String> {
+    // Desktop stub — this command is only useful on Android.
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = (&filename, &app);
+        return Ok(format!("(desktop) {filename}"));
     }
 
-    Ok(final_path.to_string_lossy().to_string())
+    #[cfg(target_os = "android")]
+    {
+        use tauri_plugin_android_fs::{AndroidFsExt, PublicGeneralPurposeDir};
+
+        // Read the PDF that pdf_finalize wrote to the app cache.
+        let cache_dir = app.path().app_cache_dir().map_err(|e| e.to_string())?;
+        let cache_path = cache_dir.join(&filename);
+        let bytes = std::fs::read(&cache_path)
+            .map_err(|e| format!("read cached PDF ({cache_path:?}): {e}"))?;
+
+        if bytes.is_empty() {
+            return Err(format!(
+                "Cached PDF is 0 bytes — IPC transfer failed. Path: {cache_path:?}"
+            ));
+        }
+
+        let api = app.android_fs_async();
+
+        // Request storage permission.
+        // Android 10+ (API 29+): MediaStore needs no permission — returns true immediately.
+        // Android <= 9: shows a WRITE_EXTERNAL_STORAGE dialog (legacy feature enabled).
+        let granted = api
+            .public_storage()
+            .request_permission()
+            .await
+            .map_err(|e| format!("permission request failed: {e}"))?;
+
+        if !granted {
+            return Err("Storage permission denied — cannot save to Downloads".to_string());
+        }
+
+        // Write to ~/Downloads/StormPOS/<filename> via Android MediaStore.
+        // The file will be visible in the Files app immediately after this call.
+        api.public_storage()
+            .write_new(
+                None,                               // primary storage volume
+                PublicGeneralPurposeDir::Downloads, // ~/Downloads/
+                format!("StormPOS/{filename}"),     // subdirectory created automatically
+                Some("application/pdf"),
+                &bytes,
+            )
+            .await
+            .map_err(|e| format!("MediaStore write failed: {e}"))?;
+
+        Ok(format!("Downloads/StormPOS/{filename}"))
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![pdf_write_chunk, pdf_finalize]);
+        .invoke_handler(tauri::generate_handler![
+            pdf_write_chunk,
+            pdf_finalize,
+            pdf_save_to_downloads,
+        ]);
 
     #[cfg(desktop)]
     let builder = builder
@@ -94,7 +150,8 @@ pub fn run() {
     let builder = builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_sharekit::init())
-        .plugin(tauri_plugin_http::init());
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_android_fs::init());
 
     builder
         .setup(|app| {

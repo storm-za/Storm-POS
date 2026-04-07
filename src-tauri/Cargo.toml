@@ -1,6 +1,6 @@
 [package]
 name = "storm-pos"
-version = "1.5.21"
+version = "1.5.22"
 description = "Storm POS - Desktop Application"
 authors = ["Storm"]
 edition = "2021"
@@ -27,6 +27,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
 tauri-plugin-sharekit = "0.3"
 tauri-plugin-http = "2"
+tauri-plugin-android-fs = { version = "28", features = ["legacy_storage_permission"] }
 
 [profile.release]
 panic = "abort"
