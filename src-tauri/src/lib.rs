@@ -85,7 +85,7 @@ async fn pdf_save_to_downloads(filename: String, app: tauri::AppHandle) -> Resul
 
     #[cfg(target_os = "android")]
     {
-        use tauri_plugin_android_fs::{AndroidFsExt, PublicGeneralPurposeDir};
+        use tauri_plugin_android_fs::{AndroidFsExt, PublicGeneralPurposeDir, StorageVolumeId};
 
         // Read the PDF that pdf_finalize wrote to the app cache.
         let cache_dir = app.path().app_cache_dir().map_err(|e| e.to_string())?;
@@ -118,8 +118,8 @@ async fn pdf_save_to_downloads(filename: String, app: tauri::AppHandle) -> Resul
         // The file will be visible in the Files app immediately after this call.
         api.public_storage()
             .write_new(
-                None,                               // primary storage volume
-                PublicGeneralPurposeDir::Downloads, // ~/Downloads/
+                None::<&StorageVolumeId>,           // primary storage volume
+                PublicGeneralPurposeDir::Download,  // ~/Downloads/
                 format!("StormPOS/{filename}"),     // subdirectory created automatically
                 Some("application/pdf"),
                 &bytes,
