@@ -152,13 +152,12 @@ const isAnyMobile = (): boolean =>
   /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
 
 // ─── Android: maak die inheemse Deel-skerm oop met die PDF ───────────────
-// tauri-plugin-fs kan nie na die openbare Aflaaigids skryf op Android nie
-// (geen fs:scope-download-write toestemming bestaan in hierdie inprop-weergawe).
+// tauri-plugin-fs kan nie na die openbare Aflaaigids skryf op Android nie.
 // Die Android Deel-skerm laat die gebruiker toe om "Stoor na Lêers" te kies
 // om die PDF na Aflaaigids te skuif, of dit direk na WhatsApp / Gmail te stuur.
-async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet' | 'failed'> {
+async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' | 'failed'> {
   try {
-    await sharePdfAndroid(blob, fileName);
+    await sharePdfAndroid(doc, fileName);
     return 'sheet';
   } catch (e) {
     console.error('[PDF] Deel-skerm misluk:', e);
@@ -166,34 +165,48 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: gesegmenteerde PDF-oordrag + Deel-skerm ────────────────────
+// ─── Android: PDF → base64 → Rust (gesegmenteerd) → FileProvider → Deel ──
 //
-// HOOFOORSAAK van 0 KB-lêers: Tauri op Android gebruik postMessage vir IPC
-// (dit kan nie die vinniger rekenaar-protokolpad gebruik nie). postMessage het
-// 'n grens van ~1 MB vir die hele JSON-lading. 'n PDF met 'n maatskappylogo
-// of baie reëlitems kan dit maklik oorskry — die data kom stil en leeg by
-// Rust aan, wat dan 'n 0-byte-lêer skryf sonder enige fout.
+// LAAG 1 — Binêre Integriteit
+//   Gebruik doc.output('arraybuffer') — bevestig mees betroubaar op Android
+//   WebView. doc.output('blob') is onbetroubaar oor WebView-bou-weergawes;
+//   die Blob-konstruktor gedra verskillend op verskillende Android-weergawes.
+//   Skakel Uint8Array → base64 om in 8 KB-snye (String.fromCharCode.apply het
+//   'n stapelgrens — segmentering vermy "Maximum call stack size exceeded").
+//   Kontroleer die greeptelling voor oordrag; gooi vroeg as jsPDF stil misluk.
 //
-// OPLOSSING: verdeel die base64 in 307 200-karakter-stukke (≡ 0 mod 4, sodat
-// elke stuk selfstandig decodeerbaar is). Elke invoke() is ~300 KB — ver
-// binne die grens. Rust voeg gedecodeerde rou grepe by 'n .part-lêer, dan
-// hernoem pdf_finalize dit en probeer dit na Aflaaigids kopieer.
-async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
+// LAAG 2 — Berging
+//   Rust skryf na app_cache_dir() wat na getCacheDir()/{bundleId}/ wys.
+//   Dit is presies die pad wat deur ons FileProvider blootgestel word, wat
+//   WhatsApp tydelike leestoegang gee via 'n content://-URI.
+//
+// LAAG 3 — URI-Brug
+//   pdf_finalize gee 'n absolute pad terug. Ons voeg file:// by sodat
+//   tauri-plugin-sharekit dit kan verwyder, 'n java.io.File skep, en
+//   FileProvider.getUriForFile(ctx, "${packageName}.fileprovider", file) roep.
+//   Die resulterende content://-URI word in die Intent geplaas met
+//   FLAG_GRANT_READ_URI_PERMISSION. MIME-tipe word uitdruklik ingestel.
+async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
 
-  // FileReader is betroubaar vir blob→base64 op Android WebView.
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
-    reader.onerror = () => reject(new Error('FileReader het misluk om PDF-blob te lees'));
-    reader.readAsDataURL(blob);
-  });
+  // LAAG 1: kry rou PDF-grepe via arraybuffer — mees betroubaar op Android WebView.
+  const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+  const u8 = new Uint8Array(arrayBuffer);
 
-  if (!base64) throw new Error('PDF-blob is leeg — jsPDF-generering het geen uitvoer geproduseer nie');
+  if (u8.length === 0) {
+    throw new Error('PDF is 0 grepe — jsPDF-generering het stil misluk op hierdie toestel');
+  }
+  console.log(`[PDF] ${u8.length} grepe — skakel om na base64 vir IPC-oordrag`);
 
-  // Elke stuk moet 'n veelvoud van 4 wees sodat dit geldige selfstandige base64 is.
-  // 307 200 = 300 × 1024, deelbaar deur 4. FileReader-uitvoer is altyd gevoer
-  // (lengte ≡ 0 mod 4), sodat elke sny (insluitend die laaste) ook ≡ 0 mod 4 is.
+  // Skakel Uint8Array → base64 in 8 KB-snye om stapeloorloop te vermy.
+  let binary = '';
+  const BIN_CHUNK = 8192;
+  for (let i = 0; i < u8.length; i += BIN_CHUNK) {
+    binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
+  }
+  const base64 = btoa(binary);
+
+  // LAAG 2: verdeel in 300 KB IPC-stukke (Android postMessage ~1 MB-grens).
   const CHUNK = 307200;
   for (let i = 0; i < base64.length; i += CHUNK) {
     await invoke<void>('pdf_write_chunk', {
@@ -203,18 +216,21 @@ async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
     });
   }
 
+  // LAAG 3: voltooi op Rust-kant → kry kaspad → deel via FileProvider.
   const path = await invoke<string>('pdf_finalize', { filename: fileName });
+  console.log(`[PDF] geskryf na: ${path}`);
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
+  // MIME-tipe MOET uitdruklik wees — moenie die OS laat raai van die uitbreiding nie.
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
 // ─── downloadOpenPDF ───────────────────────────────────────────────────────
-// Android Tauri : stoor in Aflaaigids; val terug op deel-skerm.
+// Android Tauri : kas → Deel-skerm (arraybuffer-pad, sien bo).
 // Web / Rekenaar : standaard blob <a download> klik.
 async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
-    return downloadPdfAndroid(doc.output('blob'), fileName);
+    return downloadPdfAndroid(doc, fileName);
   }
   const blob: Blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -233,7 +249,7 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'b
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   if (isTauriAndroid()) {
     try {
-      await sharePdfAndroid(doc.output('blob'), fileName);
+      await sharePdfAndroid(doc, fileName);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
@@ -3409,30 +3425,35 @@ ${dateFilteredSales.map(sale =>
     const message = `Verkoopkwitansie van ${companyName} - R${saleCompleteData.sale.total}`;
     setReceiptPdfBusy(true);
     try {
+      if (isTauriAndroid()) {
+        // Android: genereer doc vars (arraybuffer-pad — moenie gestoorde blob gebruik nie;
+        // doc.output('blob') is onbetroubaar op Android WebView oor weergawes).
+        try {
+          const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
+          if (!doc) throw new Error('generateAfrikaansReceipt het null teruggegee');
+          await sharePdfAndroid(doc, fileName);
+        } catch (e) {
+          console.error('[PDF] Android deel fout:', e);
+          toast({ title: "Kon nie deel-skerm oopmaak nie", description: "Probeer asseblief weer.", variant: "destructive" });
+        }
+        return;
+      }
+
+      // Web / Rekenaar: gebruik gestoorde blob of hergenereer
       const blob: Blob | null = receiptPdfBlob || (() => {
         const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
         return doc ? (doc.output('blob') as Blob) : null;
       })();
       if (!blob) return;
 
-      if (isTauriAndroid()) {
-        // Android: deel-skerm = aflaai + deel in een stap
-        try {
-          await sharePdfAndroid(blob, fileName);
-        } catch (e) {
-          console.error('[PDF] Android deel fout:', e);
-          toast({ title: "Kon nie deel-skerm oopmaak nie", description: "Probeer asseblief weer.", variant: "destructive" });
-        }
-      } else {
-        // Web: oombliklike aflaai via vooraf-gegenereerde URL of blob
-        const url = receiptPdfUrl || URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = fileName;
-        a.style.display = 'none'; document.body.appendChild(a); a.click();
-        setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-        // Rekenaar-web: maak ook WhatsApp Web oop vir deling
-        if (!isAnyMobile()) {
-          setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
-        }
+      // Web: oombliklike aflaai via vooraf-gegenereerde URL of blob
+      const url = receiptPdfUrl || URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+      // Rekenaar-web: maak ook WhatsApp Web oop vir deling
+      if (!isAnyMobile()) {
+        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
       }
     } finally {
       setReceiptPdfBusy(false);

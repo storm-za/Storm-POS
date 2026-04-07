@@ -141,13 +141,12 @@ const isAnyMobile = (): boolean =>
   /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
 
 // ─── Android: open the native Share Sheet with the PDF ────────────────────
-// tauri-plugin-fs cannot write to the public Downloads directory on Android
-// (no fs:scope-download-write permission exists in this plugin version).
+// tauri-plugin-fs cannot write to the public Downloads directory on Android.
 // The Android Share Sheet lets the user tap "Save to Files" to move the PDF
 // to Downloads, or send it directly to WhatsApp / Gmail / etc.
-async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet' | 'failed'> {
+async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' | 'failed'> {
   try {
-    await sharePdfAndroid(blob, fileName);
+    await sharePdfAndroid(doc, fileName);
     return 'sheet';
   } catch (e) {
     console.error('[PDF] Share sheet failed:', e);
@@ -155,34 +154,60 @@ async function downloadPdfAndroid(blob: Blob, fileName: string): Promise<'sheet'
   return 'failed';
 }
 
-// ─── Android: chunked PDF transfer + Share Sheet ──────────────────────────
+// ─── Android: PDF → base64 → Rust (chunked) → FileProvider → Share Sheet ─
 //
-// ROOT CAUSE of 0 KB files: Tauri on Android uses postMessage for IPC (it
-// cannot use the desktop custom-protocol path). postMessage has a ~1 MB limit
-// for the entire JSON payload. A PDF with a company logo or many line items
-// can easily exceed that — the data arrives silently empty at Rust, which
-// writes a 0-byte file with no error thrown.
+// LAYER 1 — Binary Integrity
+//   Use doc.output('arraybuffer') — confirmed most reliable on Android WebView.
+//   doc.output('blob') is inconsistent across WebView builds; Blob constructor
+//   behaviour varies by Android version. ArrayBuffer is always binary-safe.
+//   Convert Uint8Array → base64 in 8 KB passes (String.fromCharCode.apply has a
+//   stack limit — chunking it avoids "Maximum call stack size exceeded").
+//   Verify the byte count before sending; throw early if jsPDF silently failed.
 //
-// FIX: split the base64 into 307 200-char chunks (≡ 0 mod 4, so each chunk
-// is independently decodable). Each invoke() is ~300 KB — well within the
-// limit. Rust appends decoded raw bytes to a .part file per chunk, then
-// pdf_finalize renames it and (best-effort) copies it to Downloads.
-async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
+// LAYER 2 — Storage Location
+//   Rust writes to app_cache_dir() which maps to getCacheDir()/{bundleId}/.
+//   This is exactly the path exposed by our FileProvider, giving WhatsApp
+//   temporary read access via a content:// URI without any extra permissions.
+//
+// LAYER 3 — URI Bridge
+//   pdf_finalize returns an absolute path. We prepend file:// so tauri-plugin-
+//   sharekit can strip it, instantiate a java.io.File, and call
+//   FileProvider.getUriForFile(ctx, "${packageName}.fileprovider", file).
+//   The resulting content:// URI is placed in the Intent with
+//   FLAG_GRANT_READ_URI_PERMISSION so WhatsApp can read it immediately.
+//   MIME type is explicitly set to "application/pdf" — not guessed from extension.
+async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
   const { invoke } = await import('@tauri-apps/api/core');
 
-  // FileReader is reliable for blob→base64 on Android WebView (no spread/btoa issues).
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(',')[1] ?? '');
-    reader.onerror = () => reject(new Error('FileReader failed reading PDF blob'));
-    reader.readAsDataURL(blob);
-  });
+  // LAYER 1: get raw PDF bytes via arraybuffer — most reliable on Android WebView.
+  // doc.output('blob') and the FileReader path are both unreliable: the Blob
+  // constructor varies by WebView build, and FileReader has edge-case Android bugs.
+  const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+  const u8 = new Uint8Array(arrayBuffer);
 
-  if (!base64) throw new Error('PDF blob is empty — jsPDF generation produced no output');
+  // Binary integrity check — jsPDF wraps buildDocument() in a SAFE() handler
+  // that silently returns '' on any internal error. Catch that here.
+  if (u8.length === 0) {
+    throw new Error('PDF is 0 bytes — jsPDF generation failed silently on this device');
+  }
+  console.log(`[PDF] ${u8.length} bytes — converting to base64 for IPC transfer`);
 
-  // CHUNK must be a multiple of 4 so each slice is valid standalone base64.
-  // 307 200 = 300 × 1024, divisible by 4. FileReader output is always padded
-  // (length ≡ 0 mod 4), so every slice (including the last) is also ≡ 0 mod 4.
+  // Convert Uint8Array → base64 in 8 KB slices to avoid stack overflow.
+  // String.fromCharCode.apply(null, largeArray) throws "Maximum call stack size
+  // exceeded" on Android WebView for arrays > ~65 535 elements.
+  let binary = '';
+  const BIN_CHUNK = 8192;
+  for (let i = 0; i < u8.length; i += BIN_CHUNK) {
+    binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
+  }
+  const base64 = btoa(binary);
+
+  // LAYER 2: split into 300 KB IPC chunks.
+  // Tauri on Android routes invoke() through postMessage (not the desktop
+  // custom-protocol). postMessage has a practical limit of ~1 MB per call. A
+  // PDF with a logo or many line items easily encodes to 500 KB+ of base64.
+  // Splitting into 307 200-char chunks (≡ 0 mod 4 → valid standalone base64)
+  // keeps every call well inside the limit regardless of document size.
   const CHUNK = 307200;
   for (let i = 0; i < base64.length; i += CHUNK) {
     await invoke<void>('pdf_write_chunk', {
@@ -192,18 +217,26 @@ async function sharePdfAndroid(blob: Blob, fileName: string): Promise<void> {
     });
   }
 
+  // LAYER 3: finalise on Rust side → get the cache path → share via FileProvider.
   const path = await invoke<string>('pdf_finalize', { filename: fileName });
+  console.log(`[PDF] written to: ${path}`);
+
+  // Pass file:// URI — sharekit strips the scheme, creates a java.io.File,
+  // then calls FileProvider.getUriForFile() to produce a content:// URI.
+  // FLAG_GRANT_READ_URI_PERMISSION is set on the Intent by the plugin so
+  // WhatsApp (and every other receiver) has temporary read access.
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
+  // mimeType MUST be explicit — do not let the OS guess from the extension.
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
 // ─── downloadOpenPDF ────────────────────────────────────────────────────────
-// Android Tauri : saves to Downloads folder; falls back to share sheet.
+// Android Tauri : saves to cache → Share Sheet (arraybuffer path, see above).
 // Web / Desktop : standard blob <a download> click.
 async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'blob' | 'failed'> {
   if (isTauriAndroid()) {
-    return downloadPdfAndroid(doc.output('blob'), fileName);
+    return downloadPdfAndroid(doc, fileName);
   }
   const blob: Blob = doc.output('blob');
   const url = URL.createObjectURL(blob);
@@ -222,7 +255,7 @@ async function downloadOpenPDF(doc: any, fileName: string): Promise<'sheet' | 'b
 async function sharePDFViaSheet(doc: any, fileName: string, message: string): Promise<'shared' | 'fallback' | 'cancelled'> {
   if (isTauriAndroid()) {
     try {
-      await sharePdfAndroid(doc.output('blob'), fileName);
+      await sharePdfAndroid(doc, fileName);
       return 'shared';
     } catch (e: any) {
       const msg = String(e?.message ?? e ?? '').toLowerCase();
@@ -3912,30 +3945,35 @@ export default function PosSystem() {
     const message = `Sales receipt from ${companyName} - R${saleCompleteData.total}`;
     setReceiptPdfBusy(true);
     try {
+      if (isTauriAndroid()) {
+        // Android: generate doc fresh (arraybuffer path — do NOT use cached blob;
+        // doc.output('blob') is unreliable on Android WebView across versions).
+        try {
+          const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
+          if (!doc) throw new Error('generateReceipt returned null');
+          await sharePdfAndroid(doc, fileName);
+        } catch (e) {
+          console.error('[PDF] Android share error:', e);
+          toast({ title: "Could not open share sheet", description: "Please try again.", variant: "destructive" });
+        }
+        return;
+      }
+
+      // Web / Desktop: use pre-generated blob or regenerate
       const blob: Blob | null = receiptPdfBlob || (() => {
         const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
         return doc ? (doc.output('blob') as Blob) : null;
       })();
       if (!blob) return;
 
-      if (isTauriAndroid()) {
-        // Android: share sheet = download + share in one step
-        try {
-          await sharePdfAndroid(blob, fileName);
-        } catch (e) {
-          console.error('[PDF] Android share error:', e);
-          toast({ title: "Could not open share sheet", description: "Please try again.", variant: "destructive" });
-        }
-      } else {
-        // Web: instant download via pre-generated URL or blob
-        const url = receiptPdfUrl || URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = fileName;
-        a.style.display = 'none'; document.body.appendChild(a); a.click();
-        setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-        // Desktop web: also open WhatsApp Web for sharing
-        if (!isAnyMobile()) {
-          setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
-        }
+      // Web: instant download via pre-generated URL or blob
+      const url = receiptPdfUrl || URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = fileName;
+      a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+      // Desktop web: also open WhatsApp Web for sharing
+      if (!isAnyMobile()) {
+        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
       }
     } finally {
       setReceiptPdfBusy(false);

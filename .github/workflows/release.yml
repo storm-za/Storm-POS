@@ -175,32 +175,68 @@ jobs:
       - name: Configure Android FileProvider and permissions for PDF sharing
         run: |
           MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          RES_XML="src-tauri/gen/android/app/src/main/res/xml"
 
-          # Inject WRITE_EXTERNAL_STORAGE permission (needed on Android < 10 for Downloads)
+          # ── 1. Add xmlns:tools namespace so tools:replace works ──────────────
+          # tools:replace tells the manifest merger to use OUR values for those
+          # attributes, overriding whatever any library (e.g. sharekit) declares.
+          if ! grep -q 'xmlns:tools' "$MANIFEST"; then
+            sed -i 's|xmlns:android="http://schemas.android.com/apk/res/android"|xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"|' "$MANIFEST"
+            echo "xmlns:tools namespace added"
+          fi
+
+          # ── 2. WRITE_EXTERNAL_STORAGE (needed on Android < 10 for Downloads) ─
           if ! grep -q "WRITE_EXTERNAL_STORAGE" "$MANIFEST"; then
             sed -i 's|<application|<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <application|' "$MANIFEST"
-            echo "WRITE_EXTERNAL_STORAGE permission injected"
-          else
-            echo "WRITE_EXTERNAL_STORAGE already present, skipping"
+            echo "WRITE_EXTERNAL_STORAGE injected"
           fi
 
-          # Inject FileProvider so sharekit can serve cache files via content:// URIs
-          if ! grep -q "FileProvider" "$MANIFEST"; then
-            sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths" />\n        </provider>\n    </application>|' "$MANIFEST"
-            echo "FileProvider injected into AndroidManifest.xml"
-          else
-            echo "FileProvider already present in manifest, skipping"
-          fi
+          # ── 3. FileProvider — always replace to avoid library-level conflicts ─
+          # tauri-plugin-sharekit ships its own FileProvider in its AAR manifest.
+          # Without tools:replace, the manifest merger may keep the library's
+          # android:resource reference, which points to the plugin's file_paths.xml
+          # instead of ours.  We remove any existing provider block first, then
+          # inject a fresh one that includes tools:replace on the meta-data so our
+          # file_provider_paths.xml is guaranteed to win.
+          #
+          # Strip any previously injected <provider> block to avoid duplicates.
+          python3 -c "
+import re, sys
+txt = open('$MANIFEST').read()
+# Remove any existing <provider ... FileProvider ...> block
+txt = re.sub(r'\s*<provider[^>]*FileProvider[^>]*>.*?</provider>', '', txt, flags=re.DOTALL)
+open('$MANIFEST', 'w').write(txt)
+" 2>/dev/null || perl -i -0pe 's/\s*<provider[^>]*FileProvider[^>]*>.*?<\/provider>//gs' "$MANIFEST" 2>/dev/null || true
 
-          echo "=== Manifest permission + FileProvider check ==="
-          grep -E "WRITE_EXTERNAL|FileProvider" "$MANIFEST" || echo "WARNING: entries not found"
+          # Inject our authoritative FileProvider block with tools:replace
+          sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true"\n            tools:replace="android:authorities,android:exported,android:grantUriPermissions">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths"\n                tools:replace="android:resource" />\n        </provider>\n    </application>|' "$MANIFEST"
+          echo "FileProvider (with tools:replace) injected"
 
-          # file_provider_paths.xml: covers cache, files, external cache/files,
-          # and the public Downloads folder for device-visible PDF copies.
-          mkdir -p src-tauri/gen/android/app/src/main/res/xml
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <cache-path name="cache" path="." />\n    <files-path name="files" path="." />\n    <external-cache-path name="external_cache" path="." />\n    <external-files-path name="external_files" path="." />\n    <external-path name="external_download" path="Download/StormPOS/" />\n</paths>\n' > src-tauri/gen/android/app/src/main/res/xml/file_provider_paths.xml
-          echo "file_provider_paths.xml created:"
-          cat src-tauri/gen/android/app/src/main/res/xml/file_provider_paths.xml
+          # ── 4. Verify ─────────────────────────────────────────────────────────
+          echo "=== Manifest: FileProvider + permissions ==="
+          grep -E "WRITE_EXTERNAL|FileProvider|tools:replace" "$MANIFEST" || echo "WARNING: expected entries not found"
+
+          # ── 5. file_provider_paths.xml ────────────────────────────────────────
+          # Covers every directory Tauri might write to on Android:
+          #   cache-path       → getCacheDir() (= /data/user/0/<pkg>/cache/)
+          #                      Tauri app_cache_dir() = getCacheDir()/<bundleId>/
+          #   files-path       → getFilesDir()
+          #   external-cache   → getExternalCacheDir()
+          #   external-files   → getExternalFilesDir()
+          #   external-path    → /storage/emulated/0/Download/StormPOS/ (visible)
+          mkdir -p "$RES_XML"
+          cat > "$RES_XML/file_provider_paths.xml" << 'FILEPATHS'
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="cache" path="." />
+    <files-path name="files" path="." />
+    <external-cache-path name="external_cache" path="." />
+    <external-files-path name="external_files" path="." />
+    <external-path name="external_download" path="Download/StormPOS/" />
+</paths>
+FILEPATHS
+          echo "file_provider_paths.xml written:"
+          cat "$RES_XML/file_provider_paths.xml"
 
       - name: Build Android AAB (release)
         env:
