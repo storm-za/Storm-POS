@@ -177,38 +177,52 @@ async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' |
 //   FLAG_GRANT_READ_URI_PERMISSION so WhatsApp can read it immediately.
 //   MIME type is explicitly set to "application/pdf" — not guessed from extension.
 async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-
-  // LAYER 1: get raw PDF bytes via arraybuffer — most reliable on Android WebView.
-  // doc.output('blob') and the FileReader path are both unreliable: the Blob
-  // constructor varies by WebView build, and FileReader has edge-case Android bugs.
+  // Get PDF bytes — arraybuffer is the most reliable jsPDF output on Android WebView.
   const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
   const u8 = new Uint8Array(arrayBuffer);
 
-  // Binary integrity check — jsPDF wraps buildDocument() in a SAFE() handler
-  // that silently returns '' on any internal error. Catch that here.
   if (u8.length === 0) {
     throw new Error('PDF is 0 bytes — jsPDF generation failed silently on this device');
   }
-  console.log(`[PDF] ${u8.length} bytes — converting to base64 for IPC transfer`);
+  console.log(`[PDF] ${u8.length} bytes ready`);
 
-  // Convert Uint8Array → base64 in 8 KB slices to avoid stack overflow.
-  // String.fromCharCode.apply(null, largeArray) throws "Maximum call stack size
-  // exceeded" on Android WebView for arrays > ~65 535 elements.
+  // ── PRIMARY PATH: navigator.share with Blob ─────────────────────────────────
+  // Tauri's Android WebView is Chromium-based. Chrome handles navigator.share
+  // with File objects natively — it writes the blob to a temp file and wraps it
+  // in its OWN internal FileProvider, so no custom FileProvider config is needed.
+  // This is the simplest, most reliable approach for Android PDF sharing.
+  try {
+    const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [pdfFile] })) {
+      console.log('[PDF] using navigator.share (primary path)');
+      await navigator.share({ files: [pdfFile], title: fileName });
+      return;
+    }
+    console.log('[PDF] navigator.canShare returned false — falling back to IPC path');
+  } catch (navErr: any) {
+    // User may have cancelled the share sheet — propagate AbortError so the
+    // caller can detect a cancellation vs a real error.
+    if (navErr?.name === 'AbortError') throw navErr;
+    console.warn('[PDF] navigator.share failed, trying IPC fallback:', navErr);
+  }
+
+  // ── FALLBACK: Rust IPC → cache file → sharekit FileProvider ────────────────
+  // Used when navigator.share is unavailable or fails for a non-cancellation
+  // reason (e.g. older WebView builds without File sharing support).
+  // Chunks are kept at 30 KB (base64) — well inside any Android WebView
+  // postMessage size limit and safe for all documented Tauri IPC paths.
+  const { invoke } = await import('@tauri-apps/api/core');
+
   let binary = '';
   const BIN_CHUNK = 8192;
   for (let i = 0; i < u8.length; i += BIN_CHUNK) {
     binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
   }
   const base64 = btoa(binary);
+  console.log(`[PDF] IPC fallback: ${base64.length} base64 chars`);
 
-  // LAYER 2: split into 300 KB IPC chunks.
-  // Tauri on Android routes invoke() through postMessage (not the desktop
-  // custom-protocol). postMessage has a practical limit of ~1 MB per call. A
-  // PDF with a logo or many line items easily encodes to 500 KB+ of base64.
-  // Splitting into 307 200-char chunks (≡ 0 mod 4 → valid standalone base64)
-  // keeps every call well inside the limit regardless of document size.
-  const CHUNK = 307200;
+  const CHUNK = 30000;
   for (let i = 0; i < base64.length; i += CHUNK) {
     await invoke<void>('pdf_write_chunk', {
       filename: fileName,
@@ -217,17 +231,11 @@ async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
     });
   }
 
-  // LAYER 3: finalise on Rust side → get the cache path → share via FileProvider.
   const path = await invoke<string>('pdf_finalize', { filename: fileName });
-  console.log(`[PDF] written to: ${path}`);
+  console.log(`[PDF] IPC: written to ${path}`);
 
-  // Pass file:// URI — sharekit strips the scheme, creates a java.io.File,
-  // then calls FileProvider.getUriForFile() to produce a content:// URI.
-  // FLAG_GRANT_READ_URI_PERMISSION is set on the Intent by the plugin so
-  // WhatsApp (and every other receiver) has temporary read access.
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
-  // mimeType MUST be explicit — do not let the OS guess from the extension.
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 

@@ -187,27 +187,46 @@ async function downloadPdfAndroid(doc: any, fileName: string): Promise<'sheet' |
 //   Die resulterende content://-URI word in die Intent geplaas met
 //   FLAG_GRANT_READ_URI_PERMISSION. MIME-tipe word uitdruklik ingestel.
 async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
-  const { invoke } = await import('@tauri-apps/api/core');
-
-  // LAAG 1: kry rou PDF-grepe via arraybuffer — mees betroubaar op Android WebView.
+  // Kry PDF-grepe — arraybuffer is die mees betroubare jsPDF-uitset op Android WebView.
   const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
   const u8 = new Uint8Array(arrayBuffer);
 
   if (u8.length === 0) {
     throw new Error('PDF is 0 grepe — jsPDF-generering het stil misluk op hierdie toestel');
   }
-  console.log(`[PDF] ${u8.length} grepe — skakel om na base64 vir IPC-oordrag`);
+  console.log(`[PDF] ${u8.length} grepe gereed`);
 
-  // Skakel Uint8Array → base64 in 8 KB-snye om stapeloorloop te vermy.
+  // ── PRIMÊRE PAD: navigator.share met Blob ──────────────────────────────────
+  // Tauri se Android WebView is Chromium-gebaseer. Chrome hanteer navigator.share
+  // met File-objekte inheems — dit skryf die blob na 'n tydelike lêer en wikkel
+  // dit in sy EIE interne FileProvider, so geen aangepaste FileProvider-konfigurasie
+  // is nodig nie. Dit is die eenvoudigste, mees betroubare benadering.
+  try {
+    const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [pdfFile] })) {
+      console.log('[PDF] gebruik navigator.share (primêre pad)');
+      await navigator.share({ files: [pdfFile], title: fileName });
+      return;
+    }
+    console.log('[PDF] navigator.canShare het vals teruggegee — val terug na IPC-pad');
+  } catch (navErr: any) {
+    if (navErr?.name === 'AbortError') throw navErr;
+    console.warn('[PDF] navigator.share het misluk, probeer IPC-terugval:', navErr);
+  }
+
+  // ── TERUGVAL: Rust IPC → kas-lêer → sharekit FileProvider ─────────────────
+  const { invoke } = await import('@tauri-apps/api/core');
+
   let binary = '';
   const BIN_CHUNK = 8192;
   for (let i = 0; i < u8.length; i += BIN_CHUNK) {
     binary += String.fromCharCode.apply(null, Array.from(u8.slice(i, i + BIN_CHUNK)));
   }
   const base64 = btoa(binary);
+  console.log(`[PDF] IPC-terugval: ${base64.length} base64-karakters`);
 
-  // LAAG 2: verdeel in 300 KB IPC-stukke (Android postMessage ~1 MB-grens).
-  const CHUNK = 307200;
+  const CHUNK = 30000;
   for (let i = 0; i < base64.length; i += CHUNK) {
     await invoke<void>('pdf_write_chunk', {
       filename: fileName,
@@ -216,12 +235,10 @@ async function sharePdfAndroid(doc: any, fileName: string): Promise<void> {
     });
   }
 
-  // LAAG 3: voltooi op Rust-kant → kry kaspad → deel via FileProvider.
   const path = await invoke<string>('pdf_finalize', { filename: fileName });
-  console.log(`[PDF] geskryf na: ${path}`);
+  console.log(`[PDF] IPC: geskryf na ${path}`);
   const fileUrl = path.startsWith('file://') ? path : `file://${path}`;
   const { shareFile } = await import('@choochmeque/tauri-plugin-sharekit-api');
-  // MIME-tipe MOET uitdruklik wees — moenie die OS laat raai van die uitbreiding nie.
   await shareFile(fileUrl, { mimeType: 'application/pdf', title: fileName });
 }
 
