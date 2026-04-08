@@ -3662,15 +3662,32 @@ export default function PosSystem() {
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
-    // On Android, after saving to Downloads, immediately open the share sheet
-    // so the user can send the already-saved PDF to WhatsApp or any other app.
+    // Android: after saving to Downloads, open the share sheet.
     if (dlResult === 'saved' && isTauriAndroid()) {
       try {
         await sharePdfAndroid(doc, fileName);
       } catch (shareErr: any) {
-        // Ignore user cancellations; log any real errors
         if (shareErr?.name !== 'AbortError') {
           console.warn('[PDF] Share sheet after download failed:', shareErr);
+        }
+      }
+    }
+
+    // Web: after the blob download, open the browser share sheet so the user
+    // can send the PDF to WhatsApp, email, etc. directly from the browser.
+    if (dlResult === 'blob' && navigator.share) {
+      try {
+        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile], title: fileName });
+        } else {
+          await navigator.share({ title: fileName });
+        }
+      } catch (shareErr: any) {
+        if (shareErr?.name !== 'AbortError') {
+          console.warn('[PDF] Web share after download:', shareErr);
         }
       }
     }

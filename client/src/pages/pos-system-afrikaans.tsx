@@ -1336,15 +1336,32 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
-    // Op Android, ná die stoor na Aflaaigids, maak die deel-skerm outomaties oop
-    // sodat die gebruiker die gestoorte PDF na WhatsApp of enige ander app kan stuur.
+    // Android: ná stoor na Aflaaigids, maak die deel-skerm oop.
     if (dlResult === 'saved' && isTauriAndroid()) {
       try {
         await sharePdfAndroid(doc, fileName);
       } catch (shareErr: any) {
-        // Ignoreer gebruiker-kansellasies; teken werklike foute aan
         if (shareErr?.name !== 'AbortError') {
           console.warn('[PDF] Deel-skerm ná aflaai het misluk:', shareErr);
+        }
+      }
+    }
+
+    // Web: ná die blob-aflaai, maak die blaaier-deel-skerm oop sodat die gebruiker
+    // die PDF na WhatsApp, e-pos, ens. kan stuur direk vanuit die blaaier.
+    if (dlResult === 'blob' && navigator.share) {
+      try {
+        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile], title: fileName });
+        } else {
+          await navigator.share({ title: fileName });
+        }
+      } catch (shareErr: any) {
+        if (shareErr?.name !== 'AbortError') {
+          console.warn('[PDF] Web-deel ná aflaai:', shareErr);
         }
       }
     }
