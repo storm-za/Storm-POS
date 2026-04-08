@@ -9884,7 +9884,7 @@ export default function PosSystem() {
                     className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-3 disabled:opacity-60"
                     data-testid="button-download-share-invoice"
                     disabled={invoicePdfBusy}
-                    onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
+                    onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
                     {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
                     {invoicePdfBusy ? 'Working...' : 'Download & Share'}
@@ -9980,7 +9980,7 @@ export default function PosSystem() {
                       className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] disabled:opacity-60"
                       data-testid="button-download-share-invoice-desktop"
                       disabled={invoicePdfBusy}
-                      onClick={() => isTauriAndroid() ? generateInvoicePDF(selectedInvoice) : shareInvoice(selectedInvoice)}
+                      onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
                       {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
                       {invoicePdfBusy ? 'Working...' : 'Download & Share'}
