@@ -4131,6 +4131,8 @@ export default function PosSystem() {
           const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateReceipt returned null');
           await downloadPdfAndroid(doc, fileName);
+          toast({ title: "Receipt Downloaded", description: "Saved to Downloads/StormPOS/" });
+          setSaleCompleteData(null);
         } catch (e) {
           console.error('[PDF] Android download error:', e);
           toast({ title: "Download failed", description: "Please try again.", variant: "destructive" });
@@ -4150,6 +4152,9 @@ export default function PosSystem() {
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+
+      toast({ title: "Receipt Downloaded", description: "The PDF has been saved to your device." });
+
       // Mobile web only: open share sheet with the actual PDF file attached.
       // Desktop web and Android AAB: download only, no share sheet.
       if (isAnyMobile() && !isTauriAndroid() && navigator.share) {
@@ -4166,6 +4171,8 @@ export default function PosSystem() {
           }
         }
       }
+
+      setSaleCompleteData(null);
     } finally {
       setReceiptPdfBusy(false);
     }

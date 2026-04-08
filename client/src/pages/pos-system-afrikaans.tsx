@@ -3620,6 +3620,8 @@ ${dateFilteredSales.map(sale =>
           const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateAfrikaansReceipt het null teruggegee');
           await downloadPdfAndroid(doc, fileName);
+          toast({ title: "Kwitansie Afgelaai", description: "Gestoor na Downloads/StormPOS/" });
+          setSaleCompleteData(null);
         } catch (e) {
           console.error('[PDF] Android aflaai fout:', e);
           toast({ title: "Aflaai misluk", description: "Probeer asseblief weer.", variant: "destructive" });
@@ -3639,6 +3641,9 @@ ${dateFilteredSales.map(sale =>
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
+
+      toast({ title: "Kwitansie Afgelaai", description: "Die PDF is op jou toestel gestoor." });
+
       // Mobiele web slegs: maak deel-skerm oop met werklike PDF-lêer aangeheg.
       // Rekenaar-web en Android AAB: slegs aflaai, geen deel-skerm nie.
       if (isAnyMobile() && !isTauriAndroid() && navigator.share) {
@@ -3655,6 +3660,8 @@ ${dateFilteredSales.map(sale =>
           }
         }
       }
+
+      setSaleCompleteData(null);
     } finally {
       setReceiptPdfBusy(false);
     }
