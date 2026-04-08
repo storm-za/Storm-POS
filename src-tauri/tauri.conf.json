@@ -1,6 +1,6 @@
 {
   "productName": "Storm POS",
-  "version": "1.5.24",
+  "version": "1.5.27",
   "identifier": "za.storm.pos",
   "build": {
     "frontendDist": "../dist/public",
