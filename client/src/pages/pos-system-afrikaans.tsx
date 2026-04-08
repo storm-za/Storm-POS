@@ -2060,54 +2060,168 @@ export default function PosSystemAfrikaans() {
   const generatePOPdf = async (po: any) => {
     const jsPDF = (await import("jspdf")).default;
     const doc = new jsPDF();
-    doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 45, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold");
-    doc.text("AANKOOPBESTELLING", 20, 25);
-    doc.setFontSize(12); doc.setTextColor(200, 220, 255); doc.text(po.poNumber, 20, 35);
-    doc.setTextColor(220, 230, 255); doc.setFontSize(10);
-    doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 25);
-    if (po.expectedDate) doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 32);
-    let infoY = 55;
-    if (currentUser?.companyName) {
-      doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text("VAN:", 20, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50); doc.text(currentUser.companyName, 20, infoY + 7);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const blueColor: [number, number, number] = [43, 108, 176];
+
+    // Haal volledige maatskappy-inligting uit kwitansie-instellings — selfde bron as faktuur-PDF
+    const settings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
+    const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Besigheid';
+    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const businessAddress1 = settings.businessInfo?.addressLine1 || '';
+    const businessAddress2 = settings.businessInfo?.addressLine2 || '';
+    const businessPhone = settings.businessInfo?.phone || '';
+    const businessEmail = settings.businessInfo?.email || '';
+    const businessWebsite = settings.businessInfo?.website || '';
+    const vatNumber = settings.businessInfo?.vatNumber || '';
+    const regNumber = settings.businessInfo?.registrationNumber || '';
+
+    let y = 15;
+
+    // Maatskappy-logo (bo-links)
+    if (companyLogo) {
+      try { doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35); } catch (e) { console.error('Logo fout:', e); }
     }
-    doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    doc.text("VERSKAFFER:", 120, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-    let supplierY = infoY + 7; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
-    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, 120, supplierY); supplierY += 6; }
-    if (po.supplierEmail) { doc.text(`E-pos: ${po.supplierEmail}`, 120, supplierY); supplierY += 6; }
-    if (po.supplierAddress) { const addrLines = doc.splitTextToSize(po.supplierAddress, 70); addrLines.forEach((l: string) => { doc.text(l, 120, supplierY); supplierY += 5; }); }
-    let tableY = Math.max(supplierY, 85) + 10;
-    doc.setFillColor(30, 64, 175); doc.rect(20, tableY, 170, 8, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Item", 22, tableY + 5.5); doc.text("SKU", 85, tableY + 5.5); doc.text("Hv", 115, tableY + 5.5);
-    doc.text("Kosprys", 135, tableY + 5.5); doc.text("Totaal", 165, tableY + 5.5); tableY += 10;
-    doc.setFont("helvetica", "normal");
+
+    // AANKOOPBESTELLING-opskrif
+    y = companyLogo ? 55 : 25;
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('AANKOOPBESTELLING', margin, y);
+    y += 8;
+
+    // AB-nommer
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(po.poNumber, margin, y);
+    y += 7;
+
+    // Volledige maatskappy-inligtingsblok
+    if (companyName) {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text(companyName, margin, y);
+      y += 5;
+    }
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    if (businessAddress1) { doc.text(businessAddress1, margin, y); y += 4; }
+    if (businessAddress2) { doc.text(businessAddress2, margin, y); y += 4; }
+    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, margin, y); y += 4; }
+    if (businessEmail) { doc.text(businessEmail, margin, y); y += 4; }
+    if (businessWebsite) { doc.text(businessWebsite, margin, y); y += 4; }
+    if (vatNumber) { doc.text(`BTW: ${vatNumber}`, margin, y); y += 4; }
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, margin, y); y += 4; }
+
+    // Blou skeidingslyn
+    y += 4;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Twee-kolom afdeling: VERSKAFFER (links) | AB-BESONDERHEDE (regs)
+    const leftColX = margin;
+    const rightColX = pageWidth / 2 + 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('VERSKAFFER', leftColX, y);
+    doc.text('AB-BESONDERHEDE', rightColX, y);
+    y += 6;
+
+    // Verskaffer-naam (vet) dan besonderhede
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(po.supplierName || 'N/B', leftColX, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    let supplierY = y + 6;
+    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, leftColX, supplierY); supplierY += 5; }
+    if (po.supplierEmail) { doc.text(po.supplierEmail, leftColX, supplierY); supplierY += 5; }
+    if (po.supplierAddress) {
+      doc.splitTextToSize(po.supplierAddress, 75).forEach((l: string) => { doc.text(l, leftColX, supplierY); supplierY += 4; });
+    }
+
+    // AB-datum / verwagting / status (regskolom)
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    let detailY = y;
+    doc.text(`Datum: ${new Date(po.createdAt).toLocaleDateString()}`, rightColX, detailY); detailY += 5;
+    if (po.expectedDate) { doc.text(`Verwag: ${new Date(po.expectedDate).toLocaleDateString()}`, rightColX, detailY); detailY += 5; }
+    if (po.status) {
+      const statusLabels: Record<string, string> = { draft: 'Konsep', sent: 'Gestuur', partial: 'Gedeeltelik', received: 'Ontvang', cancelled: 'Gekanselleer' };
+      doc.text(`Status: ${statusLabels[po.status] || po.status}`, rightColX, detailY); detailY += 5;
+    }
+
+    // Items-tabel
+    let tableY = Math.max(supplierY, detailY) + 12;
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(margin, tableY, pageWidth - margin * 2, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Item', margin + 2, tableY + 5.5);
+    doc.text('SKU', 85, tableY + 5.5);
+    doc.text('Hv', 115, tableY + 5.5);
+    doc.text('Kosprys', 135, tableY + 5.5);
+    doc.text('Totaal', 165, tableY + 5.5);
+    tableY += 10;
+    doc.setFont('helvetica', 'normal');
     (po.items || []).forEach((item: any, idx: number) => {
-      if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(20, tableY - 4, 170, 7, 'F'); }
+      if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(margin, tableY - 4, pageWidth - margin * 2, 7, 'F'); }
       doc.setTextColor(40, 40, 40);
-      doc.text(item.name || "Pasgemaakte Item", 22, tableY); doc.text(item.sku || "-", 85, tableY);
-      doc.text(String(item.quantity), 115, tableY); doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
-      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY); tableY += 7;
+      doc.text(item.name || 'Pasgemaakte Item', margin + 2, tableY);
+      doc.text(item.sku || '-', 85, tableY);
+      doc.text(String(item.quantity), 115, tableY);
+      doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
+      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY);
+      tableY += 7;
     });
-    tableY += 5; doc.setDrawColor(200, 200, 200); doc.line(120, tableY, 190, tableY); tableY += 7;
-    doc.setTextColor(80, 80, 80); doc.text("Subtotaal:", 130, tableY);
-    doc.text(`R${parseFloat(po.subtotal).toFixed(2)}`, 165, tableY); tableY += 6;
+
+    // Totale
+    tableY += 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(120, tableY, 190, tableY);
+    tableY += 7;
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Subtotaal:', 130, tableY);
+    doc.text(`R${parseFloat(po.subtotal || 0).toFixed(2)}`, 165, tableY);
+    tableY += 6;
     if (parseFloat(po.taxPercent) > 0) {
       doc.text(`BTW (${po.taxPercent}%):`, 130, tableY);
-      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY); tableY += 6;
+      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY);
+      tableY += 6;
     }
     if (parseFloat(po.shippingAmount) > 0) {
-      doc.text("Versending:", 130, tableY); doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY); tableY += 6;
+      doc.text('Versending:', 130, tableY);
+      doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY);
+      tableY += 6;
     }
-    doc.setTextColor(30, 64, 175); doc.setFontSize(12); doc.setFont("helvetica", "bold");
-    doc.text("TOTAAL:", 130, tableY + 3); doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAAL:', 130, tableY + 3);
+    doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+
+    // Notas
     if (po.notes) {
-      tableY += 15; doc.setTextColor(80, 80, 80); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-      doc.text("Notas:", 20, tableY); doc.setFont("helvetica", "normal");
-      doc.splitTextToSize(po.notes, 170).forEach((l: string) => { tableY += 5; doc.text(l, 20, tableY); });
+      tableY += 15;
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Notas:', margin, tableY);
+      doc.setFont('helvetica', 'normal');
+      doc.splitTextToSize(po.notes, pageWidth - margin * 2).forEach((l: string) => { tableY += 5; doc.text(l, margin, tableY); });
     }
+
     doc.save(`${po.poNumber}.pdf`);
   };
 

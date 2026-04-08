@@ -1394,54 +1394,165 @@ export default function PosSystem() {
   const generatePOPdf = async (po: any) => {
     const jsPDF = (await import("jspdf")).default;
     const doc = new jsPDF();
-    doc.setFillColor(30, 64, 175); doc.rect(0, 0, 210, 45, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(24); doc.setFont("helvetica", "bold");
-    doc.text("PURCHASE ORDER", 20, 25);
-    doc.setFontSize(12); doc.setTextColor(200, 220, 255); doc.text(po.poNumber, 20, 35);
-    doc.setTextColor(220, 230, 255); doc.setFontSize(10);
-    doc.text(`Date: ${new Date(po.createdAt).toLocaleDateString()}`, 150, 25);
-    if (po.expectedDate) doc.text(`Expected: ${new Date(po.expectedDate).toLocaleDateString()}`, 150, 32);
-    let infoY = 55;
-    if (currentUser?.companyName) {
-      doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-      doc.text("FROM:", 20, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50); doc.text(currentUser.companyName, 20, infoY + 7);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const blueColor: [number, number, number] = [43, 108, 176];
+
+    // Pull full company info from receipt settings — same source as invoice PDF
+    const settings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Business';
+    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const businessAddress1 = settings.businessInfo?.addressLine1 || '';
+    const businessAddress2 = settings.businessInfo?.addressLine2 || '';
+    const businessPhone = settings.businessInfo?.phone || '';
+    const businessEmail = settings.businessInfo?.email || '';
+    const businessWebsite = settings.businessInfo?.website || '';
+    const vatNumber = settings.businessInfo?.vatNumber || '';
+    const regNumber = settings.businessInfo?.registrationNumber || '';
+
+    let y = 15;
+
+    // Company logo (top-left)
+    if (companyLogo) {
+      try { doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35); } catch (e) { console.error('Logo error:', e); }
     }
-    doc.setTextColor(30, 64, 175); doc.setFontSize(11); doc.setFont("helvetica", "bold");
-    doc.text("SUPPLIER:", 120, infoY); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-    let supplierY = infoY + 7; doc.text(po.supplierName, 120, supplierY); supplierY += 6;
-    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, 120, supplierY); supplierY += 6; }
-    if (po.supplierEmail) { doc.text(`Email: ${po.supplierEmail}`, 120, supplierY); supplierY += 6; }
-    if (po.supplierAddress) { const addrLines = doc.splitTextToSize(po.supplierAddress, 70); addrLines.forEach((l: string) => { doc.text(l, 120, supplierY); supplierY += 5; }); }
-    let tableY = Math.max(supplierY, 85) + 10;
-    doc.setFillColor(30, 64, 175); doc.rect(20, tableY, 170, 8, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-    doc.text("Item", 22, tableY + 5.5); doc.text("SKU", 85, tableY + 5.5); doc.text("Qty", 115, tableY + 5.5);
-    doc.text("Cost Price", 135, tableY + 5.5); doc.text("Total", 165, tableY + 5.5); tableY += 10;
-    doc.setFont("helvetica", "normal");
+
+    // PURCHASE ORDER heading
+    y = companyLogo ? 55 : 25;
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('PURCHASE ORDER', margin, y);
+    y += 8;
+
+    // PO number
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    doc.text(po.poNumber, margin, y);
+    y += 7;
+
+    // Full company info block
+    if (companyName) {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+      doc.text(companyName, margin, y);
+      y += 5;
+    }
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    if (businessAddress1) { doc.text(businessAddress1, margin, y); y += 4; }
+    if (businessAddress2) { doc.text(businessAddress2, margin, y); y += 4; }
+    if (businessPhone) { doc.text(`Tel: ${businessPhone}`, margin, y); y += 4; }
+    if (businessEmail) { doc.text(businessEmail, margin, y); y += 4; }
+    if (businessWebsite) { doc.text(businessWebsite, margin, y); y += 4; }
+    if (vatNumber) { doc.text(`VAT: ${vatNumber}`, margin, y); y += 4; }
+    if (regNumber) { doc.text(`Reg: ${regNumber}`, margin, y); y += 4; }
+
+    // Blue separator line
+    y += 4;
+    doc.setDrawColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setLineWidth(1);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Two-column section: SUPPLIER (left) | PO DETAILS (right)
+    const leftColX = margin;
+    const rightColX = pageWidth / 2 + 10;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.text('SUPPLIER', leftColX, y);
+    doc.text('PO DETAILS', rightColX, y);
+    y += 6;
+
+    // Supplier name (bold) then details
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text(po.supplierName || 'N/A', leftColX, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    let supplierY = y + 6;
+    if (po.supplierPhone) { doc.text(`Tel: ${po.supplierPhone}`, leftColX, supplierY); supplierY += 5; }
+    if (po.supplierEmail) { doc.text(po.supplierEmail, leftColX, supplierY); supplierY += 5; }
+    if (po.supplierAddress) {
+      doc.splitTextToSize(po.supplierAddress, 75).forEach((l: string) => { doc.text(l, leftColX, supplierY); supplierY += 4; });
+    }
+
+    // PO date / expected / status (right column)
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    let detailY = y;
+    doc.text(`Date: ${new Date(po.createdAt).toLocaleDateString()}`, rightColX, detailY); detailY += 5;
+    if (po.expectedDate) { doc.text(`Expected: ${new Date(po.expectedDate).toLocaleDateString()}`, rightColX, detailY); detailY += 5; }
+    if (po.status) { doc.text(`Status: ${po.status.charAt(0).toUpperCase() + po.status.slice(1)}`, rightColX, detailY); detailY += 5; }
+
+    // Items table
+    let tableY = Math.max(supplierY, detailY) + 12;
+    doc.setFillColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.rect(margin, tableY, pageWidth - margin * 2, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Item', margin + 2, tableY + 5.5);
+    doc.text('SKU', 85, tableY + 5.5);
+    doc.text('Qty', 115, tableY + 5.5);
+    doc.text('Cost Price', 135, tableY + 5.5);
+    doc.text('Total', 165, tableY + 5.5);
+    tableY += 10;
+    doc.setFont('helvetica', 'normal');
     (po.items || []).forEach((item: any, idx: number) => {
-      if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(20, tableY - 4, 170, 7, 'F'); }
+      if (idx % 2 === 0) { doc.setFillColor(240, 245, 255); doc.rect(margin, tableY - 4, pageWidth - margin * 2, 7, 'F'); }
       doc.setTextColor(40, 40, 40);
-      doc.text(item.name || "Custom Item", 22, tableY); doc.text(item.sku || "-", 85, tableY);
-      doc.text(String(item.quantity), 115, tableY); doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
-      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY); tableY += 7;
+      doc.text(item.name || 'Custom Item', margin + 2, tableY);
+      doc.text(item.sku || '-', 85, tableY);
+      doc.text(String(item.quantity), 115, tableY);
+      doc.text(`R${parseFloat(item.costPrice || 0).toFixed(2)}`, 135, tableY);
+      doc.text(`R${(item.costPrice * item.quantity).toFixed(2)}`, 165, tableY);
+      tableY += 7;
     });
-    tableY += 5; doc.setDrawColor(200, 200, 200); doc.line(120, tableY, 190, tableY); tableY += 7;
-    doc.setTextColor(80, 80, 80); doc.text("Subtotal:", 130, tableY);
-    doc.text(`R${parseFloat(po.subtotal).toFixed(2)}`, 165, tableY); tableY += 6;
+
+    // Totals
+    tableY += 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(120, tableY, 190, tableY);
+    tableY += 7;
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Subtotal:', 130, tableY);
+    doc.text(`R${parseFloat(po.subtotal || 0).toFixed(2)}`, 165, tableY);
+    tableY += 6;
     if (parseFloat(po.taxPercent) > 0) {
       doc.text(`VAT (${po.taxPercent}%):`, 130, tableY);
-      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY); tableY += 6;
+      doc.text(`R${(parseFloat(po.subtotal) * parseFloat(po.taxPercent) / 100).toFixed(2)}`, 165, tableY);
+      tableY += 6;
     }
     if (parseFloat(po.shippingAmount) > 0) {
-      doc.text("Shipping:", 130, tableY); doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY); tableY += 6;
+      doc.text('Shipping:', 130, tableY);
+      doc.text(`R${parseFloat(po.shippingAmount).toFixed(2)}`, 165, tableY);
+      tableY += 6;
     }
-    doc.setTextColor(30, 64, 175); doc.setFontSize(12); doc.setFont("helvetica", "bold");
-    doc.text("TOTAL:", 130, tableY + 3); doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+    doc.setTextColor(blueColor[0], blueColor[1], blueColor[2]);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL:', 130, tableY + 3);
+    doc.text(`R${parseFloat(po.total).toFixed(2)}`, 165, tableY + 3);
+
+    // Notes
     if (po.notes) {
-      tableY += 15; doc.setTextColor(80, 80, 80); doc.setFontSize(9); doc.setFont("helvetica", "bold");
-      doc.text("Notes:", 20, tableY); doc.setFont("helvetica", "normal");
-      doc.splitTextToSize(po.notes, 170).forEach((l: string) => { tableY += 5; doc.text(l, 20, tableY); });
+      tableY += 15;
+      doc.setTextColor(80, 80, 80);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Notes:', margin, tableY);
+      doc.setFont('helvetica', 'normal');
+      doc.splitTextToSize(po.notes, pageWidth - margin * 2).forEach((l: string) => { tableY += 5; doc.text(l, margin, tableY); });
     }
+
     doc.save(`${po.poNumber}.pdf`);
   };
 
