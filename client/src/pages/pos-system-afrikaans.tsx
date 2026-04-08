@@ -3641,9 +3641,12 @@ ${dateFilteredSales.map(sale =>
       if (isTauriAndroid()) {
         // Android: genereer doc vars (arraybuffer-pad — moenie gestoorde blob gebruik nie;
         // doc.output('blob') is onbetroubaar op Android WebView oor weergawes).
+        // Stap 1: stoor na openbare Downloads/StormPOS/ via MediaStore.
+        // Stap 2: maak die inheemse deel-skerm oop sodat die gebruiker dit ook kan stuur.
         try {
           const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateAfrikaansReceipt het null teruggegee');
+          await downloadPdfAndroid(doc, fileName);
           await sharePdfAndroid(doc, fileName);
         } catch (e) {
           console.error('[PDF] Android deel fout:', e);

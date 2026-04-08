@@ -4151,9 +4151,12 @@ export default function PosSystem() {
       if (isTauriAndroid()) {
         // Android: generate doc fresh (arraybuffer path — do NOT use cached blob;
         // doc.output('blob') is unreliable on Android WebView across versions).
+        // Step 1: save to public Downloads/StormPOS/ via MediaStore.
+        // Step 2: open the native share sheet so the user can also send it.
         try {
           const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateReceipt returned null');
+          await downloadPdfAndroid(doc, fileName);
           await sharePdfAndroid(doc, fileName);
         } catch (e) {
           console.error('[PDF] Android share error:', e);
