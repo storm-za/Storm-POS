@@ -3673,22 +3673,37 @@ export default function PosSystem() {
       }
     }
 
-    // Web: after the blob download, open the browser share sheet so the user
-    // can send the PDF to WhatsApp, email, etc. directly from the browser.
-    if (dlResult === 'blob' && navigator.share) {
-      try {
-        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share({ files: [pdfFile], title: fileName });
-        } else {
-          await navigator.share({ title: fileName });
+    // Web sharing — split on mobile vs desktop:
+    //
+    // MOBILE BROWSER: navigator.share with the PDF File object.
+    //   WhatsApp mobile registers as a file share target on Android/iOS so the
+    //   actual PDF is attached.  This is the only reliable way to send the file.
+    //
+    // DESKTOP BROWSER: navigator.share cannot transfer PDF files to WhatsApp Web
+    //   (WhatsApp Web's share target only accepts text).  Instead we open
+    //   WhatsApp Web with a pre-formatted message — the PDF is already in the
+    //   user's Downloads folder and can be attached manually if needed.
+    if (dlResult === 'blob') {
+      if (isAnyMobile() && navigator.share) {
+        try {
+          const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({ files: [pdfFile], title: fileName });
+          } else {
+            await navigator.share({ title: fileName });
+          }
+        } catch (shareErr: any) {
+          if (shareErr?.name !== 'AbortError') {
+            console.warn('[PDF] Mobile web share:', shareErr);
+          }
         }
-      } catch (shareErr: any) {
-        if (shareErr?.name !== 'AbortError') {
-          console.warn('[PDF] Web share after download:', shareErr);
-        }
+      } else if (!isAnyMobile()) {
+        const docType = invoice.documentType === 'invoice' ? 'Invoice' : 'Quote';
+        const total = typeof invoice.total === 'number' ? invoice.total.toFixed(2) : parseFloat(invoice.total || '0').toFixed(2);
+        const waMessage = `${docType} ${invoice.documentNumber} from ${companyName}. Total: R${total}`;
+        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`, '_blank'), 400);
       }
     }
 

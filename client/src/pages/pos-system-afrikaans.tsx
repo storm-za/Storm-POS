@@ -1347,22 +1347,37 @@ export default function PosSystemAfrikaans() {
       }
     }
 
-    // Web: ná die blob-aflaai, maak die blaaier-deel-skerm oop sodat die gebruiker
-    // die PDF na WhatsApp, e-pos, ens. kan stuur direk vanuit die blaaier.
-    if (dlResult === 'blob' && navigator.share) {
-      try {
-        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          await navigator.share({ files: [pdfFile], title: fileName });
-        } else {
-          await navigator.share({ title: fileName });
+    // Web-deel — onderskei mobiel vs rekenaar:
+    //
+    // MOBIELE BLAAIER: navigator.share met die PDF File-objek.
+    //   WhatsApp mobiel registreer as 'n lêer-deel-teiken op Android/iOS,
+    //   dus word die werklike PDF aangeheg. Dit is die enigste betroubare manier.
+    //
+    // REKENAAR-BLAAIER: navigator.share kan nie PDF-lêers na WhatsApp Web stuur nie
+    //   (WhatsApp Web se deel-teiken aanvaar slegs teks).  In plaas daarvan maak ons
+    //   WhatsApp Web oop met 'n voorafgefomateerde boodskap — die PDF is reeds in die
+    //   gebruiker se Aflaaigids en kan handmatig aangeheg word indien nodig.
+    if (dlResult === 'blob') {
+      if (isAnyMobile() && navigator.share) {
+        try {
+          const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({ files: [pdfFile], title: fileName });
+          } else {
+            await navigator.share({ title: fileName });
+          }
+        } catch (shareErr: any) {
+          if (shareErr?.name !== 'AbortError') {
+            console.warn('[PDF] Mobiele web-deel:', shareErr);
+          }
         }
-      } catch (shareErr: any) {
-        if (shareErr?.name !== 'AbortError') {
-          console.warn('[PDF] Web-deel ná aflaai:', shareErr);
-        }
+      } else if (!isAnyMobile()) {
+        const docType = invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie';
+        const total = typeof invoice.total === 'number' ? invoice.total.toFixed(2) : parseFloat(invoice.total || '0').toFixed(2);
+        const waMessage = `${docType} ${invoice.documentNumber} van ${companyName}. Totaal: R${total}`;
+        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`, '_blank'), 400);
       }
     }
 
