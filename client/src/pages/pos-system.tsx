@@ -6066,15 +6066,24 @@ export default function PosSystem() {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
                 {[
-                  { label: "Total", count: purchaseOrders.length, accent: 'border-l-gray-400' },
-                  { label: "Draft", count: purchaseOrders.filter((p: any) => p.status === 'draft').length, accent: 'border-l-gray-400' },
-                  { label: "Sent", count: purchaseOrders.filter((p: any) => p.status === 'sent').length, accent: 'border-l-blue-500' },
-                  { label: "Partial", count: purchaseOrders.filter((p: any) => p.status === 'partial').length, accent: 'border-l-amber-500' },
-                  { label: "Received", count: purchaseOrders.filter((p: any) => p.status === 'received').length, accent: 'border-l-green-500' },
+                  { label: "Total",    count: purchaseOrders.length,                                                           accent: 'border-l-gray-400',  filter: 'all'      },
+                  { label: "Draft",    count: purchaseOrders.filter((p: any) => p.status === 'draft').length,                  accent: 'border-l-gray-400',  filter: 'draft'    },
+                  { label: "Sent",     count: purchaseOrders.filter((p: any) => p.status === 'sent').length,                   accent: 'border-l-blue-500',  filter: 'sent'     },
+                  { label: "Partial",  count: purchaseOrders.filter((p: any) => p.status === 'partial').length,                accent: 'border-l-amber-500', filter: 'partial'  },
+                  { label: "Received", count: purchaseOrders.filter((p: any) => p.status === 'received').length,               accent: 'border-l-green-500', filter: 'received' },
+                  { label: "Not Paid", count: purchaseOrders.filter((p: any) => !p.isPaid).length,                            accent: 'border-l-red-500',   filter: 'not_paid' },
                 ].map((stat) => (
-                  <div key={stat.label} className={`rounded-lg p-3 border-l-4 ${stat.accent} ${posTheme === 'dark' ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}>
+                  <div
+                    key={stat.label}
+                    onClick={() => setPOStatusFilter(poStatusFilter === stat.filter ? 'all' : stat.filter)}
+                    className={`rounded-lg p-3 border-l-4 ${stat.accent} cursor-pointer transition-all select-none
+                      ${poStatusFilter === stat.filter
+                        ? (posTheme === 'dark' ? 'bg-white/15 border border-white/30 ring-1 ring-white/20' : 'bg-blue-50 border border-blue-200 ring-1 ring-blue-200')
+                        : (posTheme === 'dark' ? 'bg-white/5 border border-white/10 hover:bg-white/10' : 'bg-white border border-gray-200 shadow-sm hover:bg-gray-50')
+                      }`}
+                  >
                     <p className={`text-2xl font-bold leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stat.count}</p>
                     <p className={`text-xs font-medium mt-1.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
                   </div>
