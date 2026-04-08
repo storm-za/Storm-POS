@@ -3664,9 +3664,23 @@ ${dateFilteredSales.map(sale =>
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-      // Rekenaar-web: maak ook WhatsApp Web oop vir deling
+      // Rekenaar: maak WhatsApp Web oop met vooraf-gevulde teks
+      // Mobiel: gebruik navigator.share met die werklike PDF-lêer aangeheg
       if (!isAnyMobile()) {
         setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
+      } else if (navigator.share) {
+        try {
+          const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({ files: [pdfFile], title: fileName });
+          } else {
+            await navigator.share({ title: fileName });
+          }
+        } catch (shareErr: any) {
+          if (shareErr?.name !== 'AbortError') {
+            console.warn('[PDF] Mobiele kwitansie-deel:', shareErr);
+          }
+        }
       }
     } finally {
       setReceiptPdfBusy(false);

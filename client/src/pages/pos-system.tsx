@@ -4174,9 +4174,23 @@ export default function PosSystem() {
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-      // Desktop web: also open WhatsApp Web for sharing
+      // Desktop: open WhatsApp Web with pre-filled text message
+      // Mobile: use navigator.share with the actual PDF file attached
       if (!isAnyMobile()) {
         setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
+      } else if (navigator.share) {
+        try {
+          const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            await navigator.share({ files: [pdfFile], title: fileName });
+          } else {
+            await navigator.share({ title: fileName });
+          }
+        } catch (shareErr: any) {
+          if (shareErr?.name !== 'AbortError') {
+            console.warn('[PDF] Mobile receipt share:', shareErr);
+          }
+        }
       }
     } finally {
       setReceiptPdfBusy(false);
