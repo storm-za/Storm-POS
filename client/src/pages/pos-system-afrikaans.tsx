@@ -1336,10 +1336,23 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
+    // Op Android, ná die stoor na Aflaaigids, maak die deel-skerm outomaties oop
+    // sodat die gebruiker die gestoorte PDF na WhatsApp of enige ander app kan stuur.
+    if (dlResult === 'saved' && isTauriAndroid()) {
+      try {
+        await sharePdfAndroid(doc, fileName);
+      } catch (shareErr: any) {
+        // Ignoreer gebruiker-kansellasies; teken werklike foute aan
+        if (shareErr?.name !== 'AbortError') {
+          console.warn('[PDF] Deel-skerm ná aflaai het misluk:', shareErr);
+        }
+      }
+    }
+
     toast({
       title: dlResult === 'saved' ? "PDF Gestoor" : dlResult === 'sheet' ? "PDF Gereed" : "PDF Gegenereer",
       description: dlResult === 'saved'
-        ? `${invoice.documentNumber} gestoor na Downloads/StormPOS/ — maak die Lêers-app oop om dit te sien`
+        ? `${invoice.documentNumber} gestoor na Downloads/StormPOS/`
         : dlResult === 'sheet'
         ? `${invoice.documentNumber} - tik "Stoor na Lêers" in die deel-skerm om dit te hou`
         : `${invoice.documentNumber} is afgelaai`,

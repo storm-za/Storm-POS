@@ -3662,10 +3662,23 @@ export default function PosSystem() {
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
+    // On Android, after saving to Downloads, immediately open the share sheet
+    // so the user can send the already-saved PDF to WhatsApp or any other app.
+    if (dlResult === 'saved' && isTauriAndroid()) {
+      try {
+        await sharePdfAndroid(doc, fileName);
+      } catch (shareErr: any) {
+        // Ignore user cancellations; log any real errors
+        if (shareErr?.name !== 'AbortError') {
+          console.warn('[PDF] Share sheet after download failed:', shareErr);
+        }
+      }
+    }
+
     toast({
       title: dlResult === 'saved' ? "PDF Saved" : dlResult === 'sheet' ? "PDF Ready" : "PDF Generated",
       description: dlResult === 'saved'
-        ? `${invoice.documentNumber} saved to Downloads/StormPOS/ — open the Files app to view it`
+        ? `${invoice.documentNumber} saved to Downloads/StormPOS/`
         : dlResult === 'sheet'
         ? `${invoice.documentNumber} - tap "Save to Files" in the share sheet to keep it`
         : `${invoice.documentNumber} has been downloaded`,
