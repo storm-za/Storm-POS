@@ -3773,48 +3773,23 @@ export default function PosSystem() {
     const fileName = `${invoice.documentType}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
-    // Android: after saving to Downloads, open the share sheet.
-    if (dlResult === 'saved' && isTauriAndroid()) {
+    // Mobile web only: after the blob download open the share sheet with the
+    // actual PDF file attached (works on Android/iOS mobile browsers).
+    // Android AAB and desktop web: download only, no share sheet.
+    if (dlResult === 'blob' && isAnyMobile() && !isTauriAndroid() && navigator.share) {
       try {
-        await sharePdfAndroid(doc, fileName);
+        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile], title: fileName });
+        } else {
+          await navigator.share({ title: fileName });
+        }
       } catch (shareErr: any) {
         if (shareErr?.name !== 'AbortError') {
-          console.warn('[PDF] Share sheet after download failed:', shareErr);
+          console.warn('[PDF] Mobile web share:', shareErr);
         }
-      }
-    }
-
-    // Web sharing — split on mobile vs desktop:
-    //
-    // MOBILE BROWSER: navigator.share with the PDF File object.
-    //   WhatsApp mobile registers as a file share target on Android/iOS so the
-    //   actual PDF is attached.  This is the only reliable way to send the file.
-    //
-    // DESKTOP BROWSER: navigator.share cannot transfer PDF files to WhatsApp Web
-    //   (WhatsApp Web's share target only accepts text).  Instead we open
-    //   WhatsApp Web with a pre-formatted message — the PDF is already in the
-    //   user's Downloads folder and can be attached manually if needed.
-    if (dlResult === 'blob') {
-      if (isAnyMobile() && navigator.share) {
-        try {
-          const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({ files: [pdfFile], title: fileName });
-          } else {
-            await navigator.share({ title: fileName });
-          }
-        } catch (shareErr: any) {
-          if (shareErr?.name !== 'AbortError') {
-            console.warn('[PDF] Mobile web share:', shareErr);
-          }
-        }
-      } else if (!isAnyMobile()) {
-        const docType = invoice.documentType === 'invoice' ? 'Invoice' : 'Quote';
-        const total = typeof invoice.total === 'number' ? invoice.total.toFixed(2) : parseFloat(invoice.total || '0').toFixed(2);
-        const waMessage = `${docType} ${invoice.documentNumber} from ${companyName}. Total: R${total}`;
-        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`, '_blank'), 400);
       }
     }
 
@@ -4151,16 +4126,14 @@ export default function PosSystem() {
       if (isTauriAndroid()) {
         // Android: generate doc fresh (arraybuffer path — do NOT use cached blob;
         // doc.output('blob') is unreliable on Android WebView across versions).
-        // Step 1: save to public Downloads/StormPOS/ via MediaStore.
-        // Step 2: open the native share sheet so the user can also send it.
+        // Save to public Downloads/StormPOS/ via MediaStore — download only.
         try {
           const doc = generateReceipt(saleCompleteData.items, saleCompleteData.total, saleCompleteData.customerName, saleCompleteData.notes, saleCompleteData.paymentType, false, undefined, saleCompleteData.staffName, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateReceipt returned null');
           await downloadPdfAndroid(doc, fileName);
-          await sharePdfAndroid(doc, fileName);
         } catch (e) {
-          console.error('[PDF] Android share error:', e);
-          toast({ title: "Could not open share sheet", description: "Please try again.", variant: "destructive" });
+          console.error('[PDF] Android download error:', e);
+          toast({ title: "Download failed", description: "Please try again.", variant: "destructive" });
         }
         return;
       }
@@ -4177,11 +4150,9 @@ export default function PosSystem() {
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-      // Desktop: open WhatsApp Web with pre-filled text message
-      // Mobile: use navigator.share with the actual PDF file attached
-      if (!isAnyMobile()) {
-        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
-      } else if (navigator.share) {
+      // Mobile web only: open share sheet with the actual PDF file attached.
+      // Desktop web and Android AAB: download only, no share sheet.
+      if (isAnyMobile() && !isTauriAndroid() && navigator.share) {
         try {
           const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
           if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
@@ -4259,11 +4230,11 @@ export default function PosSystem() {
                 </div>
               </motion.div>
 
-              {/* Single Download & Share button */}
+              {/* Download button */}
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-2.5">
                 <Button onClick={handleDownloadShare} disabled={receiptPdfBusy} className="w-full h-11 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold rounded-xl transition-all disabled:opacity-60">
-                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Preparing...' : 'Download & Share'}
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Preparing...' : 'Download PDF'}
                 </Button>
               </motion.div>
             </div>
@@ -10046,8 +10017,8 @@ export default function PosSystem() {
                     disabled={invoicePdfBusy}
                     onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
-                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? 'Working...' : 'Download & Share'}
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? 'Working...' : 'Download PDF'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -10142,8 +10113,8 @@ export default function PosSystem() {
                       disabled={invoicePdfBusy}
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Working...' : 'Download & Share'}
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Working...' : 'Download PDF'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Close

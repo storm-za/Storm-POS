@@ -1336,48 +1336,22 @@ export default function PosSystemAfrikaans() {
     const fileName = `${invoice.documentType === 'invoice' ? 'faktuur' : 'kwotasie'}_${invoice.documentNumber}.pdf`;
     const dlResult = await downloadOpenPDF(doc, fileName);
 
-    // Android: ná stoor na Aflaaigids, maak die deel-skerm oop.
-    if (dlResult === 'saved' && isTauriAndroid()) {
+    // Mobiele web slegs: ná blob-aflaai, maak deel-skerm oop met werklike PDF.
+    // Android AAB en rekenaar-web: slegs aflaai, geen deel-skerm nie.
+    if (dlResult === 'blob' && isAnyMobile() && !isTauriAndroid() && navigator.share) {
       try {
-        await sharePdfAndroid(doc, fileName);
+        const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
+        const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({ files: [pdfFile], title: fileName });
+        } else {
+          await navigator.share({ title: fileName });
+        }
       } catch (shareErr: any) {
         if (shareErr?.name !== 'AbortError') {
-          console.warn('[PDF] Deel-skerm ná aflaai het misluk:', shareErr);
+          console.warn('[PDF] Mobiele web-deel:', shareErr);
         }
-      }
-    }
-
-    // Web-deel — onderskei mobiel vs rekenaar:
-    //
-    // MOBIELE BLAAIER: navigator.share met die PDF File-objek.
-    //   WhatsApp mobiel registreer as 'n lêer-deel-teiken op Android/iOS,
-    //   dus word die werklike PDF aangeheg. Dit is die enigste betroubare manier.
-    //
-    // REKENAAR-BLAAIER: navigator.share kan nie PDF-lêers na WhatsApp Web stuur nie
-    //   (WhatsApp Web se deel-teiken aanvaar slegs teks).  In plaas daarvan maak ons
-    //   WhatsApp Web oop met 'n voorafgefomateerde boodskap — die PDF is reeds in die
-    //   gebruiker se Aflaaigids en kan handmatig aangeheg word indien nodig.
-    if (dlResult === 'blob') {
-      if (isAnyMobile() && navigator.share) {
-        try {
-          const arrayBuffer = doc.output('arraybuffer') as ArrayBuffer;
-          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-          const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-          if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-            await navigator.share({ files: [pdfFile], title: fileName });
-          } else {
-            await navigator.share({ title: fileName });
-          }
-        } catch (shareErr: any) {
-          if (shareErr?.name !== 'AbortError') {
-            console.warn('[PDF] Mobiele web-deel:', shareErr);
-          }
-        }
-      } else if (!isAnyMobile()) {
-        const docType = invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie';
-        const total = typeof invoice.total === 'number' ? invoice.total.toFixed(2) : parseFloat(invoice.total || '0').toFixed(2);
-        const waMessage = `${docType} ${invoice.documentNumber} van ${companyName}. Totaal: R${total}`;
-        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(waMessage)}`, '_blank'), 400);
       }
     }
 
@@ -3641,16 +3615,14 @@ ${dateFilteredSales.map(sale =>
       if (isTauriAndroid()) {
         // Android: genereer doc vars (arraybuffer-pad — moenie gestoorde blob gebruik nie;
         // doc.output('blob') is onbetroubaar op Android WebView oor weergawes).
-        // Stap 1: stoor na openbare Downloads/StormPOS/ via MediaStore.
-        // Stap 2: maak die inheemse deel-skerm oop sodat die gebruiker dit ook kan stuur.
+        // Stoor na openbare Downloads/StormPOS/ via MediaStore — slegs aflaai.
         try {
           const doc = generateAfrikaansReceipt(saleCompleteData.sale, saleCompleteData.customer, saleCompleteData.tipEnabled, undefined, true);
           if (!doc) throw new Error('generateAfrikaansReceipt het null teruggegee');
           await downloadPdfAndroid(doc, fileName);
-          await sharePdfAndroid(doc, fileName);
         } catch (e) {
-          console.error('[PDF] Android deel fout:', e);
-          toast({ title: "Kon nie deel-skerm oopmaak nie", description: "Probeer asseblief weer.", variant: "destructive" });
+          console.error('[PDF] Android aflaai fout:', e);
+          toast({ title: "Aflaai misluk", description: "Probeer asseblief weer.", variant: "destructive" });
         }
         return;
       }
@@ -3667,11 +3639,9 @@ ${dateFilteredSales.map(sale =>
       const a = document.createElement('a'); a.href = url; a.download = fileName;
       a.style.display = 'none'; document.body.appendChild(a); a.click();
       setTimeout(() => { document.body.removeChild(a); if (!receiptPdfUrl) URL.revokeObjectURL(url); }, 200);
-      // Rekenaar: maak WhatsApp Web oop met vooraf-gevulde teks
-      // Mobiel: gebruik navigator.share met die werklike PDF-lêer aangeheg
-      if (!isAnyMobile()) {
-        setTimeout(() => window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank'), 600);
-      } else if (navigator.share) {
+      // Mobiele web slegs: maak deel-skerm oop met werklike PDF-lêer aangeheg.
+      // Rekenaar-web en Android AAB: slegs aflaai, geen deel-skerm nie.
+      if (isAnyMobile() && !isTauriAndroid() && navigator.share) {
         try {
           const pdfFile = new File([blob], fileName, { type: 'application/pdf' });
           if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
@@ -3752,11 +3722,11 @@ ${dateFilteredSales.map(sale =>
                 </div>
               </motion.div>
 
-              {/* Enkele Aflaai & Deel-knoppie */}
+              {/* Aflaai-knoppie */}
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-2.5">
                 <Button onClick={handleDownloadShareAfr} disabled={receiptPdfBusy} className="w-full h-11 bg-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,45%)] text-white font-semibold rounded-xl transition-all disabled:opacity-60">
-                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Share2 className="w-4 h-4 mr-2 shrink-0" />}
-                  {receiptPdfBusy ? 'Berei voor...' : 'Aflaai & Deel'}
+                  {receiptPdfBusy ? <Loader2 className="w-4 h-4 mr-2 shrink-0 animate-spin" /> : <Download className="w-4 h-4 mr-2 shrink-0" />}
+                  {receiptPdfBusy ? 'Berei voor...' : 'Aflaai PDF'}
                 </Button>
               </motion.div>
             </div>
@@ -9373,8 +9343,8 @@ ${dateFilteredSales.map(sale =>
                     disabled={invoicePdfBusy}
                     onClick={() => generateInvoicePDF(selectedInvoice)}
                   >
-                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}
-                    {invoicePdfBusy ? 'Besig...' : 'Aflaai & Deel'}
+                    {invoicePdfBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Download className="w-3 h-3 mr-1" />}
+                    {invoicePdfBusy ? 'Besig...' : 'Aflaai PDF'}
                   </Button>
                 </div>
                 <div className="sm:hidden">
@@ -9469,8 +9439,8 @@ ${dateFilteredSales.map(sale =>
                       disabled={invoicePdfBusy}
                       onClick={() => generateInvoicePDF(selectedInvoice)}
                     >
-                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
-                      {invoicePdfBusy ? 'Besig...' : 'Aflaai & Deel'}
+                      {invoicePdfBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                      {invoicePdfBusy ? 'Besig...' : 'Aflaai PDF'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => setIsInvoiceViewOpen(false)}>
                       Sluit
