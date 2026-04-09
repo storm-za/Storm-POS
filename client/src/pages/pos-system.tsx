@@ -365,6 +365,7 @@ export default function PosSystem() {
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<string | null>(null);
+  const [compressedPdfLogo, setCompressedPdfLogo] = useState<string | null>(null);
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -656,6 +657,32 @@ export default function PosSystem() {
       setBizInfoReg(bi.registrationNumber || '');
     } catch {}
   }, [currentUser?.receiptSettings]);
+
+  // Pre-compress the stored logo so PDF generators never embed a huge raw image.
+  // This only affects what gets drawn into jsPDF — download logic is unchanged.
+  useEffect(() => {
+    const settings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const rawLogo = settings.logoDataUrl || currentUser?.companyLogo || null;
+    if (!rawLogo) { setCompressedPdfLogo(null); return; }
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 200;
+      let w = img.naturalWidth || MAX;
+      let h = img.naturalHeight || MAX;
+      if (w > MAX || h > MAX) {
+        if (w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { setCompressedPdfLogo(rawLogo); return; }
+      ctx.drawImage(img, 0, 0, w, h);
+      setCompressedPdfLogo(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.onerror = () => setCompressedPdfLogo(rawLogo);
+    img.src = rawLogo;
+  }, [currentUser?.companyLogo, currentUser?.receiptSettings]);
 
   // Mobile back button handling
   useEffect(() => {
@@ -1401,7 +1428,7 @@ export default function PosSystem() {
     // Pull full company info from receipt settings — same source as invoice PDF
     const settings = mergeReceiptSettings(currentUser?.receiptSettings);
     const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Business';
-    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const companyLogo = compressedPdfLogo;
     const businessAddress1 = settings.businessInfo?.addressLine1 || '';
     const businessAddress2 = settings.businessInfo?.addressLine2 || '';
     const businessPhone = settings.businessInfo?.phone || '';
@@ -2841,7 +2868,7 @@ export default function PosSystem() {
     doc.rect(0, 46, pageWidth, 4, 'F');
 
     if (settings.toggles.showLogo) {
-      const logoToUse = settings.logoDataUrl || currentUser?.companyLogo;
+      const logoToUse = compressedPdfLogo;
       if (logoToUse) {
         try {
           doc.addImage(logoToUse, 'JPEG', margin, 8, 34, 34);
@@ -2852,7 +2879,7 @@ export default function PosSystem() {
     }
 
     doc.setTextColor(255, 255, 255);
-    const titleX = (settings.toggles.showLogo && (settings.logoDataUrl || currentUser?.companyLogo)) ? 60 : margin;
+    const titleX = (settings.toggles.showLogo && compressedPdfLogo) ? 60 : margin;
     
     if (settings.toggles.showBusinessName && settings.businessInfo.name) {
       doc.setFontSize(18);
@@ -3414,7 +3441,7 @@ export default function PosSystem() {
     // Get business details from receipt settings and user profile
     const settings = mergeReceiptSettings(currentUser?.receiptSettings);
     const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Business';
-    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const companyLogo = compressedPdfLogo;
     const businessAddress1 = settings.businessInfo?.addressLine1 || '';
     const businessAddress2 = settings.businessInfo?.addressLine2 || '';
     const businessPhone = settings.businessInfo?.phone || '';
@@ -3833,7 +3860,7 @@ export default function PosSystem() {
     
     const settings = mergeReceiptSettings(currentUser?.receiptSettings);
     const companyName = settings.businessInfo?.name || currentUser?.companyName || 'My Business';
-    const companyLogo = settings.logoDataUrl || currentUser?.companyLogo;
+    const companyLogo = compressedPdfLogo;
     const businessAddress1 = settings.businessInfo?.addressLine1 || '';
     const businessAddress2 = settings.businessInfo?.addressLine2 || '';
     const businessPhone = settings.businessInfo?.phone || '';
