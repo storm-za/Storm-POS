@@ -6905,9 +6905,15 @@ export default function PosSystem() {
               // Combined monthly revenue
               const currentMonthRevenue = currentMonthSalesRevenue + currentMonthInvoiceRevenue;
               
-              // Calculate fees
-              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005; // 0.5% of combined revenue
-              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50; // R0.50 per invoice
+              // Calculate fees based on payment plan
+              const userPlan = currentUser?.paymentPlan ?? 'percent';
+              // Flat plan: R1.00 per POS transaction + R1.00 per paid invoice (each counts as 1 sale)
+              // Percent plan: 0.5% of combined revenue (POS + paid invoices)
+              const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
+              const salesFee = isInTrial ? 0 : userPlan === 'flat'
+                ? totalSaleUnits * 1.00
+                : currentMonthRevenue * 0.005;
+              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50; // R0.50 per invoice generated
               const stormFee = salesFee + invoiceFee; // Total Storm fee
 
               // Calculate daily breakdown
@@ -6975,7 +6981,7 @@ export default function PosSystem() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Monthly Revenue', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} sales + ${currentMonthPaidInvoices.length} paid inv.` },
-                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : '0.5% of revenue' },
+                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : userPlan === 'flat' ? `${totalSaleUnits} sale units × R1.00` : '0.5% of revenue' },
                       { label: 'Invoices', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fees` },
                       { label: 'Period', value: `${Math.round(progressPercentage)}%`, sub: `Day ${daysCompleted} of ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -7107,21 +7113,36 @@ export default function PosSystem() {
                         Fee Statement — {formatMonthYear(now)}
                       </div>
                       <div className="p-4 space-y-3">
-                        <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Revenue (0.5%)</div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>POS Sales</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                        {userPlan === 'flat' ? (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Sales (R1.00 each)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Transactions</span><span className="font-medium">{currentMonthSales.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Paid Invoices</span><span className="font-medium">{currentMonthPaidInvoices.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Total Sale Units × R1.00</span><span>R{salesFee.toFixed(2)}</span>
+                            </div>
                           </div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Paid Invoices ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Revenue (0.5%)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Sales</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Paid Invoices ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Total Revenue</span><span>R{currentMonthRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Revenue Fee (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                            </div>
                           </div>
-                          <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                            <span>Total Revenue</span><span>R{currentMonthRevenue.toFixed(2)}</span>
-                          </div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Revenue Fee (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
-                          </div>
-                        </div>
+                        )}
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
                         <div className="space-y-1.5">
                           <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Invoices (R0.50 each)</div>
@@ -7157,7 +7178,7 @@ export default function PosSystem() {
                         <div className="space-y-2">
                           {[
                             { label: 'Billing cycle', value: 'Monthly — 1st to last day' },
-                            { label: 'Sales rate', value: '0.5% of gross monthly revenue' },
+                            { label: 'Sales rate', value: userPlan === 'flat' ? 'R1.00 per transaction (incl. paid invoices)' : '0.5% of gross monthly revenue' },
                             { label: 'Invoice rate', value: 'R0.50 per invoice generated' },
                             { label: 'Payment due', value: 'End of each billing month' },
                             { label: 'Setup fees', value: 'None' },

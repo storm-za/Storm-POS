@@ -6312,8 +6312,14 @@ ${paidInvoicesInRange.map((inv: any) =>
               // Gekombineerde maandelikse omset
               const currentMonthRevenue = currentMonthSalesRevenue + currentMonthInvoiceRevenue;
 
-              // Calculate Storm fees - sales fee (0.5%) + invoice fee (R0.50 each)
-              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
+              // Calculate Storm fees based on payment plan
+              const userPlan = currentUser?.paymentPlan ?? 'percent';
+              // Flat plan: R1.00 per POS transaction + R1.00 per paid invoice (each counts as 1 sale)
+              // Percent plan: 0.5% of combined revenue (POS + paid invoices)
+              const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
+              const salesFee = isInTrial ? 0 : userPlan === 'flat'
+                ? totalSaleUnits * 1.00
+                : currentMonthRevenue * 0.005;
               const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50;
               const stormFee = salesFee + invoiceFee;
 
@@ -6382,7 +6388,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} verkope + ${currentMonthPaidInvoices.length} betaalde fakt.` },
-                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : '0.5% van omset' },
+                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : userPlan === 'flat' ? `${totalSaleUnits} eenhede × R1.00` : '0.5% van omset' },
                       { label: 'Fakture', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fooie` },
                       { label: 'Periode', value: `${Math.round(progressPercentage)}%`, sub: `Dag ${daysCompleted} van ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -6514,21 +6520,36 @@ ${paidInvoicesInRange.map((inv: any) =>
                         Fooi-staat — {formatMonthYear(now)}
                       </div>
                       <div className="p-4 space-y-3">
-                        <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Omset (0.5%)</div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>POS Verkope</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                        {userPlan === 'flat' ? (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Verkope (R1.00 elk)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Transaksies</span><span className="font-medium">{currentMonthSales.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Betaalde Fakture</span><span className="font-medium">{currentMonthPaidInvoices.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Totale Eenhede × R1.00</span><span>R{salesFee.toFixed(2)}</span>
+                            </div>
                           </div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Betaalde Fakture ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Omset (0.5%)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Verkope</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Betaalde Fakture ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Totale Omset</span><span>R{currentMonthRevenue.toFixed(2)}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Omsetfooi (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                            </div>
                           </div>
-                          <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                            <span>Totale Omset</span><span>R{currentMonthRevenue.toFixed(2)}</span>
-                          </div>
-                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Omsetfooi (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
-                          </div>
-                        </div>
+                        )}
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
                         <div className="space-y-1.5">
                           <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fakture (R0.50 elk)</div>
@@ -6564,7 +6585,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <div className="space-y-2">
                           {[
                             { label: 'Faktuurperiode', value: 'Maandeliks — 1ste tot laaste dag' },
-                            { label: 'Verkooptyns', value: '0.5% van bruto maandelikse omset' },
+                            { label: 'Verkooptyns', value: userPlan === 'flat' ? 'R1.00 per transaksie (inkl. betaalde fakture)' : '0.5% van bruto maandelikse omset' },
                             { label: 'Faktuurkoers', value: 'R0.50 per faktuur geskep' },
                             { label: 'Betaling verskuldig', value: 'Einde van elke faktuurmaand' },
                             { label: 'Opstellingsfooi', value: 'Geen' },
