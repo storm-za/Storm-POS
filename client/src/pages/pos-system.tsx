@@ -6474,11 +6474,11 @@ export default function PosSystem() {
                   </Button>
                 </div>
                 {/* Filter Controls */}
-                <div className="px-4 py-3 space-y-2.5">
-                  {/* Date row — full width inputs on mobile */}
-                  <div className="flex gap-2">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className={`text-xs font-semibold uppercase tracking-wide shrink-0 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>From</span>
+                <div className={`px-4 pt-3 pb-4 space-y-3 border-t ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                  {/* Date range group */}
+                  <div>
+                    <p className={`text-[10px] font-semibold uppercase tracking-widest mb-1.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Date Range</p>
+                    <div className="flex items-center gap-2">
                       <Input
                         type="date"
                         value={reportDateFrom}
@@ -6487,11 +6487,9 @@ export default function PosSystem() {
                           if (e.target.value > reportDateTo) setReportDateTo(e.target.value);
                         }}
                         style={{ colorScheme: posTheme === 'dark' ? 'dark' : 'light' }}
-                        className={`h-8 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                        className={`h-9 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800/80 border-gray-600 text-white' : 'border-gray-200 bg-white'}`}
                       />
-                    </div>
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className={`text-xs font-semibold uppercase tracking-wide shrink-0 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>To</span>
+                      <span className={`text-xs font-medium shrink-0 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>→</span>
                       <Input
                         type="date"
                         value={reportDateTo}
@@ -6500,36 +6498,38 @@ export default function PosSystem() {
                           if (e.target.value < reportDateFrom) setReportDateFrom(e.target.value);
                         }}
                         style={{ colorScheme: posTheme === 'dark' ? 'dark' : 'light' }}
-                        className={`h-8 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                        className={`h-9 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800/80 border-gray-600 text-white' : 'border-gray-200 bg-white'}`}
                       />
                     </div>
                   </div>
-                  {/* Quick filters + Staff filter row */}
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  {/* Quick preset chips */}
+                  <div className="flex flex-wrap gap-1.5">
                     {[
                       { label: 'Today', onClick: () => { const d = new Date().toISOString().split('T')[0]; setReportDateFrom(d); setReportDateTo(d); } },
                       { label: 'This Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); setReportDateFrom(mon.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
                       { label: 'This Month', onClick: () => { const now = new Date(); setReportDateFrom(new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
-                      { label: 'Last 30d', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); setReportDateFrom(from.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'Last 30 Days', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); setReportDateFrom(from.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
                     ].map(({ label, onClick }) => (
-                      <button key={label} onClick={onClick} className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${posTheme === 'dark' ? 'bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'}`}>{label}</button>
+                      <button key={label} onClick={onClick} className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${posTheme === 'dark' ? 'bg-gray-700/70 text-gray-300 hover:bg-blue-600/30 hover:text-blue-300 hover:border-blue-500/50 border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-gray-200'}`}>{label}</button>
                     ))}
-                    <div className="ml-auto">
-                      <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                        <SelectTrigger className={`h-8 text-sm w-32 sm:w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200'}`}>
-                          <SelectValue placeholder="All Staff" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Staff</SelectItem>
-                          <SelectItem value="0">Manager</SelectItem>
-                          {staffAccounts.map((staff) => (
-                            <SelectItem key={staff.id} value={staff.id.toString()}>
-                              {staff.displayName || staff.username || `Staff #${staff.id}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  </div>
+                  {/* Staff filter group */}
+                  <div>
+                    <p className={`text-[10px] font-semibold uppercase tracking-widest mb-1.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Staff Member</p>
+                    <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                      <SelectTrigger className={`h-9 text-sm w-full ${posTheme === 'dark' ? 'bg-gray-800/80 border-gray-600 text-white' : 'border-gray-200 bg-white'}`}>
+                        <SelectValue placeholder="All Staff" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Staff</SelectItem>
+                        <SelectItem value="0">Manager</SelectItem>
+                        {staffAccounts.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id.toString()}>
+                            {staff.displayName || staff.username || `Staff #${staff.id}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
