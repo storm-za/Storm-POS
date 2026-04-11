@@ -5432,19 +5432,17 @@ ${dateFilteredSales.map(sale =>
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                       <Input placeholder="Soek bestellings..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
                     </div>
-                    {poSupplierOptions.length > 0 && (
-                      <Select value={poSupplierFilter} onValueChange={setPOSupplierFilter}>
-                        <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
-                          <SelectValue placeholder="Filtreer op verskaffer" />
-                        </SelectTrigger>
-                        <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
-                          <SelectItem value="all">Alle Verskaffers</SelectItem>
-                          {poSupplierOptions.map((name) => (
-                            <SelectItem key={name} value={name}>{name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
+                    <Select value={poSupplierFilter} onValueChange={setPOSupplierFilter}>
+                      <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
+                        <SelectValue placeholder="Filtreer op verskaffer" />
+                      </SelectTrigger>
+                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
+                        <SelectItem value="all">Alle Verskaffers</SelectItem>
+                        {poSupplierOptions.map((name) => (
+                          <SelectItem key={name} value={name}>{name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
                       <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
                         <SelectValue placeholder="Filter Status" />
