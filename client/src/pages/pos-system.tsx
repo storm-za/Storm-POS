@@ -6945,7 +6945,7 @@ export default function PosSystem() {
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Free Trial Active</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: 0.5% per sale + R0.50 per invoice.
+                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: {userPlan === 'flat' ? 'R1.00 per transaction (incl. paid invoices)' : '0.5% per sale'} + R0.50 per invoice.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">

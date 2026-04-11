@@ -6352,7 +6352,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Gratis Proeftydperk Aktief</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: 0.5% per verkoop + R0.50 per faktuur.
+                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: {userPlan === 'flat' ? 'R1.00 per transaksie (inkl. betaalde fakture)' : '0.5% per verkoop'} + R0.50 per faktuur.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">
