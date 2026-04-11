@@ -392,6 +392,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!existingUser) return res.status(404).json({ message: "User not found" });
       if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized: email does not match user." });
       if (existingUser.paymentPlan === plan) return res.status(409).json({ message: "Already on this plan." });
+      const dayOfMonth = new Date().getDate();
+      if (dayOfMonth > 5) return res.status(403).json({ message: "Plan changes are only allowed on the 1st–5th of each month." });
       let updatedUser: any;
       if (plan === 'flat') {
         updatedUser = await storage.switchPosUserToFlatPlan(userId);

@@ -6403,6 +6403,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                   {/* Betaalplan bestuur */}
                   {(() => {
                     const currentPlan = currentUser?.paymentPlan ?? 'percent';
+                    const dayOfMonth = new Date().getDate();
+                    const canChangePlan = dayOfMonth <= 5;
                     const plans = [
                       {
                         id: 'percent',
@@ -6466,37 +6468,46 @@ ${paidInvoicesInRange.map((inv: any) =>
                                   <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
                                   <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   {!isActive && (
-                                    isConfirming ? (
-                                      <div className="space-y-1.5">
-                                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-700'}`}>Skakel na hierdie plan?</p>
-                                        <div className="flex gap-2">
-                                          <Button
-                                            size="sm"
-                                            className="flex-1 h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                                            disabled={changePlanMutation.isPending}
-                                            onClick={() => changePlanMutation.mutate(plan.id)}
-                                          >
-                                            {changePlanMutation.isPending ? <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : 'Bevestig'}
-                                          </Button>
-                                          <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="flex-1 h-7 text-xs"
-                                            onClick={() => setPlanSwitchConfirm(null)}
-                                          >
-                                            Kanselleer
-                                          </Button>
+                                    canChangePlan ? (
+                                      isConfirming ? (
+                                        <div className="space-y-1.5">
+                                          <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-700'}`}>Skakel na hierdie plan?</p>
+                                          <div className="flex gap-2">
+                                            <Button
+                                              size="sm"
+                                              className="flex-1 h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                                              disabled={changePlanMutation.isPending}
+                                              onClick={() => changePlanMutation.mutate(plan.id)}
+                                            >
+                                              {changePlanMutation.isPending ? <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : 'Bevestig'}
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              className="flex-1 h-7 text-xs"
+                                              onClick={() => setPlanSwitchConfirm(null)}
+                                            >
+                                              Kanselleer
+                                            </Button>
+                                          </div>
                                         </div>
-                                      </div>
+                                      ) : (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className={`w-full h-7 text-xs font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                                          onClick={() => setPlanSwitchConfirm(plan.id)}
+                                        >
+                                          Skakel na hierdie plan
+                                        </Button>
+                                      )
                                     ) : (
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className={`w-full h-7 text-xs font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
-                                        onClick={() => setPlanSwitchConfirm(plan.id)}
-                                      >
-                                        Skakel na hierdie plan
-                                      </Button>
+                                      <div className={`flex items-start gap-1.5 rounded-lg px-2.5 py-2 ${posTheme === 'dark' ? 'bg-gray-900/50 border border-gray-700' : 'bg-gray-100 border border-gray-200'}`}>
+                                        <Lock className={`w-3 h-3 mt-0.5 flex-shrink-0 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                                        <p className={`text-xs leading-snug ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                          Planveranderinge is slegs op die 1ste–5de van elke maand toegelaat. Kom volgende maand terug.
+                                        </p>
+                                      </div>
                                     )
                                   )}
                                 </div>
@@ -6504,7 +6515,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                             })}
                           </div>
                           <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                            Planveranderinge tree onmiddellik in werking. Kontak softwarebystorm@gmail.com indien jy hulp nodig het om \'n plan te kies.
+                            {canChangePlan
+                              ? 'Planveranderinge tree onmiddellik in werking. Kontak softwarebystorm@gmail.com indien jy hulp nodig het om \'n plan te kies.'
+                              : `Vandag is die ${dayOfMonth}de — planveranderinge is gesluit tot die 1ste van volgende maand.`}
                           </p>
                         </div>
                       </div>
