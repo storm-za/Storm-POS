@@ -3396,7 +3396,7 @@ export default function PosSystem() {
     yPosition += 15;
 
     pdf.setFontSize(11);
-    pdf.text(`Total Revenue (incl. paid invoices): R${totalRevenue.toFixed(2)}`, 20, yPosition);
+    pdf.text(`Total Revenue (Sales + Invoice): R${totalRevenue.toFixed(2)}`, 20, yPosition);
     yPosition += 8;
     pdf.text(`POS Sales Revenue: R${salesRevenue.toFixed(2)}`, 20, yPosition);
     yPosition += 8;
@@ -6666,7 +6666,7 @@ export default function PosSystem() {
                     {/* KPI Cards */}
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                       {[
-                        { icon: DollarSign, label: 'Total Revenue', value: `R${totalRevenue.toFixed(2)}`, sub: 'POS + paid invoices', accent: 'from-blue-600 to-blue-700' },
+                        { icon: DollarSign, label: 'Total Revenue', value: `R${totalRevenue.toFixed(2)}`, sub: 'Sales + invoice revenue', accent: 'from-blue-600 to-blue-700' },
                         { icon: Receipt, label: 'POS Sales', value: `R${salesRevenue.toFixed(2)}`, sub: `${totalTransactions} transactions`, accent: 'from-indigo-600 to-indigo-700' },
                         { icon: FileText, label: 'Invoice Revenue', value: `R${invoiceRevenue.toFixed(2)}`, sub: `${paidInvoicesInRange.length} paid invoices`, accent: 'from-emerald-600 to-emerald-700' },
                         { icon: TrendingUp, label: 'Gross Profit', value: `R${totalProfit.toFixed(2)}`, sub: 'After cost of goods', accent: 'from-violet-600 to-violet-700' },

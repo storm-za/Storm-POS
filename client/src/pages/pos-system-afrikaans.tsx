@@ -3299,7 +3299,7 @@ export default function PosSystemAfrikaans() {
     const printContent = `
 Verkope Verslag - ${dateLabel}
 
-Totale Omset (inkl. betaalde fakture): R${totalRevenue.toFixed(2)}
+Totale Omset (Verkope + Fakture): R${totalRevenue.toFixed(2)}
 POS Verkope: R${salesRevenue.toFixed(2)}
 Faktuur Omset: R${invoiceRevenue.toFixed(2)} (${paidInvoicesInRange.length} betaalde fakture)
 Transaksies: ${totalTransactions}
@@ -6096,7 +6096,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {/* KPI Kaarte */}
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                       {[
-                        { icon: DollarSign, label: 'Totale Omset', value: `R${totalRevenue.toFixed(2)}`, sub: 'POS + betaalde fakture', accent: 'from-blue-600 to-blue-700' },
+                        { icon: DollarSign, label: 'Totale Omset', value: `R${totalRevenue.toFixed(2)}`, sub: 'Verkope + faktuur omset', accent: 'from-blue-600 to-blue-700' },
                         { icon: Receipt, label: 'POS Verkope', value: `R${salesRevenue.toFixed(2)}`, sub: `${totalTransactions} transaksies`, accent: 'from-indigo-600 to-indigo-700' },
                         { icon: FileText, label: 'Faktuur Omset', value: `R${invoiceRevenue.toFixed(2)}`, sub: `${paidInvoicesInRange.length} betaalde fakture`, accent: 'from-emerald-600 to-emerald-700' },
                         { icon: TrendingUp, label: 'Bruto Wins', value: `R${totalProfit.toFixed(2)}`, sub: 'Na koste van goedere', accent: 'from-violet-600 to-violet-700' },
