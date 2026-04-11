@@ -2568,6 +2568,28 @@ export default function PosSystemAfrikaans() {
     },
   });
 
+  const [planSwitchConfirm, setPlanSwitchConfirm] = useState<string | null>(null);
+
+  const changePlanMutation = useMutation({
+    mutationFn: async (plan: string) => {
+      if (!currentUser) throw new Error("Geen gebruiker");
+      const res = await apiRequest("PUT", `/api/pos/user/${currentUser.id}/change-plan`, { userEmail: currentUser.email, plan });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      const newPlan = data.user?.paymentPlan ?? planSwitchConfirm;
+      setCurrentUser(prev => prev ? { ...prev, paymentPlan: newPlan } : null);
+      const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
+      localStorage.setItem("posUser", JSON.stringify({ ...stored, paymentPlan: newPlan }));
+      setPlanSwitchConfirm(null);
+      toast({ title: "Plan opgedateer", description: newPlan === 'flat' ? "Geskakel na Vaste Koers-plan (R1.00/transaksie)." : "Geskakel na Persentasie-plan (0.5% van inkomste)." });
+    },
+    onError: () => {
+      setPlanSwitchConfirm(null);
+      toast({ title: "Fout", description: "Kon nie plan wissel nie. Probeer asseblief weer.", variant: "destructive" });
+    },
+  });
+
   const logoUploadMutation = useMutation({
     mutationFn: async (logo: string) => {
       const userId = currentUser?.id || 1;
@@ -6371,6 +6393,117 @@ ${paidInvoicesInRange.map((inv: any) =>
                       </div>
                     ))}
                   </div>
+
+                  {/* Betaalplan bestuur */}
+                  {(() => {
+                    const currentPlan = currentUser?.paymentPlan ?? 'percent';
+                    const plans = [
+                      {
+                        id: 'percent',
+                        name: 'Persentasie-plan',
+                        rate: '0.5% van omset',
+                        detail: '+ R0.50 per gegenereerde faktuur',
+                        description: 'Ideaal vir laer transaksie-volumes. Betaal slegs \'n klein deel van wat jy verdien.',
+                        icon: <TrendingUp className="w-5 h-5" />,
+                        accentLight: 'border-blue-500 bg-blue-50',
+                        accentDark: 'border-blue-500 bg-blue-900/20',
+                        badgeLight: 'bg-blue-100 text-blue-700',
+                        badgeDark: 'bg-blue-900/40 text-blue-300',
+                      },
+                      {
+                        id: 'flat',
+                        name: 'Vaste Koers-plan',
+                        rate: 'R1.00 per transaksie',
+                        detail: '+ R0.50 per gegenereerde faktuur',
+                        description: 'Ideaal vir hoër transaksie-volumes of groter mandjiegrootte. Voorspelbare maandelikse koste.',
+                        icon: <BarChart3 className="w-5 h-5" />,
+                        accentLight: 'border-emerald-500 bg-emerald-50',
+                        accentDark: 'border-emerald-500 bg-emerald-900/20',
+                        badgeLight: 'bg-emerald-100 text-emerald-700',
+                        badgeDark: 'bg-emerald-900/40 text-emerald-300',
+                      },
+                    ];
+                    return (
+                      <div className={`rounded-lg border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
+                        <div className={`px-4 py-3 border-b text-sm font-semibold flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
+                          <Settings className="w-4 h-4" />
+                          Betaalplan
+                        </div>
+                        <div className="p-4">
+                          <div className="grid sm:grid-cols-2 gap-3 mb-4">
+                            {plans.map(plan => {
+                              const isActive = currentPlan === plan.id;
+                              const isConfirming = planSwitchConfirm === plan.id;
+                              return (
+                                <div
+                                  key={plan.id}
+                                  className={`relative rounded-xl border-2 p-4 transition-all ${
+                                    isActive
+                                      ? (posTheme === 'dark' ? plan.accentDark + ' border-2' : plan.accentLight + ' border-2')
+                                      : (posTheme === 'dark' ? 'border-gray-700 bg-gray-900/30' : 'border-gray-200 bg-gray-50/50')
+                                  }`}
+                                >
+                                  {isActive && (
+                                    <span className={`absolute top-3 right-3 text-xs font-semibold px-2 py-0.5 rounded-full ${posTheme === 'dark' ? plan.badgeDark : plan.badgeLight}`}>
+                                      Huidige Plan
+                                    </span>
+                                  )}
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
+                                    isActive
+                                      ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600') : (posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600'))
+                                      : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500')
+                                  }`}>
+                                    {plan.icon}
+                                  </div>
+                                  <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
+                                  <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
+                                  <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
+                                  <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
+                                  {!isActive && (
+                                    isConfirming ? (
+                                      <div className="space-y-1.5">
+                                        <p className={`text-xs font-medium ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-700'}`}>Skakel na hierdie plan?</p>
+                                        <div className="flex gap-2">
+                                          <Button
+                                            size="sm"
+                                            className="flex-1 h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                                            disabled={changePlanMutation.isPending}
+                                            onClick={() => changePlanMutation.mutate(plan.id)}
+                                          >
+                                            {changePlanMutation.isPending ? <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : 'Bevestig'}
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="flex-1 h-7 text-xs"
+                                            onClick={() => setPlanSwitchConfirm(null)}
+                                          >
+                                            Kanselleer
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className={`w-full h-7 text-xs font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
+                                        onClick={() => setPlanSwitchConfirm(plan.id)}
+                                      >
+                                        Skakel na hierdie plan
+                                      </Button>
+                                    )
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Planveranderinge tree onmiddellik in werking. Kontak softwarebystorm@gmail.com indien jy hulp nodig het om \'n plan te kies.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Fee statement + billing info */}
                   <div className="grid lg:grid-cols-2 gap-4">

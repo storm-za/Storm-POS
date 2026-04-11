@@ -382,6 +382,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/pos/user/:id/change-plan", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { userEmail, plan } = req.body;
+      if (!userEmail) return res.status(400).json({ message: "User email is required for verification." });
+      if (!plan || !['percent', 'flat'].includes(plan)) return res.status(400).json({ message: "Plan must be 'percent' or 'flat'." });
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) return res.status(404).json({ message: "User not found" });
+      if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized: email does not match user." });
+      if (existingUser.paymentPlan === plan) return res.status(409).json({ message: "Already on this plan." });
+      let updatedUser: any;
+      if (plan === 'flat') {
+        updatedUser = await storage.switchPosUserToFlatPlan(userId);
+      } else {
+        updatedUser = await storage.switchPosUserToPercentPlan(userId);
+      }
+      if (!updatedUser) return res.status(500).json({ message: "Failed to switch plan" });
+      res.json({
+        success: true,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          paid: updatedUser.paid,
+          companyLogo: updatedUser.companyLogo,
+          companyName: updatedUser.companyName,
+          tutorialCompleted: updatedUser.tutorialCompleted,
+          trialStartDate: updatedUser.trialStartDate,
+          preferredLanguage: updatedUser.preferredLanguage,
+          selectedStaffAccountId: updatedUser.selectedStaffAccountId,
+          receiptSettings: updatedUser.receiptSettings,
+          paymentOptionSelected: updatedUser.paymentOptionSelected,
+          paymentPlan: updatedUser.paymentPlan,
+          planSavingAmount: null
+        }
+      });
+    } catch (error) {
+      console.error("Plan change error:", error);
+      res.status(500).json({ message: "Failed to change plan" });
+    }
+  });
+
   app.put("/api/pos/user/:id/tutorial-complete", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);

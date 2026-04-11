@@ -141,6 +141,7 @@ export interface IStorage {
   getUserUsage(userId: number): Promise<string>;
   markUpsellEmailSent(userId: number, month: string): Promise<void>;
   switchPosUserToFlatPlan(userId: number): Promise<PosUser | undefined>;
+  switchPosUserToPercentPlan(userId: number): Promise<PosUser | undefined>;
   
   // System settings for idempotent operations
   getSystemSetting(key: string): Promise<string | null>;
@@ -703,6 +704,10 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
+  async switchPosUserToPercentPlan(userId: number): Promise<PosUser | undefined> {
+    return undefined;
+  }
+
   // System settings (stub implementations for MemStorage)
   async getSystemSetting(key: string): Promise<string | null> {
     return null;
@@ -1243,6 +1248,15 @@ export class DatabaseStorage implements IStorage {
       .update(posUsers)
       .set({ paymentPlan: 'flat' })
       .where(and(eq(posUsers.id, userId), eq(posUsers.paymentPlan, 'percent')))
+      .returning();
+    return updated || undefined;
+  }
+
+  async switchPosUserToPercentPlan(userId: number): Promise<PosUser | undefined> {
+    const [updated] = await db
+      .update(posUsers)
+      .set({ paymentPlan: 'percent' })
+      .where(and(eq(posUsers.id, userId), eq(posUsers.paymentPlan, 'flat')))
       .returning();
     return updated || undefined;
   }
