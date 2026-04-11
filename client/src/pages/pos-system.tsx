@@ -6533,10 +6533,10 @@ export default function PosSystem() {
                   {/* Quick preset chips */}
                   <div className="flex flex-wrap gap-1.5">
                     {[
-                      { label: 'Today', onClick: () => { const d = new Date().toISOString().split('T')[0]; setReportDateFrom(d); setReportDateTo(d); } },
-                      { label: 'This Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); setReportDateFrom(mon.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
-                      { label: 'This Month', onClick: () => { const now = new Date(); setReportDateFrom(new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
-                      { label: 'Last 30 Days', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); setReportDateFrom(from.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'Today', onClick: () => { const now = new Date(); const d = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`; setReportDateFrom(d); setReportDateTo(d); } },
+                      { label: 'This Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1)); const toStr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; setReportDateFrom(toStr(mon)); setReportDateTo(toStr(now)); } },
+                      { label: 'This Month', onClick: () => { const now = new Date(); const toStr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; setReportDateFrom(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`); setReportDateTo(toStr(now)); } },
+                      { label: 'Last 30 Days', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); const toStr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; setReportDateFrom(toStr(from)); setReportDateTo(toStr(now)); } },
                     ].map(({ label, onClick }) => (
                       <button key={label} onClick={onClick} className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${posTheme === 'dark' ? 'bg-gray-700/70 text-gray-300 hover:bg-blue-600/30 hover:text-blue-300 hover:border-blue-500/50 border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-gray-200'}`}>{label}</button>
                     ))}
