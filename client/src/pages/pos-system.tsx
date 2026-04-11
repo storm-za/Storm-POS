@@ -9216,43 +9216,38 @@ export default function PosSystem() {
           }
         }}
       >
-        <DialogContent className="w-[calc(100vw-0.5rem)] sm:w-[92vw] sm:max-w-2xl max-h-[92vh] flex flex-col p-0 gap-0">
+        <DialogContent className="w-[calc(100vw-0.5rem)] sm:w-auto sm:max-w-3xl max-h-[94vh] overflow-hidden flex flex-col p-0 gap-0">
           {/* Sticky Header */}
-          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 bg-white shrink-0">
+          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
-              <h2 className="text-base font-semibold text-gray-900 leading-tight">
+              <DialogTitle className="text-lg font-bold text-gray-900">
                 {editingInvoice ? 'Edit' : 'New'} {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
-              </h2>
-              <p className="text-xs text-gray-400 mt-0.5">Fill in the details below</p>
+              </DialogTitle>
+              <p className="text-xs text-gray-500 mt-0.5">Fill in the details below</p>
             </div>
             {/* Doc type tab switcher */}
-            {!editingInvoice && (
-              <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => setInvoiceType('invoice')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${invoiceType === 'invoice' ? 'bg-white text-[hsl(217,90%,40%)] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  Invoice
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setInvoiceType('quote')}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${invoiceType === 'quote' ? 'bg-white text-[hsl(217,90%,40%)] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  Quote
-                </button>
-              </div>
-            )}
-            {editingInvoice && (
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-md">
-                {invoiceType === 'invoice' ? 'Invoice' : 'Quote'}
-              </span>
-            )}
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-0.5">
+              <button
+                type="button"
+                onClick={() => { if (!editingInvoice) setInvoiceType('invoice'); }}
+                disabled={!!editingInvoice}
+                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${invoiceType === 'invoice' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                Invoice
+              </button>
+              <button
+                type="button"
+                onClick={() => { if (!editingInvoice) setInvoiceType('quote'); }}
+                disabled={!!editingInvoice}
+                className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${invoiceType === 'quote' ? 'bg-[hsl(217,90%,40%)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+              >
+                Quote
+              </button>
+            </div>
           </div>
 
           {/* Scrollable Body */}
-          <div className="overflow-y-auto flex-1 bg-gray-50 px-3 sm:px-5 py-4 space-y-3">{/* section gap */}
+          <div className="overflow-y-auto flex-1 px-5 sm:px-6 py-5 space-y-5">
 
             {/* Section: Client */}
             <div className="rounded-2xl border border-gray-200 overflow-hidden">

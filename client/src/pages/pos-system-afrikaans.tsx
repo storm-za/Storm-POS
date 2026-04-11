@@ -4397,6 +4397,27 @@ ${paidInvoicesInRange.map((inv: any) =>
                               </div>
                             </div>
                           ))}
+                          {/* Ongekategoriseer card */}
+                          {products.some(p => !p.categoryId) && (
+                            <div
+                              onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter(0 as any); }}
+                              className={`p-4 rounded-xl border cursor-pointer transition-all group ${
+                                posTheme === 'dark'
+                                  ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                  : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300'
+                              }`}
+                            >
+                              <div className="flex flex-col items-center gap-2">
+                                <div className={`w-11 h-11 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${
+                                  posTheme === 'dark' ? 'bg-gray-600/40' : 'bg-gray-100'
+                                }`}>
+                                  <Folder className={`w-5 h-5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                                </div>
+                                <span className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Ongekategoriseer</span>
+                                <span className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{products.filter(p => !p.categoryId).length} items</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ) : salesDisplayMode === 'grid' && selectedSalesCategory !== null ? (
                         <div className="space-y-3">
@@ -5020,12 +5041,16 @@ ${paidInvoicesInRange.map((inv: any) =>
 
           {/* Customers Tab */}
           <TabsContent value="kliente">
-            <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <CardTitle className={`flex items-center space-x-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+            <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
+                  <CardTitle className={`flex items-center gap-2 text-xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Users className="h-5 w-5 text-[hsl(217,90%,40%)]" />
-                    <span>Klientelys</span>
+                    Klientelys
                   </CardTitle>
                   <div className="flex flex-wrap items-center gap-2">
                     <DropdownMenu>
@@ -5064,9 +5089,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                       Voeg Klient By
                     </Button>
                   </div>
-                </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                 <div className="mb-5 p-4 bg-white/5 border border-white/10 rounded-lg">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Filter Besteding op Datumreeks</p>
                   <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
@@ -5149,6 +5173,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           </TabsContent>
 
           {/* Invoices & Quotes Tab */}
