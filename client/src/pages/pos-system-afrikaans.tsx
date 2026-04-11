@@ -5913,33 +5913,38 @@ ${paidInvoicesInRange.map((inv: any) =>
                   </Button>
                 </div>
                 {/* Filter Beheer */}
-                <div className="px-5 py-3 flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Van</span>
-                    <Input
-                      type="date"
-                      value={reportDateFrom}
-                      onChange={(e) => {
-                        setReportDateFrom(e.target.value);
-                        if (e.target.value > reportDateTo) setReportDateTo(e.target.value);
-                      }}
-                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
-                    />
+                <div className="px-4 py-3 space-y-2.5">
+                  {/* Datumsry — volle breedte insette op mobiel */}
+                  <div className="flex gap-2">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className={`text-xs font-semibold uppercase tracking-wide shrink-0 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Van</span>
+                      <Input
+                        type="date"
+                        value={reportDateFrom}
+                        onChange={(e) => {
+                          setReportDateFrom(e.target.value);
+                          if (e.target.value > reportDateTo) setReportDateTo(e.target.value);
+                        }}
+                        style={{ colorScheme: posTheme === 'dark' ? 'dark' : 'light' }}
+                        className={`h-8 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className={`text-xs font-semibold uppercase tracking-wide shrink-0 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Tot</span>
+                      <Input
+                        type="date"
+                        value={reportDateTo}
+                        onChange={(e) => {
+                          setReportDateTo(e.target.value);
+                          if (e.target.value < reportDateFrom) setReportDateFrom(e.target.value);
+                        }}
+                        style={{ colorScheme: posTheme === 'dark' ? 'dark' : 'light' }}
+                        className={`h-8 text-sm flex-1 min-w-0 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Tot</span>
-                    <Input
-                      type="date"
-                      value={reportDateTo}
-                      onChange={(e) => {
-                        setReportDateTo(e.target.value);
-                        if (e.target.value < reportDateFrom) setReportDateFrom(e.target.value);
-                      }}
-                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
-                    />
-                  </div>
-                  <div className={`h-5 w-px ${posTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`} />
-                  <div className="flex gap-1.5 flex-wrap">
+                  {/* Vinnige filters + Personeelfilter ry */}
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {[
                       { label: 'Vandag', onClick: () => { const d = new Date().toISOString().split('T')[0]; setReportDateFrom(d); setReportDateTo(d); } },
                       { label: 'Hierdie Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); setReportDateFrom(mon.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
@@ -5948,22 +5953,22 @@ ${paidInvoicesInRange.map((inv: any) =>
                     ].map(({ label, onClick }) => (
                       <button key={label} onClick={onClick} className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${posTheme === 'dark' ? 'bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'}`}>{label}</button>
                     ))}
-                  </div>
-                  <div className="ml-auto">
-                    <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                      <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200'}`}>
-                        <SelectValue placeholder="Alle Personeel" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle Personeel</SelectItem>
-                        <SelectItem value="0">Bestuur</SelectItem>
-                        {staffAccounts.map((staff) => (
-                          <SelectItem key={staff.id} value={staff.id.toString()}>
-                            {staff.displayName || staff.username || `Personeel #${staff.id}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="ml-auto">
+                      <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                        <SelectTrigger className={`h-8 text-sm w-32 sm:w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200'}`}>
+                          <SelectValue placeholder="Alle Personeel" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Alle Personeel</SelectItem>
+                          <SelectItem value="0">Bestuur</SelectItem>
+                          {staffAccounts.map((staff) => (
+                            <SelectItem key={staff.id} value={staff.id.toString()}>
+                              {staff.displayName || staff.username || `Personeel #${staff.id}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
