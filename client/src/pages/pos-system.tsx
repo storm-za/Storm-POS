@@ -542,6 +542,7 @@ export default function PosSystem() {
   const [poShippingAmount, setPOShippingAmount] = useState(0);
   const [poSearchTerm, setPOSearchTerm] = useState("");
   const [poStatusFilter, setPOStatusFilter] = useState("all");
+  const [poSupplierFilter, setPOSupplierFilter] = useState("all");
   const [isDeletePODialogOpen, setIsDeletePODialogOpen] = useState(false);
   const [deletingPOId, setDeletingPOId] = useState<number | null>(null);
   
@@ -1587,9 +1588,16 @@ export default function PosSystem() {
     return (purchaseOrders || []).filter((po: any) => {
       const matchesSearch = poSearchTerm === "" || po.poNumber?.toLowerCase().includes(poSearchTerm.toLowerCase()) || po.supplierName?.toLowerCase().includes(poSearchTerm.toLowerCase());
       const matchesStatus = poStatusFilter === "all" || po.status === poStatusFilter || (poStatusFilter === "paid" && po.isPaid) || (poStatusFilter === "not_paid" && !po.isPaid);
-      return matchesSearch && matchesStatus;
+      const matchesSupplier = poSupplierFilter === "all" || po.supplierName === poSupplierFilter;
+      return matchesSearch && matchesStatus && matchesSupplier;
     }).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [purchaseOrders, poSearchTerm, poStatusFilter]);
+  }, [purchaseOrders, poSearchTerm, poStatusFilter, poSupplierFilter]);
+
+  const poSupplierOptions = useMemo(() => {
+    const names = new Set<string>();
+    (purchaseOrders || []).forEach((po: any) => { if (po.supplierName) names.add(po.supplierName); });
+    return Array.from(names).sort();
+  }, [purchaseOrders]);
 
   const createInvoiceMutation = useMutation({
     mutationFn: async (invoiceData: any) => {
@@ -6214,6 +6222,19 @@ export default function PosSystem() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input placeholder="Search by PO number or supplier..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
                 </div>
+                {poSupplierOptions.length > 0 && (
+                  <Select value={poSupplierFilter} onValueChange={setPOSupplierFilter}>
+                    <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-48 bg-gray-900 border-gray-700 text-white' : 'w-full sm:w-48 bg-white border-gray-200 text-gray-700'}>
+                      <SelectValue placeholder="Filter by supplier" />
+                    </SelectTrigger>
+                    <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
+                      <SelectItem value="all">All Suppliers</SelectItem>
+                      {poSupplierOptions.map((name) => (
+                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
                   <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-48 bg-gray-900 border-gray-700 text-white' : 'w-full sm:w-48 bg-white border-gray-200 text-gray-700'}>
                     <SelectValue placeholder="Filter by status" />
