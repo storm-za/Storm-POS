@@ -709,7 +709,7 @@ export default function PosSystemAfrikaans() {
   // Pre-compress the stored logo so PDF generators never embed a huge raw image.
   // This only affects what gets drawn into jsPDF — download logic is unchanged.
   useEffect(() => {
-    const settings = mergeReceiptSettings(currentUser?.receiptSettings);
+    const settings = mergeReceiptSettingsAfrikaans(currentUser?.receiptSettings);
     const rawLogo = settings.logoDataUrl || currentUser?.companyLogo || null;
     if (!rawLogo) { setCompressedPdfLogo(null); return; }
     const img = new Image();
