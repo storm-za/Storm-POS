@@ -355,7 +355,8 @@ export default function PosSystem() {
   const [isStaffPasswordDialogOpen, setIsStaffPasswordDialogOpen] = useState(false);
   const [staffPassword, setStaffPassword] = useState("");
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Today's date in YYYY-MM-DD format
+  const [reportDateFrom, setReportDateFrom] = useState(new Date().toISOString().split('T')[0]);
+  const [reportDateTo, setReportDateTo] = useState(new Date().toISOString().split('T')[0]);
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<number | "all">("all");
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
@@ -3278,26 +3279,27 @@ export default function PosSystem() {
 
   // Print Report Function
   const handlePrintReport = () => {
-    // Filter sales data for the report
     const filteredSales = sales.filter(sale => {
       const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
-      const dateMatch = saleDate === selectedDate;
-      
-      if (selectedStaffFilter === "all") {
-        return dateMatch;
-      } else if (selectedStaffFilter === 0) {
-        return dateMatch && !sale.staffAccountId;
-      } else {
-        return dateMatch && sale.staffAccountId === selectedStaffFilter;
-      }
+      const dateMatch = saleDate >= reportDateFrom && saleDate <= reportDateTo;
+      if (selectedStaffFilter === "all") return dateMatch;
+      if (selectedStaffFilter === 0) return dateMatch && !sale.staffAccountId;
+      return dateMatch && sale.staffAccountId === selectedStaffFilter;
     });
 
     const validSales = filteredSales.filter(sale => !sale.isVoided);
-    const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
-    const totalTransactions = validSales.length;
-    const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+    const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
 
-    // Calculate profit
+    const paidInvoicesInRange = (invoices as any[]).filter(inv =>
+      inv.status === 'paid' && inv.documentType === 'invoice' &&
+      new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
+      new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
+    );
+    const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+    const totalRevenue = salesRevenue + invoiceRevenue;
+    const totalTransactions = validSales.length;
+    const avgTransactionValue = totalTransactions > 0 ? salesRevenue / totalTransactions : 0;
+
     const totalProfit = validSales.reduce((profit, sale) => {
       const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
         const salePrice = parseFloat(item.price) * item.quantity;
@@ -3307,114 +3309,110 @@ export default function PosSystem() {
       return profit + saleProfit;
     }, 0);
 
-    // Payment method breakdown
     const paymentMethods = validSales.reduce((acc, sale) => {
       const method = sale.paymentType;
       acc[method] = (acc[method] || 0) + parseFloat(sale.total);
       return acc;
     }, {} as Record<string, number>);
 
-    // Staff filter name
-    const staffFilterName = selectedStaffFilter === "all" 
-      ? "All Staff" 
-      : selectedStaffFilter === 0 
-        ? "Manager" 
-        : staffAccounts.find(s => s.id === selectedStaffFilter)?.displayName || 
-          staffAccounts.find(s => s.id === selectedStaffFilter)?.username || 
+    const staffFilterName = selectedStaffFilter === "all"
+      ? "All Staff"
+      : selectedStaffFilter === 0
+        ? "Manager"
+        : staffAccounts.find(s => s.id === selectedStaffFilter)?.displayName ||
+          staffAccounts.find(s => s.id === selectedStaffFilter)?.username ||
           `Staff #${selectedStaffFilter}`;
 
-    // Generate PDF
+    const dateLabel = reportDateFrom === reportDateTo
+      ? new Date(reportDateFrom).toLocaleDateString()
+      : `${new Date(reportDateFrom).toLocaleDateString()} – ${new Date(reportDateTo).toLocaleDateString()}`;
+
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.width;
     let yPosition = 20;
 
-    // Header
     pdf.setFontSize(20);
     pdf.text('Storm POS - Sales Analytics Report', pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 15;
 
     pdf.setFontSize(12);
-    pdf.text(`Date: ${new Date(selectedDate).toLocaleDateString()}`, pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 10;
+    pdf.text(`Period: ${dateLabel}`, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 8;
     pdf.text(`Staff Filter: ${staffFilterName}`, pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 20;
 
-    // Summary Section
     pdf.setFontSize(16);
     pdf.text('Summary', 20, yPosition);
     yPosition += 15;
 
     pdf.setFontSize(11);
-    pdf.text(`Total Revenue: R${totalRevenue.toFixed(2)}`, 20, yPosition);
+    pdf.text(`Total Revenue (incl. paid invoices): R${totalRevenue.toFixed(2)}`, 20, yPosition);
+    yPosition += 8;
+    pdf.text(`POS Sales Revenue: R${salesRevenue.toFixed(2)}`, 20, yPosition);
+    yPosition += 8;
+    pdf.text(`Invoice Revenue: R${invoiceRevenue.toFixed(2)} (${paidInvoicesInRange.length} paid invoices)`, 20, yPosition);
     yPosition += 8;
     pdf.text(`Total Profit: R${totalProfit.toFixed(2)}`, 20, yPosition);
     yPosition += 8;
-    pdf.text(`Total Transactions: ${totalTransactions}`, 20, yPosition);
+    pdf.text(`POS Transactions: ${totalTransactions}`, 20, yPosition);
     yPosition += 8;
     pdf.text(`Average Transaction: R${avgTransactionValue.toFixed(2)}`, 20, yPosition);
     yPosition += 15;
 
-    // Payment Methods
     pdf.setFontSize(16);
     pdf.text('Payment Methods', 20, yPosition);
     yPosition += 15;
 
     pdf.setFontSize(11);
     Object.entries(paymentMethods).forEach(([method, total]) => {
-      pdf.text(`${method.charAt(0).toUpperCase() + method.slice(1)}: R${total.toFixed(2)}`, 20, yPosition);
+      pdf.text(`${method.charAt(0).toUpperCase() + method.slice(1)}: R${(total as number).toFixed(2)}`, 20, yPosition);
       yPosition += 8;
     });
     yPosition += 10;
 
-    // Sales Details
     pdf.setFontSize(16);
     pdf.text('Sales Details', 20, yPosition);
     yPosition += 15;
 
     pdf.setFontSize(9);
-    filteredSales.forEach((sale, index) => {
-      if (yPosition > 250) {
-        pdf.addPage();
-        yPosition = 20;
-      }
-
-      const staffName = sale.staffAccountId 
-        ? staffAccounts.find(staff => staff.id === sale.staffAccountId)?.displayName || 
-          staffAccounts.find(staff => staff.id === sale.staffAccountId)?.username || 
+    filteredSales.forEach((sale) => {
+      if (yPosition > 250) { pdf.addPage(); yPosition = 20; }
+      const staffName = sale.staffAccountId
+        ? staffAccounts.find(s => s.id === sale.staffAccountId)?.displayName ||
+          staffAccounts.find(s => s.id === sale.staffAccountId)?.username ||
           `Staff #${sale.staffAccountId}`
         : 'Manager';
-
-      const saleText = `#${sale.id} - R${sale.total} - ${sale.paymentType.toUpperCase()} - ${new Date(sale.createdAt).toLocaleTimeString()} - ${staffName}`;
-      pdf.text(saleText, 20, yPosition);
+      pdf.text(`#${sale.id} - R${sale.total} - ${sale.paymentType.toUpperCase()} - ${new Date(sale.createdAt).toLocaleTimeString()} - ${staffName}${sale.isVoided ? ' [VOIDED]' : ''}`, 20, yPosition);
       yPosition += 6;
-
-      if (sale.isVoided) {
-        pdf.text(`   VOIDED: ${sale.voidReason || 'No reason provided'}`, 25, yPosition);
-        yPosition += 6;
-      }
-
-      if (sale.customerName) {
-        pdf.text(`   Customer: ${sale.customerName}`, 25, yPosition);
-        yPosition += 6;
-      }
-
-      const itemsText = `   Items: ${sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}`;
-      pdf.text(itemsText, 25, yPosition);
+      if (sale.customerName) { pdf.text(`   Customer: ${sale.customerName}`, 25, yPosition); yPosition += 6; }
+      pdf.text(`   Items: ${sale.items.map((item: any) => `${item.name} (${item.quantity})`).join(', ')}`, 25, yPosition);
       yPosition += 8;
     });
 
-    // Footer
+    if (paidInvoicesInRange.length > 0) {
+      yPosition += 5;
+      if (yPosition > 250) { pdf.addPage(); yPosition = 20; }
+      pdf.setFontSize(16);
+      pdf.text('Paid Invoices', 20, yPosition);
+      yPosition += 15;
+      pdf.setFontSize(9);
+      paidInvoicesInRange.forEach((inv: any) => {
+        if (yPosition > 250) { pdf.addPage(); yPosition = 20; }
+        pdf.text(`#${inv.documentNumber} - R${parseFloat(inv.total).toFixed(2)} - ${inv.clientName || 'N/A'} - ${new Date(inv.createdDate).toLocaleDateString()}`, 20, yPosition);
+        yPosition += 8;
+      });
+    }
+
     yPosition += 10;
     pdf.setFontSize(8);
     pdf.text(`Generated on ${new Date().toLocaleString()}`, pageWidth / 2, yPosition, { align: 'center' });
 
-    // Download PDF
-    const fileName = `storm-pos-report-${selectedDate}-${staffFilterName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+    const fileName = `storm-pos-report-${reportDateFrom}-to-${reportDateTo}-${staffFilterName.replace(/\s+/g, '-').toLowerCase()}.pdf`;
     pdf.save(fileName);
 
     toast({
       title: "Report Generated",
-      description: `Sales analytics report for ${new Date(selectedDate).toLocaleDateString()} has been downloaded.`,
+      description: `Sales analytics report for ${dateLabel} has been downloaded.`,
     });
   };
 
@@ -6430,105 +6428,110 @@ export default function PosSystem() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="space-y-4"
+              className="space-y-5"
             >
-              {/* Compact Filter Bar */}
-              <div className={`rounded-xl px-4 py-3 flex flex-wrap items-center gap-3 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                <div className="flex items-center gap-2 mr-auto">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]">
-                    <BarChart3 className="w-4 h-4 text-white" />
+              {/* Enterprise Header Bar */}
+              <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-900/30">
+                      <BarChart3 className="w-4.5 h-4.5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className={`font-bold text-base leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sales Analytics</h2>
+                      <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>POS transactions + paid invoices</p>
+                    </div>
                   </div>
-                  <span className={`font-bold text-base ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sales Analytics</span>
+                  <Button
+                    onClick={() => handlePrintReport()}
+                    size="sm"
+                    className="h-8 bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,38%)] hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,43%)] text-white shadow-md text-xs"
+                  >
+                    <Download className="w-3.5 h-3.5 mr-1.5" />
+                    Export PDF
+                  </Button>
                 </div>
-                <Input
-                  id="date-filter"
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className={`h-8 text-sm w-auto ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}
-                />
-                <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                  <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}>
-                    <SelectValue placeholder="All Staff" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Sales</SelectItem>
-                    <SelectItem value="0">Manager</SelectItem>
-                    {staffAccounts.map((staff) => (
-                      <SelectItem key={staff.id} value={staff.id.toString()}>
-                        {staff.displayName || staff.username || `Staff #${staff.id}`}
-                      </SelectItem>
+                {/* Filter Controls */}
+                <div className="px-5 py-3 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>From</span>
+                    <Input
+                      type="date"
+                      value={reportDateFrom}
+                      onChange={(e) => {
+                        setReportDateFrom(e.target.value);
+                        if (e.target.value > reportDateTo) setReportDateTo(e.target.value);
+                      }}
+                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>To</span>
+                    <Input
+                      type="date"
+                      value={reportDateTo}
+                      onChange={(e) => {
+                        setReportDateTo(e.target.value);
+                        if (e.target.value < reportDateFrom) setReportDateFrom(e.target.value);
+                      }}
+                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                    />
+                  </div>
+                  <div className={`h-5 w-px ${posTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`} />
+                  <div className="flex gap-1.5 flex-wrap">
+                    {[
+                      { label: 'Today', onClick: () => { const d = new Date().toISOString().split('T')[0]; setReportDateFrom(d); setReportDateTo(d); } },
+                      { label: 'This Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); setReportDateFrom(mon.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'This Month', onClick: () => { const now = new Date(); setReportDateFrom(new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'Last 30d', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); setReportDateFrom(from.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                    ].map(({ label, onClick }) => (
+                      <button key={label} onClick={onClick} className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${posTheme === 'dark' ? 'bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'}`}>{label}</button>
                     ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  onClick={() => handlePrintReport()}
-                  size="sm"
-                  className="h-8 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-md"
-                >
-                  <Download className="w-3.5 h-3.5 mr-1.5" />
-                  Print
-                </Button>
+                  </div>
+                  <div className="ml-auto">
+                    <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                      <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200'}`}>
+                        <SelectValue placeholder="All Staff" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Staff</SelectItem>
+                        <SelectItem value="0">Manager</SelectItem>
+                        {staffAccounts.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id.toString()}>
+                            {staff.displayName || staff.username || `Staff #${staff.id}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
               {(() => {
-                // Filter sales for selected date and staff
+                // Date range filtering
                 const dateFilteredSales = sales.filter(sale => {
                   const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
-                  const dateMatch = saleDate === selectedDate;
-                  
-                  if (selectedStaffFilter === "all") {
-                    return dateMatch;
-                  } else if (selectedStaffFilter === 0) {
-                    // Manager sales (no staffAccountId)
-                    return dateMatch && !sale.staffAccountId;
-                  } else {
-                    // Specific staff member
-                    return dateMatch && sale.staffAccountId === selectedStaffFilter;
-                  }
+                  const dateMatch = saleDate >= reportDateFrom && saleDate <= reportDateTo;
+                  if (selectedStaffFilter === "all") return dateMatch;
+                  if (selectedStaffFilter === 0) return dateMatch && !sale.staffAccountId;
+                  return dateMatch && sale.staffAccountId === selectedStaffFilter;
                 });
 
-                // Filter out voided sales for calculations
                 const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
 
-                // Calculate totals by payment method (excluding voided sales)
-                const paymentMethodTotals = validSales.reduce((acc, sale) => {
-                  const method = sale.paymentType;
-                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
-                  return acc;
-                }, {} as Record<string, number>);
+                // Paid invoices in range
+                const paidInvoicesInRange = (invoices as any[]).filter(inv =>
+                  inv.status === 'paid' && inv.documentType === 'invoice' &&
+                  new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
+                  new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
+                );
 
-                // Prepare chart data
-                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
-                  name: method.charAt(0).toUpperCase() + method.slice(1),
-                  value: total,
-                  amount: `R${total.toFixed(2)}`
-                }));
-
-                // Daily totals for line chart (last 7 days including selected date) - excluding voided sales
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                  const date = new Date(selectedDate);
-                  date.setDate(date.getDate() - (6 - i));
-                  return date.toISOString().split('T')[0];
-                });
-
-                const dailyTotals = last7Days.map(date => {
-                  const daySales = sales.filter(sale => 
-                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
-                  );
-                  const total = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
-                  return {
-                    date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    total: total,
-                    transactions: daySales.length
-                  };
-                });
-
-                const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+                const totalRevenue = salesRevenue + invoiceRevenue;
                 const totalTransactions = validSales.length;
-                const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-                
-                // Calculate total profit (revenue - cost) - excluding voided sales
+                const avgTransactionValue = totalTransactions > 0 ? salesRevenue / totalTransactions : 0;
+
                 const totalProfit = validSales.reduce((profit, sale) => {
                   const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
                     const salePrice = parseFloat(item.price) * item.quantity;
@@ -6538,267 +6541,294 @@ export default function PosSystem() {
                   return profit + saleProfit;
                 }, 0);
 
-                const COLORS = ['hsl(217,90%,50%)', 'hsl(217,90%,60%)', 'hsl(217,90%,70%)', 'hsl(217,90%,40%)'];
+                // Payment method breakdown (POS only)
+                const paymentMethodTotals = validSales.reduce((acc, sale) => {
+                  const method = sale.paymentType;
+                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
+                  return acc;
+                }, {} as Record<string, number>);
+
+                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
+                  name: method.charAt(0).toUpperCase() + method.slice(1),
+                  value: total,
+                }));
+
+                // Revenue source chart (POS vs Invoices)
+                const revenueSourceData = [
+                  ...(salesRevenue > 0 ? [{ name: 'POS Sales', value: salesRevenue }] : []),
+                  ...(invoiceRevenue > 0 ? [{ name: 'Paid Invoices', value: invoiceRevenue }] : []),
+                ];
+
+                // Daily breakdown for bar chart
+                const allDays: string[] = [];
+                const cur = new Date(reportDateFrom);
+                const end = new Date(reportDateTo);
+                while (cur <= end) { allDays.push(cur.toISOString().split('T')[0]); cur.setDate(cur.getDate() + 1); }
+                const displayDays = allDays.length > 60 ? allDays.slice(-60) : allDays;
+
+                const dailyTotals = displayDays.map(date => {
+                  const daySales = sales.filter(sale =>
+                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
+                  );
+                  const dayInvoices = (invoices as any[]).filter(inv =>
+                    inv.status === 'paid' && inv.documentType === 'invoice' &&
+                    new Date(inv.createdDate).toISOString().split('T')[0] === date
+                  );
+                  const salesTotal = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                  const invoiceTotal = dayInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+                  return {
+                    date: allDays.length === 1
+                      ? new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+                      : allDays.length <= 14
+                        ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                        : new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    pos: salesTotal,
+                    invoice: invoiceTotal,
+                    total: salesTotal + invoiceTotal,
+                  };
+                });
+
+                const COLORS = ['hsl(217,90%,50%)', 'hsl(155,70%,45%)', 'hsl(38,90%,55%)', 'hsl(280,70%,55%)'];
+                const dateLabel = reportDateFrom === reportDateTo
+                  ? new Date(reportDateFrom + 'T00:00:00').toLocaleDateString('en-ZA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                  : `${new Date(reportDateFrom + 'T00:00:00').toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })} – ${new Date(reportDateTo + 'T00:00:00').toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}`;
 
                 return (
                   <>
-                    {/* Summary Cards — 2×2 on mobile, 4 across on desktop */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {/* Period label */}
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs uppercase tracking-widest font-semibold ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Period</span>
+                      <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{dateLabel}</span>
+                      {allDays.length > 1 && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${posTheme === 'dark' ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>{allDays.length} days</span>
+                      )}
+                    </div>
+
+                    {/* KPI Cards */}
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                       {[
-                        { icon: DollarSign, label: 'Total Revenue', value: `R${totalRevenue.toFixed(2)}` },
-                        { icon: TrendingUp, label: 'Total Profit', value: `R${totalProfit.toFixed(2)}` },
-                        { icon: Receipt, label: 'Transactions', value: totalTransactions },
-                        { icon: TrendingUp, label: 'Avg Transaction', value: `R${avgTransactionValue.toFixed(2)}` },
-                      ].map(({ icon: Icon, label, value }) => (
-                        <div key={label} className={`rounded-xl p-3 flex flex-col gap-1 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                          <div className="flex items-center gap-1.5">
-                            <Icon className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
-                            <span className={`text-xs font-medium truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
+                        { icon: DollarSign, label: 'Total Revenue', value: `R${totalRevenue.toFixed(2)}`, sub: 'POS + paid invoices', accent: 'from-blue-600 to-blue-700' },
+                        { icon: Receipt, label: 'POS Sales', value: `R${salesRevenue.toFixed(2)}`, sub: `${totalTransactions} transactions`, accent: 'from-indigo-600 to-indigo-700' },
+                        { icon: FileText, label: 'Invoice Revenue', value: `R${invoiceRevenue.toFixed(2)}`, sub: `${paidInvoicesInRange.length} paid invoices`, accent: 'from-emerald-600 to-emerald-700' },
+                        { icon: TrendingUp, label: 'Gross Profit', value: `R${totalProfit.toFixed(2)}`, sub: 'After cost of goods', accent: 'from-violet-600 to-violet-700' },
+                        { icon: TrendingUp, label: 'Avg Transaction', value: `R${avgTransactionValue.toFixed(2)}`, sub: 'POS only', accent: 'from-amber-600 to-amber-700' },
+                      ].map(({ icon: Icon, label, value, sub, accent }) => (
+                        <div key={label} className={`rounded-xl p-4 border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className={`text-xs font-semibold uppercase tracking-wide truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
+                            <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${accent} flex items-center justify-center flex-shrink-0`}>
+                              <Icon className="w-3.5 h-3.5 text-white" />
+                            </div>
                           </div>
-                          <div className="text-xl font-bold text-[hsl(217,90%,50%)] leading-tight">{value}</div>
+                          <div className={`text-2xl font-bold leading-none mb-1 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</div>
+                          <div className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{sub}</div>
                         </div>
                       ))}
                     </div>
 
                     {/* Charts Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Payment Methods Pie Chart */}
-                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                        <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Payment Methods Breakdown</CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                          {paymentChartData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={300}>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      {/* Daily Revenue Bar Chart — spans 2 cols */}
+                      <div className={`lg:col-span-2 rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Daily Revenue Breakdown</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>POS sales vs paid invoices per day</p>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[hsl(217,90%,50%)] inline-block" />POS</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[hsl(155,70%,45%)] inline-block" />Invoices</span>
+                          </div>
+                        </div>
+                        {dailyTotals.some(d => d.total > 0) ? (
+                          <ResponsiveContainer width="100%" height={260}>
+                            <BarChart data={dailyTotals} barSize={displayDays.length > 20 ? 6 : displayDays.length > 10 ? 10 : 18}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={posTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} vertical={false} />
+                              <XAxis dataKey="date" stroke={posTheme === 'dark' ? '#6b7280' : '#9ca3af'} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                              <YAxis stroke={posTheme === 'dark' ? '#6b7280' : '#9ca3af'} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `R${v}`} />
+                              <Tooltip
+                                contentStyle={{ backgroundColor: posTheme === 'dark' ? '#1f2937' : '#fff', border: `1px solid ${posTheme === 'dark' ? '#374151' : '#e5e7eb'}`, borderRadius: '8px', fontSize: 12 }}
+                                formatter={(value: any, name: string) => [`R${Number(value).toFixed(2)}`, name === 'pos' ? 'POS Sales' : 'Invoice Revenue']}
+                              />
+                              <Bar dataKey="pos" fill="hsl(217,90%,50%)" radius={[3, 3, 0, 0]} />
+                              <Bar dataKey="invoice" fill="hsl(155,70%,45%)" radius={[3, 3, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-[260px] flex flex-col items-center justify-center gap-2">
+                            <BarChart3 className={`w-10 h-10 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                            <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No data for this period</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Revenue Sources + Payment Methods stacked */}
+                      <div className="space-y-4">
+                        {/* Revenue Sources */}
+                        <div className={`rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <h3 className={`font-semibold text-sm mb-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Revenue Sources</h3>
+                          {revenueSourceData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={130}>
                               <PieChart>
-                                <Pie
-                                  data={paymentChartData}
-                                  cx="50%"
-                                  cy="50%"
-                                  labelLine={false}
-                                  label={({ name, value }) => `${name}: R${value.toFixed(2)}`}
-                                  outerRadius={80}
-                                  fill="hsl(217,90%,50%)"
-                                  dataKey="value"
-                                >
-                                  {paymentChartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Pie data={revenueSourceData} cx="50%" cy="50%" innerRadius={35} outerRadius={55} dataKey="value" paddingAngle={3}>
+                                  {revenueSourceData.map((_, index) => (
+                                    <Cell key={`src-${index}`} fill={['hsl(217,90%,50%)', 'hsl(155,70%,45%)'][index % 2]} />
                                   ))}
                                 </Pie>
-                                <Tooltip formatter={(value) => [`R${Number(value).toFixed(2)}`, 'Amount']} />
+                                <Tooltip formatter={(v: any) => [`R${Number(v).toFixed(2)}`, '']} contentStyle={{ backgroundColor: posTheme === 'dark' ? '#1f2937' : '#fff', border: `1px solid ${posTheme === 'dark' ? '#374151' : '#e5e7eb'}`, borderRadius: '8px', fontSize: 12 }} />
                               </PieChart>
                             </ResponsiveContainer>
                           ) : (
-                            <div className="h-[300px] flex items-center justify-center text-gray-400">
-                              No sales data for selected date
+                            <div className="h-[130px] flex items-center justify-center">
+                              <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No revenue data</p>
                             </div>
                           )}
-                        </CardContent>
-                      </Card>
+                          <div className="space-y-1.5 mt-2">
+                            {[
+                              { label: 'POS Sales', value: salesRevenue, color: 'bg-blue-500' },
+                              { label: 'Paid Invoices', value: invoiceRevenue, color: 'bg-emerald-500' },
+                            ].map(({ label, value, color }) => (
+                              <div key={label} className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${color} inline-block`} /><span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{label}</span></span>
+                                <span className={`font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{value.toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                      {/* 7-Day Trend Line Chart */}
-                      <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                        <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>7-Day Sales Trend</CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                          <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={dailyTotals}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                              <XAxis dataKey="date" stroke="#9ca3af" />
-                              <YAxis stroke="#9ca3af" />
-                              <Tooltip 
-                                formatter={(value, name) => [
-                                  name === 'total' ? `R${Number(value).toFixed(2)}` : value,
-                                  name === 'total' ? 'Revenue' : 'Transactions'
-                                ]}
-                                contentStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
-                              />
-                              <Line type="monotone" dataKey="total" stroke="hsl(217,90%,50%)" strokeWidth={3} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </CardContent>
-                      </Card>
+                        {/* Payment Methods */}
+                        <div className={`rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <h3 className={`font-semibold text-sm mb-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Payment Methods</h3>
+                          {paymentChartData.length > 0 ? (
+                            <div className="space-y-2">
+                              {paymentChartData.map(({ name, value }, idx) => (
+                                <div key={name}>
+                                  <div className="flex justify-between text-xs mb-1">
+                                    <span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{name}</span>
+                                    <span className={`font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{(value as number).toFixed(2)}</span>
+                                  </div>
+                                  <div className={`w-full rounded-full h-1.5 ${posTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                    <div className="h-1.5 rounded-full" style={{ width: `${salesRevenue > 0 ? ((value as number) / salesRevenue) * 100 : 0}%`, backgroundColor: COLORS[idx % COLORS.length] }} />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No POS transactions</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Detailed Sales List */}
-                    <Card className="bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 shadow-2xl">
-                      <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
-                        <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Sales Details for {new Date(selectedDate).toLocaleDateString()}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-6">
-                        <div className="space-y-2">
-                          {dateFilteredSales.length > 0 ? (
-                            dateFilteredSales.map((sale) => {
-                              const isExpanded = expandedSales.has(sale.id);
-                              const saleItems = Array.isArray(sale.items) ? sale.items : [];
-                              
-                              return (
-                                <motion.div 
-                                  key={sale.id} 
-                                  initial={false}
-                                  animate={{ backgroundColor: isExpanded ? 'rgba(30, 58, 138, 0.1)' : 'transparent' }}
-                                  className={`border rounded-xl overflow-hidden transition-all duration-300 ${
-                                    sale.isVoided 
-                                      ? 'bg-red-950/30 border-red-800/50' 
-                                      : isExpanded 
-                                        ? 'border-[hsl(217,90%,40%)]/50 shadow-lg shadow-blue-900/20' 
-                                        : 'border-gray-700/50 hover:border-gray-600/50'
-                                  }`}
+                    {/* Transactions + Paid Invoices List */}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      {/* POS Sales */}
+                      <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>POS Transactions</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{dateFilteredSales.length} transactions · R{salesRevenue.toFixed(2)}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-xs ${posTheme === 'dark' ? 'border-gray-600 text-gray-400' : 'border-gray-200 text-gray-500'}`}>{totalTransactions} valid</Badge>
+                        </div>
+                        <div className="divide-y max-h-[460px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          {dateFilteredSales.length > 0 ? dateFilteredSales.map((sale) => {
+                            const isExpanded = expandedSales.has(sale.id);
+                            const saleItems = Array.isArray(sale.items) ? sale.items : [];
+                            return (
+                              <motion.div key={sale.id} initial={false} className={`${posTheme === 'dark' ? 'divide-gray-700/40 border-gray-700/40' : 'divide-gray-100 border-gray-100'} ${sale.isVoided ? 'opacity-60' : ''}`}>
+                                <div
+                                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${posTheme === 'dark' ? 'hover:bg-gray-700/40' : 'hover:bg-gray-50'}`}
+                                  onClick={() => {
+                                    const newExpanded = new Set(expandedSales);
+                                    if (isExpanded) newExpanded.delete(sale.id); else newExpanded.add(sale.id);
+                                    setExpandedSales(newExpanded);
+                                  }}
                                 >
-                                  <div 
-                                    className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
-                                      isExpanded ? 'bg-gradient-to-r from-[hsl(217,30%,15%)]/80 to-transparent' : 'hover:bg-gray-800/30'
-                                    }`}
-                                    onClick={() => {
-                                      const newExpanded = new Set(expandedSales);
-                                      if (isExpanded) {
-                                        newExpanded.delete(sale.id);
-                                      } else {
-                                        newExpanded.add(sale.id);
-                                      }
-                                      setExpandedSales(newExpanded);
-                                    }}
-                                  >
-                                    <div className="flex items-center gap-3 flex-1">
-                                      <motion.div
-                                        animate={{ rotate: isExpanded ? 90 : 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className={`p-1.5 rounded-lg ${isExpanded ? 'bg-[hsl(217,90%,40%)]/20' : 'bg-gray-700/50'}`}
-                                      >
-                                        <ChevronRight className={`w-4 h-4 ${isExpanded ? 'text-[hsl(217,90%,50%)]' : 'text-gray-400'}`} />
-                                      </motion.div>
-                                      
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                          <span className="font-semibold text-white">
-                                            Sale #{sale.id}
-                                          </span>
-                                          <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">
-                                            {saleItems.length} {saleItems.length === 1 ? 'item' : 'items'}
-                                          </Badge>
-                                          <Badge variant="outline" className="text-xs bg-blue-600/20 text-blue-300 border-blue-500/30">
-                                            {sale.paymentType.toUpperCase()}
-                                          </Badge>
-                                          {sale.isVoided && (
-                                            <Badge variant="destructive" className="text-xs">
-                                              VOIDED
-                                            </Badge>
-                                          )}
-                                        </div>
-                                        <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                          {new Date(sale.createdAt).toLocaleString()} 
-                                          {sale.customerName && ` • ${sale.customerName}`}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                          Served by: {
-                                            sale.staffAccountId 
-                                              ? (() => {
-                                                  const staff = staffAccounts.find(s => s.id === sale.staffAccountId);
-                                                  return staff ? (staff.displayName || staff.username || `Staff #${staff.id}`) : 'Staff Member';
-                                                })()
-                                              : currentUser?.email?.split('@')[0] || 'Manager'
-                                          }
-                                          {sale.isVoided && sale.voidReason && ` • Void: ${sale.voidReason}`}
-                                        </p>
-                                      </div>
+                                  <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.15 }}>
+                                    <ChevronRight className={`w-4 h-4 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                                  </motion.div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Sale #{sale.id}</span>
+                                      <Badge variant="outline" className="text-xs bg-blue-600/10 text-blue-400 border-blue-500/20">{sale.paymentType.toUpperCase()}</Badge>
+                                      {sale.isVoided && <Badge variant="destructive" className="text-xs">VOIDED</Badge>}
                                     </div>
-                                    
-                                    <div className="flex items-center gap-3">
-                                      <div className="text-right">
-                                        <span className={`text-lg font-bold ${sale.isVoided ? 'line-through text-red-500' : 'text-[hsl(217,90%,50%)]'}`}>
-                                          R{sale.total}
-                                        </span>
+                                    <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                      {new Date(sale.createdAt).toLocaleString()} {sale.customerName && `· ${sale.customerName}`}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    <span className={`text-sm font-bold ${sale.isVoided ? 'line-through text-red-400' : posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{sale.total}</span>
+                                    {!sale.isVoided && (
+                                      <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleVoidSaleClick(sale); }} className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                                        <X className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                                <motion.div initial={false} animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+                                  <div className={`px-4 pb-3 pt-2 ${posTheme === 'dark' ? 'bg-gray-900/40' : 'bg-gray-50/80'}`}>
+                                    <div className="space-y-1">
+                                      {saleItems.map((item: any, idx: number) => (
+                                        <div key={idx} className="flex justify-between text-xs py-1">
+                                          <span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{item.name} <span className={posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}>×{item.quantity}</span></span>
+                                          <span className={`font-medium ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</span>
+                                        </div>
+                                      ))}
+                                      <div className={`flex justify-between text-xs pt-2 mt-1 border-t font-semibold ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
+                                        <span>Total</span>
+                                        <span>R{sale.total}</span>
                                       </div>
-                                      {!sale.isVoided && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={(e) => { e.stopPropagation(); handleVoidSaleClick(sale); }}
-                                          className="h-7 px-2 text-xs border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                                        >
-                                          <X className="h-3 w-3 mr-1" />
-                                          Void
-                                        </Button>
-                                      )}
-                                      {sale.isVoided && sale.voidReason && (
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={(e) => { e.stopPropagation(); handleViewVoidReason(sale); }}
-                                          className="h-7 px-2 text-xs border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
-                                        >
-                                          <Eye className="h-3 w-3 mr-1" />
-                                          View
-                                        </Button>
-                                      )}
                                     </div>
                                   </div>
-                                  
-                                  {/* Expandable Items Section */}
-                                  <motion.div
-                                    initial={false}
-                                    animate={{ 
-                                      height: isExpanded ? 'auto' : 0,
-                                      opacity: isExpanded ? 1 : 0
-                                    }}
-                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
-                                      <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/30' : 'bg-gray-50 border-gray-200'} rounded-lg border overflow-hidden`}>
-                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
-                                          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaction Details</span>
-                                        </div>
-                                        <div className="divide-y divide-gray-700/30">
-                                          {saleItems.map((item: any, index: number) => (
-                                            <div key={index} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/30 transition-colors">
-                                              <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">
-                                                  <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                                                </div>
-                                                <div>
-                                                  <p className="text-white font-medium">{item.name || 'Unknown Product'}</p>
-                                                  <p className="text-xs text-gray-500">SKU: {item.sku || 'N/A'}</p>
-                                                </div>
-                                              </div>
-                                              <div className="text-right">
-                                                <div className="flex items-center gap-4">
-                                                  <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Qty</p>
-                                                    <p className="text-white font-medium">{item.quantity || 1}</p>
-                                                  </div>
-                                                  <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Price</p>
-                                                    <p className="text-white font-medium">R{parseFloat(item.price || 0).toFixed(2)}</p>
-                                                  </div>
-                                                  <div className="text-center min-w-[80px]">
-                                                    <p className="text-xs text-gray-500">Subtotal</p>
-                                                    <p className="text-[hsl(217,90%,50%)] font-semibold">R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</p>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-3 border-t border-gray-700/30 flex justify-between items-center">
-                                          <span className="text-sm font-medium text-gray-300">Total</span>
-                                          <span className="text-lg font-bold text-[hsl(217,90%,50%)]">R{sale.total}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </motion.div>
                                 </motion.div>
-                              );
-                            })
-                          ) : (
-                            <div className="text-center py-8 text-gray-400">
-                              No sales recorded for {new Date(selectedDate).toLocaleDateString()}
+                              </motion.div>
+                            );
+                          }) : (
+                            <div className="px-4 py-10 text-center">
+                              <Receipt className={`w-8 h-8 mx-auto mb-2 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                              <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No transactions for this period</p>
                             </div>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+
+                      {/* Paid Invoices */}
+                      <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Paid Invoices</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{paidInvoicesInRange.length} invoices · R{invoiceRevenue.toFixed(2)}</p>
+                          </div>
+                          <Badge className="text-xs bg-emerald-600/20 text-emerald-400 border-emerald-500/30 border">{paidInvoicesInRange.length} paid</Badge>
+                        </div>
+                        <div className="divide-y max-h-[460px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          {paidInvoicesInRange.length > 0 ? paidInvoicesInRange.map((inv: any) => (
+                            <div key={inv.id} className={`flex items-center gap-3 px-4 py-3 ${posTheme === 'dark' ? 'divide-gray-700/40 border-gray-700/40' : 'divide-gray-100 border-gray-100'}`}>
+                              <div className="w-8 h-8 rounded-lg bg-emerald-600/15 flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-4 h-4 text-emerald-500" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{inv.documentNumber}</span>
+                                  <Badge className="text-xs bg-emerald-600/20 text-emerald-400 border-emerald-500/30 border">PAID</Badge>
+                                </div>
+                                <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {inv.clientName || 'No client'} · {new Date(inv.createdDate).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <span className={`text-sm font-bold flex-shrink-0 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{parseFloat(inv.total).toFixed(2)}</span>
+                            </div>
+                          )) : (
+                            <div className="px-4 py-10 text-center">
+                              <FileText className={`w-8 h-8 mx-auto mb-2 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                              <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No paid invoices for this period</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </>
                 );
               })()}
@@ -6831,8 +6861,8 @@ export default function PosSystem() {
                 return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
               });
 
-              // Calculate total revenue for current month
-              const currentMonthRevenue = currentMonthSales.reduce((total, sale) => {
+              // Calculate POS sales revenue for current month
+              const currentMonthSalesRevenue = currentMonthSales.reduce((total, sale) => {
                 return total + parseFloat(sale.total);
               }, 0);
 
@@ -6841,9 +6871,20 @@ export default function PosSystem() {
                 const invoiceDate = new Date(invoice.createdDate);
                 return invoiceDate >= currentMonthStart && invoiceDate <= currentMonthEnd;
               });
+
+              // Paid invoices this month (counted as revenue)
+              const currentMonthPaidInvoices = (invoices as any[]).filter(inv =>
+                inv.status === 'paid' && inv.documentType === 'invoice' &&
+                new Date(inv.createdDate) >= currentMonthStart &&
+                new Date(inv.createdDate) <= currentMonthEnd
+              );
+              const currentMonthInvoiceRevenue = currentMonthPaidInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+
+              // Combined monthly revenue
+              const currentMonthRevenue = currentMonthSalesRevenue + currentMonthInvoiceRevenue;
               
               // Calculate fees
-              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005; // 0.5% of sales
+              const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005; // 0.5% of combined revenue
               const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50; // R0.50 per invoice
               const stormFee = salesFee + invoiceFee; // Total Storm fee
 
@@ -6911,7 +6952,7 @@ export default function PosSystem() {
                   {/* Summary stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Monthly Revenue', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} transactions` },
+                      { label: 'Monthly Revenue', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} sales + ${currentMonthPaidInvoices.length} paid inv.` },
                       { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : '0.5% of revenue' },
                       { label: 'Invoices', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fees` },
                       { label: 'Period', value: `${Math.round(progressPercentage)}%`, sub: `Day ${daysCompleted} of ${daysInMonth}` },
@@ -6934,12 +6975,18 @@ export default function PosSystem() {
                       </div>
                       <div className="p-4 space-y-3">
                         <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Sales (0.5%)</div>
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Revenue (0.5%)</div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Gross Revenue</span><span className="font-medium">R{currentMonthRevenue.toFixed(2)}</span>
+                            <span>POS Sales</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
                           </div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Sales Fee</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                            <span>Paid Invoices ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                            <span>Total Revenue</span><span>R{currentMonthRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Revenue Fee (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
                           </div>
                         </div>
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />

@@ -358,7 +358,8 @@ export default function PosSystemAfrikaans() {
   const [staffPassword, setStaffPassword] = useState("");
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [highlightStaffButton, setHighlightStaffButton] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [reportDateFrom, setReportDateFrom] = useState(new Date().toISOString().split('T')[0]);
+  const [reportDateTo, setReportDateTo] = useState(new Date().toISOString().split('T')[0]);
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<number | "all">("all");
   const [checkoutOption, setCheckoutOption] = useState<'complete' | 'open-account' | 'add-to-account'>('complete');
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
@@ -3250,33 +3251,47 @@ export default function PosSystemAfrikaans() {
 
   // Print report function
   const handlePrintReport = () => {
-    const dateFilteredSales = sales.filter(sale => {
+    const filteredSales = sales.filter(sale => {
       const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
-      const dateMatch = saleDate === selectedDate;
-      
-      if (selectedStaffFilter === "all") {
-        return dateMatch;
-      } else if (selectedStaffFilter === 0) {
-        return dateMatch && !sale.staffAccountId;
-      } else {
-        return dateMatch && sale.staffAccountId === selectedStaffFilter;
-      }
+      const dateMatch = saleDate >= reportDateFrom && saleDate <= reportDateTo;
+      if (selectedStaffFilter === "all") return dateMatch;
+      if (selectedStaffFilter === 0) return dateMatch && !sale.staffAccountId;
+      return dateMatch && sale.staffAccountId === selectedStaffFilter;
     });
 
-    const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
-    const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const validSales = filteredSales.filter(sale => !sale.isVoided);
+    const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const paidInvoicesInRange = (invoices as any[]).filter(inv =>
+      inv.status === 'paid' && inv.documentType === 'invoice' &&
+      new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
+      new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
+    );
+    const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+    const totalRevenue = salesRevenue + invoiceRevenue;
     const totalTransactions = validSales.length;
 
+    const dateLabel = reportDateFrom === reportDateTo
+      ? new Date(reportDateFrom).toLocaleDateString('af-ZA')
+      : `${new Date(reportDateFrom).toLocaleDateString('af-ZA')} – ${new Date(reportDateTo).toLocaleDateString('af-ZA')}`;
+
     const printContent = `
-Verkope Verslag - ${new Date(selectedDate).toLocaleDateString('af-ZA')}
+Verkope Verslag - ${dateLabel}
 
-Totale Omset: R${totalRevenue.toFixed(2)}
+Totale Omset (inkl. betaalde fakture): R${totalRevenue.toFixed(2)}
+POS Verkope: R${salesRevenue.toFixed(2)}
+Faktuur Omset: R${invoiceRevenue.toFixed(2)} (${paidInvoicesInRange.length} betaalde fakture)
 Transaksies: ${totalTransactions}
-Gemiddelde Transaksie: R${totalTransactions > 0 ? (totalRevenue / totalTransactions).toFixed(2) : '0.00'}
+Gemiddelde Transaksie: R${totalTransactions > 0 ? (salesRevenue / totalTransactions).toFixed(2) : '0.00'}
 
-${dateFilteredSales.map(sale => 
+--- POS Transaksies ---
+${filteredSales.map(sale =>
   `Verkoop #${sale.id} - R${sale.total} - ${new Date(sale.createdAt).toLocaleTimeString('af-ZA')}${sale.isVoided ? ' (GEKANSELLEER)' : ''}`
 ).join('\n')}
+
+${paidInvoicesInRange.length > 0 ? `--- Betaalde Fakture ---
+${paidInvoicesInRange.map((inv: any) =>
+  `${inv.documentNumber} - R${parseFloat(inv.total).toFixed(2)} - ${inv.clientName || 'Geen kliënt'} - ${new Date(inv.createdDate).toLocaleDateString('af-ZA')}`
+).join('\n')}` : ''}
     `;
 
     const printWindow = window.open('', '_blank');
@@ -3295,7 +3310,7 @@ ${dateFilteredSales.map(sale =>
 
     toast({
       title: "Verslag gedruk",
-      description: `Verkope analise verslag vir ${new Date(selectedDate).toLocaleDateString('af-ZA')} is gedruk.`,
+      description: `Verkope verslag vir ${dateLabel} is gedruk.`,
     });
   };
 
@@ -5823,104 +5838,112 @@ ${dateFilteredSales.map(sale =>
 
           {/* Reports Tab */}
           <TabsContent value="verslae">
-            <div className="space-y-4">
-              {/* Compact Filter Bar */}
-              <div className={`rounded-xl px-4 py-3 flex flex-wrap items-center gap-3 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                <div className="flex items-center gap-2 mr-auto">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]">
-                    <BarChart3 className="w-4 h-4 text-white" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-5"
+            >
+              {/* Onderneming Koptekst */}
+              <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-900/30">
+                      <BarChart3 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h2 className={`font-bold text-base leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Verkope Analise</h2>
+                      <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>POS transaksies + betaalde fakture</p>
+                    </div>
                   </div>
-                  <span className={`font-bold text-base ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Verkope Analise</span>
+                  <Button
+                    onClick={() => handlePrintReport()}
+                    size="sm"
+                    className="h-8 bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,38%)] hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,43%)] text-white shadow-md text-xs"
+                  >
+                    <Download className="w-3.5 h-3.5 mr-1.5" />
+                    Druk Verslag
+                  </Button>
                 </div>
-                <Input
-                  id="date-filter"
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className={`h-8 text-sm w-auto ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}
-                />
-                <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
-                  <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-white/10 border-white/20 text-white' : 'border-gray-200'}`}>
-                    <SelectValue placeholder="Alle Personeel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Verkope</SelectItem>
-                    <SelectItem value="0">Bestuur</SelectItem>
-                    {staffAccounts.map((staff) => (
-                      <SelectItem key={staff.id} value={staff.id.toString()}>
-                        {staff.displayName || staff.username || `Personeel #${staff.id}`}
-                      </SelectItem>
+                {/* Filter Beheer */}
+                <div className="px-5 py-3 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Van</span>
+                    <Input
+                      type="date"
+                      value={reportDateFrom}
+                      onChange={(e) => {
+                        setReportDateFrom(e.target.value);
+                        if (e.target.value > reportDateTo) setReportDateTo(e.target.value);
+                      }}
+                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-medium uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Tot</span>
+                    <Input
+                      type="date"
+                      value={reportDateTo}
+                      onChange={(e) => {
+                        setReportDateTo(e.target.value);
+                        if (e.target.value < reportDateFrom) setReportDateFrom(e.target.value);
+                      }}
+                      className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200 bg-gray-50'}`}
+                    />
+                  </div>
+                  <div className={`h-5 w-px ${posTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`} />
+                  <div className="flex gap-1.5 flex-wrap">
+                    {[
+                      { label: 'Vandag', onClick: () => { const d = new Date().toISOString().split('T')[0]; setReportDateFrom(d); setReportDateTo(d); } },
+                      { label: 'Hierdie Week', onClick: () => { const now = new Date(); const mon = new Date(now); mon.setDate(now.getDate() - now.getDay() + 1); setReportDateFrom(mon.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'Hierdie Maand', onClick: () => { const now = new Date(); setReportDateFrom(new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                      { label: 'Laaste 30d', onClick: () => { const now = new Date(); const from = new Date(now); from.setDate(now.getDate() - 29); setReportDateFrom(from.toISOString().split('T')[0]); setReportDateTo(now.toISOString().split('T')[0]); } },
+                    ].map(({ label, onClick }) => (
+                      <button key={label} onClick={onClick} className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors ${posTheme === 'dark' ? 'bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white border border-gray-600/50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'}`}>{label}</button>
                     ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  onClick={() => handlePrintReport()}
-                  size="sm"
-                  className="h-8 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white shadow-md"
-                >
-                  <Download className="w-3.5 h-3.5 mr-1.5" />
-                  Druk
-                </Button>
+                  </div>
+                  <div className="ml-auto">
+                    <Select value={selectedStaffFilter.toString()} onValueChange={(value) => setSelectedStaffFilter(value === "all" ? "all" : parseInt(value))}>
+                      <SelectTrigger className={`h-8 text-sm w-36 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'border-gray-200'}`}>
+                        <SelectValue placeholder="Alle Personeel" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Personeel</SelectItem>
+                        <SelectItem value="0">Bestuur</SelectItem>
+                        {staffAccounts.map((staff) => (
+                          <SelectItem key={staff.id} value={staff.id.toString()}>
+                            {staff.displayName || staff.username || `Personeel #${staff.id}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
               {(() => {
-                // Filter sales for selected date and staff
                 const dateFilteredSales = sales.filter(sale => {
                   const saleDate = new Date(sale.createdAt).toISOString().split('T')[0];
-                  const dateMatch = saleDate === selectedDate;
-                  
-                  if (selectedStaffFilter === "all") {
-                    return dateMatch;
-                  } else if (selectedStaffFilter === 0) {
-                    // Manager sales (no staffAccountId)
-                    return dateMatch && !sale.staffAccountId;
-                  } else {
-                    // Specific staff member
-                    return dateMatch && sale.staffAccountId === selectedStaffFilter;
-                  }
+                  const dateMatch = saleDate >= reportDateFrom && saleDate <= reportDateTo;
+                  if (selectedStaffFilter === "all") return dateMatch;
+                  if (selectedStaffFilter === 0) return dateMatch && !sale.staffAccountId;
+                  return dateMatch && sale.staffAccountId === selectedStaffFilter;
                 });
 
-                // Filter out voided sales for calculations
                 const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
 
-                // Calculate totals by payment method (excluding voided sales)
-                const paymentMethodTotals = validSales.reduce((acc, sale) => {
-                  const method = sale.paymentType;
-                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
-                  return acc;
-                }, {} as Record<string, number>);
+                const paidInvoicesInRange = (invoices as any[]).filter(inv =>
+                  inv.status === 'paid' && inv.documentType === 'invoice' &&
+                  new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
+                  new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
+                );
 
-                // Prepare chart data
-                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
-                  name: method === 'kontant' ? 'Kontant' : method === 'kaart' ? 'Kaart' : method === 'eft' ? 'EFT' : method.charAt(0).toUpperCase() + method.slice(1),
-                  value: total,
-                  amount: `R${total.toFixed(2)}`
-                }));
-
-                // Daily totals for line chart (last 7 days including selected date) - excluding voided sales
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                  const date = new Date(selectedDate);
-                  date.setDate(date.getDate() - (6 - i));
-                  return date.toISOString().split('T')[0];
-                });
-
-                const dailyTotals = last7Days.map(date => {
-                  const daySales = sales.filter(sale => 
-                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
-                  );
-                  const total = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
-                  return {
-                    date: new Date(date).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' }),
-                    total: total,
-                    transactions: daySales.length
-                  };
-                });
-
-                const totalRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+                const totalRevenue = salesRevenue + invoiceRevenue;
                 const totalTransactions = validSales.length;
-                const avgTransactionValue = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
-                
-                // Calculate total profit (revenue - cost) - excluding voided sales
+                const avgTransactionValue = totalTransactions > 0 ? salesRevenue / totalTransactions : 0;
+
                 const totalProfit = validSales.reduce((profit, sale) => {
                   const saleProfit = sale.items.reduce((itemProfit: number, item: any) => {
                     const salePrice = parseFloat(item.price) * item.quantity;
@@ -5930,254 +5953,293 @@ ${dateFilteredSales.map(sale =>
                   return profit + saleProfit;
                 }, 0);
 
-                const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+                const paymentMethodTotals = validSales.reduce((acc, sale) => {
+                  const method = sale.paymentType;
+                  acc[method] = (acc[method] || 0) + parseFloat(sale.total);
+                  return acc;
+                }, {} as Record<string, number>);
+
+                const paymentChartData = Object.entries(paymentMethodTotals).map(([method, total]) => ({
+                  name: method === 'kontant' ? 'Kontant' : method === 'kaart' ? 'Kaart' : method === 'eft' ? 'EFT' : method.charAt(0).toUpperCase() + method.slice(1),
+                  value: total,
+                }));
+
+                const revenueSourceData = [
+                  ...(salesRevenue > 0 ? [{ name: 'POS Verkope', value: salesRevenue }] : []),
+                  ...(invoiceRevenue > 0 ? [{ name: 'Betaalde Fakture', value: invoiceRevenue }] : []),
+                ];
+
+                const allDays: string[] = [];
+                const cur = new Date(reportDateFrom);
+                const end = new Date(reportDateTo);
+                while (cur <= end) { allDays.push(cur.toISOString().split('T')[0]); cur.setDate(cur.getDate() + 1); }
+                const displayDays = allDays.length > 60 ? allDays.slice(-60) : allDays;
+
+                const dailyTotals = displayDays.map(date => {
+                  const daySales = sales.filter(sale =>
+                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
+                  );
+                  const dayInvoices = (invoices as any[]).filter(inv =>
+                    inv.status === 'paid' && inv.documentType === 'invoice' &&
+                    new Date(inv.createdDate).toISOString().split('T')[0] === date
+                  );
+                  const salesTotal = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+                  const invoiceTotal = dayInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+                  return {
+                    date: new Date(date).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' }),
+                    pos: salesTotal,
+                    faktuur: invoiceTotal,
+                    total: salesTotal + invoiceTotal,
+                  };
+                });
+
+                const COLORS = ['hsl(217,90%,50%)', 'hsl(155,70%,45%)', 'hsl(38,90%,55%)', 'hsl(280,70%,55%)'];
+                const dateLabel = reportDateFrom === reportDateTo
+                  ? new Date(reportDateFrom + 'T00:00:00').toLocaleDateString('af-ZA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+                  : `${new Date(reportDateFrom + 'T00:00:00').toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })} – ${new Date(reportDateTo + 'T00:00:00').toLocaleDateString('af-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}`;
 
                 return (
                   <>
-                    {/* Summary Cards — 2×2 on mobile, 4 across on desktop */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {/* Tydperk etiket */}
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs uppercase tracking-widest font-semibold ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Tydperk</span>
+                      <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{dateLabel}</span>
+                      {allDays.length > 1 && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${posTheme === 'dark' ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>{allDays.length} dae</span>
+                      )}
+                    </div>
+
+                    {/* KPI Kaarte */}
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                       {[
-                        { icon: DollarSign, label: 'Totale Omset', value: `R${totalRevenue.toFixed(2)}` },
-                        { icon: TrendingUp, label: 'Totale Wins', value: `R${totalProfit.toFixed(2)}` },
-                        { icon: Receipt, label: 'Transaksies', value: totalTransactions },
-                        { icon: TrendingUp, label: 'Gem. Transaksie', value: `R${avgTransactionValue.toFixed(2)}` },
-                      ].map(({ icon: Icon, label, value }) => (
-                        <div key={label} className={`rounded-xl p-3 flex flex-col gap-1 ${posTheme === 'dark' ? 'bg-gray-800/50 border border-gray-700' : 'bg-white border border-gray-200 shadow-sm'}`}>
-                          <div className="flex items-center gap-1.5">
-                            <Icon className="w-3.5 h-3.5 text-[hsl(217,90%,50%)]" />
-                            <span className={`text-xs font-medium truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
+                        { icon: DollarSign, label: 'Totale Omset', value: `R${totalRevenue.toFixed(2)}`, sub: 'POS + betaalde fakture', accent: 'from-blue-600 to-blue-700' },
+                        { icon: Receipt, label: 'POS Verkope', value: `R${salesRevenue.toFixed(2)}`, sub: `${totalTransactions} transaksies`, accent: 'from-indigo-600 to-indigo-700' },
+                        { icon: FileText, label: 'Faktuur Omset', value: `R${invoiceRevenue.toFixed(2)}`, sub: `${paidInvoicesInRange.length} betaalde fakture`, accent: 'from-emerald-600 to-emerald-700' },
+                        { icon: TrendingUp, label: 'Bruto Wins', value: `R${totalProfit.toFixed(2)}`, sub: 'Na koste van goedere', accent: 'from-violet-600 to-violet-700' },
+                        { icon: TrendingUp, label: 'Gem. Transaksie', value: `R${avgTransactionValue.toFixed(2)}`, sub: 'POS slegs', accent: 'from-amber-600 to-amber-700' },
+                      ].map(({ icon: Icon, label, value, sub, accent }) => (
+                        <div key={label} className={`rounded-xl p-4 border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className={`text-xs font-semibold uppercase tracking-wide truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{label}</span>
+                            <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${accent} flex items-center justify-center flex-shrink-0`}>
+                              <Icon className="w-3.5 h-3.5 text-white" />
+                            </div>
                           </div>
-                          <div className="text-xl font-bold text-[hsl(217,90%,50%)] leading-tight">{value}</div>
+                          <div className={`text-2xl font-bold leading-none mb-1 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</div>
+                          <div className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{sub}</div>
                         </div>
                       ))}
                     </div>
-                    {/* Charts Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Payment Methods Pie Chart */}
-                      <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                        <CardHeader>
-                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Betaalmetodes Verdeling</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          {paymentChartData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={300}>
+
+                    {/* Grafieke */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      {/* Daaglikse Omset Staafgrafiek */}
+                      <div className={`lg:col-span-2 rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Daaglikse Omset Verdeling</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>POS verkope vs betaalde fakture per dag</p>
+                          </div>
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[hsl(217,90%,50%)] inline-block" />POS</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[hsl(155,70%,45%)] inline-block" />Fakture</span>
+                          </div>
+                        </div>
+                        {dailyTotals.some(d => d.total > 0) ? (
+                          <ResponsiveContainer width="100%" height={260}>
+                            <BarChart data={dailyTotals} barSize={displayDays.length > 20 ? 6 : displayDays.length > 10 ? 10 : 18}>
+                              <CartesianGrid strokeDasharray="3 3" stroke={posTheme === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} vertical={false} />
+                              <XAxis dataKey="date" stroke={posTheme === 'dark' ? '#6b7280' : '#9ca3af'} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                              <YAxis stroke={posTheme === 'dark' ? '#6b7280' : '#9ca3af'} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `R${v}`} />
+                              <Tooltip
+                                contentStyle={{ backgroundColor: posTheme === 'dark' ? '#1f2937' : '#fff', border: `1px solid ${posTheme === 'dark' ? '#374151' : '#e5e7eb'}`, borderRadius: '8px', fontSize: 12 }}
+                                formatter={(value: any, name: string) => [`R${Number(value).toFixed(2)}`, name === 'pos' ? 'POS Verkope' : 'Faktuur Omset']}
+                              />
+                              <Bar dataKey="pos" fill="hsl(217,90%,50%)" radius={[3, 3, 0, 0]} />
+                              <Bar dataKey="faktuur" fill="hsl(155,70%,45%)" radius={[3, 3, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        ) : (
+                          <div className="h-[260px] flex flex-col items-center justify-center gap-2">
+                            <BarChart3 className={`w-10 h-10 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                            <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen data vir hierdie tydperk nie</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Omset Bronne + Betaalmetodes */}
+                      <div className="space-y-4">
+                        <div className={`rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <h3 className={`font-semibold text-sm mb-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Omset Bronne</h3>
+                          {revenueSourceData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={130}>
                               <PieChart>
-                                <Pie
-                                  data={paymentChartData}
-                                  cx="50%"
-                                  cy="50%"
-                                  labelLine={false}
-                                  label={({ name, value }) => `${name}: R${value.toFixed(2)}`}
-                                  outerRadius={80}
-                                  fill="#8884d8"
-                                  dataKey="value"
-                                >
-                                  {paymentChartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Pie data={revenueSourceData} cx="50%" cy="50%" innerRadius={35} outerRadius={55} dataKey="value" paddingAngle={3}>
+                                  {revenueSourceData.map((_, index) => (
+                                    <Cell key={`src-${index}`} fill={['hsl(217,90%,50%)', 'hsl(155,70%,45%)'][index % 2]} />
                                   ))}
                                 </Pie>
-                                <Tooltip formatter={(value) => [`R${Number(value).toFixed(2)}`, 'Bedrag']} />
+                                <Tooltip formatter={(v: any) => [`R${Number(v).toFixed(2)}`, '']} contentStyle={{ backgroundColor: posTheme === 'dark' ? '#1f2937' : '#fff', border: `1px solid ${posTheme === 'dark' ? '#374151' : '#e5e7eb'}`, borderRadius: '8px', fontSize: 12 }} />
                               </PieChart>
                             </ResponsiveContainer>
                           ) : (
-                            <div className="h-[300px] flex items-center justify-center text-gray-400">
-                              Geen verkope data vir geselekteerde datum nie
+                            <div className="h-[130px] flex items-center justify-center">
+                              <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen omset data</p>
                             </div>
                           )}
-                        </CardContent>
-                      </Card>
+                          <div className="space-y-1.5 mt-2">
+                            {[
+                              { label: 'POS Verkope', value: salesRevenue, color: 'bg-blue-500' },
+                              { label: 'Betaalde Fakture', value: invoiceRevenue, color: 'bg-emerald-500' },
+                            ].map(({ label, value, color }) => (
+                              <div key={label} className="flex items-center justify-between text-xs">
+                                <span className="flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${color} inline-block`} /><span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{label}</span></span>
+                                <span className={`font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{value.toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-                      {/* 7-Day Trend Line Chart */}
-                      <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                        <CardHeader>
-                          <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>7-Dag Verkope Tendens</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={dailyTotals}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="date" />
-                              <YAxis />
-                              <Tooltip 
-                                formatter={(value, name) => [
-                                  name === 'total' ? `R${Number(value).toFixed(2)}` : value,
-                                  name === 'total' ? 'Omset' : 'Transaksies'
-                                ]}
-                              />
-                              <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    {/* Detailed Sales List */}
-                    <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
-                      <CardHeader>
-                        <CardTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Verkopebesonderhede vir {new Date(selectedDate).toLocaleDateString('af-ZA')}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          {dateFilteredSales.length === 0 ? (
-                            <div className="text-center py-8 text-gray-400">
-                              Geen verkope vir geselekteerde datum en filter nie
+                        <div className={`rounded-2xl border p-5 ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                          <h3 className={`font-semibold text-sm mb-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Betaalmetodes</h3>
+                          {paymentChartData.length > 0 ? (
+                            <div className="space-y-2">
+                              {paymentChartData.map(({ name, value }, idx) => (
+                                <div key={name}>
+                                  <div className="flex justify-between text-xs mb-1">
+                                    <span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{name}</span>
+                                    <span className={`font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{(value as number).toFixed(2)}</span>
+                                  </div>
+                                  <div className={`w-full rounded-full h-1.5 ${posTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                                    <div className="h-1.5 rounded-full" style={{ width: `${salesRevenue > 0 ? ((value as number) / salesRevenue) * 100 : 0}%`, backgroundColor: COLORS[idx % COLORS.length] }} />
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           ) : (
-                            dateFilteredSales.map((sale) => {
-                              const isExpanded = expandedSales.has(sale.id);
-                              const saleItems = Array.isArray(sale.items) ? sale.items : [];
-                              
-                              return (
-                                <motion.div 
-                                  key={sale.id} 
-                                  initial={false}
-                                  animate={{ backgroundColor: isExpanded ? 'rgba(30, 58, 138, 0.1)' : 'transparent' }}
-                                  className={`border rounded-xl overflow-hidden transition-all duration-300 ${
-                                    sale.isVoided 
-                                      ? 'bg-red-950/30 border-red-800/50' 
-                                      : isExpanded 
-                                        ? 'border-[hsl(217,90%,40%)]/50 shadow-lg shadow-blue-900/20' 
-                                        : 'border-gray-700/50 hover:border-gray-600/50'
-                                  }`}
-                                >
-                                  <div 
-                                    className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
-                                      isExpanded ? 'bg-gradient-to-r from-[hsl(217,30%,15%)]/80 to-transparent' : 'hover:bg-gray-800/30'
-                                    }`}
-                                    onClick={() => {
-                                      const newExpanded = new Set(expandedSales);
-                                      if (isExpanded) {
-                                        newExpanded.delete(sale.id);
-                                      } else {
-                                        newExpanded.add(sale.id);
-                                      }
-                                      setExpandedSales(newExpanded);
-                                    }}
-                                  >
-                                    <div className="flex items-center gap-3 flex-1">
-                                      <motion.div
-                                        animate={{ rotate: isExpanded ? 90 : 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className={`p-1.5 rounded-lg ${isExpanded ? 'bg-[hsl(217,90%,40%)]/20' : 'bg-gray-700/50'}`}
-                                      >
-                                        <ChevronRight className={`w-4 h-4 ${isExpanded ? 'text-[hsl(217,90%,50%)]' : 'text-gray-400'}`} />
-                                      </motion.div>
-                                      
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                          <span className="font-semibold text-white">
-                                            Verkoop #{sale.id}
-                                          </span>
-                                          <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">
-                                            {saleItems.length} {saleItems.length === 1 ? 'item' : 'items'}
-                                          </Badge>
-                                          {sale.isVoided && (
-                                            <Badge variant="destructive" className="text-xs">
-                                              Gekanselleer
-                                            </Badge>
-                                          )}
-                                        </div>
-                                        <p className={`text-sm mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                          {new Date(sale.createdAt).toLocaleString('af-ZA')} • {sale.paymentType === 'kontant' ? 'Kontant' : sale.paymentType === 'kaart' ? 'Kaart' : sale.paymentType === 'eft' ? 'EFT' : sale.paymentType}
-                                          {sale.customerName && ` • ${sale.customerName}`}
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                          {sale.staffAccount ? `Bedien deur: ${sale.staffAccount.username}` : 'Bedien deur: Bestuur'}
-                                          {sale.notes && ` • Nota: ${sale.notes}`}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3">
-                                      <div className="text-right">
-                                        <span className={`text-lg font-bold ${sale.isVoided ? 'line-through text-red-500' : 'text-[hsl(217,90%,50%)]'}`}>
-                                          R{sale.total}
-                                        </span>
-                                      </div>
-                                      {sale.isVoided ? (
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={(e) => { e.stopPropagation(); setViewVoidDialog({ open: true, sale }); }}
-                                          className="bg-gray-800 border-gray-600 hover:bg-gray-700"
-                                        >
-                                          <Eye className="h-4 w-4" />
-                                        </Button>
-                                      ) : currentStaff?.userType === 'management' && (
-                                        <Button
-                                          variant="destructive"
-                                          size="sm"
-                                          onClick={(e) => { e.stopPropagation(); setVoidSaleDialog({ open: true, sale }); }}
-                                        >
-                                          Kanselleer
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Expandable Items Section */}
-                                  <motion.div
-                                    initial={false}
-                                    animate={{ 
-                                      height: isExpanded ? 'auto' : 0,
-                                      opacity: isExpanded ? 1 : 0
-                                    }}
-                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="px-4 pb-4 pt-2 border-t border-gray-700/50">
-                                      <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-700/30' : 'bg-gray-50 border-gray-200'} rounded-lg border overflow-hidden`}>
-                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-2 border-b border-gray-700/30">
-                                          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Transaksie Besonderhede</span>
-                                        </div>
-                                        <div className="divide-y divide-gray-700/30">
-                                          {saleItems.map((item: any, index: number) => (
-                                            <div key={index} className="flex items-center justify-between px-4 py-3 hover:bg-gray-800/30 transition-colors">
-                                              <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 flex items-center justify-center">
-                                                  <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                                                </div>
-                                                <div>
-                                                  <p className="text-white font-medium">{item.name || 'Onbekende Produk'}</p>
-                                                  <p className="text-xs text-gray-500">SKU: {item.sku || 'N/A'}</p>
-                                                </div>
-                                              </div>
-                                              <div className="text-right">
-                                                <div className="flex items-center gap-4">
-                                                  <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Hoev.</p>
-                                                    <p className="text-white font-medium">{item.quantity || 1}</p>
-                                                  </div>
-                                                  <div className="text-center">
-                                                    <p className="text-xs text-gray-500">Prys</p>
-                                                    <p className="text-white font-medium">R{parseFloat(item.price || 0).toFixed(2)}</p>
-                                                  </div>
-                                                  <div className="text-center min-w-[80px]">
-                                                    <p className="text-xs text-gray-500">Subtotaal</p>
-                                                    <p className="text-[hsl(217,90%,50%)] font-semibold">R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</p>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                        <div className="bg-gradient-to-r from-[hsl(217,30%,20%)]/50 to-transparent px-4 py-3 border-t border-gray-700/30 flex justify-between items-center">
-                                          <span className="text-sm font-medium text-gray-300">Totaal</span>
-                                          <span className="text-lg font-bold text-[hsl(217,90%,50%)]">R{sale.total}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </motion.div>
-                                </motion.div>
-                              );
-                            })
+                            <p className={`text-xs ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen POS transaksies</p>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
+
+                    {/* Transaksies + Betaalde Fakture Lys */}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      {/* POS Verkope */}
+                      <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>POS Transaksies</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{dateFilteredSales.length} transaksies · R{salesRevenue.toFixed(2)}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-xs ${posTheme === 'dark' ? 'border-gray-600 text-gray-400' : 'border-gray-200 text-gray-500'}`}>{totalTransactions} geldig</Badge>
+                        </div>
+                        <div className="divide-y max-h-[460px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          {dateFilteredSales.length > 0 ? dateFilteredSales.map((sale) => {
+                            const isExpanded = expandedSales.has(sale.id);
+                            const saleItems = Array.isArray(sale.items) ? sale.items : [];
+                            return (
+                              <motion.div key={sale.id} initial={false} className={`${sale.isVoided ? 'opacity-60' : ''}`}>
+                                <div
+                                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${posTheme === 'dark' ? 'hover:bg-gray-700/40' : 'hover:bg-gray-50'}`}
+                                  onClick={() => {
+                                    const newExpanded = new Set(expandedSales);
+                                    if (isExpanded) newExpanded.delete(sale.id); else newExpanded.add(sale.id);
+                                    setExpandedSales(newExpanded);
+                                  }}
+                                >
+                                  <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.15 }}>
+                                    <ChevronRight className={`w-4 h-4 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+                                  </motion.div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Verkoop #{sale.id}</span>
+                                      <Badge variant="outline" className="text-xs bg-blue-600/10 text-blue-400 border-blue-500/20">{sale.paymentType === 'kontant' ? 'KONTANT' : sale.paymentType === 'kaart' ? 'KAART' : sale.paymentType.toUpperCase()}</Badge>
+                                      {sale.isVoided && <Badge variant="destructive" className="text-xs">GEKANSELLEER</Badge>}
+                                    </div>
+                                    <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                      {new Date(sale.createdAt).toLocaleString('af-ZA')} {sale.customerName && `· ${sale.customerName}`}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    <span className={`text-sm font-bold ${sale.isVoided ? 'line-through text-red-400' : posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{sale.total}</span>
+                                    {sale.isVoided ? (
+                                      <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setViewVoidDialog({ open: true, sale }); }} className="h-6 w-6 p-0 text-blue-400 hover:text-blue-300">
+                                        <Eye className="h-3 w-3" />
+                                      </Button>
+                                    ) : currentStaff?.userType === 'management' && (
+                                      <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); setVoidSaleDialog({ open: true, sale }); }} className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                                        <X className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                                <motion.div initial={false} animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+                                  <div className={`px-4 pb-3 pt-2 ${posTheme === 'dark' ? 'bg-gray-900/40' : 'bg-gray-50/80'}`}>
+                                    <div className="space-y-1">
+                                      {saleItems.map((item: any, idx: number) => (
+                                        <div key={idx} className="flex justify-between text-xs py-1">
+                                          <span className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>{item.name} <span className={posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}>×{item.quantity}</span></span>
+                                          <span className={`font-medium ${posTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>R{((item.quantity || 1) * parseFloat(item.price || 0)).toFixed(2)}</span>
+                                        </div>
+                                      ))}
+                                      <div className={`flex justify-between text-xs pt-2 mt-1 border-t font-semibold ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
+                                        <span>Totaal</span>
+                                        <span>R{sale.total}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              </motion.div>
+                            );
+                          }) : (
+                            <div className="px-4 py-10 text-center">
+                              <Receipt className={`w-8 h-8 mx-auto mb-2 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                              <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen transaksies vir hierdie tydperk nie</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Betaalde Fakture */}
+                      <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-800/60 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
+                          <div>
+                            <h3 className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Betaalde Fakture</h3>
+                            <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{paidInvoicesInRange.length} fakture · R{invoiceRevenue.toFixed(2)}</p>
+                          </div>
+                          <Badge className="text-xs bg-emerald-600/20 text-emerald-400 border-emerald-500/30 border">{paidInvoicesInRange.length} betaal</Badge>
+                        </div>
+                        <div className="divide-y max-h-[460px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                          {paidInvoicesInRange.length > 0 ? paidInvoicesInRange.map((inv: any) => (
+                            <div key={inv.id} className={`flex items-center gap-3 px-4 py-3`}>
+                              <div className="w-8 h-8 rounded-lg bg-emerald-600/15 flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-4 h-4 text-emerald-500" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{inv.documentNumber}</span>
+                                  <Badge className="text-xs bg-emerald-600/20 text-emerald-400 border-emerald-500/30 border">BETAAL</Badge>
+                                </div>
+                                <p className={`text-xs mt-0.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {inv.clientName || 'Geen kliënt'} · {new Date(inv.createdDate).toLocaleDateString('af-ZA')}
+                                </p>
+                              </div>
+                              <span className={`text-sm font-bold flex-shrink-0 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{parseFloat(inv.total).toFixed(2)}</span>
+                            </div>
+                          )) : (
+                            <div className="px-4 py-10 text-center">
+                              <FileText className={`w-8 h-8 mx-auto mb-2 ${posTheme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+                              <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen betaalde fakture vir hierdie tydperk nie</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </>
                 );
               })()}
-            </div>
+            </motion.div>
           </TabsContent>
 
           {/* Usage Tab */}
@@ -6206,8 +6268,8 @@ ${dateFilteredSales.map(sale =>
                 return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
               });
 
-              // Calculate total revenue for current month
-              const currentMonthRevenue = currentMonthSales.reduce((total, sale) => {
+              // Calculate POS sales revenue for current month
+              const currentMonthSalesRevenue = currentMonthSales.reduce((total, sale) => {
                 return total + parseFloat(sale.total);
               }, 0);
 
@@ -6216,6 +6278,17 @@ ${dateFilteredSales.map(sale =>
                 const invoiceDate = new Date(invoice.createdAt);
                 return invoiceDate >= currentMonthStart && invoiceDate <= currentMonthEnd;
               });
+
+              // Betaalde fakture hierdie maand (tel as omset)
+              const currentMonthPaidInvoices = (invoices as any[]).filter(inv =>
+                inv.status === 'paid' && inv.documentType === 'invoice' &&
+                new Date(inv.createdDate) >= currentMonthStart &&
+                new Date(inv.createdDate) <= currentMonthEnd
+              );
+              const currentMonthInvoiceRevenue = currentMonthPaidInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
+
+              // Gekombineerde maandelikse omset
+              const currentMonthRevenue = currentMonthSalesRevenue + currentMonthInvoiceRevenue;
 
               // Calculate Storm fees - sales fee (0.5%) + invoice fee (R0.50 each)
               const salesFee = isInTrial ? 0 : currentMonthRevenue * 0.005;
@@ -6286,7 +6359,7 @@ ${dateFilteredSales.map(sale =>
                   {/* Summary stats */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} transaksies` },
+                      { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} verkope + ${currentMonthPaidInvoices.length} betaalde fakt.` },
                       { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : '0.5% van omset' },
                       { label: 'Fakture', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fooie` },
                       { label: 'Periode', value: `${Math.round(progressPercentage)}%`, sub: `Dag ${daysCompleted} van ${daysInMonth}` },
@@ -6309,12 +6382,18 @@ ${dateFilteredSales.map(sale =>
                       </div>
                       <div className="p-4 space-y-3">
                         <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Verkope (0.5%)</div>
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Omset (0.5%)</div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Bruto Omset</span><span className="font-medium">R{currentMonthRevenue.toFixed(2)}</span>
+                            <span>POS Verkope</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
                           </div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Verkoopsfooi</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                            <span>Betaalde Fakture ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                            <span>Totale Omset</span><span>R{currentMonthRevenue.toFixed(2)}</span>
+                          </div>
+                          <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <span>Omsetfooi (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
                           </div>
                         </div>
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
