@@ -6622,9 +6622,13 @@ export default function PosSystem() {
                 const displayDays = allDays.length > 60 ? allDays.slice(-60) : allDays;
 
                 const dailyTotals = displayDays.map(date => {
-                  const daySales = sales.filter(sale =>
-                    new Date(sale.createdAt).toISOString().split('T')[0] === date && !sale.isVoided
-                  );
+                  const daySales = sales.filter(sale => {
+                    if (sale.isVoided) return false;
+                    if (new Date(sale.createdAt).toISOString().split('T')[0] !== date) return false;
+                    if (selectedStaffFilter === "all") return true;
+                    if (selectedStaffFilter === 0) return !sale.staffAccountId;
+                    return sale.staffAccountId === selectedStaffFilter;
+                  });
                   const dayInvoices = (invoices as any[]).filter(inv =>
                     inv.status === 'paid' && inv.documentType === 'invoice' &&
                     new Date(inv.createdDate).toISOString().split('T')[0] === date
