@@ -3389,10 +3389,38 @@ ${paidInvoicesInRange.map((inv: any) =>
 
   const handleExportInvoices = () => {
     if (!currentUser?.id) return;
-    window.location.href = `/api/pos/export/invoices/${currentUser.id}`;
+    const data = filteredInvoices.map(inv => ({
+      'Dokumentnommer': inv.documentNumber,
+      'Tipe': inv.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie',
+      'Kliëntnaam': inv.clientName,
+      'Kliënt E-pos': inv.clientEmail || '',
+      'Datum': inv.createdDate,
+      'Vervaldatum': (inv as any).dueDate || '',
+      'PO Nommer': (inv as any).poNumber || '',
+      'Subtotaal': inv.subtotal,
+      'Korting %': inv.discountPercent,
+      'Kortingsbedrag': inv.discountAmount,
+      'BTW %': inv.taxPercent,
+      'BTW Bedrag': inv.taxAmount,
+      'Verskeping': (inv as any).shippingAmount || 0,
+      'Totaal': inv.total,
+      'Status': inv.status,
+      'Betaalmetode': (inv as any).paymentMethod || '',
+      'Notas': (inv as any).notes || '',
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Fakture");
+    const activeFilters: string[] = [];
+    if (invoiceStatusFilter !== 'all') activeFilters.push(invoiceStatusFilter);
+    if (invoiceTypeFilter !== 'all') activeFilters.push(invoiceTypeFilter);
+    if (invoiceDateFrom) activeFilters.push(`van-${invoiceDateFrom}`);
+    if (invoiceDateTo) activeFilters.push(`tot-${invoiceDateTo}`);
+    const suffix = activeFilters.length > 0 ? `-${activeFilters.join('-')}` : '';
+    XLSX.writeFile(workbook, `storm-fakture${suffix}.xlsx`);
     toast({
-      title: "Uitvoer Begin",
-      description: "Jou fakture word as 'n Excel-lêer afgelaai.",
+      title: "Uitvoer Voltooid",
+      description: `${filteredInvoices.length} faktuur/kwotasie(s) wat jou huidige filters pas is uitgevoer.`,
     });
   };
 

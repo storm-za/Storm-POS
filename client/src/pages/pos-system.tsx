@@ -2053,10 +2053,38 @@ export default function PosSystem() {
 
   const handleExportInvoices = () => {
     if (!currentUser?.id) return;
-    window.location.href = `/api/pos/export/invoices/${currentUser.id}`;
+    const data = filteredInvoices.map(inv => ({
+      'Document Number': inv.documentNumber,
+      'Type': inv.documentType === 'invoice' ? 'Invoice' : 'Quote',
+      'Client Name': inv.clientName,
+      'Client Email': inv.clientEmail || '',
+      'Date': inv.createdDate,
+      'Due Date': (inv as any).dueDate || '',
+      'PO Number': (inv as any).poNumber || '',
+      'Subtotal': inv.subtotal,
+      'Discount %': inv.discountPercent,
+      'Discount Amount': inv.discountAmount,
+      'Tax %': inv.taxPercent,
+      'Tax Amount': inv.taxAmount,
+      'Shipping': (inv as any).shippingAmount || 0,
+      'Total': inv.total,
+      'Status': inv.status,
+      'Payment Method': (inv as any).paymentMethod || '',
+      'Notes': (inv as any).notes || '',
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Invoices");
+    const activeFilters: string[] = [];
+    if (invoiceStatusFilter !== 'all') activeFilters.push(invoiceStatusFilter);
+    if (invoiceTypeFilter !== 'all') activeFilters.push(invoiceTypeFilter);
+    if (invoiceDateFrom) activeFilters.push(`from-${invoiceDateFrom}`);
+    if (invoiceDateTo) activeFilters.push(`to-${invoiceDateTo}`);
+    const suffix = activeFilters.length > 0 ? `-${activeFilters.join('-')}` : '';
+    XLSX.writeFile(workbook, `storm-invoices${suffix}.xlsx`);
     toast({
-      title: "Export Started",
-      description: "Your invoices are being downloaded as an Excel file.",
+      title: "Export Complete",
+      description: `${filteredInvoices.length} invoice(s) matching your current filters exported.`,
     });
   };
 
