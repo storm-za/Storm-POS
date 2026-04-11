@@ -3340,11 +3340,14 @@ export default function PosSystem() {
     const validSales = filteredSales.filter(sale => !sale.isVoided);
     const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
 
-    const paidInvoicesInRange = (invoices as any[]).filter(inv =>
-      inv.status === 'paid' && inv.documentType === 'invoice' &&
-      new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
-      new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
-    );
+    const paidInvoicesInRange = (invoices as any[]).filter(inv => {
+      if (inv.status !== 'paid' || inv.documentType !== 'invoice') return false;
+      const invDate = new Date(inv.createdDate).toISOString().split('T')[0];
+      if (invDate < reportDateFrom || invDate > reportDateTo) return false;
+      if (selectedStaffFilter === "all") return true;
+      if (selectedStaffFilter === 0) return !inv.staffAccountId;
+      return inv.staffAccountId === selectedStaffFilter;
+    });
     const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
     const totalRevenue = salesRevenue + invoiceRevenue;
     const totalTransactions = validSales.length;
@@ -6574,12 +6577,15 @@ export default function PosSystem() {
 
                 const validSales = dateFilteredSales.filter(sale => !sale.isVoided);
 
-                // Paid invoices in range
-                const paidInvoicesInRange = (invoices as any[]).filter(inv =>
-                  inv.status === 'paid' && inv.documentType === 'invoice' &&
-                  new Date(inv.createdDate).toISOString().split('T')[0] >= reportDateFrom &&
-                  new Date(inv.createdDate).toISOString().split('T')[0] <= reportDateTo
-                );
+                // Paid invoices in range (also filtered by staff)
+                const paidInvoicesInRange = (invoices as any[]).filter(inv => {
+                  if (inv.status !== 'paid' || inv.documentType !== 'invoice') return false;
+                  const invDate = new Date(inv.createdDate).toISOString().split('T')[0];
+                  if (invDate < reportDateFrom || invDate > reportDateTo) return false;
+                  if (selectedStaffFilter === "all") return true;
+                  if (selectedStaffFilter === 0) return !inv.staffAccountId;
+                  return inv.staffAccountId === selectedStaffFilter;
+                });
 
                 const salesRevenue = validSales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
                 const invoiceRevenue = paidInvoicesInRange.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
@@ -6629,10 +6635,13 @@ export default function PosSystem() {
                     if (selectedStaffFilter === 0) return !sale.staffAccountId;
                     return sale.staffAccountId === selectedStaffFilter;
                   });
-                  const dayInvoices = (invoices as any[]).filter(inv =>
-                    inv.status === 'paid' && inv.documentType === 'invoice' &&
-                    new Date(inv.createdDate).toISOString().split('T')[0] === date
-                  );
+                  const dayInvoices = (invoices as any[]).filter(inv => {
+                    if (inv.status !== 'paid' || inv.documentType !== 'invoice') return false;
+                    if (new Date(inv.createdDate).toISOString().split('T')[0] !== date) return false;
+                    if (selectedStaffFilter === "all") return true;
+                    if (selectedStaffFilter === 0) return !inv.staffAccountId;
+                    return inv.staffAccountId === selectedStaffFilter;
+                  });
                   const salesTotal = daySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
                   const invoiceTotal = dayInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.total), 0);
                   return {
@@ -10026,6 +10035,7 @@ export default function PosSystem() {
                     terms: invoiceTerms || null,
                     showBusinessInfo: invoiceShowBusinessInfo,
                     customFieldValues: invoiceCustomFieldValues,
+                    staffAccountId: currentStaff?.id || null,
                   };
                   if (editingInvoice) {
                     updateInvoiceMutation.mutate({

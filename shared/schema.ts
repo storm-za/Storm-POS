@@ -150,6 +150,7 @@ export const posInvoices = pgTable("pos_invoices", {
   terms: text("terms"), // Terms & conditions
   showBusinessInfo: boolean("show_business_info").notNull().default(true),
   customFieldValues: jsonb("custom_field_values"), // { cf_id: value, vis_fieldName: boolean }
+  staffAccountId: integer("staff_account_id").references(() => posStaffAccounts.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
