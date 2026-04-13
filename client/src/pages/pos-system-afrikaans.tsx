@@ -727,6 +727,8 @@ export default function PosSystemAfrikaans() {
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       if (!ctx) { setCompressedPdfLogo(rawLogo); return; }
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       setCompressedPdfLogo(canvas.toDataURL('image/jpeg', 0.75));
     };
@@ -1056,6 +1058,8 @@ export default function PosSystemAfrikaans() {
     // Voeg maatskappy logo by indien beskikbaar (linker kant)
     if (companyLogo) {
       try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
         doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
       } catch (error) {
         console.error('Fout met byvoeging van logo na PDF:', error);
@@ -1438,6 +1442,8 @@ export default function PosSystemAfrikaans() {
     
     if (companyLogo) {
       try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
         doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
       } catch (error) {
         console.error('Fout met logo in PDF:', error);
@@ -2088,7 +2094,11 @@ export default function PosSystemAfrikaans() {
 
     // Maatskappy-logo (bo-links)
     if (companyLogo) {
-      try { doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35); } catch (e) { console.error('Logo fout:', e); }
+      try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
+        doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
+      } catch (e) { console.error('Logo fout:', e); }
     }
 
     // AANKOOPBESTELLING-opskrif
@@ -3028,6 +3038,8 @@ export default function PosSystemAfrikaans() {
       const logoToUse = compressedPdfLogo;
       if (logoToUse) {
         try {
+          doc.setFillColor(255, 255, 255);
+          doc.rect(margin, 8, 34, 34, 'F');
           doc.addImage(logoToUse, 'JPEG', margin, 8, 34, 34);
         } catch (error) {
           console.error('Error adding logo to PDF:', error);

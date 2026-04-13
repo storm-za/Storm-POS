@@ -679,6 +679,8 @@ export default function PosSystem() {
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       if (!ctx) { setCompressedPdfLogo(rawLogo); return; }
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
       ctx.drawImage(img, 0, 0, w, h);
       setCompressedPdfLogo(canvas.toDataURL('image/jpeg', 0.75));
     };
@@ -1443,7 +1445,11 @@ export default function PosSystem() {
 
     // Company logo (top-left)
     if (companyLogo) {
-      try { doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35); } catch (e) { console.error('Logo error:', e); }
+      try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
+        doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
+      } catch (e) { console.error('Logo error:', e); }
     }
 
     // PURCHASE ORDER heading
@@ -2908,6 +2914,8 @@ export default function PosSystem() {
       const logoToUse = compressedPdfLogo;
       if (logoToUse) {
         try {
+          doc.setFillColor(255, 255, 255);
+          doc.rect(margin, 8, 34, 34, 'F');
           doc.addImage(logoToUse, 'JPEG', margin, 8, 34, 34);
         } catch (error) {
           console.error('Error adding logo to PDF:', error);
@@ -3521,6 +3529,8 @@ export default function PosSystem() {
     // Add company logo if available (left side)
     if (companyLogo) {
       try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
         doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
       } catch (error) {
         console.error('Error adding logo to PDF:', error);
@@ -3938,6 +3948,8 @@ export default function PosSystem() {
     
     if (companyLogo) {
       try {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(margin, y, 35, 35, 'F');
         doc.addImage(companyLogo, 'JPEG', margin, y, 35, 35);
       } catch (error) {
         console.error('Error adding logo to PDF:', error);
