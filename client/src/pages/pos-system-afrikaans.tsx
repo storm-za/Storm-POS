@@ -1698,6 +1698,7 @@ export default function PosSystemAfrikaans() {
         await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { staffAccountId: null });
       } catch {}
     }
+    sessionStorage.setItem("posJustLoggedOut", "1");
     localStorage.removeItem('posUser');
     localStorage.removeItem('posLoginTimestamp');
     try {

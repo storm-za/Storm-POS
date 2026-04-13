@@ -3476,6 +3476,7 @@ export default function PosSystem() {
         await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { staffAccountId: null });
       } catch {}
     }
+    sessionStorage.setItem("posJustLoggedOut", "1");
     localStorage.removeItem('posUser');
     localStorage.removeItem('posLoginTimestamp');
     window.location.href = "/pos/login";

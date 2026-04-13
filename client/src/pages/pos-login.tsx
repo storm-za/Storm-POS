@@ -111,6 +111,11 @@ export default function PosLogin() {
   });
 
   useEffect(() => {
+    const justLoggedOut = sessionStorage.getItem("posJustLoggedOut") === "1";
+    if (justLoggedOut) {
+      sessionStorage.removeItem("posJustLoggedOut");
+      return; // User explicitly logged out — don't auto-submit
+    }
     if (activeSession) { setLocation(activeSession.destination); return; }
     if (saved && !autoSubmitted.current) {
       autoSubmitted.current = true;
