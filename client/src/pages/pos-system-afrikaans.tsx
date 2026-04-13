@@ -1693,12 +1693,16 @@ export default function PosSystemAfrikaans() {
 
   // Logout function
   const logout = async () => {
+    if (currentUser?.id) {
+      try {
+        await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { staffAccountId: null });
+      } catch {}
+    }
     localStorage.removeItem('posUser');
     localStorage.removeItem('posLoginTimestamp');
     try {
       await apiFetch('/api/pos/logout', { method: 'POST' });
-    } catch {
-    }
+    } catch {}
     window.location.href = '/pos/login';
   };
 
@@ -10008,11 +10012,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-              onClick={() => {
-                localStorage.removeItem('posUser');
-                localStorage.removeItem('posLoginTimestamp');
-                window.location.href = '/pos/login';
-              }}
+              onClick={() => logout()}
             >
               Ja, Teken Uit
             </AlertDialogAction>

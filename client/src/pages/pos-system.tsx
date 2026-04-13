@@ -3470,7 +3470,12 @@ export default function PosSystem() {
   };
 
   // Logout
-  const logout = () => {
+  const logout = async () => {
+    if (currentUser?.id) {
+      try {
+        await apiRequest("PUT", `/api/pos/user/${currentUser.id}/staff-selection`, { staffAccountId: null });
+      } catch {}
+    }
     localStorage.removeItem('posUser');
     localStorage.removeItem('posLoginTimestamp');
     window.location.href = "/pos/login";
@@ -10620,11 +10625,7 @@ export default function PosSystem() {
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-              onClick={() => {
-                localStorage.removeItem('posUser');
-                localStorage.removeItem('posLoginTimestamp');
-                window.location.href = '/pos/login';
-              }}
+              onClick={() => logout()}
             >
               Yes, Log Out
             </AlertDialogAction>
