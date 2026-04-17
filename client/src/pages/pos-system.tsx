@@ -447,6 +447,7 @@ export default function PosSystem() {
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
+  const [invoicePickerPosition, setInvoicePickerPosition] = useState({ top: 0, left: 0, width: 300 });
   const [invoicePickerSearch, setInvoicePickerSearch] = useState("");
   const [invoiceCategoryFilter, setInvoiceCategoryFilter] = useState<number | null>(null);
   const [invoicePriceMode, setInvoicePriceMode] = useState<'retail' | 'trade'>('retail');
@@ -688,6 +689,23 @@ export default function PosSystem() {
     img.onerror = () => setCompressedPdfLogo(rawLogo);
     img.src = rawLogo;
   }, [currentUser?.companyLogo, currentUser?.receiptSettings]);
+
+  // Reposition the invoice product picker on scroll/resize while it is open
+  useEffect(() => {
+    if (!invoicePickerOpen) return;
+    const update = () => {
+      if (invoicePickerBtnRef.current) {
+        const r = invoicePickerBtnRef.current.getBoundingClientRect();
+        setInvoicePickerPosition({ top: r.bottom + 4, left: r.left, width: r.width });
+      }
+    };
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [invoicePickerOpen]);
 
   // Mobile back button handling
   useEffect(() => {
@@ -9531,7 +9549,16 @@ export default function PosSystem() {
                   <button
                     ref={invoicePickerBtnRef}
                     type="button"
-                    onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}
+                    onClick={() => {
+                      const newOpen = !invoicePickerOpen;
+                      if (newOpen && invoicePickerBtnRef.current) {
+                        const r = invoicePickerBtnRef.current.getBoundingClientRect();
+                        setInvoicePickerPosition({ top: r.bottom + 4, left: r.left, width: r.width });
+                      }
+                      setInvoicePickerOpen(newOpen);
+                      setInvoicePickerSearch("");
+                      setInvoiceCategoryFilter(null);
+                    }}
                     className="w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
                   >
                     <span className="flex items-center gap-2 text-gray-500">
@@ -9541,12 +9568,10 @@ export default function PosSystem() {
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${invoicePickerOpen ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {invoicePickerOpen && (() => {
-                    const btnRect = invoicePickerBtnRef.current?.getBoundingClientRect();
-                    return (
+                  {invoicePickerOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
-                      <div className="fixed z-50 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" style={{ top: (btnRect?.bottom ?? 0) + 4, left: btnRect?.left ?? 0, width: btnRect?.width ?? 300 }}>
+                      <div className="fixed z-50 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" style={{ top: invoicePickerPosition.top, left: invoicePickerPosition.left, width: invoicePickerPosition.width }}>
                         {/* Search + Price Toggle */}
                         <div className="p-3 border-b bg-gray-50 space-y-2">
                           <div className="relative">
@@ -9651,8 +9676,7 @@ export default function PosSystem() {
                         </div>
                       </div>
                     </>
-                  );
-                })()}
+                  )}
                 </div>
                 
                 {/* Quick Add Custom Product */}
