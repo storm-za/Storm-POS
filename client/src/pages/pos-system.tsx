@@ -9529,7 +9529,7 @@ export default function PosSystem() {
                   <button
                     
                     type="button"
-                    onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}}
+                    onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}
                     className="w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
                   >
                     <span className="flex items-center gap-2 text-gray-500">
@@ -9542,7 +9542,7 @@ export default function PosSystem() {
                   {invoicePickerOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
-                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden max-h-80">
+                      <div className="absolute z-50 left-1/2 top-full mt-1 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden max-h-80">
                         {/* Search + Price Toggle */}
                         <div className="p-3 border-b bg-gray-50 space-y-2">
                           <div className="relative">
