@@ -9525,7 +9525,7 @@ export default function PosSystem() {
                 })}
                 
                 {/* Enterprise Product Picker */}
-                <div className="relative">
+                <div className="relative z-50 overflow-visible">
                   <button
                     
                     type="button"
@@ -9542,7 +9542,7 @@ export default function PosSystem() {
                   {invoicePickerOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
-                      <div className="absolute z-50 left-1/2 top-full mt-1 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden max-h-80">
+                      <div className="absolute z-[60] left-1/2 top-full mt-1 w-[min(44rem,calc(100vw-2rem))] -translate-x-1/2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden max-h-80">
                         {/* Search + Price Toggle */}
                         <div className="p-3 border-b bg-gray-50 space-y-2">
                           <div className="relative">
