@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -451,6 +450,12 @@ export default function PosSystemAfrikaans() {
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
+  useEffect(() => {
+    if (!invoicePickerOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prevOverflow; };
+  }, [invoicePickerOpen]);
   const [invoicePickerSearch, setInvoicePickerSearch] = useState("");
   const [invoiceCategoryFilter, setInvoiceCategoryFilter] = useState<number | null>(null);
   const [invoicePriceMode, setInvoicePriceMode] = useState<'retail' | 'trade'>('retail');
