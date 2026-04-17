@@ -393,6 +393,7 @@ export default function PosSystem() {
   const [customerSpendFrom, setCustomerSpendFrom] = useState("");
   const [customerSpendTo, setCustomerSpendTo] = useState("");
   const productListRef = useRef<HTMLDivElement>(null);
+  const invoicePickerBtnRef = useRef<HTMLButtonElement>(null);
   const [productScrollThumb, setProductScrollThumb] = useState({ top: 0, height: 100 });
   const handleProductScroll = useCallback(() => {
     const el = productListRef.current;
@@ -9528,6 +9529,7 @@ export default function PosSystem() {
                 {/* Enterprise Product Picker */}
                 <div className="relative">
                   <button
+                    ref={invoicePickerBtnRef}
                     type="button"
                     onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}
                     className="w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
@@ -9539,10 +9541,12 @@ export default function PosSystem() {
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${invoicePickerOpen ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {invoicePickerOpen && (
+                  {invoicePickerOpen && (() => {
+                    const btnRect = invoicePickerBtnRef.current?.getBoundingClientRect();
+                    return (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
-                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                      <div className="fixed z-50 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" style={{ top: (btnRect?.bottom ?? 0) + 4, left: btnRect?.left ?? 0, width: btnRect?.width ?? 300 }}>
                         {/* Search + Price Toggle */}
                         <div className="p-3 border-b bg-gray-50 space-y-2">
                           <div className="relative">
@@ -9647,7 +9651,8 @@ export default function PosSystem() {
                         </div>
                       </div>
                     </>
-                  )}
+                  );
+                })()}
                 </div>
                 
                 {/* Quick Add Custom Product */}
