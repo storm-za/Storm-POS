@@ -405,7 +405,6 @@ export default function PosSystemAfrikaans() {
   const [customerSpendFrom, setCustomerSpendFrom] = useState("");
   const [customerSpendTo, setCustomerSpendTo] = useState("");
   const productListRef = useRef<HTMLDivElement>(null);
-  const invoicePickerBtnRef = useRef<HTMLButtonElement>(null);
   const [productScrollThumb, setProductScrollThumb] = useState({ top: 0, height: 100 });
   const handleProductScroll = useCallback(() => {
     const el = productListRef.current;
@@ -450,7 +449,6 @@ export default function PosSystemAfrikaans() {
   const [quickAddName, setQuickAddName] = useState("");
   const [quickAddPrice, setQuickAddPrice] = useState("");
   const [invoicePickerOpen, setInvoicePickerOpen] = useState(false);
-  const [invoicePickerPosition, setInvoicePickerPosition] = useState({ top: 0, left: 0, width: 300 });
   const [invoicePickerSearch, setInvoicePickerSearch] = useState("");
   const [invoiceCategoryFilter, setInvoiceCategoryFilter] = useState<number | null>(null);
   const [invoicePriceMode, setInvoicePriceMode] = useState<'retail' | 'trade'>('retail');
@@ -737,24 +735,6 @@ export default function PosSystemAfrikaans() {
     img.onerror = () => setCompressedPdfLogo(rawLogo);
     img.src = rawLogo;
   }, [currentUser?.companyLogo, currentUser?.receiptSettings]);
-
-  // Reposition the invoice product picker on scroll/resize while it is open
-  useEffect(() => {
-    if (!invoicePickerOpen) return;
-    const update = () => {
-      if (invoicePickerBtnRef.current) {
-        const r = invoicePickerBtnRef.current.getBoundingClientRect();
-        setInvoicePickerPosition({ top: r.bottom + 4, left: r.left, width: r.width });
-      }
-    };
-    window.addEventListener('scroll', update, true);
-    window.addEventListener('resize', update);
-    return () => {
-      window.removeEventListener('scroll', update, true);
-      window.removeEventListener('resize', update);
-    };
-  }, [invoicePickerOpen]);
-
   // Check if user has paid subscription
   useEffect(() => {
     if (currentUser && !currentUser.paid) {
@@ -8966,18 +8946,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                 {/* Enterprise Product Picker */}
                 <div className="relative">
                   <button
-                    ref={invoicePickerBtnRef}
+                    
                     type="button"
-                    onClick={() => {
-                      const newOpen = !invoicePickerOpen;
-                      if (newOpen && invoicePickerBtnRef.current) {
-                        const r = invoicePickerBtnRef.current.getBoundingClientRect();
-                        setInvoicePickerPosition({ top: r.bottom + 4, left: r.left, width: r.width });
-                      }
-                      setInvoicePickerOpen(newOpen);
-                      setInvoicePickerSearch("");
-                      setInvoiceCategoryFilter(null);
-                    }}
+                    onClick={() => { setInvoicePickerOpen(!invoicePickerOpen); setInvoicePickerSearch(""); setInvoiceCategoryFilter(null); }}}
                     className="w-full flex items-center justify-between px-3 py-2.5 border rounded-lg text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[hsl(217,90%,40%)] bg-white"
                   >
                     <span className="flex items-center gap-2 text-gray-500">
@@ -8990,7 +8961,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   {invoicePickerOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setInvoicePickerOpen(false)} />
-                      <div className="fixed z-50 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden" style={{ top: invoicePickerPosition.top, left: invoicePickerPosition.left, width: invoicePickerPosition.width }}>
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden max-h-80">
                         {/* Search + Price Toggle */}
                         <div className="p-3 border-b bg-gray-50 space-y-2">
                           <div className="relative">
