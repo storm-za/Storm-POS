@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storm POS — Full Product Audit & Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:     #07101f;
+    --navy2:    #0c1929;
+    --card:     #111d2e;
+    --border:   rgba(0,180,240,.1);
+    --cyan:     #00b4f0;
+    --cyan2:    #0090c8;
+    --volt:     #b8ff00;
+    --white:    #ffffff;
+    --off:      #dde8f5;
+    --muted:    #7a93b4;
+    --red:      #ff4d6a;
+    --amber:    #ffb830;
+    --green:    #22c55e;
+    --purple:   #a78bfa;
+    --radius:   14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--navy);
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7,16,31,.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 56px;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 40px;
+  }
+  /* Storm logo — exact reconstruction from screenshots */
+  .storm-logo-svg { width: 26px; height: 26px; }
+  .storm-wordmark {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: .06em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 4px; flex: 1; }
+  .nav-link {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-link:hover, .nav-link.active {
+    background: rgba(0,180,240,.1);
+    color: var(--cyan);
+  }
+  .nav-badge {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(150deg, #060f1e 0%, #091728 60%, #050c14 100%);
+    padding: 72px 48px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 600px 350px at 75% 50%, rgba(0,180,240,.07), transparent);
+    pointer-events: none;
+  }
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,180,240,.1);
+    border: 1px solid rgba(0,180,240,.2);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(34px, 4.5vw, 58px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.05;
+    max-width: 700px;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--cyan); }
+  .hero-sub { font-size: 15px; color: var(--muted); max-width: 580px; line-height: 1.65; margin-bottom: 32px; }
+  .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-pill {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 999px;
+    padding: 5px 16px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .hero-pill strong { color: var(--off); }
+
+  /* ── PAGE ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+  @media(max-width:768px){ .page { padding: 0 20px; } }
+
+  /* ── SECTION ── */
+  .section { padding: 64px 0 48px; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+  .sec-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px, 3vw, 38px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .sec-desc { font-size: 14px; color: var(--muted); margin-bottom: 36px; max-width: 640px; line-height: 1.6; }
+
+  /* ── SCORE CARDS ── */
+  .score-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 14px; margin-bottom: 40px; }
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    border-top: 3px solid var(--accent, #334);
+  }
+  .score-card .slabel { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .score-card .sval { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1; color: var(--accent); }
+  .score-card .sverdict { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── SCREEN AUDIT TABLE ── */
+  .screen-grid { display: flex; flex-direction: column; gap: 20px; }
+  .screen-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .screen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.02);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .screen-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .screen-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .spill {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    padding: 3px 10px;
+  }
+  .spill-good { background: rgba(34,197,94,.15); color: #4ade80; }
+  .spill-warn { background: rgba(255,184,48,.12); color: var(--amber); }
+  .spill-bad  { background: rgba(255,77,106,.14); color: #ff8099; }
+
+  .screen-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:680px){ .screen-body { grid-template-columns: 1fr; } }
+
+  .obs-block h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .obs-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .obs-list li {
+    font-size: 13px;
+    color: var(--off);
+    line-height: 1.5;
+    padding-left: 20px;
+    position: relative;
+  }
+  .obs-list li::before {
+    content: attr(data-icon);
+    position: absolute;
+    left: 0;
+    font-size: 12px;
+  }
+  .obs-list li.good::before { content: '✓'; color: var(--green); }
+  .obs-list li.warn::before { content: '⚠'; color: var(--amber); }
+  .obs-list li.bad::before  { content: '✗'; color: var(--red); }
+
+  /* ── IMPROVEMENTS LIST ── */
+  .impr-grid { display: flex; flex-direction: column; gap: 14px; }
+  .impr-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--ic, #334);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .impr-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ic, #334);
+    opacity: .5;
+    line-height: 1.2;
+  }
+  .impr-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14.5px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .impr-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .effort-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  .e-low { background: rgba(34,197,94,.12); color: #4ade80; }
+  .e-med { background: rgba(255,184,48,.12); color: var(--amber); }
+  .e-high { background: rgba(167,139,250,.12); color: var(--purple); }
+
+  /* ── FEATURES TABLE ── */
+  .feat-section { margin-bottom: 32px; }
+  .feat-section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .feat-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 12px; }
+  .feat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color .2s;
+  }
+  .feat-card:hover { border-color: rgba(0,180,240,.3); }
+  .feat-icon-box {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .feat-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .feat-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+  .feat-priority {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-top: 8px;
+    display: inline-block;
+  }
+  .p1 { background: rgba(255,77,106,.14); color: #ff8099; }
+  .p2 { background: rgba(255,184,48,.12); color: var(--amber); }
+  .p3 { background: rgba(34,197,94,.12); color: #4ade80; }
+  .p4 { background: rgba(167,139,250,.12); color: var(--purple); }
+
+  /* ── BILLING CALLOUT ── */
+  .billing-box {
+    background: linear-gradient(135deg, rgba(0,180,240,.08), rgba(184,255,0,.05));
+    border: 1px solid rgba(0,180,240,.2);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 32px;
+  }
+  .billing-box h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .billing-box p { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+  .billing-box .highlight { color: var(--volt); font-weight: 700; }
+
+  /* ── UX QUICKWINS ── */
+  .qw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:680px){ .qw-grid { grid-template-columns: 1fr; } }
+  .qw-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .qw-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .qw-title { font-family: 'Syne', sans-serif; font-weight: 700; color: #fff; margin-bottom: 6px; font-size: 14px; }
+  .qw-body { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+  /* ── ROADMAP TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-phase {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    padding-bottom: 32px;
+    position: relative;
+  }
+  .tl-phase::before {
+    content: '';
+    position: absolute;
+    left: 139px;
+    top: 8px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-phase:last-child::before { display: none; }
+  .tl-label {
+    text-align: right;
+    padding-top: 4px;
+  }
+  .tl-phase-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .tl-phase-time { font-size: 11px; color: var(--muted); }
+  .tl-dot {
+    position: absolute;
+    left: 131px;
+    top: 8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--td, #334);
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tl-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--td, #334); }
+  .tl-items { display: flex; flex-direction: column; gap: 8px; }
+  .tl-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--off);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tl-item-icon { font-size: 15px; flex-shrink: 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--navy2);
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 80px;
+  }
+  .footer strong { color: var(--cyan); }
+
+  /* ── ANSWER RE: LOGIN ── */
+  .login-note {
+    background: linear-gradient(135deg, rgba(255,184,48,.07), rgba(255,77,106,.05));
+    border: 1px solid rgba(255,184,48,.2);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+  .login-note-icon { font-size: 22px; flex-shrink: 0; }
+  .login-note h4 { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
+  .login-note p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo-area">
+    <svg class="storm-logo-svg" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2L6 14.5h7.5L8.5 24L20 11h-7.5L15 2z" fill="#00b4f0"/>
+    </svg>
+    <span class="storm-wordmark">Storm</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" href="#scorecard">Scorecard</a>
+    <a class="nav-link" href="#screen-audit">Screen Audit</a>
+    <a class="nav-link" href="#ux-improvements">UX Fixes <span class="nav-badge">14</span></a>
+    <a class="nav-link" href="#features">Feature Roadmap <span class="nav-badge">22</span></a>
+    <a class="nav-link" href="#billing">Billing Model</a>
+    <a class="nav-link" href="#timeline">Timeline</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">⚡ Internal Product Audit — April 2026</div>
+  <h1>Storm POS<br><span>Full Product Review</span></h1>
+  <div class="hero-sub">A complete screen-by-screen audit of every module in the current POS — covering what works, what needs fixing, and what features to build next.</div>
+  <div class="hero-meta">
+    <div class="hero-pill">Screens reviewed: <strong>10</strong></div>
+    <div class="hero-pill">UX issues found: <strong>14</strong></div>
+    <div class="hero-pill">Features to add: <strong>22</strong></div>
+    <div class="hero-pill">Billing model: <strong>Percentage + flat</strong></div>
+    <div class="hero-pill">Market: <strong>South Africa · ZAR</strong></div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ══ LOGIN NOTE ══ -->
+<div class="section" style="padding-top:40px;border-bottom:none;">
+  <div class="login-note">
+    <div class="login-note-icon">🔐</div>
+    <div>
+      <h4>On sharing login details</h4>
+      <p>Please don't share your login credentials — not with Claude, not with any AI tool. Even with good intentions, pasting credentials into a chat window is a security risk (they end up in conversation logs, training data, and session history). The 10 screenshots you've shared give a complete picture of every screen and module. Everything in this audit is based directly on what's visible in those images. If you want a deeper test of specific logic or edge cases, record a short Loom video of the flow and share that instead.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 1 — SCORECARD ══ -->
+<div class="section" id="scorecard">
+  <div class="sec-eyebrow">Section 01</div>
+  <div class="sec-title">Overall Product Scorecard</div>
+  <div class="sec-desc">Based on the 10 screens reviewed across all modules.</div>
+
+  <div class="score-row">
+    <div class="score-card" style="--accent:#22c55e">
+      <div class="slabel">Core POS Flow</div>
+      <div class="sval">82</div>
+      <div class="sverdict">Solid. Clean, functional sell screen.</div>
+    </div>
+    <div class="score-card" style="--accent:#fbbf24">
+      <div class="slabel">Inventory</div>
+      <div class="sval">68</div>
+      <div class="sverdict">Missing cost tracking, images, variants.</div>
+    </div>
+    <div class="score-card" style="--accent:#fbbf24">
+      <div class="slabel">Customers</div>
+      <div class="sval">55</div>
+      <div class="sverdict">Minimal. No loyalty, segments or history.</div>
+    </div>
+    <div class="score-card" style="--accent:#22c55e">
+      <div class="slabel">Invoicing</div>
+      <div class="sval">76</div>
+      <div class="sverdict">Strong. Needs quote status & reminders.</div>
+    </div>
+    <div class="score-card" style="--accent:#ff4d6a">
+      <div class="slabel">Reporting</div>
+      <div class="sval">44</div>
+      <div class="sverdict">Dashboard blank state. Needs real charts.</div>
+    </div>
+    <div class="score-card" style="--accent:#a78bfa">
+      <div class="slabel">Purchase Orders</div>
+      <div class="sval">60</div>
+      <div class="sverdict">Structure good, needs supplier mgmt.</div>
+    </div>
+    <div class="score-card" style="--accent:#fbbf24">
+      <div class="slabel">UI Consistency</div>
+      <div class="sval">71</div>
+      <div class="sverdict">Clean design, small gaps in component use.</div>
+    </div>
+    <div class="score-card" style="--accent:#00b4f0">
+      <div class="slabel">Billing Model</div>
+      <div class="sval">78</div>
+      <div class="sverdict">Fair & SA-appropriate. Comms needed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 2 — SCREEN-BY-SCREEN AUDIT ══ -->
+<div class="section" id="screen-audit">
+  <div class="sec-eyebrow">Section 02</div>
+  <div class="sec-title">Screen-by-Screen Audit</div>
+  <div class="sec-desc">Each module reviewed for what's working, what needs improvement, and what's missing entirely.</div>
+
+  <div class="screen-grid">
+
+    <!-- SALES -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(0,180,240,.12);">🛒</div>
+          Sales / POS Terminal
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Core working</span>
+          <span class="spill spill-warn">UX gaps</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Product search bar present and prominent</li>
+            <li class="good">Real-time stock count shown per product</li>
+            <li class="good">Discount presets (5%, 10%, 20%, 50%) + custom %</li>
+            <li class="good">Tip on receipt toggle — great for hospitality</li>
+            <li class="good">Customer selector & payment method on same panel</li>
+            <li class="good">Open Account & Add to Account for credit sales</li>
+            <li class="good">SKU visible per product — good for barcoding</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">No barcode scanner input field visible — major friction at high-volume tills</li>
+            <li class="bad">No product images shown — staff must read names, slow on busy tills</li>
+            <li class="bad">No quick-quantity input — clicking a product presumably adds 1 at a time</li>
+            <li class="warn">No "hold sale" / park sale functionality visible — can't serve two customers simultaneously</li>
+            <li class="warn">No cash tendered + change calculator on checkout</li>
+            <li class="warn">"No items yet" empty cart state has no upsell or suggested product</li>
+            <li class="warn">Sort dropdown (Name A-Z) — needs "Frequently Sold" and "Category" options</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(167,139,250,.12);">📦</div>
+          Product Inventory
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Functional</span>
+          <span class="spill spill-bad">Missing features</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Summary tiles: Total, In Stock, Low Stock, Out of Stock</li>
+            <li class="good">Import/Export CSV functionality</li>
+            <li class="good">Categories system present</li>
+            <li class="good">SKU field shown — enables barcode integration</li>
+            <li class="good">Cost vs. Retail price columns — margin visibility</li>
+            <li class="good">Search by name or SKU</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">All products show Cost: R0.00 — no cost tracking in use, so Gross Profit reports are meaningless</li>
+            <li class="bad">No product images — makes the sales screen unusable visually</li>
+            <li class="bad">No product variants (size, colour) — limits retail use cases</li>
+            <li class="bad">No supplier field per product — breaks purchase order linking</li>
+            <li class="warn">No reorder point / reorder quantity per product</li>
+            <li class="warn">No product expiry date field (critical for food/pharmacy)</li>
+            <li class="warn">Low Stock threshold appears global, not per-product</li>
+            <li class="warn">No bulk price update tool</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(34,197,94,.1);">👥</div>
+          Customer Directory
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-warn">Basic</span>
+          <span class="spill spill-bad">Major gaps</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Customer type tag visible (Retail)</li>
+            <li class="good">Total spend shown per customer (R3400.00)</li>
+            <li class="good">Phone number stored</li>
+            <li class="good">Filter spend by date range</li>
+            <li class="good">Import/Export customer data</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">No customer email field visible — can't send digital receipts</li>
+            <li class="bad">No purchase history / transaction log per customer</li>
+            <li class="bad">No loyalty points / rewards system</li>
+            <li class="bad">No customer balance / credit limit for account customers</li>
+            <li class="warn">Only one customer in directory — needs search & pagination for scale</li>
+            <li class="warn">No customer notes or tags beyond type label</li>
+            <li class="warn">No WhatsApp number field separate from phone</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES & QUOTES -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(0,180,240,.12);">📄</div>
+          Invoices & Quotes
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Strong</span>
+          <span class="spill spill-warn">Small gaps</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Invoice list with client name, amount, payment method</li>
+            <li class="good">Paid toggle directly on the list — fast payment marking</li>
+            <li class="good">Terms field visible (7 days on INV-0202)</li>
+            <li class="good">Excel export functionality</li>
+            <li class="good">Notes field used well (INV-0205 shows guest names)</li>
+            <li class="good">Search by document number or client</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">No overdue invoice indicator — no visual for "past due date"</li>
+            <li class="bad">No payment reminder / automated follow-up</li>
+            <li class="warn">No quote status (Draft / Sent / Accepted / Declined) visible in list</li>
+            <li class="warn">No partial payment recording — invoices are just Paid or Unpaid</li>
+            <li class="warn">No invoice PDF preview button visible in list</li>
+            <li class="warn">Filters panel (button visible) — unclear what filter options exist</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PURCHASE ORDERS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(255,184,48,.1);">🚚</div>
+          Purchase Orders
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Structure good</span>
+          <span class="spill spill-warn">Unused</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Status pipeline visible: Draft → Sent → Partial → Received → Not Paid</li>
+            <li class="good">Search by PO number or supplier</li>
+            <li class="good">Filter by supplier and status</li>
+            <li class="good">Clear empty state with action prompt</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">No Supplier directory — can't pre-fill supplier details on PO creation</li>
+            <li class="bad">No auto-suggest PO based on low-stock products</li>
+            <li class="bad">No stock auto-update when PO marked as "Received"</li>
+            <li class="warn">No expected delivery date field shown</li>
+            <li class="warn">No email PO to supplier functionality confirmed</li>
+            <li class="warn">Module appears completely unused by demo account — onboarding needed</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPEN ACCOUNTS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(255,77,106,.1);">📂</div>
+          Open Accounts
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-warn">Minimal</span>
+          <span class="spill spill-bad">Needs work</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Concept is clear and valuable for SA credit culture</li>
+            <li class="good">Created from the Sales screen (logical flow)</li>
+            <li class="good">Distinct navigation item — treated as first-class feature</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">Empty screen has no visual guidance — just one line of text</li>
+            <li class="bad">No credit limit per customer account</li>
+            <li class="bad">No aging report (30/60/90 days overdue)</li>
+            <li class="bad">No statement generation for account customers</li>
+            <li class="warn">No SMS/WhatsApp payment reminder integration</li>
+            <li class="warn">No interest/late fee calculation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(184,255,0,.08);">📊</div>
+          Reports — Sales Analytics
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-warn">Structure good</span>
+          <span class="spill spill-bad">Empty state problem</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">5 KPI cards: Total Revenue, POS Sales, Invoice Revenue, Gross Profit, Avg Transaction</li>
+            <li class="good">Quick-select periods: Today, This Week, This Month, Last 30 Days</li>
+            <li class="good">Staff member filter — performance tracking ready</li>
+            <li class="good">Revenue Sources split (POS vs Invoices)</li>
+            <li class="good">Payment methods breakdown</li>
+            <li class="good">Export PDF button — professional reporting</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">All cards show R0.00 — no demo/sample data to illustrate the product's value</li>
+            <li class="bad">Chart area shows "No data for this period" — visually dead for new users</li>
+            <li class="bad">No Top Products report visible</li>
+            <li class="bad">No Stock Valuation report</li>
+            <li class="bad">No Customer Spend report (separate from customer directory)</li>
+            <li class="warn">No comparison period (vs. last month, vs. last year)</li>
+            <li class="warn">No scheduled email reports (weekly/monthly auto-send)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(100,100,120,.2);">⚙️</div>
+          Settings & Integrations
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Well structured</span>
+          <span class="spill spill-warn">Expand integrations</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">XERO integration with two-way sync for customers & products</li>
+            <li class="good">Receipt customisation — logo & layout</li>
+            <li class="good">Invoice & Quote setup with custom fields</li>
+            <li class="good">Light/Dark theme toggle</li>
+            <li class="good">Afrikaans language option — strong SA localisation</li>
+            <li class="good">Business information section for invoice headers</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">XERO is the only integration — Sage, QuickBooks needed for SA market</li>
+            <li class="bad">No payment gateway integration (Yoco, Peach Payments, SnapScan)</li>
+            <li class="bad">No WhatsApp Business API integration</li>
+            <li class="warn">No multi-location / branch support visible</li>
+            <li class="warn">No staff / user management with role permissions</li>
+            <li class="warn">No hardware settings (receipt printer, barcode scanner, cash drawer)</li>
+            <li class="warn">"Danger Zone" account deletion is very discoverable — needs a friction step</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <div class="screen-name">
+          <div class="screen-icon" style="background:rgba(0,180,240,.1);">💳</div>
+          Usage & Billing
+        </div>
+        <div class="screen-pills">
+          <span class="spill spill-good">Transparent</span>
+          <span class="spill spill-warn">Comms gaps</span>
+        </div>
+      </div>
+      <div class="screen-body">
+        <div class="obs-block">
+          <h4>✅ What's Working</h4>
+          <ul class="obs-list">
+            <li class="good">Two plan options clearly shown side by side</li>
+            <li class="good">Fee statement shows exact breakdown</li>
+            <li class="good">Billing period progress (Day 27 of 30)</li>
+            <li class="good">No setup fees — competitive for SA market</li>
+            <li class="good">Support email visible (sofwarebystorm@gmail.com)</li>
+          </ul>
+        </div>
+        <div class="obs-block">
+          <h4>⚠️ Issues & Gaps</h4>
+          <ul class="obs-list">
+            <li class="bad">Support email is Gmail — unprofessional vs. enterprise buyers; use support@stormsoftware.co.za</li>
+            <li class="bad">No payment method management visible (how do they pay?)</li>
+            <li class="warn">Plan lock explanation ("1st–5th of each month") needs clearer in-app messaging</li>
+            <li class="warn">No invoice history / downloadable billing statements</li>
+            <li class="warn">R0.50 per invoice fee not disclosed on the /pos marketing page</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screen-grid -->
+</div>
+
+<!-- ══ SECTION 3 — UX IMPROVEMENTS ══ -->
+<div class="section" id="ux-improvements">
+  <div class="sec-eyebrow">Section 03</div>
+  <div class="sec-title">UX Improvements — Quick Wins</div>
+  <div class="sec-desc">These are UI/UX changes that will have an immediate impact on usability without requiring major backend work.</div>
+
+  <div class="impr-grid">
+
+    <div class="impr-card" style="--ic:#ff4d6a">
+      <div class="impr-num">01</div>
+      <div>
+        <div class="impr-title">Add a Barcode / SKU Scan Input to the Sales Screen</div>
+        <div class="impr-body">A text field at the top of the product area that accepts keyboard input from a USB barcode scanner (which presents itself as a keyboard). When a SKU is typed/scanned and Enter is pressed, the product is instantly added to the cart. This is how every real POS terminal works and is critical for speed at the counter. No camera needed — just a text field that fires on Enter.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ff4d6a">
+      <div class="impr-num">02</div>
+      <div>
+        <div class="impr-title">Cash Tendered & Change Calculator on Checkout</div>
+        <div class="impr-body">When "Cash" is selected as payment method, show a "Cash received: R___" input. Auto-calculate and display change due: "Change: R___". This is a basic POS requirement that prevents cashier errors and speeds up cash transactions. Currently the system completes a sale without this step.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ff4d6a">
+      <div class="impr-num">03</div>
+      <div>
+        <div class="impr-title">Quantity Input on Product Selection</div>
+        <div class="impr-body">When a product is tapped/clicked, show a quantity selector (or allow long-press / right-click to enter quantity directly). A cashier selling 12 units of the same item should not have to click 12 times. Add a qty input in the cart row alongside the item name.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ffb830">
+      <div class="impr-num">04</div>
+      <div>
+        <div class="impr-title">Sample Data in Reports During Onboarding</div>
+        <div class="impr-body">New accounts see a completely blank Reports screen — all R0.00 with an empty chart. This kills first impressions. Show sample/demo data with a "This is example data — your real stats will appear here once you start selling" banner. Let new users see what the reports WILL look like, so they understand the value before they've made a single sale.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ffb830">
+      <div class="impr-num">05</div>
+      <div>
+        <div class="impr-title">Product Images in Inventory & Sales Screen</div>
+        <div class="impr-body">Allow users to upload a product image (or auto-fetch from a product name lookup). Display as a thumbnail in the product list and as a card/tile in the sales screen. Visual product selection is significantly faster than name-reading, especially for staff who didn't set up the product database themselves.</div>
+      </div>
+      <div class="effort-badge e-med">Medium effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ffb830">
+      <div class="impr-num">06</div>
+      <div>
+        <div class="impr-title">Overdue Invoice Highlight + Aging Indicator</div>
+        <div class="impr-body">In the Invoices list, add a red "Overdue" badge next to any invoice where terms have passed and it's still unpaid. Show a subtle aging tag: "7 days overdue", "31 days overdue". Add a filter for "Overdue Only". This single feature reduces debtor days significantly and is the most-requested feature among SA service businesses.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ffb830">
+      <div class="impr-num">07</div>
+      <div>
+        <div class="impr-title">"Hold Sale" / Park Sale Functionality</div>
+        <div class="impr-body">Allow a cashier to park an in-progress sale (save it as a named hold) and start a new transaction. This handles the real-world scenario of a customer running to get something while another customer is waiting. A "Parked Sales" indicator in the header restores held transactions.</div>
+      </div>
+      <div class="effort-badge e-med">Medium effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#ffb830">
+      <div class="impr-num">08</div>
+      <div>
+        <div class="impr-title">Add Friction to "Delete Account" in Danger Zone</div>
+        <div class="impr-body">The Delete Account button is far too accessible. Add a multi-step confirmation: (1) warning modal explaining consequences, (2) type the word "DELETE" to confirm, (3) a 24-hour cancellation period where data is soft-deleted first. This prevents accidental deletion and gives unhappy customers a cooling-off window.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#a78bfa">
+      <div class="impr-num">09</div>
+      <div>
+        <div class="impr-title">Empty State Improvements Across All Modules</div>
+        <div class="impr-body">Open Accounts, Purchase Orders, and Reports all show minimal empty states. Each should have: a relevant illustration, a single clear action button ("Create your first PO"), and 1-sentence benefit copy. Good empty states are onboarding — they teach users what the feature does and how to start. Currently they're dead ends.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#a78bfa">
+      <div class="impr-num">10</div>
+      <div>
+        <div class="impr-title">Customer Purchase History Panel</div>
+        <div class="impr-body">When viewing a customer record, show a scrollable transaction history: date, items, amount, payment method. Currently only total spend is shown. This lets business owners answer "what did Frikkie buy last time?" in seconds. Combine with a "Send Statement" button to generate a PDF of all transactions in a date range.</div>
+      </div>
+      <div class="effort-badge e-med">Medium effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#a78bfa">
+      <div class="impr-num">11</div>
+      <div>
+        <div class="impr-title">Sales Screen Layout: Add Category Filter Tabs</div>
+        <div class="impr-body">When a business has 50+ products, the current vertical list is slow to navigate. Add horizontal category filter pills/tabs above the product list (e.g., "All | Drinks | Food | Hardware"). Tapping a category instantly filters. This is the standard for modern POS interfaces (Square, Lightspeed, iKhokha all do this).</div>
+      </div>
+      <div class="effort-badge e-med">Medium effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#22c55e">
+      <div class="impr-num">12</div>
+      <div>
+        <div class="impr-title">Replace Gmail Support Email with Branded Address</div>
+        <div class="impr-body">The billing screen shows "sofwarebystorm@gmail.com" (also note the typo: "sofw" not "soft"). This immediately undermines enterprise trust. Set up support@stormsoftware.co.za — costs nothing, takes 10 minutes in Google Workspace or Zoho Mail, and makes a significant perception difference when businesses see it on their billing page.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#22c55e">
+      <div class="impr-num">13</div>
+      <div>
+        <div class="impr-title">Keyboard Shortcut Layer for Power Users</div>
+        <div class="impr-body">Add keyboard shortcuts for common actions: F1 = New Sale, F2 = Search Products, F3 = Complete Sale, Esc = Cancel, Tab = cycle cart items. Show a cheat-sheet in Settings. This turns Storm POS from a web app into something that feels like professional POS software for high-volume retailers.</div>
+      </div>
+      <div class="effort-badge e-med">Medium effort</div>
+    </div>
+
+    <div class="impr-card" style="--ic:#22c55e">
+      <div class="impr-num">14</div>
+      <div>
+        <div class="impr-title">Onboarding Checklist Progress Bar</div>
+        <div class="impr-body">The "Complete your account setup" banner at the top of Settings is good but static. Replace it with a visual progress checklist: ✓ Add your logo, ✓ Add your first product, □ Run a test sale, □ Connect payment method, □ Invite a staff member. Each step ticked off reveals the next. Gamified onboarding dramatically improves 7-day activation rates.</div>
+      </div>
+      <div class="effort-badge e-low">Low effort</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SECTION 4 — FEATURES ══ -->
+<div class="section" id="features">
+  <div class="sec-eyebrow">Section 04</div>
+  <div class="sec-title">Features to Build — Priority Roadmap</div>
+  <div class="sec-desc">22 features grouped by category and priority. P1 = build now, P4 = future roadmap.</div>
+
+  <!-- PAYMENTS -->
+  <div class="feat-section">
+    <div class="feat-section-title">💳 Payments & Checkout</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,77,106,.12);">💳</div>
+        <div>
+          <div class="feat-title">Yoco / iKhokha Card Integration</div>
+          <div class="feat-desc">Native card machine integration. SA's most-used card terminals. When "Card" is selected, initiate the charge on the paired device. Mark the sale complete on payment confirmation.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,77,106,.12);">📱</div>
+        <div>
+          <div class="feat-title">SnapScan / Zapper QR Payments</div>
+          <div class="feat-desc">Generate a dynamic QR code at checkout for the sale total. Customer scans with their banking app. Payment confirmed via webhook. No hardware required — works on any screen.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,184,48,.1);">💰</div>
+        <div>
+          <div class="feat-title">Split Payment Support</div>
+          <div class="feat-desc">Allow a sale to be paid with multiple methods: R500 cash + R300 card. Many SA customers request this, especially for large purchases. Essential for hospitality and high-value retail.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,184,48,.1);">🏦</div>
+        <div>
+          <div class="feat-title">EFT / Bank Reference Generator</div>
+          <div class="impr-body">Auto-generate a unique EFT reference per sale. Display it on the screen and receipt. Allows the business owner to match bank statement entries to specific invoices without manual cross-referencing.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNICATIONS -->
+  <div class="feat-section">
+    <div class="feat-section-title">📲 Communications & Receipts</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(34,197,94,.1);">💬</div>
+        <div>
+          <div class="feat-title">WhatsApp Receipt Sending</div>
+          <div class="feat-desc">After completing a sale, auto-send the receipt via WhatsApp to the customer's number. Uses WhatsApp Business API or wa.me link fallback. SA's #1 communication channel — customers love this.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(34,197,94,.1);">📧</div>
+        <div>
+          <div class="feat-title">Automated Invoice Reminders</div>
+          <div class="feat-desc">Schedule email + SMS/WhatsApp reminders for unpaid invoices: 3 days before due, on due date, 7 days overdue. Reduces debtor days without the business owner chasing manually.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(0,180,240,.1);">📋</div>
+        <div>
+          <div class="feat-title">Customer Account Statement PDF</div>
+          <div class="feat-desc">One-click generate a statement for an Open Account customer showing all transactions in a period, balance due, and payment details. Email or WhatsApp it directly from the system.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(0,180,240,.1);">📅</div>
+        <div>
+          <div class="feat-title">Scheduled Sales Reports via Email</div>
+          <div class="feat-desc">Allow owners to receive their daily, weekly, or monthly sales summary PDF automatically via email. Set-and-forget business intelligence — know your numbers without logging in every day.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="feat-section">
+    <div class="feat-section-title">📦 Inventory & Stock</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(167,139,250,.12);">⚡</div>
+        <div>
+          <div class="feat-title">Low-Stock Alerts & Auto-PO Suggestions</div>
+          <div class="feat-desc">When stock falls below the reorder point, trigger an in-app notification and optionally auto-generate a draft Purchase Order for that supplier. Closes the loop between sales depletion and restocking.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(167,139,250,.12);">🎨</div>
+        <div>
+          <div class="feat-title">Product Variants (Size / Colour / Type)</div>
+          <div class="feat-desc">Allow a product to have variants with individual stock counts and optionally different prices. E.g., "T-Shirt" → Small, Medium, Large, each tracked separately. Essential for clothing, shoe, and hardware retail.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(167,139,250,.12);">🏭</div>
+        <div>
+          <div class="feat-title">Supplier Directory</div>
+          <div class="feat-desc">A dedicated supplier database (name, contact, lead time, payment terms). Link products to suppliers. Pre-fill supplier details when creating a Purchase Order. Show supplier performance on POs.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,184,48,.1);">📊</div>
+        <div>
+          <div class="feat-title">Stock Valuation Report</div>
+          <div class="feat-desc">A report showing total stock value at cost and at retail. Breakdown by category. Supports SARS asset reporting, insurance claims, and year-end financial statements. Blocked currently by R0.00 cost entries.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTING -->
+  <div class="feat-section">
+    <div class="feat-section-title">📈 Reporting & Analytics</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(184,255,0,.08);">🏆</div>
+        <div>
+          <div class="feat-title">Top Products & Dead Stock Report</div>
+          <div class="feat-desc">Rank products by units sold, revenue, and profit. Flag products with zero sales in 30+ days as "dead stock." Helps owners make reorder decisions and identify what to discount or discontinue.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(184,255,0,.08);">⏰</div>
+        <div>
+          <div class="feat-title">Peak Hours / Day-of-Week Heatmap</div>
+          <div class="feat-desc">A visual heatmap showing which hours and days generate the most sales. Helps owners schedule staff, plan restocking, and identify lunchtime vs. weekend peaks. Huge value for food & beverage.</div>
+          <span class="feat-priority p3">P3 — Nice to have</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(184,255,0,.08);">📉</div>
+        <div>
+          <div class="feat-title">Period-over-Period Comparison</div>
+          <div class="feat-desc">Show "This month vs. last month" and "This month vs. same month last year" delta percentages on all KPI cards. Green/red arrows showing direction. Gives context to raw numbers.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(184,255,0,.08);">🧾</div>
+        <div>
+          <div class="feat-title">VAT / Tax Report for SARS</div>
+          <div class="feat-desc">A dedicated VAT summary report: Output VAT collected on sales, Input VAT on purchases (if cost tracking is used), Net VAT payable. Exportable as a SARS-ready statement. This alone justifies the subscription for VAT-registered businesses.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOYALTY & CUSTOMERS -->
+  <div class="feat-section">
+    <div class="feat-section-title">🎁 Loyalty & Customer Retention</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,77,106,.1);">⭐</div>
+        <div>
+          <div class="feat-title">Loyalty Points System</div>
+          <div class="feat-desc">Customers earn points per Rand spent. Points redeemable against future purchases. Configurable earn rate and redemption value. Display point balance at checkout. Drives repeat visits and rewards regulars — huge for salons, bottle stores, and spaza shops.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,77,106,.1);">🏷️</div>
+        <div>
+          <div class="feat-title">Customer Price Groups / Wholesale Pricing</div>
+          <div class="feat-desc">Assign customers to a pricing tier (Retail, Wholesale, VIP). Products automatically show the tier price when that customer is selected in a sale. Eliminates the need for manual discounting on repeat customers.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(255,184,48,.1);">🎂</div>
+        <div>
+          <div class="feat-title">Birthday & Anniversary Vouchers</div>
+          <div class="feat-desc">Store customer birthday. Auto-send a WhatsApp/email with a discount voucher on their birthday. Low-cost, high-impact retention tool. Drives visits during a period when customers are making purchasing decisions anyway.</div>
+          <span class="feat-priority p3">P3 — Nice to have</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTI-LOCATION & STAFF -->
+  <div class="feat-section">
+    <div class="feat-section-title">🏢 Multi-Location & Staff</div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(0,180,240,.1);">👤</div>
+        <div>
+          <div class="feat-title">Staff Roles & Permissions</div>
+          <div class="feat-desc">Create multiple user accounts with role-based access: Cashier (sell only), Manager (reports + discounts), Admin (full access). Cashiers cannot see cost prices or delete records. Critical for any business with employees.</div>
+          <span class="feat-priority p1">P1 — Critical</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(0,180,240,.1);">🏪</div>
+        <div>
+          <div class="feat-title">Multi-Location / Branch Support</div>
+          <div class="feat-desc">A single account managing multiple store locations. Separate inventory per branch, consolidated reporting across all branches, transfer stock between branches. Enables franchise and chain expansion — your biggest growth market.</div>
+          <span class="feat-priority p3">P3 — Scale feature</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-box" style="background:rgba(0,180,240,.1);">🔒</div>
+        <div>
+          <div class="feat-title">Cashier PIN Login & Session Management</div>
+          <div class="feat-desc">Each cashier logs in with a 4-digit PIN at the start of their shift. Sales are attributed to that cashier. PIN logout at shift end. Cash-up report per cashier shows exactly what they sold. Prevents buddy punching and shared responsibility gaps.</div>
+          <span class="feat-priority p2">P2 — Important</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SECTION 5 — BILLING MODEL NOTES ══ -->
+<div class="section" id="billing">
+  <div class="sec-eyebrow">Section 05</div>
+  <div class="sec-title">Billing Model Analysis</div>
+  <div class="sec-desc">Observations on the current pricing model and recommendations for improvement.</div>
+
+  <div class="billing-box">
+    <h3>Current Model: Percentage + Per-Invoice Fee</h3>
+    <p>
+      The Percentage Plan charges <span class="highlight">0.5% of gross revenue</span> + <span class="highlight">R0.50 per invoice generated</span>.
+      The Flat Rate Plan charges <span class="highlight">R1.00 per POS transaction</span> + <span class="highlight">R0.50 per invoice</span>.
+      This is a usage-based model — businesses pay proportionally to their revenue. This is fair and
+      appropriate for early-stage SA SMEs, but it has significant strategic implications:
+    </p>
+  </div>
+
+  <div class="qw-grid">
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--green);">✅ What works well</div>
+      <div class="qw-title">Zero barrier to entry</div>
+      <div class="qw-body">No fixed monthly fee means a business doing R0 in a slow month pays R0. This removes the biggest objection for SA SMEs who fear committing to a subscription. Excellent for word-of-mouth growth.</div>
+    </div>
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--green);">✅ What works well</div>
+      <div class="qw-title">Aligned incentives</div>
+      <div class="qw-body">Storm earns more as the business earns more. This is the same model as Shopify Payments, Square, and Yoco. Customers feel the fee is "fair" because it scales with their success rather than being a fixed overhead.</div>
+    </div>
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--red);">⚠️ Risk to address</div>
+      <div class="qw-title">High-volume businesses will outgrow % pricing</div>
+      <div class="qw-body">A business doing R200k/month pays R1,000/month at 0.5%. They'll quickly calculate this and switch to Flat Rate — or leave for a fixed-price competitor. Consider a third tier: a flat R399–R799/month with unlimited transactions for established businesses.</div>
+    </div>
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--red);">⚠️ Risk to address</div>
+      <div class="qw-title">Invoice fee creates friction for invoice-heavy users</div>
+      <div class="qw-body">A business generating 100 invoices/month pays R50 just in invoice fees on top of the revenue percentage. This isn't communicated clearly on the marketing page. Invoice-heavy users (agencies, contractors) may feel penalised. Consider bundling X free invoices per tier.</div>
+    </div>
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--amber);">💡 Recommendation</div>
+      <div class="qw-title">Add a third "Scale" tier</div>
+      <div class="qw-body">Consider: Starter (0.5% + R0.50/inv), Growth (R599/month flat, 200 invoices included), Scale (R999/month, unlimited, multi-location, priority support). This captures different segments and increases ARPU as businesses grow.</div>
+    </div>
+    <div class="qw-card">
+      <div class="qw-label" style="color:var(--amber);">💡 Recommendation</div>
+      <div class="qw-title">Disclose fees on the marketing page</div>
+      <div class="qw-body">The /pos page references "R799/mo" in site metadata but the actual model is usage-based with no fixed monthly fee. This mismatch creates trust issues when users see their real billing. Update the marketing page to show the actual pricing model clearly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SECTION 6 — ROADMAP TIMELINE ══ -->
+<div class="section" id="timeline">
+  <div class="sec-eyebrow">Section 06</div>
+  <div class="sec-title">Suggested Build Roadmap</div>
+  <div class="sec-desc">Phased approach to delivering improvements without overwhelming the development pipeline.</div>
+
+  <div class="timeline">
+
+    <div class="tl-phase" style="--td:#ff4d6a">
+      <div class="tl-label">
+        <div class="tl-phase-name">Phase 1</div>
+        <div class="tl-phase-time">Weeks 1–4</div>
+        <div class="tl-phase-time" style="color:var(--red);font-weight:700;font-size:11px;margin-top:2px;">Critical fixes</div>
+      </div>
+      <div class="tl-dot" style="--td:#ff4d6a"></div>
+      <div class="tl-items">
+        <div class="tl-item"><div class="tl-item-icon">🔍</div>Barcode/SKU scan input on Sales screen</div>
+        <div class="tl-item"><div class="tl-item-icon">💰</div>Cash tendered + change calculator on checkout</div>
+        <div class="tl-item"><div class="tl-item-icon">📧</div>Replace Gmail with branded support email</div>
+        <div class="tl-item"><div class="tl-item-icon">🚫</div>Add friction/confirmation steps to Delete Account</div>
+        <div class="tl-item"><div class="tl-item-icon">📊</div>Sample data in Reports for new accounts</div>
+        <div class="tl-item"><div class="tl-item-icon">🔴</div>Overdue invoice highlight + aging badge</div>
+      </div>
+    </div>
+
+    <div class="tl-phase" style="--td:#ffb830">
+      <div class="tl-label">
+        <div class="tl-phase-name">Phase 2</div>
+        <div class="tl-phase-time">Weeks 5–10</div>
+        <div class="tl-phase-time" style="color:var(--amber);font-weight:700;font-size:11px;margin-top:2px;">Core features</div>
+      </div>
+      <div class="tl-dot" style="--td:#ffb830"></div>
+      <div class="tl-items">
+        <div class="tl-item"><div class="tl-item-icon">💬</div>WhatsApp receipt sending after sale completion</div>
+        <div class="tl-item"><div class="tl-item-icon">👤</div>Staff roles & permissions (Cashier / Manager / Admin)</div>
+        <div class="tl-item"><div class="tl-item-icon">🖼️</div>Product images in inventory and sales screen</div>
+        <div class="tl-item"><div class="tl-item-icon">🏷️</div>Category filter tabs on sales screen</div>
+        <div class="tl-item"><div class="tl-item-icon">🔢</div>Quantity input per cart line item</div>
+        <div class="tl-item"><div class="tl-item-icon">📋</div>Customer purchase history panel</div>
+        <div class="tl-item"><div class="tl-item-icon">⚡</div>Low-stock alerts + draft PO suggestions</div>
+        <div class="tl-item"><div class="tl-item-icon">🧾</div>VAT / Tax report for SARS</div>
+      </div>
+    </div>
+
+    <div class="tl-phase" style="--td:#00b4f0">
+      <div class="tl-label">
+        <div class="tl-phase-name">Phase 3</div>
+        <div class="tl-phase-time">Weeks 11–18</div>
+        <div class="tl-phase-time" style="color:var(--cyan);font-weight:700;font-size:11px;margin-top:2px;">Growth features</div>
+      </div>
+      <div class="tl-dot" style="--td:#00b4f0"></div>
+      <div class="tl-items">
+        <div class="tl-item"><div class="tl-item-icon">💳</div>Yoco / iKhokha card machine integration</div>
+        <div class="tl-item"><div class="tl-item-icon">📱</div>SnapScan / QR payment at checkout</div>
+        <div class="tl-item"><div class="tl-item-icon">⏸️</div>Hold sale / park sale functionality</div>
+        <div class="tl-item"><div class="tl-item-icon">🏭</div>Supplier directory + product-supplier linking</div>
+        <div class="tl-item"><div class="tl-item-icon">📅</div>Automated invoice payment reminders</div>
+        <div class="tl-item"><div class="tl-item-icon">📉</div>Period-over-period comparison in reports</div>
+        <div class="tl-item"><div class="tl-item-icon">🏆</div>Top products & dead stock report</div>
+        <div class="tl-item"><div class="tl-item-icon">⭐</div>Loyalty points system</div>
+      </div>
+    </div>
+
+    <div class="tl-phase" style="--td:#a78bfa">
+      <div class="tl-label">
+        <div class="tl-phase-name">Phase 4</div>
+        <div class="tl-phase-time">Month 5+</div>
+        <div class="tl-phase-time" style="color:var(--purple);font-weight:700;font-size:11px;margin-top:2px;">Scale & enterprise</div>
+      </div>
+      <div class="tl-dot" style="--td:#a78bfa"></div>
+      <div class="tl-items">
+        <div class="tl-item"><div class="tl-item-icon">🏪</div>Multi-location / branch support with consolidated reporting</div>
+        <div class="tl-item"><div class="tl-item-icon">🎨</div>Product variants (size, colour, type)</div>
+        <div class="tl-item"><div class="tl-item-icon">💰</div>Split payment support (cash + card)</div>
+        <div class="tl-item"><div class="tl-item-icon">🏷️</div>Customer price groups / wholesale pricing tiers</div>
+        <div class="tl-item"><div class="tl-item-icon">📊</div>Peak hours heatmap report</div>
+        <div class="tl-item"><div class="tl-item-icon">⌨️</div>Keyboard shortcuts for power users</div>
+        <div class="tl-item"><div class="tl-item-icon">📈</div>Sage / QuickBooks accounting integration</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<div class="footer">
+  Storm POS Internal Product Audit · April 2026 · Based on 10 live screenshots across all modules<br>
+  <strong>stormsoftware.co.za</strong> · Built for South African businesses
+</div>
+
+<script>
+  // Smooth scroll + active nav on scroll
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (href.startsWith('#')) {
+        e.preventDefault();
+        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
