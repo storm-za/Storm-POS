@@ -632,7 +632,7 @@ export default function POS() {
               <div className="grid grid-cols-3 border-t border-gray-100">
                 <div className="bg-gray-50 px-7 py-5" />
                 <div className="bg-[#0f172a] px-6 py-5 flex items-center justify-center">
-                  <Link href="/pos#pricing">
+                  <Link href="/pos/signup">
                     <Button className="bg-white text-[#0f172a] hover:bg-gray-100 font-semibold text-sm px-5 h-9 rounded-lg shadow-none">
                       Start free trial
                     </Button>
