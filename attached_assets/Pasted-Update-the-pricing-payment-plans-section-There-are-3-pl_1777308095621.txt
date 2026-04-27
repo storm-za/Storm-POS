@@ -1,0 +1,76 @@
+Update the pricing/payment plans section. There are 3 plans: Starter, Growth, and Scale. 
+Make the following changes:
+
+---
+
+STARTER PLAN:
+- Change price from "0.5% of revenue" to "R299 / month"
+- Change subtitle from "per sale · pay as you go" to "flat rate · no surprises"
+- Remove "+ R0.50 per invoice" from the features list
+- Replace all current bullet points with:
+  ✓ Full POS terminal
+  ✓ Up to 500 products
+  ✓ 30 invoices per month
+  ✓ Customer directory
+  ✓ Purchase orders
+  ✓ Open accounts / credit sales
+  ✓ Basic sales reports
+  ✓ XERO integration
+  ✓ VAT-ready invoices
+  ✓ Email support
+  ✓ 7-day free trial
+
+- Update the description text to: "Perfect for new and growing businesses. 
+  One flat monthly fee — no percentage cuts, no surprise charges."
+
+---
+
+GROWTH PLAN (R599/month) — keep price, update content:
+- Change subtitle to "flat fee · most popular"
+- Replace bullet points with:
+  ✓ Everything in Starter
+  ✓ Unlimited products
+  ✓ 200 invoices included (R0.50 each extra)
+  ✓ Full sales analytics & PDF export
+  ✓ Staff accounts (up to 5)
+  ✓ Top products & dead stock reports
+  ✓ Period-over-period comparisons
+  ✓ Automated invoice reminders
+  ✓ WhatsApp receipt sending
+  ✓ Priority email support
+  ✓ 7-day free trial
+
+- Update description to: "For businesses ready to scale. Predictable costs, 
+  deeper insights, and tools to grow your team."
+
+---
+
+SCALE PLAN (R999/month) — keep price, update content:
+- Change subtitle to "per month · enterprise"
+- Replace bullet points with:
+  ✓ Everything in Growth
+  ✓ Unlimited invoices
+  ✓ Multi-location / branch support
+  ✓ Unlimited staff accounts
+  ✓ Role-based permissions (Cashier / Manager / Admin)
+  ✓ Consolidated multi-branch reporting
+  ✓ Customer loyalty points system
+  ✓ Dedicated priority support (WhatsApp + email)
+  ✓ Custom receipt & invoice branding
+  ✓ Early access to new features
+  ✓ 7-day free trial
+
+- Update description to: "For established businesses running multiple locations 
+  or large teams. Full control, maximum features, priority assistance."
+
+---
+
+ALSO update the in-app billing page (Usage & Billing screen) to match:
+- Starter card: show "R299 / month" as the price, same description and features as above
+- Make sure the "Current Plan" label still displays correctly on whichever plan 
+  the user is on
+- The lock message ("Plan changes only allowed 1st–5th of each month") 
+  should remain unchanged on Growth and Scale cards
+
+Do not change any colours, fonts, layout structure, icons, or the "Popular" 
+badge on Growth. Only update the text content and pricing as specified above.
