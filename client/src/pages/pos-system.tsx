@@ -39,7 +39,6 @@ import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_17621973881
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
-import UpsellBanner from "@/components/UpsellBanner";
 import { InvoiceProductPicker } from "@/components/InvoiceProductPicker";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import jsPDF from 'jspdf';
@@ -4819,15 +4818,6 @@ export default function PosSystem() {
             </div>
           </div>
 
-          {currentUser && currentUser.paymentPlan === 'percent' && (currentUser.planSavingAmount ?? 0) > 0 && (
-            <UpsellBanner
-              userId={currentUser.id}
-              userEmail={currentUser.email}
-              planSavingAmount={currentUser.planSavingAmount!}
-              language={currentUser.preferredLanguage || 'en'}
-              onSwitched={(u) => setCurrentUser(prev => prev ? { ...prev, ...(u as typeof prev) } : prev)}
-            />
-          )}
 
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden content-bottom-safe">
             <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
