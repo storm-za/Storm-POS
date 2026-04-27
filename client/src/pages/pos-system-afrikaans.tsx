@@ -5089,9 +5089,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                               <div className="relative block md:hidden space-y-3">
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
-                                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
-                                      <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                                    </div>
+                                    {product.imageUrl ? (
+                                      <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    ) : (
+                                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                        <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                      </div>
+                                    )}
                                     <div className="min-w-0 flex-1 overflow-hidden">
                                       <h3 className="font-semibold text-white text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
                                       <p className="text-[11px] text-gray-400 truncate">SKU: {product.sku}</p>
@@ -5149,9 +5153,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                               {/* Desktop Layout - shows on screens 768px and above */}
                               <div className="relative hidden md:flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
-                                    <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
-                                  </div>
+                                  {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                  ) : (
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                      <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
+                                    </div>
+                                  )}
                                   <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-white text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
                                     <p className="text-sm text-gray-400">SKU: {product.sku}</p>
