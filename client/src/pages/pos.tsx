@@ -28,6 +28,7 @@ const NAV_LINKS = [
 
 export default function POS() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'growth' | 'scale'>('growth');
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -391,49 +392,148 @@ export default function POS() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {/* Starter plan */}
-            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-              className="bg-white rounded-2xl p-7 border-2 border-gray-200 shadow-lg hover:border-[hsl(217,90%,40%)]/40 transition-all">
+            <motion.div
+              initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+              onClick={() => setSelectedPlan('starter')}
+              className={`relative bg-white rounded-2xl p-7 border-2 shadow-lg transition-all cursor-pointer flex flex-col ${
+                selectedPlan === 'starter'
+                  ? 'border-[hsl(217,90%,40%)] ring-2 ring-[hsl(217,90%,40%)]/30 bg-blue-50/40'
+                  : 'border-gray-200 hover:border-[hsl(217,90%,40%)]/40'
+              }`}>
+              {selectedPlan === 'starter' && (
+                <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[hsl(217,90%,40%)] flex items-center justify-center">
+                  <Check className="w-3.5 h-3.5 text-white" weight="bold" />
+                </div>
+              )}
               <TrendingUp className="w-8 h-8 text-[hsl(217,90%,40%)] mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] mb-1">Starter</div>
               <div className="text-3xl font-bold text-gray-900 mb-1">R299</div>
               <div className="text-gray-500 text-sm mb-3">flat rate · no surprises</div>
               <p className="text-gray-400 text-xs mb-4 leading-relaxed">Perfect for new and growing businesses. One flat monthly fee — no percentage cuts.</p>
-              <ul className="space-y-2">
-                {["Up to 200 products","50 invoices per month","Customer directory & purchase orders","XERO integration · VAT-ready invoices","7-day free trial"].map(t => (
+              <ul className="space-y-2 flex-1">
+                {[
+                  "Full POS terminal",
+                  "Up to 200 products",
+                  "50 invoices per month",
+                  "Customer directory",
+                  "Purchase orders",
+                  "Open accounts / credit sales",
+                  "Custom receipt & invoice branding",
+                  "Basic sales reports",
+                  "XERO integration",
+                  "VAT-ready invoices",
+                  "Email support",
+                  "7-day free trial",
+                ].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
+              <div className="mt-6">
+                <Button asChild className={`w-full font-semibold transition-all ${
+                  selectedPlan === 'starter'
+                    ? 'bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]'
+                    : 'bg-white text-[hsl(217,90%,40%)] border border-[hsl(217,90%,40%)] hover:bg-blue-50'
+                }`}>
+                  <Link href="/pos/signup">Start for free →</Link>
+                </Button>
+              </div>
             </motion.div>
 
             {/* Growth plan */}
-            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.05 }}
-              className="relative bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] rounded-2xl p-7 text-white shadow-2xl shadow-blue-500/25">
-              <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</div>
+            <motion.div
+              initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.05 }}
+              onClick={() => setSelectedPlan('growth')}
+              className={`relative rounded-2xl p-7 text-white shadow-2xl shadow-blue-500/25 transition-all cursor-pointer flex flex-col ${
+                selectedPlan === 'growth'
+                  ? 'bg-gradient-to-br from-[hsl(217,90%,38%)] to-[hsl(217,90%,50%)] ring-4 ring-white/40'
+                  : 'bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)]'
+              }`}>
+              <div className="absolute top-4 right-4 flex items-center gap-2">
+                {selectedPlan === 'growth' ? (
+                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                    <Check className="w-3.5 h-3.5 text-[hsl(217,90%,40%)]" weight="bold" />
+                  </div>
+                ) : (
+                  <div className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</div>
+                )}
+              </div>
               <CreditCard className="w-8 h-8 mb-4 opacity-90" />
               <div className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">Growth</div>
               <div className="text-3xl font-bold mb-1">R599</div>
               <div className="text-white/80 text-sm mb-3">flat fee · most popular</div>
               <p className="text-white/60 text-xs mb-4 leading-relaxed">For businesses ready to scale. Deeper insights, tools to grow your team.</p>
-              <ul className="space-y-2">
-                {["Everything in Starter","Unlimited products","200 invoices included (R0.50 extra)","Staff accounts (up to 5)","7-day free trial"].map(t => (
+              <ul className="space-y-2 flex-1">
+                {[
+                  "Everything in Starter",
+                  "Unlimited products",
+                  "200 invoices included (R0.50 each extra)",
+                  "Full sales analytics & PDF export",
+                  "Staff accounts (up to 5)",
+                  "Top products & dead stock reports",
+                  "Period-over-period comparisons",
+                  "Automated invoice reminders",
+                  "WhatsApp receipt sending",
+                  "Priority email support",
+                  "7-day free trial",
+                ].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-300 shrink-0" />{t}</li>
                 ))}
               </ul>
+              <div className="mt-6">
+                <Button asChild className={`w-full font-semibold transition-all ${
+                  selectedPlan === 'growth'
+                    ? 'bg-white text-[hsl(217,90%,40%)] hover:bg-white/90'
+                    : 'bg-transparent text-white border border-white/70 hover:bg-white/10'
+                }`}>
+                  <Link href="/pos/signup">Start for free →</Link>
+                </Button>
+              </div>
             </motion.div>
 
             {/* Scale plan */}
-            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-7 border-2 border-purple-200 shadow-lg hover:border-purple-400/60 transition-all">
+            <motion.div
+              initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.1 }}
+              onClick={() => setSelectedPlan('scale')}
+              className={`relative bg-white rounded-2xl p-7 border-2 shadow-lg transition-all cursor-pointer flex flex-col ${
+                selectedPlan === 'scale'
+                  ? 'border-purple-500 ring-2 ring-purple-400/30 bg-purple-50/40'
+                  : 'border-purple-200 hover:border-purple-400/60'
+              }`}>
+              {selectedPlan === 'scale' && (
+                <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center">
+                  <Check className="w-3.5 h-3.5 text-white" weight="bold" />
+                </div>
+              )}
               <Globe className="w-8 h-8 text-purple-600 mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-purple-600 mb-1">Scale</div>
               <div className="text-3xl font-bold text-gray-900 mb-1">R999</div>
               <div className="text-gray-500 text-sm mb-3">per month · enterprise</div>
               <p className="text-gray-400 text-xs mb-4 leading-relaxed">For established businesses with multiple locations or large teams.</p>
-              <ul className="space-y-2">
-                {["Everything in Growth","Unlimited invoices","Multi-location / branch support","Unlimited staff · role-based permissions","Dedicated priority support","7-day free trial"].map(t => (
+              <ul className="space-y-2 flex-1">
+                {[
+                  "Everything in Growth",
+                  "Unlimited invoices",
+                  "Multi-location / branch support",
+                  "Unlimited staff accounts",
+                  "Role-based permissions (Cashier / Manager / Admin)",
+                  "Consolidated multi-branch reporting",
+                  "Customer loyalty points system",
+                  "Dedicated priority support",
+                  "Early access to new features",
+                  "7-day free trial",
+                ].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-purple-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
+              <div className="mt-6">
+                <Button asChild className={`w-full font-semibold transition-all ${
+                  selectedPlan === 'scale'
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-white text-purple-600 border border-purple-500 hover:bg-purple-50'
+                }`}>
+                  <Link href="/pos/signup">Start for free →</Link>
+                </Button>
+              </div>
             </motion.div>
           </div>
 
