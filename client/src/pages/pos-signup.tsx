@@ -25,7 +25,7 @@ export default function PosSignup() {
   useEffect(() => {
     updatePageSEO({
       title: 'Sign Up - Storm POS | Start Your 7-Day Free Trial',
-      description: 'Create your Storm POS account today. 7 days completely free, then only pay 0.5% per sale. No credit card required. No monthly fees. Start selling now.',
+      description: 'Create your Storm POS account today. 7 days completely free, then from R299/month flat rate. No credit card required. No setup fees. Start selling now.',
       canonical: window.location.origin + '/pos/signup'
     });
   }, []);
@@ -238,7 +238,7 @@ export default function PosSignup() {
             </Button>
 
             <p className="text-center text-xs text-gray-400 leading-relaxed pt-1">
-              By signing up you agree to our terms of service. After 7 days: 0.5% per sale or R1 flat per sale.
+              By signing up you agree to our terms of service. After 7 days: Starter (R299/mo), Growth (R599/mo), or Scale (R999/mo).
             </p>
           </form>
 

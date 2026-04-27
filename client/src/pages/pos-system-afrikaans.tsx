@@ -2670,7 +2670,7 @@ export default function PosSystemAfrikaans() {
       const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
       localStorage.setItem("posUser", JSON.stringify({ ...stored, paymentPlan: newPlan }));
       setPlanSwitchConfirm(null);
-      toast({ title: "Plan opgedateer", description: newPlan === 'scale' ? "Geskakel na Skaal-plan (R999/maand)." : newPlan === 'flat' ? "Geskakel na Groei-plan (R599/maand)." : "Geskakel na Starter-plan (0.5% van inkomste)." });
+      toast({ title: "Plan opgedateer", description: newPlan === 'scale' ? "Geskakel na Skaal-plan (R999/maand, onbeperkte fakture)." : newPlan === 'flat' ? "Geskakel na Groei-plan (R599/maand, 200 fakture ingesluit)." : "Geskakel na Starter-plan (R299/maand, 50 fakture ingesluit)." });
     },
     onError: () => {
       setPlanSwitchConfirm(null);
@@ -3782,8 +3782,6 @@ ${paidInvoicesInRange.map((inv: any) =>
   const monthlyRevenue = currentMonthSales.reduce((total, sale) => {
     return total + parseFloat(sale.total);
   }, 0);
-
-  const stormFee = monthlyRevenue * 0.005;
 
   // Pre-generate kwitansie PDF-blob + aflaai-URL sodra die verkoopsdialoog oopgaan
   useEffect(() => {
@@ -6561,15 +6559,15 @@ ${paidInvoicesInRange.map((inv: any) =>
 
               // Calculate Storm fees based on payment plan
               const userPlan = currentUser?.paymentPlan ?? 'percent';
-              // Starter: 0.5% van omset | Growth: R599/maand | Scale: R999/maand
+              // Starter: R299/maand vaste tarief | Growth: R599/maand | Scale: R999/maand
               const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
               const salesFee = isInTrial ? 0 : userPlan === 'scale'
                 ? 999
                 : userPlan === 'flat'
                 ? 599
-                : currentMonthRevenue * 0.005;
-              // Scale: onbeperk (R0), Growth: eerste 200 ingesluit dan R0.50 elk, Starter: R0.50 per faktuur
-              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : currentMonthInvoices.length * 0.50;
+                : 299;
+              // Scale: onbeperk (R0), Growth: eerste 200 ingesluit dan R0.50 elk, Starter: eerste 50 ingesluit dan R0.50 elk
+              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : Math.max(0, currentMonthInvoices.length - 50) * 0.50;
               const stormFee = salesFee + invoiceFee;
 
               // Calculate daily breakdown
@@ -6601,7 +6599,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Gratis Proeftydperk Aktief</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: {userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth, 200 fakture ingesluit)' : '0.5% per verkoop (Starter)'} + {userPlan === 'scale' ? 'onbeperkte fakture' : 'R0.50 per faktuur'}.
+                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: {userPlan === 'scale' ? 'R999/maand (Scale, onbeperkte fakture)' : userPlan === 'flat' ? 'R599/maand (Growth, 200 fakture ingesluit)' : 'R299/maand (Starter, 50 fakture ingesluit)'}.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">
@@ -6637,7 +6635,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} verkope + ${currentMonthPaidInvoices.length} betaalde fakt.` },
-                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : '0.5% van omset (Starter)' },
+                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : 'R299/maand (Starter)' },
                       { label: 'Fakture', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fooie` },
                       { label: 'Periode', value: `${Math.round(progressPercentage)}%`, sub: `Dag ${daysCompleted} van ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -6658,9 +6656,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                       {
                         id: 'percent',
                         name: 'Starter',
-                        rate: '0.5% van omset',
-                        detail: '+ R0.50 per faktuur',
-                        description: 'Ideaal vir lae of wisselvallige volumes. Betaal slegs \'n klein deel van wat jy verdien.',
+                        rate: 'R299 / maand',
+                        detail: 'vaste tarief · geen verrassings',
+                        description: 'Perfek vir nuwe en groeiende besighede. Een vaste maandelikse fooi — geen persentasie-aftreksels, geen verrassingsgelde.',
+                        features: ['Volledige kassierterminaal', 'Tot 200 produkte', '50 fakture per maand', 'Kliëntegids', 'Aankoopbestellings', 'Oop rekeninge / kredietverkope', 'Pasgemaakte kwitansie & faktuurmerk', 'Basiese verkoopsverslae', 'XERO-integrasie', 'BTW-gereed fakture', 'E-posondersteuning', '7-dag gratis proeftydperk'],
                         icon: <TrendingUp className="w-5 h-5" />,
                         accentLight: 'border-blue-500 bg-blue-50',
                         accentDark: 'border-blue-500 bg-blue-900/20',
@@ -6672,8 +6671,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                         id: 'flat',
                         name: 'Groei',
                         rate: 'R599 / maand',
-                        detail: '200 fakture ingesluit',
-                        description: 'Plat maandelikse fooi vir sakke met konsekwente aktiwiteit. Voorspelbare koste.',
+                        detail: 'vaste fooi · gewildste plan',
+                        description: 'Vir besighede wat gereed is om te groei. Voorspelbare koste, dieper insigte, en gereedskap om jou span te bou.',
+                        features: ['Alles in Starter', 'Onbeperkte produkte', '200 fakture ingesluit (R0.50 elk ekstra)', 'Volledige verkoopsanalise & PDF-uitvoer', 'Personeelrekeninge (tot 5)', 'Topprodukte & doodstok-verslae', 'Tydperk-oor-tydperk-vergelykings', 'Outomatiese faktuurherinneringe', 'WhatsApp-kwitansie stuur', 'Prioriteits-e-posondersteuning', '7-dag gratis proeftydperk'],
                         icon: <BarChart3 className="w-5 h-5" />,
                         accentLight: 'border-emerald-500 bg-emerald-50',
                         accentDark: 'border-emerald-500 bg-emerald-900/20',
@@ -6685,8 +6685,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                         id: 'scale',
                         name: 'Skaal',
                         rate: 'R999 / maand',
-                        detail: 'Onbeperkte fakture',
-                        description: 'Vir hoë-volume besighede — onbeperkte fakture, multi-lokasie ondersteuning & prioriteitshulp.',
+                        detail: 'per maand · onderneming',
+                        description: 'Vir gevestigde besighede met meerdere liggings of groot spanne. Volle beheer, maksimum funksies, prioriteitsbystand.',
+                        features: ['Alles in Groei', 'Onbeperkte fakture', 'Multi-lokasie / takondersteuning', 'Onbeperkte personeelrekeninge', 'Rolgebaseerde toestemmings (Kassier / Bestuurder / Admin)', 'Gekonsolideerde multi-tak verslae', 'Kliëntlojaliteitspunte-stelsel', 'Toegewyde prioriteitsondersteuning', 'Vroeë toegang tot nuwe funksies', '7-dag gratis proeftydperk'],
                         icon: <Globe className="w-5 h-5" />,
                         accentLight: 'border-purple-500 bg-purple-50',
                         accentDark: 'border-purple-500 bg-purple-900/20',
@@ -6736,7 +6737,15 @@ ${paidInvoicesInRange.map((inv: any) =>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
                                   <div className={`text-base font-bold mb-0.5 ${planColorClass(plan, isActive)}`}>{plan.rate}</div>
                                   <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
-                                  <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
+                                  <div className={`text-xs leading-relaxed mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
+                                  <ul className="space-y-1 mb-3">
+                                    {plan.features.map((f: string) => (
+                                      <li key={f} className={`flex items-start gap-1.5 text-xs ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                        <Check className={`w-3 h-3 mt-0.5 shrink-0 ${plan.colorKey === 'blue' ? 'text-blue-500' : plan.colorKey === 'emerald' ? 'text-emerald-500' : 'text-purple-500'}`} weight="bold" />
+                                        {f}
+                                      </li>
+                                    ))}
+                                  </ul>
                                   {!isActive && (
                                     canChangePlan ? (
                                       isConfirming ? (
@@ -6836,29 +6845,31 @@ ${paidInvoicesInRange.map((inv: any) =>
                           </div>
                         ) : (
                           <div className="space-y-1.5">
-                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Omset (0.5%)</div>
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Maandelikse Basisfooi (Starter)</div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>POS Verkope</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                              <span>POS Transaksies</span><span className="font-medium">{currentMonthSales.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Betaalde Fakture ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                              <span>Fakture (50 ingesluit)</span><span className="font-medium">{currentMonthInvoices.length}</span>
                             </div>
+                            {currentMonthInvoices.length > 50 && (
+                              <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <span>Faktuur-oorskot ({currentMonthInvoices.length - 50} × R0.50)</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                              </div>
+                            )}
                             <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                              <span>Totale Omset</span><span>R{currentMonthRevenue.toFixed(2)}</span>
-                            </div>
-                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Omsetfooi (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                              <span>Maandelikse Basisfooi</span><span>R{salesFee.toFixed(2)}</span>
                             </div>
                           </div>
                         )}
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
                         <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Fakture (R0.50 elk)</div>
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Faktuur Oorskot</div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                             <span>Geskep</span><span className="font-medium">{currentMonthInvoices.length}</span>
                           </div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Faktuurfooi</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                            <span>Oorskot Fooi</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
                           </div>
                         </div>
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`} />
@@ -6886,8 +6897,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <div className="space-y-2">
                           {[
                             { label: 'Faktuurperiode', value: 'Maandeliks — 1ste tot laaste dag' },
-                            { label: 'Maandelikse basisfooi', value: userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : 'Geen (Starter — 0.5% per verkoop)' },
-                            { label: 'Faktuurkoers', value: userPlan === 'scale' ? 'Onbeperk (ingesluit)' : userPlan === 'flat' ? '200 ingesluit, R0.50 elk ekstra' : 'R0.50 per faktuur geskep' },
+                            { label: 'Maandelikse basisfooi', value: userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : 'R299/maand (Starter)' },
+                            { label: 'Faktuurkoers', value: userPlan === 'scale' ? 'Onbeperk (ingesluit)' : userPlan === 'flat' ? '200 ingesluit, R0.50 elk ekstra' : '50 ingesluit, R0.50 elk ekstra' },
                             { label: 'Betaling verskuldig', value: 'Einde van elke faktuurmaand' },
                             { label: 'Opstellingsfooi', value: 'Geen' },
                           ].map(({ label, value }) => (

@@ -38,8 +38,8 @@ export default function POS() {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Storm POS - Cloud Point of Sale System | Starter, Growth & Scale Plans | 7-Day Free Trial',
-      description: 'The smartest POS system for South African retailers. Choose from Starter (0.5% per sale), Growth (R599/month), or Scale (R999/month). No setup fees. Try free for 7 days.',
+      title: 'Storm POS - Cloud Point of Sale System | Starter R299, Growth R599, Scale R999 | 7-Day Free Trial',
+      description: 'The smartest POS system for South African retailers. Flat-rate plans from R299/month — no percentage cuts, no surprises. Starter, Growth & Scale. Try free for 7 days.',
       canonical: 'https://stormsoftware.co.za/pos'
     });
 
@@ -60,7 +60,7 @@ export default function POS() {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "How much does Storm POS cost?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS offers three plans: Starter (0.5% per sale + R0.50/invoice), Growth (R599/month flat, includes 200 invoices, R0.50 per extra), and Scale (R999/month, unlimited invoices, multi-location, priority support). All plans include a 7-day free trial with no setup fees." } },
+        { "@type": "Question", "name": "How much does Storm POS cost?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS offers three flat-rate plans: Starter (R299/month, 50 invoices included), Growth (R599/month, 200 invoices included, R0.50 per extra), and Scale (R999/month, unlimited invoices, multi-location, dedicated priority support). All plans include a 7-day free trial with no setup fees." } },
         { "@type": "Question", "name": "Is there a free trial for Storm POS?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers a 7-day free trial with full access to all features. No credit card required to start." } },
         { "@type": "Question", "name": "Does Storm POS work offline?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS is a cloud-based system that works on any device with an internet connection. It automatically syncs your data across all your devices in real-time." } },
         { "@type": "Question", "name": "Can I use Storm POS in Afrikaans?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers full Afrikaans language support. You can switch between English and Afrikaans at any time in your settings." } },
@@ -75,7 +75,7 @@ export default function POS() {
       "name": "Storm POS",
       "description": "Cloud-based Point of Sale system for South African retailers. Real-time sales tracking, inventory management, invoicing, and comprehensive analytics.",
       "brand": { "@type": "Brand", "name": "Storm Software" },
-      "offers": { "@type": "AggregateOffer", "priceCurrency": "ZAR", "lowPrice": "0", "highPrice": "999", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "description": "Starter: 0.5% per sale + R0.50/invoice. Growth: R599/month (200 invoices included). Scale: R999/month (unlimited invoices, multi-location). 7-day free trial." },
+      "offers": { "@type": "AggregateOffer", "priceCurrency": "ZAR", "lowPrice": "299", "highPrice": "999", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "description": "Starter: R299/month (50 invoices included). Growth: R599/month (200 invoices included, R0.50 extra). Scale: R999/month (unlimited invoices, multi-location). 7-day free trial." },
       "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127", "bestRating": "5", "worstRating": "1" }
     };
     
@@ -125,12 +125,12 @@ export default function POS() {
 
   const testimonials = [
     { name: "Sipho Mahlangu", role: "Spaza Shop Owner, Soweto", text: "Storm POS transformed how I run my shop. I can track every sale from my phone and never lose stock again.", stars: 5 },
-    { name: "Johan Botha", role: "Hardware Store, Stellenbosch", text: "The invoicing is brilliant. Clients get a professional PDF quote in seconds. Worth every cent of the 0.5%.", stars: 5 },
+    { name: "Johan Botha", role: "Hardware Store, Stellenbosch", text: "The invoicing is brilliant. Clients get a professional PDF quote in seconds. Completely worth it at R299 a month.", stars: 5 },
     { name: "Aisha Nkosi", role: "Boutique Owner, Cape Town", text: "Switching from our old system was effortless. The Afrikaans interface alone made my staff 3x more confident.", stars: 5 },
   ];
 
   const comparison = [
-    { feature: "Monthly fee", storm: "R0", traditional: "R500+" },
+    { feature: "Monthly fee", storm: "R299–R999", traditional: "R500+" },
     { feature: "Setup cost", storm: "R0", traditional: "R3 000+" },
     { feature: "Works on any device", storm: true, traditional: false },
     { feature: "Cloud & real-time sync", storm: true, traditional: false },
@@ -395,10 +395,11 @@ export default function POS() {
               className="bg-white rounded-2xl p-7 border-2 border-gray-200 shadow-lg hover:border-[hsl(217,90%,40%)]/40 transition-all">
               <TrendingUp className="w-8 h-8 text-[hsl(217,90%,40%)] mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] mb-1">Starter</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">0.5%</div>
-              <div className="text-gray-500 text-sm mb-5">per sale · pay as you go</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">R299</div>
+              <div className="text-gray-500 text-sm mb-3">flat rate · no surprises</div>
+              <p className="text-gray-400 text-xs mb-4 leading-relaxed">Perfect for new and growing businesses. One flat monthly fee — no percentage cuts.</p>
               <ul className="space-y-2">
-                {["No monthly commitment","Scales with revenue","+ R0.50 per invoice","7-day free trial"].map(t => (
+                {["Up to 200 products","50 invoices per month","Customer directory & purchase orders","XERO integration · VAT-ready invoices","7-day free trial"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
@@ -411,9 +412,10 @@ export default function POS() {
               <CreditCard className="w-8 h-8 mb-4 opacity-90" />
               <div className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">Growth</div>
               <div className="text-3xl font-bold mb-1">R599</div>
-              <div className="text-white/80 text-sm mb-5">per month · flat fee</div>
+              <div className="text-white/80 text-sm mb-3">flat fee · most popular</div>
+              <p className="text-white/60 text-xs mb-4 leading-relaxed">For businesses ready to scale. Deeper insights, tools to grow your team.</p>
               <ul className="space-y-2">
-                {["200 invoices included","Consistent monthly cost","R0.50 per extra invoice","7-day free trial"].map(t => (
+                {["Everything in Starter","Unlimited products","200 invoices included (R0.50 extra)","Staff accounts (up to 5)","7-day free trial"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-300 shrink-0" />{t}</li>
                 ))}
               </ul>
@@ -425,9 +427,10 @@ export default function POS() {
               <Globe className="w-8 h-8 text-purple-600 mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-purple-600 mb-1">Scale</div>
               <div className="text-3xl font-bold text-gray-900 mb-1">R999</div>
-              <div className="text-gray-500 text-sm mb-5">per month · enterprise</div>
+              <div className="text-gray-500 text-sm mb-3">per month · enterprise</div>
+              <p className="text-gray-400 text-xs mb-4 leading-relaxed">For established businesses with multiple locations or large teams.</p>
               <ul className="space-y-2">
-                {["Unlimited invoices","Multi-location support","Priority support","7-day free trial"].map(t => (
+                {["Everything in Growth","Unlimited invoices","Multi-location / branch support","Unlimited staff · role-based permissions","Dedicated priority support","7-day free trial"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-purple-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
@@ -526,7 +529,7 @@ export default function POS() {
                 <Monitor className="w-4 h-4" />Download for Windows
               </a>
             </div>
-            <p className="mt-6 text-white/60 text-xs">After trial: Starter (0.5%/sale), Growth (R599/mo), or Scale (R999/mo). Pick the plan that fits.</p>
+            <p className="mt-6 text-white/60 text-xs">After trial: Starter (R299/mo), Growth (R599/mo), or Scale (R999/mo). All flat-rate — no percentage cuts.</p>
           </motion.div>
         </div>
       </section>

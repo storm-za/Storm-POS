@@ -1,56 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Check, X, CaretDown as ChevronDown, CaretUp as ChevronUp,
-  RocketLaunch as Zap, ShieldCheck, Calculator, ChartBar,
-  DeviceMobile, Globe, FileText, Users, CurrencyDollar,
-  Receipt, ArrowRight, Sparkle, Star, Question, Percent,
-  TrendUp, Package
+  RocketLaunch as Zap, ShieldCheck, ChartBar,
+  Globe, FileText, Users, CurrencyDollar,
+  Receipt, ArrowRight, Sparkle, Question,
+  Package, Buildings
 } from "@phosphor-icons/react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { updatePageSEO } from "@/lib/seo";
 import { useEffect } from "react";
 
-const BLUE = "hsl(217,90%,40%)";
-
-
-function BreakevenSVG({ breakeven }: { breakeven: number }) {
-  const GROWTH_FLAT = 599;
-  const w = 300, h = 160, pad = 30;
-  const maxSales = Math.max(breakeven * 2, 100);
-  const maxAvg = 500;
-  const points = Array.from({ length: 11 }, (_, i) => {
-    const sales = (maxSales / 10) * i;
-    return { sales, pct: sales * maxAvg * 0.005, flat: GROWTH_FLAT };
-  });
-  const scaleX = (sales: number) => pad + ((sales / maxSales) * (w - pad * 2));
-  const scaleY = (cost: number) => {
-    const maxCost = Math.max(...points.map(p => Math.max(p.pct, p.flat)));
-    return h - pad - ((cost / maxCost) * (h - pad * 2));
-  };
-  const pctPath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${scaleX(p.sales)} ${scaleY(p.pct)}`).join(" ");
-  const flatPath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${scaleX(p.sales)} ${scaleY(p.flat)}`).join(" ");
-  const bx = scaleX(breakeven);
-  const by = scaleY(GROWTH_FLAT);
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-      <text x="15" y="10" fill="#9ca3af" fontSize="8" fontFamily="system-ui">Cost</text>
-      <text x={w - 45} y={h - 4} fill="#9ca3af" fontSize="8" fontFamily="system-ui">Sales/mo</text>
-      <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#e5e7eb" strokeWidth="1"/>
-      <line x1={pad} y1={pad} x2={pad} y2={h - pad} stroke="#e5e7eb" strokeWidth="1"/>
-      <path d={pctPath} stroke={BLUE} strokeWidth="2" fill="none" strokeLinecap="round"/>
-      <path d={flatPath} stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round" strokeDasharray="4 2"/>
-      <circle cx={bx} cy={by} r="5" fill="#f59e0b" stroke="white" strokeWidth="1.5"/>
-      <rect x={bx - 28} y={by - 22} width="56" height="16" rx="4" fill="#fef3c7"/>
-      <text x={bx} y={by - 10} textAnchor="middle" fill="#92400e" fontSize="8" fontFamily="system-ui" fontWeight="700">Break-even</text>
-      <text x={w - pad - 2} y={points[points.length-1] ? scaleY(points[points.length-1].pct) + 4 : 50} fill={BLUE} fontSize="8" fontFamily="system-ui">Starter</text>
-      <text x={w - pad - 2} y={points[points.length-1] ? scaleY(points[points.length-1].flat) + 4 : 80} fill="#10b981" fontSize="8" fontFamily="system-ui">Growth</text>
-    </svg>
-  );
-}
 
 const features = [
   { cat: "Core POS", items: [
@@ -104,23 +67,23 @@ const features = [
 const faqs = [
   {
     q: "When does the 7-day free trial end?",
-    a: "Your trial starts the moment you sign up and lasts exactly 7 days. During this time you pay absolutely nothing - not a single cent. On day 8, your chosen plan activates and fees only apply to new sales from that point forward."
+    a: "Your trial starts the moment you sign up and lasts exactly 7 days. During this time you pay absolutely nothing — not a single cent. On day 8, your chosen plan activates and the flat monthly fee applies from that billing cycle."
   },
   {
     q: "What is the difference between Starter, Growth, and Scale?",
-    a: "Starter (0.5%) charges a percentage of each sale — ideal when volumes are low or unpredictable. Growth (R599/month) is a flat monthly fee covering 200 invoices, great for businesses with consistent activity. Scale (R999/month) offers unlimited invoices, multi-location support, and priority help for high-volume businesses. Use the calculator above to see which plan saves you the most."
+    a: "All three plans are flat-rate monthly fees. Starter (R299/month) is ideal for small or new businesses — it's our most affordable entry point and includes 50 invoices. Growth (R599/month) suits growing businesses with 200 invoices included and priority email support. Scale (R999/month) is built for high-volume operations with unlimited invoices, multi-location support, and priority phone & email assistance."
   },
   {
     q: "How are invoice fees charged on each plan?",
-    a: "On the Starter plan, invoices cost R0.50 each. On the Growth plan, the first 200 invoices per month are included; beyond that, R0.50 each applies. On the Scale plan, invoices are unlimited with no extra charge."
+    a: "Starter includes 50 invoices per month; any extras are R0.50 each. Growth includes 200 invoices per month; extras are R0.50 each. Scale includes unlimited invoices at no extra charge."
   },
   {
     q: "Can I switch plans at any time?",
     a: "Plan switches are allowed between the 1st and 5th of each month to avoid mid-cycle billing confusion. Head to Settings → Billing inside the POS to switch."
   },
   {
-    q: "What happens in a month where I make zero sales on the Starter plan?",
-    a: "You pay nothing on Starter. There are no monthly minimums. Growth and Scale are fixed monthly fees, so those apply regardless of sales volume."
+    q: "What if my business is just starting out — is Starter right for me?",
+    a: "Starter at R299/month is our most affordable flat-rate plan. It includes all features and 50 invoices per month — more than enough for most new businesses. If you grow beyond 50 invoices regularly, switching to Growth will give you 200 invoices at R599/month."
   },
   {
     q: "Is there a long-term contract or cancellation fee?",
@@ -132,7 +95,7 @@ const faqs = [
   },
   {
     q: "How will I know when I should switch plans?",
-    a: "Storm POS automatically monitors your usage and will show you a banner inside the POS - and send you an email - when switching plans would save you money. You can also switch manually at any time from your account settings."
+    a: "Storm POS automatically monitors your usage and will show you a banner inside the POS — and send you an email — when switching plans would save you money. You can also switch manually at any time from your billing settings."
   },
 ];
 
@@ -140,168 +103,122 @@ export default function Pricing() {
   useEffect(() => {
     updatePageSEO({
       title: "Pricing - Storm POS | Starter, Growth & Scale | 7-Day Free Trial",
-      description: "Simple, transparent 3-tier pricing for South African retailers. Starter (0.5% per sale), Growth (R599/month), Scale (R999/month). No setup fees. 7-day free trial.",
+      description: "Simple, transparent flat-rate pricing for South African retailers. Starter (R299/month), Growth (R599/month), Scale (R999/month). No setup fees. 7-day free trial.",
       canonical: "https://stormsoftware.co.za/pricing"
     });
   }, []);
 
-  const [salesCount, setSalesCount] = useState(150);
-  const [avgSale, setAvgSale] = useState(350);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [openCats, setOpenCats] = useState<string[]>(features.map(f => f.cat));
 
   const toggleCat = (cat: string) =>
     setOpenCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
 
-  const { pctCost, flatCost, pctSaves, flatSaves, breakeven } = useMemo(() => {
-    const pct = salesCount * avgSale * 0.005;
-    const flat = 599; // Growth plan: R599/month flat
-    return {
-      pctCost: pct,
-      flatCost: flat,
-      pctSaves: flat > pct ? flat - pct : 0,
-      flatSaves: pct > flat ? pct - flat : 0,
-      breakeven: Math.ceil(599 / (avgSale * 0.005)),
-    };
-  }, [salesCount, avgSale]);
-
-  const cheaper = pctCost <= flatCost ? "pct" : "flat";
-
-  const fmt = (n: number) => `R${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
 
-      {/* ── HERO + CALCULATOR ──────────────────────────────────────── */}
+      {/* ── HERO ──────────────────────────────────────────────────── */}
       <section className="relative pt-28 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gray-50/60">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:56px_56px]" />
 
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative max-w-4xl mx-auto">
           {/* Heading */}
-          <motion.div className="text-center mb-10"
+          <motion.div className="text-center mb-12"
             initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center justify-center gap-3 mb-5">
               <span className="block h-px w-10 bg-[hsl(217,90%,40%)]" />
               <span className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rotate-45 inline-block shrink-0" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(217,90%,40%)]">Pricing Calculator</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(217,90%,40%)]">Simple Pricing</span>
               <span className="w-1.5 h-1.5 bg-[hsl(217,90%,40%)] rotate-45 inline-block shrink-0" />
               <span className="block h-px w-10 bg-[hsl(217,90%,40%)]" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-              Find your perfect plan
+              Flat-rate pricing. No surprises.
             </h1>
             <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              Adjust the sliders to match your business and see exactly what you would pay each month on each plan.
+              Three straightforward flat-rate plans — no percentage cuts, no surprise charges. Pick the one that fits your business size.
             </p>
           </motion.div>
 
-          {/* Calculator card */}
+          {/* Plan summary cards */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden">
-            <div className="grid lg:grid-cols-2 gap-0">
-              {/* Sliders side */}
-              <div className="p-8 lg:border-r border-gray-100">
-                <div className="flex items-center gap-2 mb-7">
-                  <Calculator className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                  <h3 className="font-bold text-gray-900 text-lg">Your business</h3>
+            className="grid md:grid-cols-3 gap-5 mb-8">
+            {[
+              {
+                name: "Starter",
+                price: "R299",
+                sub: "flat rate · no surprises",
+                color: "hsl(217,90%,40%)",
+                bgClass: "bg-[hsl(217,90%,40%)] text-white",
+                borderClass: "border-[hsl(217,90%,40%)]",
+                highlights: [
+                  "Full POS terminal",
+                  "Up to 200 products",
+                  "50 invoices per month",
+                  "Customer directory & purchase orders",
+                  "VAT-ready invoices · XERO integration",
+                  "7-day free trial",
+                ],
+              },
+              {
+                name: "Growth",
+                price: "R599",
+                sub: "flat fee · most popular",
+                color: "#059669",
+                bgClass: "bg-white text-gray-900",
+                borderClass: "border-emerald-300",
+                highlights: [
+                  "Everything in Starter",
+                  "Unlimited products",
+                  "200 invoices included (R0.50 extra)",
+                  "Staff accounts (up to 5)",
+                  "Full analytics & PDF export",
+                  "7-day free trial",
+                ],
+              },
+              {
+                name: "Scale",
+                price: "R999",
+                sub: "per month · enterprise",
+                color: "#7c3aed",
+                bgClass: "bg-white text-gray-900",
+                borderClass: "border-purple-300",
+                highlights: [
+                  "Everything in Growth",
+                  "Unlimited invoices",
+                  "Multi-location / branch support",
+                  "Unlimited staff · role-based permissions",
+                  "Dedicated priority support",
+                  "7-day free trial",
+                ],
+              },
+            ].map((plan, i) => (
+              <div key={plan.name}
+                className={`rounded-2xl border-2 ${plan.borderClass} ${plan.bgClass} p-6 shadow-sm flex flex-col`}>
+                <div className="mb-4">
+                  <div className="text-sm font-bold uppercase tracking-wide opacity-70 mb-1">{plan.name}</div>
+                  <div className="text-4xl font-black tracking-tight mb-0.5">{plan.price}</div>
+                  <div className="text-xs opacity-60">{plan.sub}</div>
                 </div>
-
-                <div className="mb-7">
-                  <div className="flex justify-between items-baseline mb-2">
-                    <label className="text-sm font-semibold text-gray-700">Monthly sales</label>
-                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">{salesCount} <span className="text-sm font-medium text-gray-400">sales</span></span>
-                  </div>
-                  <input type="range" min={1} max={1000} value={salesCount}
-                    onChange={e => setSalesCount(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>1</span><span>500</span><span>1,000</span></div>
-                </div>
-
-                <div className="mb-7">
-                  <div className="flex justify-between items-baseline mb-2">
-                    <label className="text-sm font-semibold text-gray-700">Average sale value</label>
-                    <span className="text-2xl font-black text-[hsl(217,90%,40%)]">R{avgSale} <span className="text-sm font-medium text-gray-400">avg</span></span>
-                  </div>
-                  <input type="range" min={10} max={5000} step={10} value={avgSale}
-                    onChange={e => setAvgSale(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[hsl(217,90%,40%)]" />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1.5"><span>R10</span><span>R2,500</span><span>R5,000</span></div>
-                </div>
-
-                <div className="bg-gray-50 rounded-xl px-4 py-3 flex justify-between items-center mb-6">
-                  <span className="text-sm text-gray-500">Estimated monthly turnover</span>
-                  <span className="font-bold text-gray-900">{fmt(salesCount * avgSale)}</span>
-                </div>
-
-                <div>
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Cost curve</div>
-                  <BreakevenSVG breakeven={breakeven} />
-                  <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-[hsl(217,90%,40%)] inline-block rounded" />Starter (0.5%)</span>
-                    <span className="flex items-center gap-1.5"><span className="w-5 h-0.5 bg-green-500 inline-block rounded" />Growth (R599/mo)</span>
-                    <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />Break-even</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Results side */}
-              <div className="p-8 bg-gradient-to-br from-gray-50/60 to-white">
-                <div className="flex items-center gap-2 mb-7">
-                  <ChartBar className="w-5 h-5 text-[hsl(217,90%,40%)]" />
-                  <h3 className="font-bold text-gray-900 text-lg">Your monthly cost</h3>
-                </div>
-
-                <div className={`rounded-2xl p-5 mb-4 border-2 transition-all ${cheaper === "pct" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">Starter plan (0.5% per sale)</div>
-                      <div className="text-4xl font-black text-gray-900">{fmt(pctCost)}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">sales fees only, excl. invoices</div>
-                    </div>
-                    {cheaper === "pct" && <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">Best for you</div>}
-                  </div>
-                  {pctSaves > 0 && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
-                      <TrendUp className="w-4 h-4 shrink-0" />
-                      <span>You save <strong>{fmt(pctSaves)}/month</strong> vs Growth</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className={`rounded-2xl p-5 mb-6 border-2 transition-all ${cheaper === "flat" ? "border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/5" : "border-gray-200 bg-white"}`}>
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-0.5">Growth plan (R599/month flat)</div>
-                      <div className="text-4xl font-black text-gray-900">{fmt(flatCost)}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">200 invoices included</div>
-                    </div>
-                    {cheaper === "flat" && <div className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">Best for you</div>}
-                  </div>
-                  {flatSaves > 0 && (
-                    <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">
-                      <TrendUp className="w-4 h-4 shrink-0" />
-                      <span>You save <strong>{fmt(flatSaves)}/month</strong> vs Starter</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6">
-                  <div className="text-xs font-bold uppercase tracking-wide text-amber-700 mb-1">Break-even point</div>
-                  <div className="text-sm text-amber-800">
-                    At <strong>R{avgSale} average</strong> sale value, Starter and Growth cost the same at <strong>{breakeven} sales/month</strong>.
-                    {salesCount < breakeven ? " Below this volume, Starter is cheaper." : " Above this volume, Growth's flat R599 wins."}
-                  </div>
-                </div>
-
-                <Button asChild className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold py-3.5 rounded-xl text-base border-0 hover:scale-105 transition-all">
-                  <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free - Choose Plan Later</Link>
+                <ul className="space-y-2 flex-1 mb-5">
+                  {plan.highlights.map(f => (
+                    <li key={f} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 shrink-0" weight="bold" style={{ color: plan.name === "Starter" ? "#86efac" : "#22c55e" }} />{f}
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild className={`w-full font-bold py-2.5 rounded-xl text-sm border-0 hover:scale-105 transition-all ${plan.name === "Starter" ? "bg-white text-[hsl(217,90%,40%)] hover:bg-blue-50" : plan.name === "Growth" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"}`}>
+                  <Link href="/pos/signup">Start Free Trial</Link>
                 </Button>
-                <p className="text-center text-xs text-gray-400 mt-2">Pick your plan after the 7-day trial. No card needed.</p>
               </div>
-            </div>
+            ))}
           </motion.div>
 
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+            className="text-center">
+            <p className="text-sm text-gray-400">All prices exclude VAT (15%). 7-day free trial — no credit card required. Cancel anytime.</p>
+          </motion.div>
         </div>
       </section>
 
@@ -311,7 +228,7 @@ export default function Pricing() {
           <motion.div className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Three plans. Zero surprises.</h2>
-            <p className="text-gray-500 text-lg">All plans include every feature. Pick how you prefer to pay.</p>
+            <p className="text-gray-500 text-lg">Pick the plan that fits your business — every price is flat, every month.</p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -319,26 +236,26 @@ export default function Pricing() {
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.05 }}
               className="relative bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] rounded-3xl p-7 text-white shadow-2xl shadow-blue-500/25 overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
-              <div className="absolute top-4 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">Popular</div>
               <div className="relative">
                 <div className="flex items-center gap-2 mb-2">
-                  <Percent className="w-5 h-5 opacity-80" />
+                  <ShieldCheck className="w-5 h-5 opacity-80" />
                   <span className="text-sm font-semibold opacity-80 uppercase tracking-wide">Starter</span>
                 </div>
-                <div className="text-5xl font-black mb-1 tracking-tight">0.5%</div>
-                <div className="text-white/75 text-sm mb-5">of each sale + R0.50/invoice</div>
+                <div className="text-5xl font-black mb-1 tracking-tight">R299</div>
+                <div className="text-white/75 text-sm mb-4">flat rate · no surprises</div>
+                <p className="text-white/80 text-xs mb-4 leading-relaxed">Perfect for new and growing businesses. One flat monthly fee — no percentage cuts, no surprise charges.</p>
 
                 <div className="bg-white/10 rounded-2xl p-4 mb-5">
-                  <div className="text-xs font-bold uppercase tracking-wide opacity-70 mb-2">Example</div>
+                  <div className="text-xs font-bold uppercase tracking-wide opacity-70 mb-2">What's included</div>
                   <div className="space-y-1 text-sm">
-                    <div className="flex justify-between"><span className="opacity-80">50 sales × R200</span><span className="font-semibold">R5/mo</span></div>
-                    <div className="flex justify-between"><span className="opacity-80">200 sales × R500</span><span className="font-semibold">R500/mo</span></div>
-                    <div className="flex justify-between"><span className="opacity-80">Invoice (each)</span><span className="font-semibold">+R0.50</span></div>
+                    <div className="flex justify-between"><span className="opacity-80">Monthly base fee</span><span className="font-semibold">R299</span></div>
+                    <div className="flex justify-between"><span className="opacity-80">Invoices (first 50)</span><span className="font-semibold">Free</span></div>
+                    <div className="flex justify-between"><span className="opacity-80">Products</span><span className="font-semibold">Up to 200</span></div>
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 mb-7">
-                  {["All features included","7-day free trial","No setup fee","Pay less on small sales","Switch plans anytime"].map(f => (
+                <ul className="space-y-2 mb-7">
+                  {["Full POS terminal","Up to 200 products","50 invoices per month","Customer directory","Purchase orders","Open accounts / credit sales","Custom receipt & invoice branding","Basic sales reports","XERO integration","VAT-ready invoices","Email support","7-day free trial"].map(f => (
                     <li key={f} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-300 shrink-0" weight="bold" />{f}</li>
                   ))}
                 </ul>
@@ -352,14 +269,15 @@ export default function Pricing() {
             {/* Growth plan */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.12 }}
               className="relative bg-white rounded-3xl p-7 border-2 border-emerald-200 shadow-lg hover:border-emerald-400/60 hover:shadow-xl transition-all overflow-hidden group">
-              <div className="absolute top-4 right-4 bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">Growth</div>
+              <div className="absolute top-4 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">Popular</div>
               <div className="relative">
                 <div className="flex items-center gap-2 mb-2">
                   <CurrencyDollar className="w-5 h-5 text-emerald-500" />
                   <span className="text-sm font-semibold text-emerald-600 uppercase tracking-wide">Growth</span>
                 </div>
                 <div className="text-5xl font-black text-gray-900 mb-1 tracking-tight">R599</div>
-                <div className="text-gray-400 text-sm mb-5">per month · 200 invoices included</div>
+                <div className="text-gray-400 text-sm mb-4">flat fee · most popular</div>
+                <p className="text-gray-500 text-xs mb-4 leading-relaxed">For businesses ready to scale. Predictable costs, deeper insights, and tools to grow your team.</p>
 
                 <div className="bg-emerald-50 rounded-2xl p-4 mb-5">
                   <div className="text-xs font-bold uppercase tracking-wide text-emerald-600 mb-2">What's included</div>
@@ -370,8 +288,8 @@ export default function Pricing() {
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 mb-7">
-                  {["All features included","7-day free trial","Flat monthly fee","200 invoices free","Scale up predictably"].map(f => (
+                <ul className="space-y-2 mb-7">
+                  {["Everything in Starter","Unlimited products","200 invoices included (R0.50 each extra)","Full sales analytics & PDF export","Staff accounts (up to 5)","Top products & dead stock reports","Period-over-period comparisons","Automated invoice reminders","WhatsApp receipt sending","Priority email support","7-day free trial"].map(f => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-700"><Check className="w-4 h-4 text-green-500 shrink-0" weight="bold" />{f}</li>
                   ))}
                 </ul>
@@ -392,7 +310,8 @@ export default function Pricing() {
                   <span className="text-sm font-semibold text-purple-600 uppercase tracking-wide">Scale</span>
                 </div>
                 <div className="text-5xl font-black text-gray-900 mb-1 tracking-tight">R999</div>
-                <div className="text-gray-400 text-sm mb-5">per month · unlimited invoices</div>
+                <div className="text-gray-400 text-sm mb-4">per month · enterprise</div>
+                <p className="text-gray-500 text-xs mb-4 leading-relaxed">For established businesses running multiple locations or large teams. Full control, maximum features, priority assistance.</p>
 
                 <div className="bg-purple-50 rounded-2xl p-4 mb-5">
                   <div className="text-xs font-bold uppercase tracking-wide text-purple-600 mb-2">What's included</div>
@@ -403,8 +322,8 @@ export default function Pricing() {
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 mb-7">
-                  {["All features included","7-day free trial","Unlimited invoices","Multi-location support","Priority support"].map(f => (
+                <ul className="space-y-2 mb-7">
+                  {["Everything in Growth","Unlimited invoices","Multi-location / branch support","Unlimited staff accounts","Role-based permissions (Cashier / Manager / Admin)","Consolidated multi-branch reporting","Customer loyalty points system","Dedicated priority support","Early access to new features","7-day free trial"].map(f => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-700"><Check className="w-4 h-4 text-green-500 shrink-0" weight="bold" />{f}</li>
                   ))}
                 </ul>

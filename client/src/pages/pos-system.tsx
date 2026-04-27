@@ -3264,7 +3264,7 @@ export default function PosSystem() {
       const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
       localStorage.setItem("posUser", JSON.stringify({ ...stored, paymentPlan: newPlan }));
       setPlanSwitchConfirm(null);
-      toast({ title: "Plan updated", description: newPlan === 'scale' ? "Switched to Scale plan (R999/month, unlimited invoices)." : newPlan === 'flat' ? "Switched to Growth plan (R599/month, 200 invoices included)." : "Switched to Starter plan (0.5% of revenue)." });
+      toast({ title: "Plan updated", description: newPlan === 'scale' ? "Switched to Scale plan (R999/month, unlimited invoices)." : newPlan === 'flat' ? "Switched to Growth plan (R599/month, 200 invoices included)." : "Switched to Starter plan (R299/month, 50 invoices included)." });
     },
     onError: () => {
       setPlanSwitchConfirm(null);
@@ -7176,15 +7176,15 @@ export default function PosSystem() {
               
               // Calculate fees based on payment plan
               const userPlan = currentUser?.paymentPlan ?? 'percent';
-              // Starter: 0.5% of combined revenue | Growth: R599/month flat | Scale: R999/month flat
+              // Starter: R299/month flat | Growth: R599/month flat | Scale: R999/month flat
               const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
               const salesFee = isInTrial ? 0 : userPlan === 'scale'
                 ? 999
                 : userPlan === 'flat'
                 ? 599
-                : currentMonthRevenue * 0.005;
-              // Scale: unlimited (R0), Growth: first 200 included then R0.50 each, Starter: R0.50 per invoice
-              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : currentMonthInvoices.length * 0.50;
+                : 299;
+              // Scale: unlimited (R0), Growth: first 200 included then R0.50 each, Starter: first 50 included then R0.50 each
+              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : Math.max(0, currentMonthInvoices.length - 50) * 0.50;
               const stormFee = salesFee + invoiceFee; // Total Storm fee
 
               // Calculate daily breakdown
@@ -7216,7 +7216,7 @@ export default function PosSystem() {
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Free Trial Active</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: {userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth, 200 invoices included)' : '0.5% per sale (Starter)'} + {userPlan === 'scale' ? 'unlimited invoices' : 'R0.50 per invoice'}.
+                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: {userPlan === 'scale' ? 'R999/month (Scale, unlimited invoices)' : userPlan === 'flat' ? 'R599/month (Growth, 200 invoices included)' : 'R299/month (Starter, 50 invoices included)'}.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">
@@ -7252,7 +7252,7 @@ export default function PosSystem() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Monthly Revenue', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} sales + ${currentMonthPaidInvoices.length} paid inv.` },
-                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : '0.5% of revenue (Starter)' },
+                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : 'R299/month (Starter)' },
                       { label: 'Invoices', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fees` },
                       { label: 'Period', value: `${Math.round(progressPercentage)}%`, sub: `Day ${daysCompleted} of ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -7273,9 +7273,10 @@ export default function PosSystem() {
                       {
                         id: 'percent',
                         name: 'Starter',
-                        rate: '0.5% of revenue',
-                        detail: '+ R0.50 per invoice generated',
-                        description: 'Ideal for new or lower-volume businesses. Pay only a small slice of what you earn — no monthly minimums.',
+                        rate: 'R299 / month',
+                        detail: 'flat rate · no surprises',
+                        description: 'Perfect for new and growing businesses. One flat monthly fee — no percentage cuts, no surprise charges.',
+                        features: ['Full POS terminal', 'Up to 200 products', '50 invoices per month', 'Customer directory', 'Purchase orders', 'Open accounts / credit sales', 'Custom receipt & invoice branding', 'Basic sales reports', 'XERO integration', 'VAT-ready invoices', 'Email support', '7-day free trial'],
                         icon: <TrendingUp className="w-5 h-5" />,
                         accentLight: 'border-blue-500 bg-blue-50',
                         accentDark: 'border-blue-500 bg-blue-900/20',
@@ -7286,8 +7287,9 @@ export default function PosSystem() {
                         id: 'flat',
                         name: 'Growth',
                         rate: 'R599 / month',
-                        detail: '200 invoices included · R0.50 each extra',
-                        description: 'Best for growing businesses. Flat monthly fee includes 200 invoices. Predictable, scalable costs.',
+                        detail: 'flat fee · most popular',
+                        description: 'For businesses ready to scale. Predictable costs, deeper insights, and tools to grow your team.',
+                        features: ['Everything in Starter', 'Unlimited products', '200 invoices included (R0.50 each extra)', 'Full sales analytics & PDF export', 'Staff accounts (up to 5)', 'Top products & dead stock reports', 'Period-over-period comparisons', 'Automated invoice reminders', 'WhatsApp receipt sending', 'Priority email support', '7-day free trial'],
                         icon: <BarChart3 className="w-5 h-5" />,
                         accentLight: 'border-emerald-500 bg-emerald-50',
                         accentDark: 'border-emerald-500 bg-emerald-900/20',
@@ -7298,8 +7300,9 @@ export default function PosSystem() {
                         id: 'scale',
                         name: 'Scale',
                         rate: 'R999 / month',
-                        detail: 'Unlimited invoices · Multi-location · Priority support',
-                        description: 'For established businesses running at scale. Unlimited invoices, multi-location support, and priority assistance.',
+                        detail: 'per month · enterprise',
+                        description: 'For established businesses running multiple locations or large teams. Full control, maximum features, priority assistance.',
+                        features: ['Everything in Growth', 'Unlimited invoices', 'Multi-location / branch support', 'Unlimited staff accounts', 'Role-based permissions (Cashier / Manager / Admin)', 'Consolidated multi-branch reporting', 'Customer loyalty points system', 'Dedicated priority support', 'Early access to new features', '7-day free trial'],
                         icon: <CheckCircle2 className="w-5 h-5" />,
                         accentLight: 'border-purple-500 bg-purple-50',
                         accentDark: 'border-purple-500 bg-purple-900/20',
@@ -7343,7 +7346,15 @@ export default function PosSystem() {
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
                                   <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : plan.id === 'flat' ? (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600') : (posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
                                   <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
-                                  <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
+                                  <div className={`text-xs leading-relaxed mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
+                                  <ul className="space-y-1 mb-3">
+                                    {plan.features.map((f: string) => (
+                                      <li key={f} className={`flex items-start gap-1.5 text-xs ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                        <Check className={`w-3 h-3 mt-0.5 shrink-0 ${plan.id === 'percent' ? 'text-blue-500' : plan.id === 'flat' ? 'text-emerald-500' : 'text-purple-500'}`} weight="bold" />
+                                        {f}
+                                      </li>
+                                    ))}
+                                  </ul>
                                   {!isActive && (
                                     canChangePlan ? (
                                       isConfirming ? (
@@ -7443,29 +7454,31 @@ export default function PosSystem() {
                           </div>
                         ) : (
                           <div className="space-y-1.5">
-                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Revenue (0.5%)</div>
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Monthly Base Fee (Starter)</div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>POS Sales</span><span className="font-medium">R{currentMonthSalesRevenue.toFixed(2)}</span>
+                              <span>POS Transactions</span><span className="font-medium">{currentMonthSales.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Paid Invoices ({currentMonthPaidInvoices.length})</span><span className="font-medium">R{currentMonthInvoiceRevenue.toFixed(2)}</span>
+                              <span>Invoices (50 included)</span><span className="font-medium">{currentMonthInvoices.length}</span>
                             </div>
+                            {currentMonthInvoices.length > 50 && (
+                              <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <span>Invoice overage ({currentMonthInvoices.length - 50} × R0.50)</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                              </div>
+                            )}
                             <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                              <span>Total Revenue</span><span>R{currentMonthRevenue.toFixed(2)}</span>
-                            </div>
-                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Revenue Fee (0.5%)</span><span className="font-medium">R{salesFee.toFixed(2)}</span>
+                              <span>Monthly Base Fee</span><span>R{salesFee.toFixed(2)}</span>
                             </div>
                           </div>
                         )}
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-700' : 'border-gray-100'}`} />
                         <div className="space-y-1.5">
-                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Invoices (R0.50 each)</div>
+                          <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Invoice Overage</div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                             <span>Generated</span><span className="font-medium">{currentMonthInvoices.length}</span>
                           </div>
                           <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <span>Invoice Fee</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                            <span>Overage Fee</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
                           </div>
                         </div>
                         <div className={`border-t ${posTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`} />
@@ -7493,8 +7506,8 @@ export default function PosSystem() {
                         <div className="space-y-2">
                           {[
                             { label: 'Billing cycle', value: 'Monthly — 1st to last day' },
-                            { label: 'Monthly base fee', value: userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : 'None (Starter — 0.5% per sale)' },
-                            { label: 'Invoice rate', value: userPlan === 'scale' ? 'Unlimited (included)' : userPlan === 'flat' ? '200 included, R0.50 per extra' : 'R0.50 per invoice generated' },
+                            { label: 'Monthly base fee', value: userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : 'R299/month (Starter)' },
+                            { label: 'Invoice rate', value: userPlan === 'scale' ? 'Unlimited (included)' : userPlan === 'flat' ? '200 included, R0.50 per extra' : '50 included, R0.50 per extra' },
                             { label: 'Payment due', value: 'End of each billing month' },
                             { label: 'Setup fees', value: 'None' },
                           ].map(({ label, value }) => (
