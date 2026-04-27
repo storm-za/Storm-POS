@@ -33,7 +33,8 @@ import {
   GridNine as Grid3X3, ListBullets as LayoutList, Folder, FolderSimplePlus as FolderPlus,
   Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
   CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2,
-  Bell, ListChecks, Moon, Sun, Copy, Envelope as Mail
+  Bell, ListChecks, Moon, Sun, Copy, Envelope as Mail,
+  Barcode, Image as ImageIcon, ArrowSquareOut as ExternalLink
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -53,6 +54,7 @@ interface Product {
   retailPrice: string;
   tradePrice?: string;
   quantity: number;
+  imageUrl?: string | null;
 }
 
 interface Customer {
@@ -435,6 +437,10 @@ export default function PosSystemAfrikaans() {
   const [editingOpenAccount, setEditingOpenAccount] = useState<PosOpenAccount | null>(null);
   const [editOpenAccountName, setEditOpenAccountName] = useState("");
   const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
+  const [skuScanInput, setSkuScanInput] = useState("");
+  const [cashTendered, setCashTendered] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [productImageInput, setProductImageInput] = useState<string | null>(null);
   
   // Invoice-related state
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
@@ -536,7 +542,7 @@ export default function PosSystemAfrikaans() {
   const [salesDisplayMode, setSalesDisplayMode] = useState<'grid' | 'tabs'>('grid');
   const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | 'all'>('all');
-  const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
+  const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc' | 'frequently-sold'>('name-asc');
   const [inventorySortOrder, setInventorySortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
 
   // Aankoopbestellings staat
@@ -2604,7 +2610,7 @@ export default function PosSystemAfrikaans() {
       const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
       localStorage.setItem("posUser", JSON.stringify({ ...stored, paymentPlan: newPlan }));
       setPlanSwitchConfirm(null);
-      toast({ title: "Plan opgedateer", description: newPlan === 'flat' ? "Geskakel na Vaste Koers-plan (R1.00/transaksie)." : "Geskakel na Persentasie-plan (0.5% van inkomste)." });
+      toast({ title: "Plan opgedateer", description: newPlan === 'scale' ? "Geskakel na Skaal-plan (R999/maand)." : newPlan === 'flat' ? "Geskakel na Groei-plan (R599/maand)." : "Geskakel na Starter-plan (0.5% van inkomste)." });
     },
     onError: () => {
       setPlanSwitchConfirm(null);
@@ -3274,9 +3280,11 @@ export default function PosSystemAfrikaans() {
       productForm.setValue("retailPrice", product.retailPrice.toString());
       productForm.setValue("tradePrice", product.tradePrice ? product.tradePrice.toString() : "");
       productForm.setValue("quantity", product.quantity);
+      setProductImageInput(product.imageUrl || null);
     } else {
       setEditingProduct(null);
       productForm.reset();
+      setProductImageInput(null);
     }
     setIsProductDialogOpen(true);
   };
@@ -3364,7 +3372,7 @@ ${paidInvoicesInRange.map((inv: any) =>
   };
 
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
-    const dataWithUserId = { ...data, userId: currentUser?.id };
+    const dataWithUserId = { ...data, userId: currentUser?.id, imageUrl: productImageInput || null };
     
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.id, data: dataWithUserId });
@@ -3665,6 +3673,11 @@ ${paidInvoicesInRange.map((inv: any) =>
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
+      if (productSortOrder === 'frequently-sold') {
+        const countA = sales.filter((s: any) => !s.isVoided && s.items?.some((i: any) => i.productId === a.id)).reduce((acc: number, s: any) => acc + (s.items?.filter((i: any) => i.productId === a.id).reduce((q: number, i: any) => q + (i.quantity || 0), 0) || 0), 0);
+        const countB = sales.filter((s: any) => !s.isVoided && s.items?.some((i: any) => i.productId === b.id)).reduce((acc: number, s: any) => acc + (s.items?.filter((i: any) => i.productId === b.id).reduce((q: number, i: any) => q + (i.quantity || 0), 0) || 0), 0);
+        return countB - countA;
+      }
       switch (productSortOrder) {
         case 'name-asc': return a.name.localeCompare(b.name);
         case 'name-desc': return b.name.localeCompare(a.name);
@@ -4367,6 +4380,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                               <SelectItem value="price-desc">Prys Hoog-Laag</SelectItem>
                               <SelectItem value="stock-asc">Voorraad Laag-Hoog</SelectItem>
                               <SelectItem value="stock-desc">Voorraad Hoog-Laag</SelectItem>
+                              <SelectItem value="frequently-sold">Meeste Verkoop</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -4374,6 +4388,30 @@ ${paidInvoicesInRange.map((inv: any) =>
                       <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input placeholder="Soek produkte..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`pl-10 h-9 ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
+                      </div>
+                      <div className="relative mt-2">
+                        <Barcode className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-400" />
+                        <Input
+                          placeholder="Skandeer strepieskode / SKU + Enter..."
+                          value={skuScanInput}
+                          onChange={(e) => setSkuScanInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && skuScanInput.trim()) {
+                              const match = products.find(
+                                (p) => p.sku.toLowerCase() === skuScanInput.trim().toLowerCase() ||
+                                       p.name.toLowerCase() === skuScanInput.trim().toLowerCase()
+                              );
+                              if (match) {
+                                addToSale(match);
+                                toast({ title: "Produk bygevoeg", description: `${match.name} by mandjie gevoeg` });
+                              } else {
+                                toast({ title: "Produk nie gevind", description: `Geen produk met SKU "${skuScanInput.trim()}" nie.`, variant: "destructive" });
+                              }
+                              setSkuScanInput("");
+                            }
+                          }}
+                          className={`pl-10 h-9 text-sm ${posTheme === 'dark' ? 'bg-green-950/20 border-green-700/40 text-white placeholder:text-gray-500 focus:border-green-500/60' : 'bg-green-50 border-green-200 text-gray-900 placeholder:text-gray-400 focus:border-green-400'}`}
+                        />
                       </div>
                       {salesDisplayMode === 'tabs' && categories.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -4490,9 +4528,16 @@ ${paidInvoicesInRange.map((inv: any) =>
                           <div className="grid gap-1">
                             {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
                               <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
-                                <div>
-                                  <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
-                                  <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                                <div className="flex items-center gap-3">
+                                  {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover shrink-0 border border-gray-700/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                  ) : (
+                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${posTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}><Package className="w-4 h-4 text-gray-500" /></div>
+                                  )}
+                                  <div>
+                                    <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
+                                    <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                                  </div>
                                 </div>
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
                               </div>
@@ -4503,9 +4548,16 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <div className="grid gap-1">
                           {filteredSalesProducts.map((product) => (
                             <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
-                              <div>
-                                <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
-                                <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                              <div className="flex items-center gap-3">
+                                {product.imageUrl ? (
+                                  <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover shrink-0 border border-gray-700/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                ) : (
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${posTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-100'}`}><Package className="w-4 h-4 text-gray-500" /></div>
+                                )}
+                                <div>
+                                  <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
+                                  <p className="text-xs text-gray-500">SKU: {product.sku} · Voorraad: {product.quantity}</p>
+                                </div>
                               </div>
                               <div className="text-right">
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
@@ -4582,7 +4634,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                           </div>
                           <div>
                             <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Betaling</Label>
-                            <Select value={paymentType} onValueChange={setPaymentType}>
+                            <Select value={paymentType} onValueChange={(v) => { setPaymentType(v); setCashTendered(""); }}>
                               <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="kontant">Kontant</SelectItem>
@@ -4592,6 +4644,30 @@ ${paidInvoicesInRange.map((inv: any) =>
                             </Select>
                           </div>
                         </div>
+                        {paymentType === "kontant" && currentSale.length > 0 && (
+                          <div className={`p-3 rounded-lg border ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50' : 'bg-green-50 border-green-200'}`}>
+                            <Label className={`text-xs mb-1 block font-medium ${posTheme === 'dark' ? 'text-gray-300' : 'text-green-800'}`}>Kontant ontvang</Label>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="0.00"
+                              value={cashTendered}
+                              onChange={(e) => setCashTendered(e.target.value)}
+                              className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-green-300 text-gray-900'}`}
+                            />
+                            {cashTendered && parseFloat(cashTendered) >= 0 && (() => {
+                              const total = currentSale.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0) * (1 - discountPercentage / 100);
+                              const change = parseFloat(cashTendered) - total;
+                              return (
+                                <div className={`mt-2 flex justify-between text-xs font-semibold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                  <span>Wisselgeld:</span>
+                                  <span>{change >= 0 ? `R${change.toFixed(2)}` : `Te min: R${Math.abs(change).toFixed(2)}`}</span>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
                         <div>
                           <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</Label>
                           <Textarea value={saleNotes} onChange={(e) => setSaleNotes(e.target.value)} placeholder="Verkoop notas..." rows={1} className={`text-xs resize-none ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white placeholder:text-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
@@ -5455,6 +5531,14 @@ ${paidInvoicesInRange.map((inv: any) =>
                                 {invoice.documentType === 'invoice' ? 'Faktuur' : 'Kwotasie'}
                               </span>
                               <span className={`font-semibold text-sm sm:text-base truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{invoice.documentNumber}</span>
+                              {invoice.documentType === 'invoice' && invoice.status !== 'paid' && invoice.dueDate && new Date(invoice.dueDate) < new Date() && (() => {
+                                const daysOverdue = Math.floor((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24));
+                                return (
+                                  <Badge className="text-xs bg-red-500/20 text-red-400 border-red-500/30 border animate-pulse">
+                                    {daysOverdue}d Agterstallig
+                                  </Badge>
+                                );
+                              })()}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -5606,10 +5690,15 @@ ${paidInvoicesInRange.map((inv: any) =>
                   {isPOLoading ? (
                     <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
                   ) : filteredPurchaseOrders.length === 0 ? (
-                    <div className="text-center py-12">
-                      <ClipboardList className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-                      <p className="text-gray-400 text-lg mb-2">Nog geen aankoopbestellings nie</p>
-                      <p className="text-gray-500 text-sm">Skep jou eerste aankoopbestelling om voorraad van verskaffers te bestel</p>
+                    <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-800/20 flex items-center justify-center mb-4 border border-blue-500/20">
+                        <ClipboardList className="h-8 w-8 text-blue-400" />
+                      </div>
+                      <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen aankoopbestellings nie</h3>
+                      <p className="text-sm text-gray-500 max-w-xs mb-4">Skep jou eerste aankoopbestelling om voorraad van verskaffers te bestel en ontvangs van goedere te spoor.</p>
+                      <Button size="sm" onClick={() => setIsPODialogOpen(true)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white text-xs">
+                        <Plus className="w-3.5 h-3.5 mr-1.5" />Skep Aankoopbestelling
+                      </Button>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-800/50">
@@ -5866,8 +5955,12 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
-                      <div className="text-center py-8 text-gray-400">
-                        Geen oop rekeninge nie. Skep een vanuit die Verkope-oortjie om te begin.
+                      <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-800/20 flex items-center justify-center mb-4 border border-teal-500/20">
+                          <Users className="h-8 w-8 text-teal-400" />
+                        </div>
+                        <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen oop rekeninge nie</h3>
+                        <p className="text-sm text-gray-500 max-w-xs">Voeg items by 'n oop rekening in die Verkope-oortjie om tafelle of kliënte se lopende balanse te bestuur.</p>
                       </div>
                     ) : (
                       openAccounts.map((account) => (
@@ -6392,7 +6485,7 @@ ${paidInvoicesInRange.map((inv: any) =>
 
               // Filter invoices for current month
               const currentMonthInvoices = invoices.filter(invoice => {
-                const invoiceDate = new Date(invoice.createdAt);
+                const invoiceDate = new Date(invoice.createdDate);
                 return invoiceDate >= currentMonthStart && invoiceDate <= currentMonthEnd;
               });
 
@@ -6409,13 +6502,15 @@ ${paidInvoicesInRange.map((inv: any) =>
 
               // Calculate Storm fees based on payment plan
               const userPlan = currentUser?.paymentPlan ?? 'percent';
-              // Flat plan: R1.00 per POS transaction + R1.00 per paid invoice (each counts as 1 sale)
-              // Percent plan: 0.5% of combined revenue (POS + paid invoices)
+              // Starter: 0.5% van omset | Growth: R599/maand | Scale: R999/maand
               const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
-              const salesFee = isInTrial ? 0 : userPlan === 'flat'
-                ? totalSaleUnits * 1.00
+              const salesFee = isInTrial ? 0 : userPlan === 'scale'
+                ? 999
+                : userPlan === 'flat'
+                ? 599
                 : currentMonthRevenue * 0.005;
-              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50;
+              // Scale: onbeperk (R0), Growth: eerste 200 ingesluit dan R0.50 elk, Starter: R0.50 per faktuur
+              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : currentMonthInvoices.length * 0.50;
               const stormFee = salesFee + invoiceFee;
 
               // Calculate daily breakdown
@@ -6447,7 +6542,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Gratis Proeftydperk Aktief</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: {userPlan === 'flat' ? 'R1.00 per transaksie (inkl. betaalde fakture)' : '0.5% per verkoop'} + R0.50 per faktuur.
+                          {daysRemaining} {daysRemaining === 1 ? 'dag' : 'dae'} oor — eindig {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('af-ZA', { month: 'short', day: 'numeric' })}. Na die proeftydperk: {userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth, 200 fakture ingesluit)' : '0.5% per verkoop (Starter)'} + {userPlan === 'scale' ? 'onbeperkte fakture' : 'R0.50 per faktuur'}.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">
@@ -6483,7 +6578,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Maand Omset', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} verkope + ${currentMonthPaidInvoices.length} betaalde fakt.` },
-                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : userPlan === 'flat' ? `${totalSaleUnits} eenhede × R1.00` : '0.5% van omset' },
+                      { label: 'Storm Fooi', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Proeftydperk — R0.00' : userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : '0.5% van omset (Starter)' },
                       { label: 'Fakture', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fooie` },
                       { label: 'Periode', value: `${Math.round(progressPercentage)}%`, sub: `Dag ${daysCompleted} van ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -6503,29 +6598,54 @@ ${paidInvoicesInRange.map((inv: any) =>
                     const plans = [
                       {
                         id: 'percent',
-                        name: 'Persentasie-plan',
+                        name: 'Starter',
                         rate: '0.5% van omset',
-                        detail: '+ R0.50 per gegenereerde faktuur',
-                        description: 'Ideaal vir laer transaksie-volumes. Betaal slegs \'n klein deel van wat jy verdien.',
+                        detail: '+ R0.50 per faktuur',
+                        description: 'Ideaal vir lae of wisselvallige volumes. Betaal slegs \'n klein deel van wat jy verdien.',
                         icon: <TrendingUp className="w-5 h-5" />,
                         accentLight: 'border-blue-500 bg-blue-50',
                         accentDark: 'border-blue-500 bg-blue-900/20',
                         badgeLight: 'bg-blue-100 text-blue-700',
                         badgeDark: 'bg-blue-900/40 text-blue-300',
+                        colorKey: 'blue',
                       },
                       {
                         id: 'flat',
-                        name: 'Vaste Koers-plan',
-                        rate: 'R1.00 per transaksie',
-                        detail: '+ R0.50 per gegenereerde faktuur',
-                        description: 'Ideaal vir hoër transaksie-volumes of groter mandjiegrootte. Voorspelbare maandelikse koste.',
+                        name: 'Groei',
+                        rate: 'R599 / maand',
+                        detail: '200 fakture ingesluit',
+                        description: 'Plat maandelikse fooi vir sakke met konsekwente aktiwiteit. Voorspelbare koste.',
                         icon: <BarChart3 className="w-5 h-5" />,
                         accentLight: 'border-emerald-500 bg-emerald-50',
                         accentDark: 'border-emerald-500 bg-emerald-900/20',
                         badgeLight: 'bg-emerald-100 text-emerald-700',
                         badgeDark: 'bg-emerald-900/40 text-emerald-300',
+                        colorKey: 'emerald',
+                      },
+                      {
+                        id: 'scale',
+                        name: 'Skaal',
+                        rate: 'R999 / maand',
+                        detail: 'Onbeperkte fakture',
+                        description: 'Vir hoë-volume besighede — onbeperkte fakture, multi-lokasie ondersteuning & prioriteitshulp.',
+                        icon: <Globe className="w-5 h-5" />,
+                        accentLight: 'border-purple-500 bg-purple-50',
+                        accentDark: 'border-purple-500 bg-purple-900/20',
+                        badgeLight: 'bg-purple-100 text-purple-700',
+                        badgeDark: 'bg-purple-900/40 text-purple-300',
+                        colorKey: 'purple',
                       },
                     ];
+                    const planColorClass = (plan: typeof plans[0], isActive: boolean) => {
+                      if (!isActive) return posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700';
+                      const map: Record<string, string> = { blue: posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600', emerald: posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600', purple: posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600' };
+                      return map[plan.colorKey] || '';
+                    };
+                    const planIconBg = (plan: typeof plans[0], isActive: boolean) => {
+                      if (!isActive) return posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500';
+                      const map: Record<string, string> = { blue: posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600', emerald: posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600', purple: posTheme === 'dark' ? 'bg-purple-900/40 text-purple-300' : 'bg-purple-100 text-purple-600' };
+                      return map[plan.colorKey] || '';
+                    };
                     return (
                       <div className={`rounded-lg border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
                         <div className={`px-4 py-3 border-b text-sm font-semibold flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
@@ -6533,7 +6653,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                           Betaalplan
                         </div>
                         <div className="p-4">
-                          <div className="grid sm:grid-cols-2 gap-3 mb-4">
+                          <div className="grid sm:grid-cols-3 gap-3 mb-4">
                             {plans.map(plan => {
                               const isActive = currentPlan === plan.id;
                               const isConfirming = planSwitchConfirm === plan.id;
@@ -6551,15 +6671,11 @@ ${paidInvoicesInRange.map((inv: any) =>
                                       Huidige Plan
                                     </span>
                                   )}
-                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
-                                    isActive
-                                      ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600') : (posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600'))
-                                      : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500')
-                                  }`}>
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${planIconBg(plan, isActive)}`}>
                                     {plan.icon}
                                   </div>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
-                                  <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
+                                  <div className={`text-base font-bold mb-0.5 ${planColorClass(plan, isActive)}`}>{plan.rate}</div>
                                   <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
                                   <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   {!isActive && (
@@ -6600,7 +6716,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                                       <div className={`flex items-start gap-1.5 rounded-lg px-2.5 py-2 ${posTheme === 'dark' ? 'bg-gray-900/50 border border-gray-700' : 'bg-gray-100 border border-gray-200'}`}>
                                         <Lock className={`w-3 h-3 mt-0.5 flex-shrink-0 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
                                         <p className={`text-xs leading-snug ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                          Planveranderinge is slegs op die 1ste–5de van elke maand toegelaat. Kom volgende maand terug.
+                                          Planveranderinge is slegs op die 1ste–5de van elke maand toegelaat.
                                         </p>
                                       </div>
                                     )
@@ -6628,17 +6744,35 @@ ${paidInvoicesInRange.map((inv: any) =>
                         Fooi-staat — {formatMonthYear(now)}
                       </div>
                       <div className="p-4 space-y-3">
-                        {userPlan === 'flat' ? (
+                        {userPlan === 'scale' ? (
                           <div className="space-y-1.5">
-                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Verkope (R1.00 elk)</div>
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Maandelikse Basisfooi (Scale)</div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                               <span>POS Transaksies</span><span className="font-medium">{currentMonthSales.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Betaalde Fakture</span><span className="font-medium">{currentMonthPaidInvoices.length}</span>
+                              <span>Fakture (onbeperk ingesluit)</span><span className="font-medium">{currentMonthInvoices.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                              <span>Totale Eenhede × R1.00</span><span>R{salesFee.toFixed(2)}</span>
+                              <span>Maandelikse Basisfooi</span><span>R{salesFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ) : userPlan === 'flat' ? (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Maandelikse Basisfooi (Growth)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Transaksies</span><span className="font-medium">{currentMonthSales.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Fakture (200 ingesluit)</span><span className="font-medium">{currentMonthInvoices.length}</span>
+                            </div>
+                            {currentMonthInvoices.length > 200 && (
+                              <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <span>Faktuur-oorskot ({currentMonthInvoices.length - 200} × R0.50)</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                              </div>
+                            )}
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Basisfooi + Oorskot</span><span>R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
                         ) : (
@@ -6693,8 +6827,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <div className="space-y-2">
                           {[
                             { label: 'Faktuurperiode', value: 'Maandeliks — 1ste tot laaste dag' },
-                            { label: 'Verkooptyns', value: userPlan === 'flat' ? 'R1.00 per transaksie (inkl. betaalde fakture)' : '0.5% van bruto maandelikse omset' },
-                            { label: 'Faktuurkoers', value: 'R0.50 per faktuur geskep' },
+                            { label: 'Maandelikse basisfooi', value: userPlan === 'scale' ? 'R999/maand (Scale)' : userPlan === 'flat' ? 'R599/maand (Growth)' : 'Geen (Starter — 0.5% per verkoop)' },
+                            { label: 'Faktuurkoers', value: userPlan === 'scale' ? 'Onbeperk (ingesluit)' : userPlan === 'flat' ? '200 ingesluit, R0.50 elk ekstra' : 'R0.50 per faktuur geskep' },
                             { label: 'Betaling verskuldig', value: 'Einde van elke faktuurmaand' },
                             { label: 'Opstellingsfooi', value: 'Geen' },
                           ].map(({ label, value }) => (
@@ -6725,29 +6859,64 @@ ${paidInvoicesInRange.map((inv: any) =>
               className="space-y-6"
             >
               {/* Opstelling Voltooiingskaart */}
-              {!currentUser?.tutorialCompleted && (
-                <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
-                  <CardContent className="pt-5 pb-5">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[hsl(217,90%,40%)]/20 flex items-center justify-center flex-shrink-0">
-                        <ListChecks className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+              {!currentUser?.tutorialCompleted && (() => {
+                const checklistItems = [
+                  { id: 'logo', label: 'Laai jou maatskappylogo op', done: !!currentUser?.companyLogo, action: () => setIsLogoDialogOpen(true), actionLabel: 'Laai Op' },
+                  { id: 'product', label: 'Voeg jou eerste produk by', done: products.length > 0, action: () => setCurrentTab('produkte'), actionLabel: 'Voeg By' },
+                  { id: 'sale', label: 'Doen \'n toetsverkoop', done: sales.length > 0, action: () => setCurrentTab('verkope'), actionLabel: 'Maak Verkoop' },
+                  { id: 'invoice', label: 'Skep jou eerste faktuur', done: invoices.length > 0, action: () => setCurrentTab('fakturen'), actionLabel: 'Skep Faktuur' },
+                ];
+                const completedCount = checklistItems.filter(i => i.done).length;
+                const pct = Math.round((completedCount / checklistItems.length) * 100);
+                return (
+                  <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
+                    <CardContent className="pt-5 pb-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-[hsl(217,90%,40%)]/20 flex items-center justify-center flex-shrink-0">
+                            <ListChecks className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold text-sm">Rekeningopstelling</p>
+                            <p className="text-gray-400 text-xs">{completedCount}/{checklistItems.length} stappe voltooi</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`text-xs font-semibold ${pct === 100 ? 'text-green-400' : 'text-[hsl(217,90%,60%)]'}`}>{pct}%</span>
+                            <div className="w-24 h-1.5 rounded-full bg-gray-700">
+                              <div className={`h-1.5 rounded-full transition-all ${pct === 100 ? 'bg-green-400' : 'bg-[hsl(217,90%,50%)]'}`} style={{ width: `${pct}%` }} />
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => markTutorialMutation.mutate()}
+                            disabled={markTutorialMutation.isPending}
+                            size="sm"
+                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white flex-shrink-0 whitespace-nowrap"
+                          >
+                            {markTutorialMutation.isPending ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />Stoor...</> : <><Check className="w-3.5 h-3.5 mr-1.5" />Merk Voltooi</>}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold text-sm">Voltooi jou rekeningopstelling</p>
-                        <p className="text-gray-400 text-xs mt-0.5">Laai jou logo hieronder op, voeg jou eerste produk by, doen 'n toetsverkoop en koppel betaalmetodes. Klik op Merk Voltooi as jy klaar is.</p>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {checklistItems.map(item => (
+                          <div key={item.id} className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border transition-all ${item.done ? (posTheme === 'dark' ? 'bg-green-950/20 border-green-700/30' : 'bg-green-50 border-green-200') : (posTheme === 'dark' ? 'bg-gray-800/40 border-gray-700/40' : 'bg-white/60 border-gray-200')}`}>
+                            <div className="flex items-center gap-2.5">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${item.done ? 'bg-green-500 border-green-500' : (posTheme === 'dark' ? 'border-gray-600' : 'border-gray-300')}`}>
+                                {item.done && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                              <span className={`text-xs font-medium ${item.done ? (posTheme === 'dark' ? 'text-green-400' : 'text-green-700') : (posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700')}`}>{item.label}</span>
+                            </div>
+                            {!item.done && (
+                              <button onClick={item.action} className="text-xs font-medium text-[hsl(217,90%,60%)] hover:underline flex-shrink-0">{item.actionLabel} →</button>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <Button
-                        onClick={() => markTutorialMutation.mutate()}
-                        disabled={markTutorialMutation.isPending}
-                        size="sm"
-                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white flex-shrink-0 whitespace-nowrap"
-                      >
-                        {markTutorialMutation.isPending ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />Stoor...</> : <><Check className="w-3.5 h-3.5 mr-1.5" />Merk Voltooi</>}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {/* Voorkoms Kaart */}
               <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/10' : 'bg-white border-gray-200 shadow-lg'}>
@@ -7595,6 +7764,51 @@ ${paidInvoicesInRange.map((inv: any) =>
                   />
                 </div>
                 
+                {/* Cost Price Warning */}
+                {(() => {
+                  const cp = parseFloat(productForm.watch("costPrice") || "0");
+                  return cp === 0 ? (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>Kosprys is R0.00 — wins-verslae sal onakkuraat wees.</span>
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* Product Image URL */}
+                <div className="pt-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ImageIcon className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                    <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Produkfoto (opsioneel)</span>
+                    <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      {productImageInput && (
+                        <button type="button" onClick={() => setProductImageInput(null)} className="text-xs text-red-400 hover:text-red-300">Verwyder</button>
+                      )}
+                    </div>
+                    {productImageInput ? (
+                      <div className="flex items-center gap-3">
+                        <img src={productImageInput} alt="Produk" className="w-16 h-16 object-cover rounded-lg border border-gray-600" />
+                        <p className="text-xs text-gray-400">Foto opgelaai. Klik Verwyder om te verwyder.</p>
+                      </div>
+                    ) : (
+                      <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${posTheme === 'dark' ? 'border-gray-600 hover:border-[hsl(217,90%,50%)]/50 bg-gray-800/30' : 'border-gray-300 hover:border-[hsl(217,90%,50%)]/50 bg-gray-50'}`}>
+                        <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                        <span className="text-xs text-gray-400">Klik om produkfoto op te laai</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => setProductImageInput(ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }} />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
                 <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
                   <Button 
                     type="button" 
@@ -9929,7 +10143,7 @@ ${paidInvoicesInRange.map((inv: any) =>
         </AlertDialogContent>
       </AlertDialog>
       {/* Skrap Rekening Bevestigingsdialoog */}
-      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
+      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={(open) => { setIsDeleteAccountDialogOpen(open); if (!open) setDeleteConfirmText(""); }}>
         <AlertDialogContent className={posTheme === 'dark' ? 'bg-gray-900 border border-red-900/40' : 'bg-white border border-red-200'}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400 flex items-center gap-2">
@@ -9947,23 +10161,30 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <li>Alle besigheidsinstellings en data</li>
               </ul>
               <span className="block mt-3 font-semibold text-red-400">Hierdie aksie kan nie ongedaan gemaak word nie.</span>
+              <span className="block mt-4 text-sm text-gray-400">Tik <strong className="text-red-400 font-mono">UITVEE</strong> om te bevestig:</span>
+              <Input
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="UITVEE"
+                className="mt-2 bg-gray-800 border-red-900/50 text-white placeholder:text-gray-600 font-mono"
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
               className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}
-              onClick={() => setIsDeleteAccountDialogOpen(false)}
+              onClick={() => { setIsDeleteAccountDialogOpen(false); setDeleteConfirmText(""); }}
             >
               Kanselleer
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={isDeletingAccount}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={isDeletingAccount || deleteConfirmText !== "UITVEE"}
               onClick={async () => {
-                if (!currentUser) return;
+                if (!currentUser || deleteConfirmText !== "UITVEE") return;
                 setIsDeletingAccount(true);
                 try {
-                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userEmail: currentUser.email }) });
                   if (res.ok) {
                     localStorage.removeItem('posUser');
                     localStorage.removeItem('posToken');
@@ -9972,11 +10193,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                     toast({ title: 'Fout', description: 'Kon nie rekening skrap nie. Probeer asseblief weer.', variant: 'destructive' });
                     setIsDeletingAccount(false);
                     setIsDeleteAccountDialogOpen(false);
+                    setDeleteConfirmText("");
                   }
                 } catch {
                   toast({ title: 'Fout', description: 'Kon nie rekening skrap nie. Probeer asseblief weer.', variant: 'destructive' });
                   setIsDeletingAccount(false);
                   setIsDeleteAccountDialogOpen(false);
+                  setDeleteConfirmText("");
                 }
               }}
             >

@@ -46,6 +46,8 @@ export const posUsers = pgTable("pos_users", {
   paymentPlan: text("payment_plan"), // 'percent' (0.5% per sale) or 'flat' (R1.00 per sale)
   currentSalesCount: integer("current_sales_count").notNull().default(0), // Non-trial sales this billing month
   upsellEmailSentMonth: text("upsell_email_sent_month"), // 'YYYY-MM' of month upsell email was sent
+  pendingDeletion: boolean("pending_deletion").notNull().default(false), // Soft-delete: account scheduled for deletion
+  deletionScheduledAt: timestamp("deletion_scheduled_at"), // When the 24h grace period expires
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -80,6 +82,7 @@ export const posProducts = pgTable("pos_products", {
   retailPrice: decimal("retail_price", { precision: 10, scale: 2 }).notNull(),
   tradePrice: decimal("trade_price", { precision: 10, scale: 2 }),
   quantity: integer("quantity").notNull().default(0),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

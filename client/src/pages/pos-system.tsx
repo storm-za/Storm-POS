@@ -32,7 +32,8 @@ import {
   GridNine as Grid3X3, ListBullets as LayoutList, CaretLeft as ChevronLeft,
   Palette, ClipboardText as ClipboardList, Sliders as SlidersHorizontal,
   CheckCircle as CheckCircle2, Buildings as Building2, CircleNotch as Loader2,
-  Bell, ListChecks, Moon, Sun, Copy, Envelope as Mail
+  Bell, ListChecks, Moon, Sun, Copy, Envelope as Mail,
+  Barcode, Image as ImageIcon, ArrowSquareOut as ExternalLink
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -52,6 +53,7 @@ interface Product {
   retailPrice: string;
   tradePrice?: string;
   quantity: number;
+  imageUrl?: string | null;
 }
 
 interface Customer {
@@ -364,6 +366,10 @@ export default function PosSystem() {
   const [isOpenAccountDialogOpen, setIsOpenAccountDialogOpen] = useState(false);
   const [selectedOpenAccount, setSelectedOpenAccount] = useState<PosOpenAccount | null>(null);
   const [isBankDetailsOpen, setIsBankDetailsOpen] = useState(false);
+  const [skuScanInput, setSkuScanInput] = useState("");
+  const [cashTendered, setCashTendered] = useState("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [productImageInput, setProductImageInput] = useState<string | null>(null);
 
   const [selectedOpenAccountId, setSelectedOpenAccountId] = useState<number | null>(null);
   const [isLogoDialogOpen, setIsLogoDialogOpen] = useState(false);
@@ -532,7 +538,7 @@ export default function PosSystem() {
   const [salesDisplayMode, setSalesDisplayMode] = useState<'grid' | 'tabs'>('tabs');
   const [selectedSalesCategory, setSelectedSalesCategory] = useState<number | null>(null);
   const [salesCategoryFilter, setSalesCategoryFilter] = useState<number | "all">("all");
-  const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
+  const [productSortOrder, setProductSortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc' | 'frequently-sold'>('name-asc');
   const [inventorySortOrder, setInventorySortOrder] = useState<'name-asc' | 'name-desc' | 'sku-asc' | 'sku-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc'>('name-asc');
 
   // Purchase Order state
@@ -1933,6 +1939,7 @@ export default function PosSystem() {
       productForm.setValue("tradePrice", product.tradePrice ? product.tradePrice.toString() : "");
       productForm.setValue("quantity", product.quantity);
       productForm.setValue("categoryId", product.categoryId || null);
+      setProductImageInput(product.imageUrl || null);
     } else {
       setEditingProduct(null);
       console.log("Resetting form for new product");
@@ -1945,6 +1952,7 @@ export default function PosSystem() {
         quantity: 0,
         categoryId: null,
       });
+      setProductImageInput(null);
     }
     setIsProductDialogOpen(true);
   };
@@ -1972,8 +1980,8 @@ export default function PosSystem() {
   const handleProductSubmit = (data: z.infer<typeof productFormSchema>) => {
     console.log("Form submitted:", { data, editingProduct: editingProduct?.id, errors: productForm.formState.errors });
     
-    // Add userId to the data - use current user's ID
-    const dataWithUserId = { ...data, userId: currentUser?.id || 1 };
+    // Add userId and imageUrl to the data
+    const dataWithUserId = { ...data, userId: currentUser?.id || 1, imageUrl: productImageInput || null };
     
     if (editingProduct) {
       updateProductMutation.mutate({ id: editingProduct.id, data: dataWithUserId });
@@ -2286,6 +2294,11 @@ export default function PosSystem() {
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
+      if (productSortOrder === 'frequently-sold') {
+        const countA = sales.filter(s => !s.isVoided && s.items?.some((i: any) => i.productId === a.id)).reduce((acc: number, s: any) => acc + (s.items?.filter((i: any) => i.productId === a.id).reduce((q: number, i: any) => q + (i.quantity || 0), 0) || 0), 0);
+        const countB = sales.filter(s => !s.isVoided && s.items?.some((i: any) => i.productId === b.id)).reduce((acc: number, s: any) => acc + (s.items?.filter((i: any) => i.productId === b.id).reduce((q: number, i: any) => q + (i.quantity || 0), 0) || 0), 0);
+        return countB - countA;
+      }
       switch (productSortOrder) {
         case 'name-asc': return a.name.localeCompare(b.name);
         case 'name-desc': return b.name.localeCompare(a.name);
@@ -3191,7 +3204,7 @@ export default function PosSystem() {
       const stored = JSON.parse(localStorage.getItem("posUser") ?? "{}");
       localStorage.setItem("posUser", JSON.stringify({ ...stored, paymentPlan: newPlan }));
       setPlanSwitchConfirm(null);
-      toast({ title: "Plan updated", description: newPlan === 'flat' ? "Switched to Flat Rate plan (R1.00/transaction)." : "Switched to Percentage plan (0.5% of revenue)." });
+      toast({ title: "Plan updated", description: newPlan === 'scale' ? "Switched to Scale plan (R999/month, unlimited invoices)." : newPlan === 'flat' ? "Switched to Growth plan (R599/month, 200 invoices included)." : "Switched to Starter plan (0.5% of revenue)." });
     },
     onError: () => {
       setPlanSwitchConfirm(null);
@@ -4861,6 +4874,7 @@ export default function PosSystem() {
                               <SelectItem value="price-desc">Price High-Low</SelectItem>
                               <SelectItem value="stock-asc">Stock Low-High</SelectItem>
                               <SelectItem value="stock-desc">Stock High-Low</SelectItem>
+                              <SelectItem value="frequently-sold">Frequently Sold</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -4868,6 +4882,30 @@ export default function PosSystem() {
                       <div className="relative mt-3">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`pl-10 h-9 ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-600/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'}`} />
+                      </div>
+                      <div className="relative mt-2">
+                        <Barcode className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-400" />
+                        <Input
+                          placeholder="Scan barcode / enter SKU + Enter..."
+                          value={skuScanInput}
+                          onChange={(e) => setSkuScanInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && skuScanInput.trim()) {
+                              const match = products.find(p =>
+                                p.sku.toLowerCase() === skuScanInput.trim().toLowerCase() ||
+                                p.name.toLowerCase() === skuScanInput.trim().toLowerCase()
+                              );
+                              if (match) {
+                                addToSale(match);
+                                toast({ title: 'Product added', description: `${match.name} added to cart` });
+                              } else {
+                                toast({ title: 'Not found', description: `No product with SKU "${skuScanInput.trim()}"`, variant: 'destructive' });
+                              }
+                              setSkuScanInput("");
+                            }
+                          }}
+                          className={`pl-10 h-9 text-sm ${posTheme === 'dark' ? 'bg-green-950/20 border-green-700/40 text-white placeholder:text-gray-500 focus:border-green-500/60' : 'bg-green-50 border-green-200 text-gray-900 placeholder:text-gray-400 focus:border-green-400'}`}
+                        />
                       </div>
                       {salesDisplayMode === 'tabs' && categories.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -4985,9 +5023,18 @@ export default function PosSystem() {
                           <div className="grid gap-1">
                             {products.filter(p => p.categoryId === selectedSalesCategory).map((product) => (
                               <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
-                                <div>
-                                  <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
-                                  <p className="text-xs text-gray-500">SKU: {product.sku} · Stock: {product.quantity}</p>
+                                <div className="flex items-center gap-3">
+                                  {product.imageUrl ? (
+                                    <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                  ) : (
+                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${posTheme === 'dark' ? 'bg-gray-700/40' : 'bg-gray-100'}`}>
+                                      <Package className={`w-4 h-4 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
+                                    <p className="text-xs text-gray-500">SKU: {product.sku} · Stock: {product.quantity}</p>
+                                  </div>
                                 </div>
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
                               </div>
@@ -4997,12 +5044,19 @@ export default function PosSystem() {
                       ) : (
                         <div className="grid gap-1">
                           {filteredSalesProducts.map((product) => (
-                            <div key={product.id} className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
-                              <div>
-                                <p className={`font-medium text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
+                            <div key={product.id} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 border ${posTheme === 'dark' ? 'hover:bg-white/5 border-transparent hover:border-gray-700/50' : 'hover:bg-gray-50 border-transparent hover:border-gray-200'}`} onClick={() => addToSale(product)}>
+                              {product.imageUrl ? (
+                                <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" />
+                              ) : (
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${posTheme === 'dark' ? 'bg-gray-700/40' : 'bg-gray-100'}`}>
+                                  <Package className={`w-4 h-4 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-medium text-sm truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</p>
                                 <p className="text-xs text-gray-500">SKU: {product.sku} · Stock: {product.quantity}</p>
                               </div>
-                              <div className="text-right">
+                              <div className="text-right flex-shrink-0">
                                 <p className="font-semibold text-[hsl(217,90%,60%)] text-sm">R{getProductPrice(product, selectedCustomerId ? customers.find(c => c.id === selectedCustomerId)?.customerType || 'retail' : 'retail')}</p>
                                 {product.tradePrice && (
                                   <p className="text-xs text-gray-500">{selectedCustomerId && customers.find(c => c.id === selectedCustomerId)?.customerType === 'trade' ? `Retail: R${product.retailPrice}` : `Trade: R${product.tradePrice}`}</p>
@@ -5077,7 +5131,7 @@ export default function PosSystem() {
                           </div>
                           <div>
                             <Label className={`text-xs mb-1 block ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Payment</Label>
-                            <Select value={paymentType} onValueChange={setPaymentType}>
+                            <Select value={paymentType} onValueChange={(v) => { setPaymentType(v); setCashTendered(""); }}>
                               <SelectTrigger className={`h-9 text-xs ${posTheme === 'dark' ? 'bg-gray-900/40 border-gray-700/50 text-white' : 'bg-white border-gray-200 text-gray-700'}`}><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="cash">Cash</SelectItem>
@@ -5087,6 +5141,35 @@ export default function PosSystem() {
                             </Select>
                           </div>
                         </div>
+                        {paymentType === 'cash' && currentSale.length > 0 && (
+                          <div className={`p-3 rounded-lg border ${posTheme === 'dark' ? 'bg-green-950/20 border-green-700/30' : 'bg-green-50 border-green-200'}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <DollarSign className="w-4 h-4 text-green-400 flex-shrink-0" />
+                              <Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-green-400' : 'text-green-700'}`}>Cash Tendered</Label>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-sm font-bold ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>R</span>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                value={cashTendered}
+                                onChange={(e) => setCashTendered(e.target.value)}
+                                className={`h-8 text-sm ${posTheme === 'dark' ? 'bg-gray-900/40 border-green-700/40 text-white' : 'bg-white border-green-300 text-gray-900'}`}
+                              />
+                            </div>
+                            {cashTendered && parseFloat(cashTendered) >= 0 && (
+                              <div className="mt-2 flex justify-between items-center">
+                                <span className={`text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Change Due:</span>
+                                <span className={`text-sm font-bold ${parseFloat(cashTendered) >= parseFloat(calculateTotal()) ? (posTheme === 'dark' ? 'text-green-400' : 'text-green-700') : 'text-red-400'}`}>
+                                  R{Math.max(0, parseFloat(cashTendered) - parseFloat(calculateTotal())).toFixed(2)}
+                                  {parseFloat(cashTendered) < parseFloat(calculateTotal()) && <span className="text-xs ml-1">(short R{(parseFloat(calculateTotal()) - parseFloat(cashTendered)).toFixed(2)})</span>}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                         {selectedCustomerId && (() => {
                           const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
                           return selectedCustomer ? (
@@ -5530,6 +5613,12 @@ export default function PosSystem() {
                                           />
                                         </div>
                                       </FormControl>
+                                      {(!field.value || field.value === "0" || field.value === "0.00") && (
+                                        <p className="text-xs text-amber-500 flex items-center gap-1 mt-1">
+                                          <AlertTriangle className="w-3 h-3" />
+                                          No cost price — profit margin will not be calculated
+                                        </p>
+                                      )}
                                       <FormMessage />
                                     </FormItem>
                                   )}
@@ -5615,6 +5704,36 @@ export default function PosSystem() {
                               />
                             </div>
                             
+                            {/* Product Image Upload */}
+                            <div className="pt-2">
+                              <div className="flex items-center gap-2 mb-3">
+                                <ImageIcon className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                                <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Product Image</span>
+                                <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
+                                {productImageInput && (
+                                  <button type="button" onClick={() => setProductImageInput(null)} className="text-xs text-red-400 hover:text-red-300">Remove</button>
+                                )}
+                              </div>
+                              {productImageInput ? (
+                                <div className="flex items-center gap-3">
+                                  <img src={productImageInput} alt="Product" className="w-16 h-16 object-cover rounded-lg border border-gray-600" />
+                                  <p className="text-xs text-gray-400">Image uploaded. Click Remove to clear.</p>
+                                </div>
+                              ) : (
+                                <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${posTheme === 'dark' ? 'border-gray-600 hover:border-[hsl(217,90%,50%)]/50 bg-gray-800/30' : 'border-gray-300 hover:border-[hsl(217,90%,50%)]/50 bg-gray-50'}`}>
+                                  <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                                  <span className="text-xs text-gray-400">Click to upload product image</span>
+                                  <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => setProductImageInput(ev.target?.result as string);
+                                    reader.readAsDataURL(file);
+                                  }} />
+                                </label>
+                              )}
+                            </div>
+
                             <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
                               <Button 
                                 type="button" 
@@ -6204,6 +6323,14 @@ export default function PosSystem() {
                                 {invoice.documentType === 'invoice' ? 'Invoice' : 'Quote'}
                               </span>
                               <span className={`font-semibold text-sm sm:text-base truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{invoice.documentNumber}</span>
+                              {invoice.documentType === 'invoice' && invoice.status !== 'paid' && invoice.dueDate && (() => {
+                                const daysOverdue = Math.floor((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24));
+                                return daysOverdue > 0 ? (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
+                                    {daysOverdue}d overdue
+                                  </span>
+                                ) : null;
+                              })()}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -6355,9 +6482,14 @@ export default function PosSystem() {
                   <div className="text-center py-12 text-gray-400">Loading purchase orders...</div>
                 ) : filteredPurchaseOrders.length === 0 ? (
                   <div className="text-center py-16">
-                    <ClipboardList className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-400">No purchase orders found</h3>
-                    <p className="text-gray-500 mt-2">Create your first purchase order to get started</p>
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/10 flex items-center justify-center mx-auto mb-5 border border-[hsl(217,90%,50%)]/20">
+                      <ClipboardList className="h-10 w-10 text-[hsl(217,90%,50%)]/60" />
+                    </div>
+                    <h3 className={`text-xl font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>No purchase orders yet</h3>
+                    <p className={`text-sm mb-6 max-w-xs mx-auto ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Track stock orders from suppliers. Create your first purchase order to manage incoming inventory.</p>
+                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/20">
+                      <Plus className="h-4 w-4 mr-2" />Create First Purchase Order
+                    </Button>
                   </div>
                 ) : (
                   filteredPurchaseOrders.map((po: any) => (
@@ -6427,8 +6559,15 @@ export default function PosSystem() {
                 <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
-                      <div className="text-center py-8 text-gray-400">
-                        No open accounts. Create one from the Sales tab to get started.
+                      <div className="text-center py-14">
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-400/10 flex items-center justify-center mx-auto mb-5 border border-teal-500/20">
+                          <BookOpen className="h-10 w-10 text-teal-400/60" />
+                        </div>
+                        <h3 className={`text-xl font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>No open accounts yet</h3>
+                        <p className={`text-sm mb-6 max-w-xs mx-auto ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Open accounts let you run a tab for a table or customer. Start a sale on the Sales screen and choose "Open Account" at checkout.</p>
+                        <Button onClick={() => setCurrentTab('sales')} variant="outline" className={`${posTheme === 'dark' ? 'border-teal-700/50 text-teal-400 hover:bg-teal-500/10' : 'border-teal-300 text-teal-700 hover:bg-teal-50'}`}>
+                          <ShoppingCart className="h-4 w-4 mr-2" />Go to Sales
+                        </Button>
                       </div>
                     ) : (
                       openAccounts.map((account) => (
@@ -6978,13 +7117,15 @@ export default function PosSystem() {
               
               // Calculate fees based on payment plan
               const userPlan = currentUser?.paymentPlan ?? 'percent';
-              // Flat plan: R1.00 per POS transaction + R1.00 per paid invoice (each counts as 1 sale)
-              // Percent plan: 0.5% of combined revenue (POS + paid invoices)
+              // Starter: 0.5% of combined revenue | Growth: R599/month flat | Scale: R999/month flat
               const totalSaleUnits = currentMonthSales.length + currentMonthPaidInvoices.length;
-              const salesFee = isInTrial ? 0 : userPlan === 'flat'
-                ? totalSaleUnits * 1.00
+              const salesFee = isInTrial ? 0 : userPlan === 'scale'
+                ? 999
+                : userPlan === 'flat'
+                ? 599
                 : currentMonthRevenue * 0.005;
-              const invoiceFee = isInTrial ? 0 : currentMonthInvoices.length * 0.50; // R0.50 per invoice generated
+              // Scale: unlimited (R0), Growth: first 200 included then R0.50 each, Starter: R0.50 per invoice
+              const invoiceFee = isInTrial ? 0 : userPlan === 'scale' ? 0 : userPlan === 'flat' ? Math.max(0, currentMonthInvoices.length - 200) * 0.50 : currentMonthInvoices.length * 0.50;
               const stormFee = salesFee + invoiceFee; // Total Storm fee
 
               // Calculate daily breakdown
@@ -7016,7 +7157,7 @@ export default function PosSystem() {
                         <span className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-amber-300' : 'text-amber-800'}`}>Free Trial Active</span>
                         <span className={`mx-2 ${posTheme === 'dark' ? 'text-amber-600' : 'text-amber-400'}`}>·</span>
                         <span className={`text-sm ${posTheme === 'dark' ? 'text-amber-400' : 'text-amber-700'}`}>
-                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: {userPlan === 'flat' ? 'R1.00 per transaction (incl. paid invoices)' : '0.5% per sale'} + R0.50 per invoice.
+                          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining — ends {new Date(new Date(userTrialStartDate!).getTime() + (7 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}. After trial: {userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth, 200 invoices included)' : '0.5% per sale (Starter)'} + {userPlan === 'scale' ? 'unlimited invoices' : 'R0.50 per invoice'}.
                         </span>
                       </div>
                       <div className="flex-shrink-0 text-right">
@@ -7052,7 +7193,7 @@ export default function PosSystem() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       { label: 'Monthly Revenue', value: `R${currentMonthRevenue.toFixed(2)}`, sub: `${currentMonthSales.length} sales + ${currentMonthPaidInvoices.length} paid inv.` },
-                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : userPlan === 'flat' ? `${totalSaleUnits} sale units × R1.00` : '0.5% of revenue' },
+                      { label: 'Service Fee', value: `R${stormFee.toFixed(2)}`, sub: isInTrial ? 'Trial — R0.00' : userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : '0.5% of revenue (Starter)' },
                       { label: 'Invoices', value: String(currentMonthInvoices.length), sub: `R${invoiceFee.toFixed(2)} in fees` },
                       { label: 'Period', value: `${Math.round(progressPercentage)}%`, sub: `Day ${daysCompleted} of ${daysInMonth}` },
                     ].map(({ label, value, sub }) => (
@@ -7072,10 +7213,10 @@ export default function PosSystem() {
                     const plans = [
                       {
                         id: 'percent',
-                        name: 'Percentage Plan',
+                        name: 'Starter',
                         rate: '0.5% of revenue',
                         detail: '+ R0.50 per invoice generated',
-                        description: 'Ideal for lower transaction volumes. Pay only a small slice of what you earn.',
+                        description: 'Ideal for new or lower-volume businesses. Pay only a small slice of what you earn — no monthly minimums.',
                         icon: <TrendingUp className="w-5 h-5" />,
                         accentLight: 'border-blue-500 bg-blue-50',
                         accentDark: 'border-blue-500 bg-blue-900/20',
@@ -7084,15 +7225,27 @@ export default function PosSystem() {
                       },
                       {
                         id: 'flat',
-                        name: 'Flat Rate Plan',
-                        rate: 'R1.00 per transaction',
-                        detail: '+ R0.50 per invoice generated',
-                        description: 'Ideal for higher transaction volumes or larger basket sizes. Predictable monthly costs.',
+                        name: 'Growth',
+                        rate: 'R599 / month',
+                        detail: '200 invoices included · R0.50 each extra',
+                        description: 'Best for growing businesses. Flat monthly fee includes 200 invoices. Predictable, scalable costs.',
                         icon: <BarChart3 className="w-5 h-5" />,
                         accentLight: 'border-emerald-500 bg-emerald-50',
                         accentDark: 'border-emerald-500 bg-emerald-900/20',
                         badgeLight: 'bg-emerald-100 text-emerald-700',
                         badgeDark: 'bg-emerald-900/40 text-emerald-300',
+                      },
+                      {
+                        id: 'scale',
+                        name: 'Scale',
+                        rate: 'R999 / month',
+                        detail: 'Unlimited invoices · Multi-location · Priority support',
+                        description: 'For established businesses running at scale. Unlimited invoices, multi-location support, and priority assistance.',
+                        icon: <CheckCircle2 className="w-5 h-5" />,
+                        accentLight: 'border-purple-500 bg-purple-50',
+                        accentDark: 'border-purple-500 bg-purple-900/20',
+                        badgeLight: 'bg-purple-100 text-purple-700',
+                        badgeDark: 'bg-purple-900/40 text-purple-300',
                       },
                     ];
                     return (
@@ -7102,10 +7255,15 @@ export default function PosSystem() {
                           Payment Plan
                         </div>
                         <div className="p-4">
-                          <div className="grid sm:grid-cols-2 gap-3 mb-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                             {plans.map(plan => {
                               const isActive = currentPlan === plan.id;
                               const isConfirming = planSwitchConfirm === plan.id;
+                              const iconColorMap: Record<string, string> = {
+                                'percent': isActive ? (posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                                'flat': isActive ? (posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                                'scale': isActive ? (posTheme === 'dark' ? 'bg-purple-900/40 text-purple-300' : 'bg-purple-100 text-purple-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                              };
                               return (
                                 <div
                                   key={plan.id}
@@ -7120,15 +7278,11 @@ export default function PosSystem() {
                                       Current Plan
                                     </span>
                                   )}
-                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
-                                    isActive
-                                      ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600') : (posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600'))
-                                      : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500')
-                                  }`}>
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${iconColorMap[plan.id]}`}>
                                     {plan.icon}
                                   </div>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
-                                  <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
+                                  <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : plan.id === 'flat' ? (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600') : (posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
                                   <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
                                   <div className={`text-xs leading-relaxed mb-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   {!isActive && (
@@ -7169,7 +7323,7 @@ export default function PosSystem() {
                                       <div className={`flex items-start gap-1.5 rounded-lg px-2.5 py-2 ${posTheme === 'dark' ? 'bg-gray-900/50 border border-gray-700' : 'bg-gray-100 border border-gray-200'}`}>
                                         <Lock className={`w-3 h-3 mt-0.5 flex-shrink-0 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
                                         <p className={`text-xs leading-snug ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
-                                          Plan changes are only allowed on the 1st–5th of each month. Come back next month.
+                                          Locked. Plan switches are only allowed between the <strong>1st–5th</strong> of each month to avoid mid-cycle billing confusion. You can switch again on the 1st.
                                         </p>
                                       </div>
                                     )
@@ -7197,17 +7351,35 @@ export default function PosSystem() {
                         Fee Statement — {formatMonthYear(now)}
                       </div>
                       <div className="p-4 space-y-3">
-                        {userPlan === 'flat' ? (
+                        {userPlan === 'scale' ? (
                           <div className="space-y-1.5">
-                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Sales (R1.00 each)</div>
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Monthly Base Fee (Scale)</div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                               <span>POS Transactions</span><span className="font-medium">{currentMonthSales.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-                              <span>Paid Invoices</span><span className="font-medium">{currentMonthPaidInvoices.length}</span>
+                              <span>Invoices (unlimited included)</span><span className="font-medium">{currentMonthInvoices.length}</span>
                             </div>
                             <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
-                              <span>Total Sale Units × R1.00</span><span>R{salesFee.toFixed(2)}</span>
+                              <span>Monthly Base Fee</span><span>R{salesFee.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        ) : userPlan === 'flat' ? (
+                          <div className="space-y-1.5">
+                            <div className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Monthly Base Fee (Growth)</div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>POS Transactions</span><span className="font-medium">{currentMonthSales.length}</span>
+                            </div>
+                            <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                              <span>Invoices (200 included)</span><span className="font-medium">{currentMonthInvoices.length}</span>
+                            </div>
+                            {currentMonthInvoices.length > 200 && (
+                              <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <span>Invoice overage ({currentMonthInvoices.length - 200} × R0.50)</span><span className="font-medium">R{invoiceFee.toFixed(2)}</span>
+                              </div>
+                            )}
+                            <div className={`flex justify-between text-sm font-semibold border-t pt-1.5 ${posTheme === 'dark' ? 'text-white border-gray-700' : 'text-gray-900 border-gray-100'}`}>
+                              <span>Monthly Base Fee + Overage</span><span>R{stormFee.toFixed(2)}</span>
                             </div>
                           </div>
                         ) : (
@@ -7262,8 +7434,8 @@ export default function PosSystem() {
                         <div className="space-y-2">
                           {[
                             { label: 'Billing cycle', value: 'Monthly — 1st to last day' },
-                            { label: 'Sales rate', value: userPlan === 'flat' ? 'R1.00 per transaction (incl. paid invoices)' : '0.5% of gross monthly revenue' },
-                            { label: 'Invoice rate', value: 'R0.50 per invoice generated' },
+                            { label: 'Monthly base fee', value: userPlan === 'scale' ? 'R999/month (Scale)' : userPlan === 'flat' ? 'R599/month (Growth)' : 'None (Starter — 0.5% per sale)' },
+                            { label: 'Invoice rate', value: userPlan === 'scale' ? 'Unlimited (included)' : userPlan === 'flat' ? '200 included, R0.50 per extra' : 'R0.50 per invoice generated' },
                             { label: 'Payment due', value: 'End of each billing month' },
                             { label: 'Setup fees', value: 'None' },
                           ].map(({ label, value }) => (
@@ -7293,30 +7465,65 @@ export default function PosSystem() {
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
-              {/* Setup Completion Card */}
-              {!currentUser?.tutorialCompleted && (
-                <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
-                  <CardContent className="pt-5 pb-5">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[hsl(217,90%,40%)]/20 flex items-center justify-center flex-shrink-0">
-                        <ListChecks className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+              {/* Setup Completion Checklist */}
+              {!currentUser?.tutorialCompleted && (() => {
+                const checklistItems = [
+                  { id: 'logo', label: 'Upload your company logo', done: !!currentUser?.companyLogo, action: () => setIsLogoDialogOpen(true), actionLabel: 'Upload' },
+                  { id: 'product', label: 'Add your first product', done: products.length > 0, action: () => setCurrentTab('inventory'), actionLabel: 'Add Product' },
+                  { id: 'sale', label: 'Run a test sale', done: sales.length > 0, action: () => setCurrentTab('sales'), actionLabel: 'Make Sale' },
+                  { id: 'invoice', label: 'Create your first invoice', done: invoices.length > 0, action: () => setCurrentTab('invoices'), actionLabel: 'Create Invoice' },
+                ];
+                const completedCount = checklistItems.filter(i => i.done).length;
+                const pct = Math.round((completedCount / checklistItems.length) * 100);
+                return (
+                  <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
+                    <CardContent className="pt-5 pb-5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-[hsl(217,90%,40%)]/20 flex items-center justify-center flex-shrink-0">
+                            <ListChecks className="w-5 h-5 text-[hsl(217,90%,60%)]" />
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold text-sm">Account Setup</p>
+                            <p className="text-gray-400 text-xs">{completedCount}/{checklistItems.length} steps completed</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`text-xs font-semibold ${pct === 100 ? 'text-green-400' : 'text-[hsl(217,90%,60%)]'}`}>{pct}%</span>
+                            <div className="w-24 h-1.5 rounded-full bg-gray-700">
+                              <div className={`h-1.5 rounded-full transition-all ${pct === 100 ? 'bg-green-400' : 'bg-[hsl(217,90%,50%)]'}`} style={{ width: `${pct}%` }} />
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => markTutorialMutation.mutate()}
+                            disabled={markTutorialMutation.isPending}
+                            size="sm"
+                            className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white flex-shrink-0 whitespace-nowrap"
+                          >
+                            {markTutorialMutation.isPending ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />Saving...</> : <><Check className="w-3.5 h-3.5 mr-1.5" />Mark Done</>}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold text-sm">Complete your account setup</p>
-                        <p className="text-gray-400 text-xs mt-0.5">Upload your logo in the section below, add your first product, run a test sale, and connect payment methods. Once you are done, click Mark Complete.</p>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {checklistItems.map(item => (
+                          <div key={item.id} className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border transition-all ${item.done ? (posTheme === 'dark' ? 'bg-green-950/20 border-green-700/30' : 'bg-green-50 border-green-200') : (posTheme === 'dark' ? 'bg-gray-800/40 border-gray-700/40' : 'bg-white/60 border-gray-200')}`}>
+                            <div className="flex items-center gap-2.5">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${item.done ? 'bg-green-500 border-green-500' : (posTheme === 'dark' ? 'border-gray-600' : 'border-gray-300')}`}>
+                                {item.done && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                              <span className={`text-xs font-medium ${item.done ? (posTheme === 'dark' ? 'text-green-400' : 'text-green-700') : (posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700')}`}>{item.label}</span>
+                            </div>
+                            {!item.done && (
+                              <button onClick={item.action} className={`text-xs font-medium text-[hsl(217,90%,60%)] hover:underline flex-shrink-0`}>{item.actionLabel} →</button>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <Button
-                        onClick={() => markTutorialMutation.mutate()}
-                        disabled={markTutorialMutation.isPending}
-                        size="sm"
-                        className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white flex-shrink-0 whitespace-nowrap"
-                      >
-                        {markTutorialMutation.isPending ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />Saving...</> : <><Check className="w-3.5 h-3.5 mr-1.5" />Mark Complete</>}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {/* Appearance Card */}
               <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/10' : 'bg-white border-gray-200 shadow-lg'}>
@@ -10542,7 +10749,7 @@ export default function PosSystem() {
         </AlertDialogContent>
       </AlertDialog>
       {/* Delete Account Confirmation Dialog */}
-      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={setIsDeleteAccountDialogOpen}>
+      <AlertDialog open={isDeleteAccountDialogOpen} onOpenChange={(open) => { setIsDeleteAccountDialogOpen(open); if (!open) setDeleteConfirmText(""); }}>
         <AlertDialogContent className={posTheme === 'dark' ? 'bg-gray-900 border border-red-900/40' : 'bg-white border border-red-200'}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400 flex items-center gap-2">
@@ -10562,21 +10769,33 @@ export default function PosSystem() {
               <span className="block mt-3 font-semibold text-red-400">This action cannot be undone.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="px-6 pb-2">
+            <Label className="text-sm text-gray-400 mb-1.5 block">
+              Type <strong className="text-red-400 font-mono">DELETE</strong> to confirm
+            </Label>
+            <Input
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE here"
+              className={`font-mono ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900'} ${deleteConfirmText === 'DELETE' ? 'border-red-500' : ''}`}
+              autoComplete="off"
+            />
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel
               className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}
-              onClick={() => setIsDeleteAccountDialogOpen(false)}
+              onClick={() => { setIsDeleteAccountDialogOpen(false); setDeleteConfirmText(""); }}
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={isDeletingAccount}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={isDeletingAccount || deleteConfirmText !== 'DELETE'}
               onClick={async () => {
-                if (!currentUser) return;
+                if (!currentUser || deleteConfirmText !== 'DELETE') return;
                 setIsDeletingAccount(true);
                 try {
-                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE' });
+                  const res = await apiFetch(`/api/pos/account/delete/${currentUser.id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userEmail: currentUser.email }) });
                   if (res.ok) {
                     localStorage.removeItem('posUser');
                     localStorage.removeItem('posToken');
@@ -10585,11 +10804,13 @@ export default function PosSystem() {
                     toast({ title: 'Error', description: 'Failed to delete account. Please try again.', variant: 'destructive' });
                     setIsDeletingAccount(false);
                     setIsDeleteAccountDialogOpen(false);
+                    setDeleteConfirmText("");
                   }
                 } catch {
                   toast({ title: 'Error', description: 'Failed to delete account. Please try again.', variant: 'destructive' });
                   setIsDeletingAccount(false);
                   setIsDeleteAccountDialogOpen(false);
+                  setDeleteConfirmText("");
                 }
               }}
             >

@@ -19,11 +19,11 @@ import * as XLSX from "xlsx";
 
 const scryptAsync = promisify(scrypt);
 
-function computePlanSavingAmount(user: { paymentPlan?: string | null; currentUsage?: string | null; currentSalesCount?: number | null }): number | null {
+function computePlanSavingAmount(user: { paymentPlan?: string | null; currentUsage?: string | null }): number | null {
   if (user.paymentPlan !== 'percent') return null;
   const currentUsage = parseFloat(user.currentUsage || '0');
-  const flatCost = (user.currentSalesCount || 0) * 1.0;
-  const saving = currentUsage - flatCost;
+  const growthMonthlyCost = 599; // Growth plan: R599/month
+  const saving = currentUsage - growthMonthlyCost;
   return saving > 0.005 ? Math.round(saving * 100) / 100 : null;
 }
 
@@ -81,6 +81,15 @@ async function checkAndPerformMonthlyReset() {
 
 // Set up monthly reset interval - check every hour to catch the 1st day of month
 setInterval(checkAndPerformMonthlyReset, 60 * 60 * 1000);
+
+// Process soft-deleted accounts every hour — permanently deletes accounts past their 24h grace period
+setInterval(async () => {
+  try {
+    await storage.processScheduledDeletions();
+  } catch (err) {
+    console.error("❌ Error processing scheduled account deletions:", err);
+  }
+}, 60 * 60 * 1000);
 
 // In-memory temporary PDF storage for Android download workaround
 const pdfTempStore = new Map<string, { data: Buffer; filename: string; expires: number }>();
@@ -297,8 +306,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.id);
       const { plan, userEmail } = req.body;
       
-      if (!plan || !['percent', 'flat'].includes(plan)) {
-        return res.status(400).json({ message: "Invalid plan. Must be 'percent' or 'flat'." });
+      if (!plan || !['percent', 'flat', 'scale'].includes(plan)) {
+        return res.status(400).json({ message: "Invalid plan. Must be 'percent', 'flat', or 'scale'." });
       }
 
       if (!userEmail) {
@@ -387,19 +396,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.id);
       const { userEmail, plan } = req.body;
       if (!userEmail) return res.status(400).json({ message: "User email is required for verification." });
-      if (!plan || !['percent', 'flat'].includes(plan)) return res.status(400).json({ message: "Plan must be 'percent' or 'flat'." });
+      if (!plan || !['percent', 'flat', 'scale'].includes(plan)) return res.status(400).json({ message: "Plan must be 'percent', 'flat', or 'scale'." });
       const existingUser = await storage.getPosUser(userId);
       if (!existingUser) return res.status(404).json({ message: "User not found" });
       if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized: email does not match user." });
       if (existingUser.paymentPlan === plan) return res.status(409).json({ message: "Already on this plan." });
       const dayOfMonth = new Date().getDate();
       if (dayOfMonth > 5) return res.status(403).json({ message: "Plan changes are only allowed on the 1st–5th of each month." });
-      let updatedUser: any;
-      if (plan === 'flat') {
-        updatedUser = await storage.switchPosUserToFlatPlan(userId);
-      } else {
-        updatedUser = await storage.switchPosUserToPercentPlan(userId);
-      }
+      const updatedUser = await storage.updatePosUserPaymentPlan(userId, plan);
       if (!updatedUser) return res.status(500).json({ message: "Failed to switch plan" });
       res.json({
         success: true,
@@ -830,11 +834,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       if (isNaN(userId)) return res.status(400).json({ message: "Invalid userId" });
-      await storage.deleteAccount(userId);
-      res.json({ success: true });
+      const { userEmail } = req.body;
+      if (!userEmail) return res.status(400).json({ message: "User email is required for verification." });
+      const existingUser = await storage.getPosUser(userId);
+      if (!existingUser) return res.status(404).json({ message: "User not found" });
+      if (existingUser.email !== userEmail) return res.status(403).json({ message: "Unauthorized: email does not match user." });
+      // Soft-delete: schedule deletion 24 hours from now
+      await storage.scheduleAccountDeletion(userId);
+      res.json({ success: true, pendingDeletion: true, message: "Account scheduled for deletion in 24 hours." });
     } catch (error) {
-      console.error("Error deleting account:", error);
-      res.status(500).json({ message: "Failed to delete account" });
+      console.error("Error scheduling account deletion:", error);
+      res.status(500).json({ message: "Failed to schedule account deletion" });
     }
   });
 
@@ -1031,13 +1041,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Increment sales count separately (only for sales, not invoices)
             await storage.incrementSalesCount(userIdToUse);
 
-            // Upsell check: if % plan user's cost now exceeds flat plan cost, send one email per month
-            // Only sale fees (currentUsage from sales) compared against salesCount * R1.00
+            // Upsell check: if Starter plan user's fee now exceeds Growth (R599/mo), send one email per month
             if (user.paymentPlan === 'percent') {
               const newSaleFee = parseFloat(user.currentUsage || '0') + parseFloat(usageAmount);
-              const newCount = (user.currentSalesCount || 0) + 1;
-              const flatCost = newCount * 1.0;
-              const saving = newSaleFee - flatCost;
+              const growthMonthlyCost = 599; // Growth plan: R599/month
+              const saving = newSaleFee - growthMonthlyCost;
               const billingMonth = currentBillingMonth();
               if (saving > 0.005 && user.upsellEmailSentMonth !== billingMonth) {
                 // Mark first so duplicate sends are avoided even if email throws
@@ -1195,7 +1203,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, tax, ...invoiceData } = req.body; // Remove 'tax' as it's calculated, not stored
       const userIdToUse = userId || 1;
-      
+
+      // Growth plan (flat): track 200 included invoices; flag overage (R0.50 per extra invoice)
+      let invoiceOverage = false;
+      if (invoiceData.documentType === 'invoice') {
+        const posUser = await storage.getPosUser(userIdToUse);
+        if (posUser?.paymentPlan === 'flat') {
+          const monthlyCount = await storage.getMonthlyInvoiceCount(userIdToUse);
+          if (monthlyCount >= 200) {
+            invoiceOverage = true;
+            console.log(`Growth plan overage: user ${userIdToUse} has ${monthlyCount} invoices this month (limit 200; R0.50 per extra applies)`);
+          }
+        }
+      }
+
       // Auto-generate document number
       const documentNumber = await storage.getNextDocumentNumber(userIdToUse, invoiceData.documentType);
       
@@ -1222,7 +1243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Invoice fees (R0.50 per invoice) apply equally on all plans;
       // they are NOT tracked in currentUsage to keep the sales-fee upsell comparison clean.
       
-      res.json(invoice);
+      res.json({ ...invoice, invoiceOverage });
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error("Invoice validation errors:", JSON.stringify(error.errors, null, 2));

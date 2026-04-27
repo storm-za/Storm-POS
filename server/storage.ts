@@ -12,7 +12,7 @@ import {
   type PosSupplier, type InsertPosSupplier
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, gte, lte, count } from "drizzle-orm";
 import { scrypt, randomBytes } from "crypto";
 import { promisify } from "util";
 
@@ -149,6 +149,9 @@ export interface IStorage {
   getLastMonthlyResetDate(): Promise<string | null>;
   setLastMonthlyResetDate(date: string): Promise<void>;
   deleteAccount(userId: number): Promise<void>;
+  scheduleAccountDeletion(userId: number): Promise<PosUser | undefined>;
+  processScheduledDeletions(): Promise<void>;
+  getMonthlyInvoiceCount(userId: number): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
@@ -727,6 +730,18 @@ export class MemStorage implements IStorage {
 
   async deleteAccount(userId: number): Promise<void> {
     // No-op in MemStorage
+  }
+
+  async scheduleAccountDeletion(userId: number): Promise<PosUser | undefined> {
+    return undefined;
+  }
+
+  async processScheduledDeletions(): Promise<void> {
+    // No-op in MemStorage
+  }
+
+  async getMonthlyInvoiceCount(userId: number): Promise<number> {
+    return 0;
   }
 }
 
@@ -1308,6 +1323,41 @@ export class DatabaseStorage implements IStorage {
     await db.delete(posCategories).where(eq(posCategories.userId, userId));
     await db.delete(posSuppliers).where(eq(posSuppliers.userId, userId));
     await db.delete(posUsers).where(eq(posUsers.id, userId));
+  }
+
+  async scheduleAccountDeletion(userId: number): Promise<PosUser | undefined> {
+    const deletionScheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+    const [updated] = await db
+      .update(posUsers)
+      .set({ pendingDeletion: true, deletionScheduledAt })
+      .where(eq(posUsers.id, userId))
+      .returning();
+    return updated || undefined;
+  }
+
+  async processScheduledDeletions(): Promise<void> {
+    const now = new Date();
+    const pendingUsers = await db
+      .select({ id: posUsers.id })
+      .from(posUsers)
+      .where(and(eq(posUsers.pendingDeletion, true), lte(posUsers.deletionScheduledAt, now)));
+    for (const user of pendingUsers) {
+      await this.deleteAccount(user.id);
+    }
+  }
+
+  async getMonthlyInvoiceCount(userId: number): Promise<number> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const result = await db
+      .select({ value: count() })
+      .from(posInvoices)
+      .where(and(
+        eq(posInvoices.userId, userId),
+        sql`${posInvoices.documentType} = 'invoice'`,
+        gte(posInvoices.createdDate, startOfMonth)
+      ));
+    return result[0]?.value ?? 0;
   }
 }
 

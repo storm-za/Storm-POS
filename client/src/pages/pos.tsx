@@ -38,8 +38,8 @@ export default function POS() {
 
   useEffect(() => {
     updatePageSEO({
-      title: 'Storm POS - Cloud Point of Sale System | 7 Days Free, Pay Only 0.5% Per Sale',
-      description: 'The smartest POS system for South African retailers. No monthly fees, no setup costs. Just 0.5% per sale. Try free for 7 days. Always online, works on any device.',
+      title: 'Storm POS - Cloud Point of Sale System | Starter, Growth & Scale Plans | 7-Day Free Trial',
+      description: 'The smartest POS system for South African retailers. Choose from Starter (0.5% per sale), Growth (R599/month), or Scale (R999/month). No setup fees. Try free for 7 days.',
       canonical: 'https://stormsoftware.co.za/pos'
     });
 
@@ -60,7 +60,7 @@ export default function POS() {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "How much does Storm POS cost?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS has no monthly fees or setup costs. You only pay 0.5% per sale plus R0.50 per invoice generated. This means you only pay when you make money." } },
+        { "@type": "Question", "name": "How much does Storm POS cost?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS offers three plans: Starter (0.5% per sale + R0.50/invoice), Growth (R599/month flat, includes 200 invoices, R0.50 per extra), and Scale (R999/month, unlimited invoices, multi-location, priority support). All plans include a 7-day free trial with no setup fees." } },
         { "@type": "Question", "name": "Is there a free trial for Storm POS?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers a 7-day free trial with full access to all features. No credit card required to start." } },
         { "@type": "Question", "name": "Does Storm POS work offline?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS is a cloud-based system that works on any device with an internet connection. It automatically syncs your data across all your devices in real-time." } },
         { "@type": "Question", "name": "Can I use Storm POS in Afrikaans?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers full Afrikaans language support. You can switch between English and Afrikaans at any time in your settings." } },
@@ -75,7 +75,7 @@ export default function POS() {
       "name": "Storm POS",
       "description": "Cloud-based Point of Sale system for South African retailers. Real-time sales tracking, inventory management, invoicing, and comprehensive analytics.",
       "brand": { "@type": "Brand", "name": "Storm Software" },
-      "offers": { "@type": "Offer", "priceCurrency": "ZAR", "price": "0", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "description": "Pay only 0.5% per sale + R0.50 per invoice. No monthly fees." },
+      "offers": { "@type": "AggregateOffer", "priceCurrency": "ZAR", "lowPrice": "0", "highPrice": "999", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "description": "Starter: 0.5% per sale + R0.50/invoice. Growth: R599/month (200 invoices included). Scale: R999/month (unlimited invoices, multi-location). 7-day free trial." },
       "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127", "bestRating": "5", "worstRating": "1" }
     };
     
@@ -385,34 +385,50 @@ export default function POS() {
           <motion.div className="text-center mb-10"
             initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
             <span className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 px-4 py-1.5 rounded-full">Transparent Pricing</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-4 mb-3">Pay Only When You Sell</h2>
-            <p className="text-gray-500">No monthly fees. No surprises. Your profits, your pace.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-4 mb-3">Choose Your Plan</h2>
+            <p className="text-gray-500">Start free for 7 days. Pick the plan that fits your sales volume.</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* % plan */}
-            <motion.div initial={{ opacity:0, x:-20 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
-              className="relative bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] rounded-2xl p-8 text-white shadow-2xl shadow-blue-500/25">
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {/* Starter plan */}
+            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+              className="bg-white rounded-2xl p-7 border-2 border-gray-200 shadow-lg hover:border-[hsl(217,90%,40%)]/40 transition-all">
+              <TrendingUp className="w-8 h-8 text-[hsl(217,90%,40%)] mb-4" />
+              <div className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] mb-1">Starter</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">0.5%</div>
+              <div className="text-gray-500 text-sm mb-5">per sale · pay as you go</div>
+              <ul className="space-y-2">
+                {["No monthly commitment","Scales with revenue","+ R0.50 per invoice","7-day free trial"].map(t => (
+                  <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Growth plan */}
+            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.05 }}
+              className="relative bg-gradient-to-br from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] rounded-2xl p-7 text-white shadow-2xl shadow-blue-500/25">
               <div className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</div>
-              <TrendingUp className="w-9 h-9 mb-4 opacity-90" />
-              <div className="text-4xl font-bold mb-1">0.5%</div>
-              <div className="text-white/80 text-sm mb-5">per sale - pay less as you grow</div>
-              <ul className="space-y-2.5">
-                {["Best for growing businesses","Scales with your revenue","+ R0.50 per invoice/quote","7-day free trial included"].map(t => (
+              <CreditCard className="w-8 h-8 mb-4 opacity-90" />
+              <div className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">Growth</div>
+              <div className="text-3xl font-bold mb-1">R599</div>
+              <div className="text-white/80 text-sm mb-5">per month · flat fee</div>
+              <ul className="space-y-2">
+                {["200 invoices included","Consistent monthly cost","R0.50 per extra invoice","7-day free trial"].map(t => (
                   <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-300 shrink-0" />{t}</li>
                 ))}
               </ul>
             </motion.div>
 
-            {/* flat plan */}
-            <motion.div initial={{ opacity:0, x:20 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
-              className="bg-white rounded-2xl p-8 border-2 border-gray-200 shadow-lg hover:border-[hsl(217,90%,40%)]/40 transition-all">
-              <CreditCard className="w-9 h-9 text-[hsl(217,90%,40%)] mb-4" />
-              <div className="text-4xl font-bold text-gray-900 mb-1">R1.00</div>
-              <div className="text-gray-500 text-sm mb-5">flat per sale - predictable costs</div>
-              <ul className="space-y-2.5">
-                {["Best for high-value transactions","Fixed cost per sale - no surprises","+ R0.50 per invoice/quote","7-day free trial included"].map(t => (
-                  <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-green-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
+            {/* Scale plan */}
+            <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-7 border-2 border-purple-200 shadow-lg hover:border-purple-400/60 transition-all">
+              <Globe className="w-8 h-8 text-purple-600 mb-4" />
+              <div className="text-xs font-bold uppercase tracking-widest text-purple-600 mb-1">Scale</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">R999</div>
+              <div className="text-gray-500 text-sm mb-5">per month · enterprise</div>
+              <ul className="space-y-2">
+                {["Unlimited invoices","Multi-location support","Priority support","7-day free trial"].map(t => (
+                  <li key={t} className="flex items-center gap-2 text-sm"><Check className="w-4 h-4 text-purple-500 shrink-0" /><span className="text-gray-700">{t}</span></li>
                 ))}
               </ul>
             </motion.div>
@@ -510,7 +526,7 @@ export default function POS() {
                 <Monitor className="w-4 h-4" />Download for Windows
               </a>
             </div>
-            <p className="mt-6 text-white/60 text-xs">After trial: 0.5% per sale or R1 flat per sale. + R0.50 per invoice. Zero monthly fees, ever.</p>
+            <p className="mt-6 text-white/60 text-xs">After trial: Starter (0.5%/sale), Growth (R599/mo), or Scale (R999/mo). Pick the plan that fits.</p>
           </motion.div>
         </div>
       </section>
