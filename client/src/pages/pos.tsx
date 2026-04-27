@@ -21,7 +21,7 @@ import ReportingDashboard from "@/components/illustrations/ReportingDashboard";
 
 const NAV_LINKS = [
   { label: "Home",    href: "/" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Pricing", href: "#pricing" },
   { label: "Web Dev", href: "/web-development" },
   { label: "Contact", href: "/contact" },
   { label: "About",   href: "/#about" },
