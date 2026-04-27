@@ -538,15 +538,6 @@ export default function POS() {
             </motion.div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <div className="font-semibold text-green-800 text-sm">7-Day Free Trial - No Credit Card</div>
-              <div className="text-green-700 text-xs mt-0.5">Full access to every feature. Cancel anytime. Zero risk.</div>
-            </div>
-            <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] text-white font-bold px-6 border-0 hover:scale-105 transition-all shrink-0">
-              <Link href="/pos/signup">Start Free →</Link>
-            </Button>
-          </div>
         </div>
       </section>
 
