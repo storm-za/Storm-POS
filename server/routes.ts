@@ -1260,7 +1260,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/pos/invoices/:id", async (req, res) => {
     try {
       const invoiceId = parseInt(req.params.id);
-      const invoice = await storage.updatePosInvoice(invoiceId, req.body);
+      const updates = { ...req.body };
+      if (updates.dueDate && typeof updates.dueDate === 'string') {
+        updates.dueDate = new Date(updates.dueDate);
+      } else if (!updates.dueDate) {
+        updates.dueDate = null;
+      }
+      const invoice = await storage.updatePosInvoice(invoiceId, updates);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -1302,6 +1308,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting invoice:", error);
       res.status(500).json({ message: "Failed to delete invoice" });
+    }
+  });
+
+  app.post("/api/pos/invoices/:id/duplicate", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const userId = parseInt(req.body.userId) || 1;
+      const source = await storage.getPosInvoiceForUser(invoiceId, userId);
+      if (!source) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      const documentNumber = await storage.getNextDocumentNumber(source.userId, source.documentType);
+
+      // Only copy client info, items, and banking/payment details.
+      // Reset dates, terms, discounts, VAT, shipping, notes, and other fields to defaults.
+      const sourceItems = Array.isArray(source.items) ? (source.items as Array<{ lineTotal?: number | string }>) : [];
+      const subtotalNum = sourceItems.reduce((sum, item) => sum + parseFloat(String(item.lineTotal || 0)), 0);
+      const taxPercent = "15.00";
+      const totalNum = subtotalNum * (1 + parseFloat(taxPercent) / 100);
+
+      const newInvoiceData = {
+        userId: source.userId,
+        documentNumber,
+        documentType: source.documentType,
+        status: 'draft' as const,
+        clientId: source.clientId,
+        clientName: source.clientName,
+        clientEmail: source.clientEmail,
+        clientPhone: source.clientPhone,
+        title: source.title,
+        poNumber: null,
+        dueTerms: null,
+        dueDate: null,
+        items: source.items,
+        subtotal: subtotalNum.toFixed(2),
+        discountPercent: "0.00",
+        discountAmount: "0.00",
+        taxPercent,
+        shippingAmount: "0.00",
+        total: totalNum.toFixed(2),
+        paymentMethod: source.paymentMethod,
+        paymentDetails: source.paymentDetails,
+        notes: null,
+        terms: null,
+        showBusinessInfo: source.showBusinessInfo,
+        customFieldValues: null,
+        staffAccountId: source.staffAccountId,
+      };
+
+      const validatedData = insertPosInvoiceSchema.parse(newInvoiceData);
+      const newInvoice = await storage.createPosInvoice(validatedData);
+      res.json(newInvoice);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("Duplicate invoice validation errors:", JSON.stringify(error.errors, null, 2));
+        return res.status(400).json({ message: "Validation failed", errors: error.errors });
+      }
+      console.error("Error duplicating invoice:", error);
+      res.status(500).json({ message: "Failed to duplicate invoice" });
     }
   });
 

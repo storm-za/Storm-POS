@@ -1738,6 +1738,67 @@ export default function PosSystem() {
     },
   });
 
+  const duplicateInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId: number) => {
+      const response = await apiRequest("POST", `/api/pos/invoices/${invoiceId}/duplicate`, { userId: currentUser?.id });
+      return response.json();
+    },
+    onSuccess: (newInvoice) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      setEditingInvoice(newInvoice);
+      setInvoiceType(newInvoice.documentType);
+      // Copy client info
+      if (newInvoice.clientId) {
+        setIsCustomClient(false);
+        setInvoiceClientId(newInvoice.clientId);
+        setInvoiceCustomClient("");
+      } else if (newInvoice.clientName) {
+        setIsCustomClient(true);
+        setInvoiceCustomClient(newInvoice.clientName);
+        setInvoiceClientId(null);
+      }
+      setInvoiceClientEmail(newInvoice.clientEmail || '');
+      setInvoiceClientPhone(newInvoice.clientPhone || '');
+      // Copy banking/payment details
+      setInvoicePaymentMethod(newInvoice.paymentMethod || '');
+      setInvoicePaymentDetails(newInvoice.paymentDetails || '');
+      // Copy products/items
+      const items = Array.isArray(newInvoice.items) ? newInvoice.items : [];
+      setInvoiceItems(items.map((item) => ({
+        productId: item.productId,
+        customName: item.productId ? undefined : (item.name || item.customName),
+        quantity: parseFloat(item.quantity) || item.quantity,
+        price: parseFloat(item.price)
+      })));
+      // Reset everything else to defaults
+      setInvoiceDueDate('');
+      setInvoiceDueTerms('none');
+      setInvoiceNotes('');
+      setInvoicePoNumber('');
+      setInvoiceTerms('');
+      setInvoiceDiscountType('percent');
+      setInvoiceDiscountPercent('0');
+      setInvoiceDiscountAmount('0');
+      setInvoiceShippingAmount('0');
+      setInvoiceTaxEnabled(true);
+      setInvoiceShowBusinessInfo(true);
+      setInvoiceCustomFieldValues(getInvoiceVisDefs());
+      setIsInvoiceViewOpen(false);
+      setIsInvoiceDialogOpen(true);
+      toast({
+        title: "Duplicated",
+        description: `A copy of the ${newInvoice.documentType === 'invoice' ? 'invoice' : 'quote'} has been created as a draft`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to duplicate invoice",
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateInvoiceStatusMutation = useMutation({
     mutationFn: async ({ invoiceId, status }: { invoiceId: number; status: string }) => {
       const response = await apiRequest("PATCH", `/api/pos/invoices/${invoiceId}`, { status });
@@ -10430,9 +10491,20 @@ export default function PosSystem() {
                   >
                     Status
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    data-testid="button-duplicate-invoice"
+                    disabled={duplicateInvoiceMutation.isPending}
+                    onClick={() => selectedInvoice && duplicateInvoiceMutation.mutate(selectedInvoice.id)}
+                  >
+                    {duplicateInvoiceMutation.isPending ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Copy className="w-3 h-3 mr-1" />}
+                    Duplicate
+                  </Button>
                   <Button 
                     size="sm" 
-                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-3 disabled:opacity-60"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-xs col-span-2 disabled:opacity-60"
                     data-testid="button-download-share-invoice"
                     disabled={invoicePdfBusy}
                     onClick={() => generateInvoicePDF(selectedInvoice)}
@@ -10512,6 +10584,16 @@ export default function PosSystem() {
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-duplicate-invoice-desktop"
+                      disabled={duplicateInvoiceMutation.isPending}
+                      onClick={() => selectedInvoice && duplicateInvoiceMutation.mutate(selectedInvoice.id)}
+                    >
+                      {duplicateInvoiceMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Copy className="w-4 h-4 mr-2" />}
+                      Duplicate
                     </Button>
                   </div>
                   <div className="flex gap-2">

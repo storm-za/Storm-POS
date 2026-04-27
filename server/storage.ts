@@ -104,6 +104,8 @@ export interface IStorage {
   
   // Invoice Operations
   getPosInvoices(userId: number): Promise<PosInvoice[]>;
+  getPosInvoice(id: number): Promise<PosInvoice | undefined>;
+  getPosInvoiceForUser(id: number, userId: number): Promise<PosInvoice | undefined>;
   createPosInvoice(invoice: InsertPosInvoice): Promise<PosInvoice>;
   updatePosInvoice(id: number, invoice: Partial<PosInvoice>): Promise<PosInvoice | undefined>;
   deletePosInvoice(id: number): Promise<boolean>;
@@ -605,6 +607,14 @@ export class MemStorage implements IStorage {
     return [];
   }
 
+  async getPosInvoice(id: number): Promise<PosInvoice | undefined> {
+    return undefined;
+  }
+
+  async getPosInvoiceForUser(id: number, userId: number): Promise<PosInvoice | undefined> {
+    return undefined;
+  }
+
   async createPosInvoice(insertInvoice: InsertPosInvoice): Promise<PosInvoice> {
     throw new Error("Invoice operations not supported in MemStorage");
   }
@@ -1040,6 +1050,16 @@ export class DatabaseStorage implements IStorage {
   // Invoice Operations
   async getPosInvoices(userId: number): Promise<PosInvoice[]> {
     return db.select().from(posInvoices).where(eq(posInvoices.userId, userId));
+  }
+
+  async getPosInvoice(id: number): Promise<PosInvoice | undefined> {
+    const [invoice] = await db.select().from(posInvoices).where(eq(posInvoices.id, id));
+    return invoice || undefined;
+  }
+
+  async getPosInvoiceForUser(id: number, userId: number): Promise<PosInvoice | undefined> {
+    const [invoice] = await db.select().from(posInvoices).where(and(eq(posInvoices.id, id), eq(posInvoices.userId, userId)));
+    return invoice || undefined;
   }
 
   async createPosInvoice(insertInvoice: InsertPosInvoice): Promise<PosInvoice> {
