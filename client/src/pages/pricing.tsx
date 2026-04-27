@@ -148,7 +148,6 @@ export default function Pricing() {
               {
                 name: "Starter",
                 price: "R299",
-                sub: "flat rate · no surprises",
                 color: "hsl(217,90%,40%)",
                 bgClass: "bg-[hsl(217,90%,40%)] text-white",
                 borderClass: "border-[hsl(217,90%,40%)]",
@@ -164,7 +163,6 @@ export default function Pricing() {
               {
                 name: "Growth",
                 price: "R599",
-                sub: "flat fee · most popular",
                 color: "#059669",
                 bgClass: "bg-white text-gray-900",
                 borderClass: "border-emerald-300",
@@ -180,7 +178,6 @@ export default function Pricing() {
               {
                 name: "Scale",
                 price: "R999",
-                sub: "per month · enterprise",
                 color: "#7c3aed",
                 bgClass: "bg-white text-gray-900",
                 borderClass: "border-purple-300",
@@ -198,8 +195,7 @@ export default function Pricing() {
                 className={`rounded-2xl border-2 ${plan.borderClass} ${plan.bgClass} p-6 shadow-sm flex flex-col`}>
                 <div className="mb-4">
                   <div className="text-sm font-bold uppercase tracking-wide opacity-70 mb-1">{plan.name}</div>
-                  <div className="text-4xl font-black tracking-tight mb-0.5">{plan.price}</div>
-                  <div className="text-xs opacity-60">{plan.sub}</div>
+                  <div className="text-4xl font-black tracking-tight mb-0.5">{plan.price}<span className="text-sm font-normal opacity-50 ml-1">/month</span></div>
                 </div>
                 <ul className="space-y-2 flex-1 mb-5">
                   {plan.highlights.map(f => (
@@ -241,8 +237,7 @@ export default function Pricing() {
                   <ShieldCheck className="w-5 h-5 opacity-80" />
                   <span className="text-sm font-semibold opacity-80 uppercase tracking-wide">Starter</span>
                 </div>
-                <div className="text-5xl font-black mb-1 tracking-tight">R299</div>
-                <div className="text-white/75 text-sm mb-4">flat rate · no surprises</div>
+                <div className="text-5xl font-black mb-4 tracking-tight">R299<span className="text-xl font-normal text-white/50 ml-1">/month</span></div>
                 <p className="text-white/80 text-xs mb-4 leading-relaxed">Perfect for new and growing businesses. One flat monthly fee — no percentage cuts, no surprise charges.</p>
 
                 <div className="bg-white/10 rounded-2xl p-4 mb-5">
@@ -275,8 +270,7 @@ export default function Pricing() {
                   <CurrencyDollar className="w-5 h-5 text-emerald-500" />
                   <span className="text-sm font-semibold text-emerald-600 uppercase tracking-wide">Growth</span>
                 </div>
-                <div className="text-5xl font-black text-gray-900 mb-1 tracking-tight">R599</div>
-                <div className="text-gray-400 text-sm mb-4">flat fee · most popular</div>
+                <div className="text-5xl font-black text-gray-900 mb-4 tracking-tight">R599<span className="text-xl font-normal text-gray-400 ml-1">/month</span></div>
                 <p className="text-gray-500 text-xs mb-4 leading-relaxed">For businesses ready to scale. Predictable costs, deeper insights, and tools to grow your team.</p>
 
                 <div className="bg-emerald-50 rounded-2xl p-4 mb-5">
@@ -309,8 +303,7 @@ export default function Pricing() {
                   <Globe className="w-5 h-5 text-purple-500" />
                   <span className="text-sm font-semibold text-purple-600 uppercase tracking-wide">Scale</span>
                 </div>
-                <div className="text-5xl font-black text-gray-900 mb-1 tracking-tight">R999</div>
-                <div className="text-gray-400 text-sm mb-4">per month · enterprise</div>
+                <div className="text-5xl font-black text-gray-900 mb-4 tracking-tight">R999<span className="text-xl font-normal text-gray-400 ml-1">/month</span></div>
                 <p className="text-gray-500 text-xs mb-4 leading-relaxed">For established businesses running multiple locations or large teams. Full control, maximum features, priority assistance.</p>
 
                 <div className="bg-purple-50 rounded-2xl p-4 mb-5">

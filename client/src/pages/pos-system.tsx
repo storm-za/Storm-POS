@@ -7273,8 +7273,7 @@ export default function PosSystem() {
                       {
                         id: 'percent',
                         name: 'Starter',
-                        rate: 'R299 / month',
-                        detail: 'flat rate · no surprises',
+                        rate: 'R299',
                         description: 'Perfect for new and growing businesses. One flat monthly fee — no percentage cuts, no surprise charges.',
                         features: ['Full POS terminal', 'Up to 200 products', '50 invoices per month', 'Customer directory', 'Purchase orders', 'Open accounts / credit sales', 'Custom receipt & invoice branding', 'Basic sales reports', 'XERO integration', 'VAT-ready invoices', 'Email support', '7-day free trial'],
                         icon: <TrendingUp className="w-5 h-5" />,
@@ -7286,8 +7285,7 @@ export default function PosSystem() {
                       {
                         id: 'flat',
                         name: 'Growth',
-                        rate: 'R599 / month',
-                        detail: 'flat fee · most popular',
+                        rate: 'R599',
                         description: 'For businesses ready to scale. Predictable costs, deeper insights, and tools to grow your team.',
                         features: ['Everything in Starter', 'Unlimited products', '200 invoices included (R0.50 each extra)', 'Full sales analytics & PDF export', 'Staff accounts (up to 5)', 'Top products & dead stock reports', 'Period-over-period comparisons', 'Automated invoice reminders', 'WhatsApp receipt sending', 'Priority email support', '7-day free trial'],
                         icon: <BarChart3 className="w-5 h-5" />,
@@ -7299,8 +7297,7 @@ export default function PosSystem() {
                       {
                         id: 'scale',
                         name: 'Scale',
-                        rate: 'R999 / month',
-                        detail: 'per month · enterprise',
+                        rate: 'R999',
                         description: 'For established businesses running multiple locations or large teams. Full control, maximum features, priority assistance.',
                         features: ['Everything in Growth', 'Unlimited invoices', 'Multi-location / branch support', 'Unlimited staff accounts', 'Role-based permissions (Cashier / Manager / Admin)', 'Consolidated multi-branch reporting', 'Customer loyalty points system', 'Dedicated priority support', 'Early access to new features', '7-day free trial'],
                         icon: <CheckCircle2 className="w-5 h-5" />,
@@ -7344,8 +7341,9 @@ export default function PosSystem() {
                                     {plan.icon}
                                   </div>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
-                                  <div className={`text-base font-bold mb-0.5 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : plan.id === 'flat' ? (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600') : (posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>{plan.rate}</div>
-                                  <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
+                                  <div className={`text-base font-bold mb-2 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : plan.id === 'flat' ? (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600') : (posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>
+                                    {plan.rate}<span className={`text-xs font-normal ml-1 text-gray-400`}>/month</span>
+                                  </div>
                                   <div className={`text-xs leading-relaxed mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   <ul className="space-y-1 mb-3">
                                     {plan.features.map((f: string) => (

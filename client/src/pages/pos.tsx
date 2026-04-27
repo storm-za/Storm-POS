@@ -408,8 +408,7 @@ export default function POS() {
               )}
               <TrendingUp className="w-8 h-8 text-[hsl(217,90%,40%)] mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-[hsl(217,90%,40%)] mb-1">Starter</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">R299</div>
-              <div className="text-gray-500 text-sm mb-3">flat rate · no surprises</div>
+              <div className="text-3xl font-bold text-gray-900 mb-3">R299<span className="text-base font-normal text-gray-400 ml-1">/month</span></div>
               <p className="text-gray-400 text-xs mb-4 leading-relaxed">Perfect for new and growing businesses. One flat monthly fee — no percentage cuts.</p>
               <ul className="space-y-2 flex-1">
                 {[
@@ -460,8 +459,7 @@ export default function POS() {
               </div>
               <CreditCard className="w-8 h-8 mb-4 opacity-90" />
               <div className="text-xs font-bold uppercase tracking-widest text-white/70 mb-1">Growth</div>
-              <div className="text-3xl font-bold mb-1">R599</div>
-              <div className="text-white/80 text-sm mb-3">flat fee · most popular</div>
+              <div className="text-3xl font-bold mb-3">R599<span className="text-base font-normal text-white/60 ml-1">/month</span></div>
               <p className="text-white/60 text-xs mb-4 leading-relaxed">For businesses ready to scale. Deeper insights, tools to grow your team.</p>
               <ul className="space-y-2 flex-1">
                 {[
@@ -507,8 +505,7 @@ export default function POS() {
               )}
               <Globe className="w-8 h-8 text-purple-600 mb-4" />
               <div className="text-xs font-bold uppercase tracking-widest text-purple-600 mb-1">Scale</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">R999</div>
-              <div className="text-gray-500 text-sm mb-3">per month · enterprise</div>
+              <div className="text-3xl font-bold text-gray-900 mb-3">R999<span className="text-base font-normal text-gray-400 ml-1">/month</span></div>
               <p className="text-gray-400 text-xs mb-4 leading-relaxed">For established businesses with multiple locations or large teams.</p>
               <ul className="space-y-2 flex-1">
                 {[
