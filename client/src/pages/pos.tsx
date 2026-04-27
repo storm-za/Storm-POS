@@ -9,7 +9,8 @@ import {
   Package, CreditCard, Globe, Calculator, ChartPie as PieChart,
   UserCircleCheck as UserCheck, Translate as Languages,
   Wallet, ChatCircle as MessageSquare, ShareNetwork as Share2,
-  Desktop as Monitor, Star, X, List as Menu
+  Desktop as Monitor, Star, X, List as Menu,
+  Tag, Wrench
 } from "@phosphor-icons/react";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
@@ -131,12 +132,12 @@ export default function POS() {
   ];
 
   const comparison = [
-    { feature: "Monthly fee", storm: "R299–R999", traditional: "R500+" },
-    { feature: "Setup cost", storm: "R0", traditional: "R3 000+" },
-    { feature: "Works on any device", storm: true, traditional: false },
-    { feature: "Cloud & real-time sync", storm: true, traditional: false },
-    { feature: "Built-in invoicing", storm: true, traditional: false },
-    { feature: "Afrikaans support", storm: true, traditional: false },
+    { feature: "Monthly fee", storm: "R299–R999", traditional: "R500+", Icon: Tag },
+    { feature: "Setup cost", storm: "R0", traditional: "R3 000+", Icon: Wrench },
+    { feature: "Works on any device", storm: true, traditional: false, Icon: Monitor },
+    { feature: "Cloud & real-time sync", storm: true, traditional: false, Icon: Cloud },
+    { feature: "Built-in invoicing", storm: true, traditional: false, Icon: FileText },
+    { feature: "Afrikaans support", storm: true, traditional: false, Icon: MessageSquare },
   ];
 
   return (
@@ -550,36 +551,110 @@ export default function POS() {
       </section>
 
       {/* ── VS COMPARISON ─────────────────────────────────────── */}
-      <section className="py-14 px-4 sm:px-6 lg:px-8 bg-gray-50/60">
-        <div className="max-w-3xl mx-auto">
-          <motion.div className="text-center mb-8"
-            initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Storm vs Traditional POS</h2>
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+
+          {/* Heading */}
+          <motion.div className="text-center mb-14"
+            initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5 }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[hsl(217,90%,45%)] mb-4">Why Storm?</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-950 tracking-tight leading-tight">
+              Built for modern retail.<br className="hidden sm:block" /> Not the 90s.
+            </h2>
+            <p className="mt-4 text-gray-500 text-base max-w-md mx-auto leading-relaxed">See exactly what you get with Storm versus a traditional system.</p>
           </motion.div>
 
-          <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
-            className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="grid grid-cols-3 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-wide text-gray-500 border-b border-gray-200">
-              <div>Feature</div>
-              <div className="text-center text-[hsl(217,90%,40%)]">Storm POS</div>
-              <div className="text-center text-gray-400">Traditional</div>
-            </div>
-            {comparison.map((row, i) => (
-              <div key={row.feature} className={`grid grid-cols-3 px-5 py-3.5 text-sm ${i % 2 === 0 ? "" : "bg-gray-50/50"} border-b border-gray-100 last:border-0`}>
-                <div className="text-gray-700 font-medium">{row.feature}</div>
-                <div className="text-center">
-                  {typeof row.storm === "boolean"
-                    ? <Check className="w-4 h-4 text-green-500 mx-auto" />
-                    : <span className="font-bold text-[hsl(217,90%,40%)]">{row.storm}</span>}
+          {/* Table */}
+          <motion.div
+            initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5, delay:0.1 }}
+            className="overflow-x-auto rounded-2xl border border-gray-200 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]"
+          >
+            <div className="min-w-[540px]">
+
+              {/* Column headers */}
+              <div className="grid grid-cols-3">
+                {/* Feature col */}
+                <div className="bg-gray-50 border-b border-gray-200 px-7 py-5 flex items-center">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-400">Feature</span>
                 </div>
-                <div className="text-center">
-                  {typeof row.traditional === "boolean"
-                    ? <X className="w-4 h-4 text-red-400 mx-auto" />
-                    : <span className="text-gray-400">{row.traditional}</span>}
+
+                {/* Storm POS — dark authority header */}
+                <div className="bg-[#0f172a] border-b border-[#0f172a] px-6 py-5 flex flex-col items-center justify-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/10 text-white/70 text-[10px] font-semibold uppercase tracking-widest">
+                    <Star weight="fill" className="w-2.5 h-2.5 text-amber-400" />
+                    Recommended
+                  </span>
+                  <span className="text-white text-base font-bold tracking-tight mt-0.5">Storm POS</span>
+                </div>
+
+                {/* Traditional POS — muted header */}
+                <div className="bg-gray-50 border-b border-l border-gray-200 px-6 py-5 flex flex-col items-center justify-center gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-300">Traditional</span>
+                  <span className="text-gray-400 text-base font-semibold tracking-tight">POS System</span>
                 </div>
               </div>
-            ))}
+
+              {/* Feature rows */}
+              {comparison.map((row, i) => {
+                const isLast = i === comparison.length - 1;
+                return (
+                  <motion.div
+                    key={row.feature}
+                    initial={{ opacity:0 }}
+                    whileInView={{ opacity:1 }}
+                    viewport={{ once:true }}
+                    transition={{ duration:0.3, delay: i * 0.06 }}
+                    className="grid grid-cols-3"
+                  >
+                    {/* Feature label */}
+                    <div className={`flex items-center gap-3 px-7 py-4 bg-white ${!isLast ? "border-b border-gray-100" : ""}`}>
+                      <row.Icon className="w-4 h-4 text-gray-400 flex-shrink-0" weight="regular" />
+                      <span className="text-sm font-medium text-gray-700 leading-snug">{row.feature}</span>
+                    </div>
+
+                    {/* Storm cell — very subtle blue wash */}
+                    <div className={`flex items-center justify-center px-6 py-4 bg-slate-50 border-l border-r border-[#e8edf5] ${!isLast ? "border-b border-b-[#e8edf5]" : ""}`}>
+                      {typeof row.storm === "boolean" ? (
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200">
+                          <Check className="w-3.5 h-3.5 text-white" weight="bold" />
+                        </span>
+                      ) : (
+                        <span className="text-sm font-bold text-[hsl(217,90%,40%)] tabular-nums">{row.storm}</span>
+                      )}
+                    </div>
+
+                    {/* Traditional cell */}
+                    <div className={`flex items-center justify-center px-6 py-4 bg-white border-l border-gray-100 ${!isLast ? "border-b border-gray-100" : ""}`}>
+                      {typeof row.traditional === "boolean" ? (
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100">
+                          <X className="w-3.5 h-3.5 text-gray-400" weight="bold" />
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-300 line-through tabular-nums">{row.traditional}</span>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+
+              {/* Footer CTA row */}
+              <div className="grid grid-cols-3 border-t border-gray-100">
+                <div className="bg-gray-50 px-7 py-5" />
+                <div className="bg-[#0f172a] px-6 py-5 flex items-center justify-center">
+                  <Link href="/pos#pricing">
+                    <Button className="bg-white text-[#0f172a] hover:bg-gray-100 font-semibold text-sm px-5 h-9 rounded-lg shadow-none">
+                      Start free trial
+                    </Button>
+                  </Link>
+                </div>
+                <div className="bg-gray-50 border-l border-gray-200 px-6 py-5 flex items-center justify-center">
+                  <span className="text-xs text-gray-300">Stick with old tech</span>
+                </div>
+              </div>
+
+            </div>
           </motion.div>
+
         </div>
       </section>
 
