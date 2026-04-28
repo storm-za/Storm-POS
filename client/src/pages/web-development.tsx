@@ -278,8 +278,8 @@ export default function WebDevelopment() {
               key={i}
               className="absolute w-1 h-1 bg-[hsl(217,90%,40%)]/40 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${(i * 17 + 5) % 100}%`,
+                top: `${(i * 23 + 7) % 100}%`,
               }}
               animate={{
                 y: [0, -30, 0],

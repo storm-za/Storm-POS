@@ -160,7 +160,7 @@ export default function Home() {
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-[hsl(217,90%,50%)]/30 rounded-full"
-              style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+              style={{ left: `${(i * 17 + 5) % 100}%`, top: `${(i * 23 + 7) % 100}%` }}
               animate={{ y: [0, -40, 0], opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
               transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 3, ease: "easeInOut" }}
             />
@@ -340,8 +340,8 @@ export default function Home() {
               key={i}
               className="absolute w-1 h-1 bg-[hsl(217,90%,40%)]/40 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${(i * 17 + 5) % 100}%`,
+                top: `${(i * 23 + 7) % 100}%`,
               }}
               animate={{
                 y: [0, -30, 0],
