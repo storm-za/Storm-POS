@@ -131,6 +131,30 @@ export function InvoiceProductPicker({
     return () => el.removeEventListener("wheel", onWheel);
   }, [open, categories.length]);
 
+  // Manually drive vertical wheel scrolling so Radix Dialog's scroll lock
+  // (react-remove-scroll) cannot block the product list.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || !open) return;
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      const atTop = el.scrollTop <= 0;
+      const atBottom =
+        el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      const goingUp = e.deltaY < 0;
+      const goingDown = e.deltaY > 0;
+      if ((atTop && goingUp) || (atBottom && goingDown)) {
+        // Let the browser handle it normally; overscroll-contain stops the
+        // dialog/page from scrolling, so we just don't preventDefault here.
+        return;
+      }
+      el.scrollTop += e.deltaY;
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [open, filtered.length]);
+
   const cat = (id: number | null | undefined) =>
     id ? categories.find((c) => c.id === id) : null;
 
