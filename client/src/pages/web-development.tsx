@@ -5,15 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Check, ArrowLeft, RocketLaunch as Zap, ShieldCheck as Shield,
-  DeviceMobile as Smartphone, MagnifyingGlass as Search, Code, Palette,
-  Rocket, ChartBar as BarChart3, CaretDown as ChevronDown,
-  CaretUp as ChevronUp, Medal as Award, Clock, Target,
-  TrendUp as TrendingUp, CheckCircle, XCircle, Users, MapPin, Star
+  DeviceMobile as Smartphone, MagnifyingGlass as Search,
+  CaretDown as ChevronDown, CaretUp as ChevronUp,
+  CheckCircle, XCircle, Users, MapPin, Star, TrendUp as TrendingUp
 } from "@phosphor-icons/react";
-import WebDevSVG from "@/components/web-dev-svg";
 import ContactForm from "@/components/contact-form";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 import { updatePageSEO } from "@/lib/seo";
+import WebBuildHeroIllustration from "@/components/illustrations/WebBuildHeroIllustration";
+import WebDevIllustration from "@/components/illustrations/WebDevIllustration";
+import BuildProcessIllustration from "@/components/illustrations/BuildProcessIllustration";
+import GrowthAnalyticsIllustration from "@/components/illustrations/GrowthAnalyticsIllustration";
 
 export default function WebDevelopment() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -210,6 +212,34 @@ export default function WebDevelopment() {
     document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const features = [
+    { icon: Zap, title: "Lightning Fast", description: "Optimized for speed with 2-second load times that keep visitors engaged." },
+    { icon: Smartphone, title: "Mobile First", description: "Perfect on every device — 70% of your visitors come from mobile." },
+    { icon: Search, title: "SEO Optimized", description: "Rank higher on Google with advanced on-page SEO best practices." },
+    { icon: Shield, title: "Bank-Level Security", description: "SSL certificates and robust security protect your business and customers." }
+  ];
+
+  const processSteps = [
+    { number: "01", title: "Discovery", description: "We learn about your business, goals, and vision through our online form." },
+    { number: "02", title: "Design", description: "Our team creates a custom design that reflects your brand identity." },
+    { number: "03", title: "Development", description: "We build your site with modern technology and best practices." },
+    { number: "04", title: "Launch", description: "Your website goes live and we provide ongoing support." }
+  ];
+
+  const wantMore = [
+    "Fast, mobile-ready websites",
+    "More qualified leads",
+    "Better SEO visibility",
+    "Professional online presence"
+  ];
+
+  const wantLess = [
+    "Missed deadlines",
+    "Overpriced developers",
+    "Broken websites",
+    "Poor communication"
+  ];
+
   return (
     <div className="min-h-screen overflow-x-hidden w-full">
       {/* Return to Home Button */}
@@ -231,130 +261,121 @@ export default function WebDevelopment() {
         </Button>
       </motion.div>
 
-      {/* Hero Section with High-Tech Background */}
-      <section className="pt-8 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50">
-        {/* High-Tech Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Animated Gradient Orbs */}
-          <motion.div 
-            className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-tr from-cyan-400/15 to-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1.2, 1, 1.2],
-              opacity: [0.4, 0.6, 0.4],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          
-          {/* Animated Grid Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `
-                linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px),
-                linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)
-              `,
-              backgroundSize: '60px 60px'
-            }} />
-          </div>
-          
-          {/* Floating Tech Particles */}
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-[hsl(217,90%,40%)]/40 rounded-full"
-              style={{
-                left: `${(i * 17 + 5) % 100}%`,
-                top: `${(i * 23 + 7) % 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0, 1, 0],
-                scale: [0, 1.5, 0],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
-          
-          {/* Pulsing Rings */}
+      {/* ─────────────────────────────────────────── HERO (LIGHT) */}
+      <section className="relative pt-8 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-gray-50 to-blue-50 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(217,90%,60%)]/8 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(217,90%,60%)]/5 via-transparent to-transparent" />
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)`,
+            backgroundSize: '80px 80px'
+          }} />
           <motion.div
-            className="absolute top-1/2 left-1/4 w-64 h-64 border border-[hsl(217,90%,40%)]/10 rounded-full"
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 0, 0.3],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeOut"
-            }}
+            className="absolute top-20 left-1/4 w-64 h-64 bg-[hsl(217,90%,60%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-1/4 w-80 h-80 bg-[hsl(217,90%,60%)]/8 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.3, 0.15] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center"
+          <motion.div
+            className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
             initial="initial"
             animate="animate"
             variants={staggerContainer}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="flex justify-center mb-8"
-            >
-              <img src={stormLogo} alt="Storm" className="h-32 w-auto" />
-            </motion.div>
-            
-            <motion.h1 
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
-              variants={fadeInUp}
-            >
-              <span className="text-[hsl(217,90%,40%)]">Professional Websites</span><br />
-              Without High Upfront Costs
-            </motion.h1>
-            
-            <motion.p 
-              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
-              variants={fadeInUp}
-            >
-              Storm helps South African businesses grow online with powerful monthly web solutions.
-            </motion.p>
-            
-            <motion.div variants={fadeInUp}>
-              <Button 
-                onClick={scrollToContact}
-                size="lg"
-                className="bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] transform hover:scale-105 transition-all duration-200 shadow-lg"
+            {/* Left column */}
+            <div className="text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="flex justify-center lg:justify-start mb-8"
               >
-                Get Your Website Today
-              </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[hsl(217,90%,60%)]/10 blur-2xl rounded-full scale-150" />
+                  <img src={stormLogo} alt="Storm" className="relative h-24 w-auto drop-shadow-lg" />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="inline-flex items-center px-5 py-2 mb-6 bg-[hsl(217,90%,50%)]/10 backdrop-blur-xl rounded-full border border-[hsl(217,90%,50%)]/20 shadow-lg"
+              >
+                <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+                <span className="text-sm font-medium text-[hsl(217,90%,35%)]">Enterprise Web Development</span>
+              </motion.div>
+
+              <motion.h1
+                className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+                variants={fadeInUp}
+              >
+                <span className="bg-gradient-to-r from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] bg-clip-text text-transparent">Professional Websites.</span>
+                <br />
+                <span className="text-gray-900">Without High Upfront Costs.</span>
+              </motion.h1>
+
+              <motion.p
+                className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                variants={fadeInUp}
+              >
+                Storm helps South African businesses grow online with <span className="text-gray-900 font-medium">powerful monthly web solutions.</span>
+              </motion.p>
+
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button
+                  onClick={scrollToContact}
+                  size="lg"
+                  className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-blue-500/30 px-8 py-6 text-lg font-semibold"
+                >
+                  Get Your Website Today
+                  <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.8 }}
+                className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-gray-500 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>No Setup Fees</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>24/7 Support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>South African Based</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right column - hero illustration */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative flex justify-center lg:justify-end"
+            >
+              <div className="relative w-full max-w-2xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-3xl blur-2xl" />
+                <WebBuildHeroIllustration className="relative w-full h-auto drop-shadow-2xl" />
+              </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Social Proof Stats Bar */}
+      {/* ─────────────────────────────────────────── SOCIAL PROOF STATS BAR */}
       <section className="py-6 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100 shadow-sm">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -386,354 +407,303 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Features & Benefits Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      {/* ─────────────────────────────────────────── WHY CHOOSE STORM (LIGHT, 2-COL SPLIT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="inline-flex items-center px-4 py-2 bg-[hsl(217,90%,40%)]/10 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-[hsl(217,90%,40%)]/20"
             >
-              <span className="w-2 h-2 bg-[hsl(217,90%,40%)] rounded-full mr-2 animate-pulse"></span>
+              <span className="w-2 h-2 bg-[hsl(217,90%,40%)] rounded-full mr-2 animate-pulse" />
               Why Choose Storm
             </motion.div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Everything You Need to 
-              <span className="text-[hsl(217,90%,40%)]"> Succeed Online</span>
+              Everything You Need to <span className="text-[hsl(217,90%,40%)]">Succeed Online</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              We deliver fast, beautiful, and high-performing websites that drive real business results
-            </p>
-          </motion.div>
-          
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            {/* Lightning Fast */}
-            <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardContent className="relative p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Zap className="text-white h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Lightning Fast</h3>
-                  <p className="text-gray-600 text-sm">Optimized for speed with 2-second load times that keep visitors engaged</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Mobile First */}
-            <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardContent className="relative p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Smartphone className="text-white h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Mobile First</h3>
-                  <p className="text-gray-600 text-sm">Perfect on every device - 70% of your visitors use mobile</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* SEO Optimized */}
-            <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardContent className="relative p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-[hsl(217,90%,50%)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Search className="text-white h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">SEO Optimized</h3>
-                  <p className="text-gray-600 text-sm">Rank higher on Google with our advanced SEO best practices</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Bank-Level Security */}
-            <motion.div variants={fadeInUp}>
-              <Card className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <CardContent className="relative p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-[hsl(217,90%,50%)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Shield className="text-white h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Bank-Level Security</h3>
-                  <p className="text-gray-600 text-sm">SSL certificates and robust security protect your business</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works - Process Timeline */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
-            className="absolute top-1/2 right-1/4 w-72 h-72 bg-gradient-to-br from-[hsl(217,90%,60%)]/10 to-transparent rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.4, 0.2],
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              How <span className="text-[hsl(217,90%,40%)]">It Works</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              From initial contact to launch, we make the process simple and transparent
+              We deliver fast, beautiful, and high-performing websites that drive real business results.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { icon: Target, title: "1. Discovery", description: "We learn about your business, goals, and vision through our online form" },
-              { icon: Palette, title: "2. Design", description: "Our team creates a custom design that reflects your brand identity" },
-              { icon: Code, title: "3. Development", description: "We build your site with modern technology and best practices" },
-              { icon: Rocket, title: "4. Launch", description: "Your website goes live and we provide ongoing support" }
-            ].map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="relative"
-              >
-                <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                      <step.icon className="text-white h-8 w-8" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                    <p className="text-gray-600 text-sm">{step.description}</p>
-                  </CardContent>
-                </Card>
-                {index < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <div className="w-8 h-0.5 bg-[hsl(217,90%,40%)]/30"></div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative flex justify-center lg:justify-start"
+            >
+              <div className="relative w-full max-w-xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/15 to-[hsl(217,90%,40%)]/5 rounded-3xl blur-2xl" />
+                <div className="relative bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
+                  <WebDevIllustration className="w-full h-auto" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Inline benefit rows */}
+            <motion.ul
+              className="space-y-6"
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
+              {features.map((feature) => (
+                <motion.li
+                  key={feature.title}
+                  variants={fadeInUp}
+                  className="flex items-start gap-4"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[hsl(217,90%,40%)]/10 border border-[hsl(217,90%,40%)]/20 flex items-center justify-center">
+                    <feature.icon className="w-5 h-5 text-[hsl(217,90%,40%)]" />
                   </div>
-                )}
-              </motion.div>
-            ))}
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">{feature.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                  </div>
+                </motion.li>
+              ))}
+            </motion.ul>
           </div>
         </div>
       </section>
 
-      {/* Success Stories / Results */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
+      {/* ─────────────────────────────────────────── HOW IT WORKS (SLATE) */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-tr from-cyan-400/15 to-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.6, 0.4] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)`,
+              backgroundSize: '60px 60px'
+            }} />
+          </div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+              <span className="text-sm font-medium text-gray-400">Our Process</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">How </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">It Works</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              From initial contact to launch, we make the process <span className="text-white font-medium">simple and transparent.</span>
+            </p>
+          </motion.div>
+
+          {/* Build process illustration */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mb-16"
+          >
+            <div className="relative max-w-5xl mx-auto">
+              <div className="absolute -inset-6 bg-gradient-to-br from-[hsl(217,90%,60%)]/15 to-[hsl(217,90%,40%)]/5 rounded-3xl blur-2xl" />
+              <div className="relative bg-white rounded-2xl p-6 md:p-10 shadow-2xl">
+                <BuildProcessIllustration className="w-full h-auto" />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Step cards */}
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {processSteps.map((step) => (
+              <motion.div key={step.number} variants={fadeInUp}>
+                <Card className="group h-full bg-slate-800/80 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/40 transition-all duration-300 shadow-2xl hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,50%)]/30 text-[hsl(217,90%,60%)] font-bold text-sm mb-4">
+                      {step.number}
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">{step.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────── REAL RESULTS (SLATE, 2-COL SPLIT) */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[hsl(217,90%,30%)]/10 via-transparent to-transparent" />
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+          <motion.div
+            className="absolute -top-40 -right-32 w-96 h-96 bg-[hsl(217,90%,50%)]/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Real <span className="text-[hsl(217,90%,40%)]">Results</span>
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <TrendingUp className="w-4 h-4 text-[hsl(217,90%,60%)] mr-2" />
+              <span className="text-sm font-medium text-gray-400">Real Results</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">Real </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">Results</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Success stories from South African businesses we've helped grow
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Success stories from South African businesses we've <span className="text-white font-medium">helped grow.</span>
             </p>
           </motion.div>
 
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Growth analytics illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative flex justify-center lg:justify-start"
+            >
+              <div className="relative w-full max-w-xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-3xl blur-2xl" />
+                <div className="relative bg-white rounded-2xl p-6 shadow-2xl">
+                  <GrowthAnalyticsIllustration className="w-full h-auto" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Testimonial cards (slate enterprise style) */}
+            <motion.div
+              className="space-y-5"
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
+              <motion.div variants={fadeInUp}>
+                <Card className="group bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <div className="text-2xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">+300%</div>
+                  </div>
+                  <p className="text-gray-300 italic mb-3 leading-relaxed">
+                    "Storm delivered exactly what we needed. <span className="text-white font-medium">Our online sales tripled</span> within the first quarter!"
+                  </p>
+                  <div className="text-sm">
+                    <span className="font-semibold text-white">John Botha</span>
+                    <span className="text-gray-500"> · Retail Owner, Cape Town</span>
+                  </div>
+                </Card>
+              </motion.div>
+
+              <motion.div variants={fadeInUp}>
+                <Card className="group bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <div className="text-2xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">2 Weeks</div>
+                  </div>
+                  <p className="text-gray-300 italic mb-3 leading-relaxed">
+                    "Fast, professional, and the quality exceeded our expectations. <span className="text-white font-medium">No hassle, just results.</span>"
+                  </p>
+                  <div className="text-sm">
+                    <span className="font-semibold text-white">Linda Mokoena</span>
+                    <span className="text-gray-500"> · Restaurant Owner, Johannesburg</span>
+                  </div>
+                </Card>
+              </motion.div>
+
+              <motion.div variants={fadeInUp}>
+                <Card className="group bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <div className="text-2xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">#1</div>
+                  </div>
+                  <p className="text-gray-300 italic mb-3 leading-relaxed">
+                    "Now we're <span className="text-white font-medium">ranking first on Google</span> for our main keywords. The leads just keep coming!"
+                  </p>
+                  <div className="text-sm">
+                    <span className="font-semibold text-white">Peter De Villiers</span>
+                    <span className="text-gray-500"> · Law Firm, Pretoria</span>
+                  </div>
+                </Card>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────── PRICING (LIGHT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
           <motion.div
-            className="grid md:grid-cols-3 gap-8"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">+300%</div>
-                <div className="text-sm text-gray-500 mb-4">Online Sales Increase</div>
-                <p className="text-gray-700 mb-4 italic">
-                  "Storm delivered exactly what we needed. Our online sales tripled within the first quarter!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">JB</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">John Botha</div>
-                    <div className="text-sm text-gray-500">Retail Owner, Cape Town</div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">2 Weeks</div>
-                <div className="text-sm text-gray-500 mb-4">From Start to Launch</div>
-                <p className="text-gray-700 mb-4 italic">
-                  "Fast, professional, and the quality exceeded our expectations. No hassle, just results."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">LM</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Linda Mokoena</div>
-                    <div className="text-sm text-gray-500">Restaurant Owner, Johannesburg</div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <Card className="h-full bg-white/80 backdrop-blur-sm border-0 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="flex items-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <div className="text-3xl font-bold text-[hsl(217,90%,40%)] mb-2">#1</div>
-                <div className="text-sm text-gray-500 mb-4">Google Ranking</div>
-                <p className="text-gray-700 mb-4 italic">
-                  "Now we're ranking first on Google for our main keywords. The leads just keep coming!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-bold text-lg">PD</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Peter De Villiers</div>
-                    <div className="text-sm text-gray-500">Law Firm, Pretoria</div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* SVG Illustration Section */}
-      <section className="pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
-            className="flex justify-center items-center relative"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-          >
-            <div className="relative max-w-2xl mx-auto">
-              <WebDevSVG />
-              
-              {/* Floating Icons with Text */}
-              <motion.div
-                className="absolute top-2 left-2 sm:left-4 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[90px] sm:max-w-none"
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 3, 0]
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-[hsl(217,90%,45%)] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-xs font-semibold text-gray-800 truncate">Fast</span>
-              </motion.div>
-
-              <motion.div
-                className="absolute top-12 right-2 sm:right-4 lg:right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[100px] sm:max-w-none"
-                animate={{
-                  y: [0, 8, 0],
-                  rotate: [0, -2, 0]
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1
-                }}
-              >
-                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-[hsl(217,90%,40%)] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-xs font-semibold text-gray-800 truncate">Secure</span>
-              </motion.div>
-
-              <motion.div
-                className="absolute bottom-4 left-2 sm:left-4 bg-white/90 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 shadow-lg flex items-center space-x-1 sm:space-x-2 max-w-[100px] sm:max-w-none"
-                animate={{
-                  y: [0, -6, 0],
-                  rotate: [0, 1, 0]
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 2
-                }}
-              >
-                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.586l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-xs font-semibold text-gray-800 truncate">Growth</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -746,8 +716,8 @@ export default function WebDevelopment() {
             <p className="text-xl text-gray-600">All plans include hosting, support, SEO updates, and design</p>
             <p className="text-lg text-[hsl(217,90%,40%)] font-semibold mt-2">✓ No calls needed.</p>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="grid md:grid-cols-3 gap-8"
             initial="initial"
             whileInView="animate"
@@ -763,28 +733,13 @@ export default function WebDevelopment() {
                     R799<span className="text-lg text-gray-600">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      5-page responsive website
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Mobile optimization
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Basic SEO setup
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Hosting included
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Monthly updates
-                    </li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />5-page responsive website</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Mobile optimization</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Basic SEO setup</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Hosting included</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Monthly updates</li>
                   </ul>
-                  <Button 
+                  <Button
                     onClick={scrollToContact}
                     className="w-full bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] shadow-lg"
                     data-testid="button-starter-package"
@@ -794,8 +749,8 @@ export default function WebDevelopment() {
                 </CardContent>
               </Card>
             </motion.div>
-            
-            {/* Growth Package */}
+
+            {/* Growth Package - Most Popular (preserved) */}
             <motion.div variants={fadeInUp}>
               <Card className="h-full shadow-2xl text-white transform scale-105 relative bg-gradient-to-br from-[hsl(217,90%,35%)] via-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] ring-4 ring-[hsl(217,90%,50%)]/40">
                 <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-400 text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl tracking-wide uppercase">
@@ -807,24 +762,12 @@ export default function WebDevelopment() {
                     R1,499<span className="text-lg text-blue-200">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-blue-100 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />
-                      10-page responsive website
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />
-                      E-commerce functionality
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />
-                      Advanced SEO
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />
-                      Priority support
-                    </li>
+                    <li className="flex items-center"><Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />10-page responsive website</li>
+                    <li className="flex items-center"><Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />E-commerce functionality</li>
+                    <li className="flex items-center"><Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />Advanced SEO</li>
+                    <li className="flex items-center"><Check className="text-white mr-2 h-5 w-5 flex-shrink-0" />Priority support</li>
                   </ul>
-                  <Button 
+                  <Button
                     onClick={scrollToContact}
                     className="w-full bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 shadow-xl font-bold text-base"
                     data-testid="button-growth-package"
@@ -834,7 +777,7 @@ export default function WebDevelopment() {
                 </CardContent>
               </Card>
             </motion.div>
-            
+
             {/* Pro Package */}
             <motion.div variants={fadeInUp}>
               <Card className="h-full shadow-xl border-2 border-gray-100 hover:border-[hsl(217,90%,40%)] transition-all duration-300 hover:-translate-y-1">
@@ -844,24 +787,12 @@ export default function WebDevelopment() {
                     R2,499+<span className="text-lg text-gray-600">/month</span>
                   </div>
                   <ul className="text-left space-y-3 text-gray-600 mb-8 flex-grow">
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Unlimited pages
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Advanced integrations
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Dedicated support
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />
-                      Performance optimization
-                    </li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Unlimited pages</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Advanced integrations</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Dedicated support</li>
+                    <li className="flex items-center"><Check className="text-[hsl(217,90%,40%)] mr-2 h-5 w-5 flex-shrink-0" />Performance optimization</li>
                   </ul>
-                  <Button 
+                  <Button
                     onClick={scrollToContact}
                     className="w-full bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)] shadow-lg"
                     data-testid="button-pro-package"
@@ -875,20 +806,17 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Technology Stack */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+      {/* ─────────────────────────────────────────── TECH STACK (LIGHT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden opacity-[0.02]">
           <div className="absolute inset-0" style={{
-            backgroundImage: `
-              linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px),
-              linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)
-            `,
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,40%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,40%) 1px, transparent 1px)`,
             backgroundSize: '50px 50px'
           }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -899,7 +827,7 @@ export default function WebDevelopment() {
               Built with <span className="text-[hsl(217,90%,40%)]">Modern Technology</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We use cutting-edge tools and frameworks to deliver exceptional results
+              We use cutting-edge tools and frameworks to deliver exceptional results.
             </p>
           </motion.div>
 
@@ -921,10 +849,10 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      {/* ─────────────────────────────────────────── FAQ (LIGHT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -935,7 +863,7 @@ export default function WebDevelopment() {
               Frequently Asked <span className="text-[hsl(217,90%,40%)]">Questions</span>
             </h2>
             <p className="text-xl text-gray-600">
-              Everything you need to know about our web development services
+              Everything you need to know about our web development services.
             </p>
           </motion.div>
 
@@ -981,7 +909,7 @@ export default function WebDevelopment() {
               }
             ].map((faq, index) => (
               <motion.div key={index} variants={fadeInUp}>
-                <Card className="border border-gray-200 hover:border-[hsl(217,90%,40%)]/30 transition-all duration-300 overflow-hidden">
+                <Card className="overflow-hidden border-2 border-gray-100 hover:border-[hsl(217,90%,40%)]/30 transition-all duration-300">
                   <button
                     className="w-full p-6 text-left hover:bg-gray-50 transition-colors duration-200"
                     onClick={() => setOpenFaq(openFaq === index ? null : index)}
@@ -989,11 +917,11 @@ export default function WebDevelopment() {
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-gray-900 pr-8">{faq.question}</h3>
-                      <div className="flex-shrink-0">
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${openFaq === index ? 'bg-[hsl(217,90%,40%)]' : 'bg-gray-100'}`}>
                         {openFaq === index ? (
-                          <ChevronUp className="w-5 h-5 text-[hsl(217,90%,40%)]" />
+                          <ChevronUp className="w-5 h-5 text-white" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                          <ChevronDown className="w-5 h-5 text-gray-500" />
                         )}
                       </div>
                     </div>
@@ -1010,139 +938,182 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Target Market Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+      {/* ─────────────────────────────────────────── TARGET MARKET (SLATE TRUST STRIP) */}
+      <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[hsl(217,90%,30%)]/10 via-transparent to-transparent" />
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }} />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Built for <span className="text-[hsl(217,90%,40%)]">South African SMEs</span>
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center px-4 py-2 mb-6 bg-white/5 backdrop-blur-xl rounded-full border border-white/10"
+            >
+              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+              <span className="text-sm font-medium text-gray-400">Who We Serve</span>
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="text-white">Built for </span>
+              <span className="bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent">South African SMEs</span>
             </h2>
           </motion.div>
-          
-          <motion.div 
-            className="grid lg:grid-cols-3 gap-8"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div className="text-center" variants={fadeInUp}>
-              <Card className="p-6 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="text-white h-8 w-8" />
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Supporting illustration */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative flex justify-center lg:justify-start"
+            >
+              <div className="relative w-full max-w-xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-3xl blur-2xl" />
+                <div className="relative bg-white rounded-2xl p-6 shadow-2xl">
+                  <WebDevIllustration className="w-full h-auto" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">SME Owners (30-50)</h3>
-                <p className="text-gray-600">Business leaders who understand the value of professional web presence</p>
-              </Card>
+              </div>
             </motion.div>
-            
-            <motion.div className="text-center" variants={fadeInUp}>
-              <Card className="p-6 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="text-white h-8 w-8" />
+
+            {/* Trust strip */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                <div className="px-2">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,50%)]/30 mb-3">
+                    <Users className="w-6 h-6 text-[hsl(217,90%,60%)]" />
+                  </div>
+                  <div className="text-lg font-bold text-white mb-1">SME Owners</div>
+                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">Ages 30–50</div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Urban Hubs</h3>
-                <p className="text-gray-600">Located in Johannesburg, Cape Town, and other major cities</p>
-              </Card>
-            </motion.div>
-            
-            <motion.div className="text-center" variants={fadeInUp}>
-              <Card className="p-6 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-[hsl(217,90%,50%)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="text-white h-8 w-8" />
+                <div className="sm:border-x sm:border-white/10 px-2">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,50%)]/30 mb-3">
+                    <MapPin className="w-6 h-6 text-[hsl(217,90%,60%)]" />
+                  </div>
+                  <div className="text-lg font-bold text-white mb-1">Urban Hubs</div>
+                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">JHB · CPT · DBN</div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Growth-Oriented</h3>
-                <p className="text-gray-600">Tired of bad freelancers and DIY website builders</p>
-              </Card>
+                <div className="px-2">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,50%)]/30 mb-3">
+                    <TrendingUp className="w-6 h-6 text-[hsl(217,90%,60%)]" />
+                  </div>
+                  <div className="text-lg font-bold text-white mb-1">Growth-Oriented</div>
+                  <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">Ready to scale</div>
+                </div>
+              </div>
+              <p className="mt-8 text-center text-sm text-gray-400 leading-relaxed">
+                Business leaders tired of bad freelancers and DIY website builders — ready for a <span className="text-white font-medium">professional online presence.</span>
+              </p>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Miracles & Miseries Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <motion.div 
+      {/* ─────────────────────────────────────────── WANT MORE vs WANT LESS (LIGHT, ENTERPRISE) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[hsl(217,90%,45%)] mb-4">The Storm Difference</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-950 tracking-tight">
               What You Want <span className="text-[hsl(217,90%,40%)]">vs.</span> What You Don't
             </h2>
+            <p className="mt-4 text-gray-500 text-base max-w-md mx-auto leading-relaxed">
+              See exactly what working with Storm delivers — and what you'll never deal with again.
+            </p>
           </motion.div>
-          
-          <motion.div 
-            className="grid lg:grid-cols-2 gap-12"
+
+          <motion.div
+            className="grid lg:grid-cols-2 gap-6"
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            {/* Want More */}
+            {/* Want More - Highlighted Storm winner */}
             <motion.div variants={fadeInUp}>
-              <Card className="bg-gradient-to-br from-[hsl(217,90%,40%)]/5 to-transparent shadow-xl h-full border-2 border-[hsl(217,90%,40%)]/20">
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-[hsl(217,90%,40%)] mb-6 flex items-center">
-                    <CheckCircle className="mr-3 h-6 w-6" />
-                    Want More
-                  </h3>
+              <Card className="relative h-full overflow-hidden bg-gradient-to-br from-[hsl(217,90%,40%)] via-[hsl(217,90%,42%)] to-[hsl(217,90%,48%)] text-white shadow-2xl border-0">
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
+                  backgroundSize: '40px 40px'
+                }} />
+                <CardContent className="relative p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/15 text-white text-[10px] font-semibold uppercase tracking-widest backdrop-blur-sm">
+                      <Star weight="fill" className="w-2.5 h-2.5 text-amber-300" />
+                      Recommended
+                    </div>
+                    <div className="text-2xl font-bold">Want More</div>
+                  </div>
                   <ul className="space-y-4">
-                    <li className="flex items-center text-gray-700">
-                      <CheckCircle className="text-[hsl(217,90%,40%)] mr-3 h-5 w-5 flex-shrink-0" />
-                      Fast, mobile-ready websites
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <CheckCircle className="text-[hsl(217,90%,40%)] mr-3 h-5 w-5 flex-shrink-0" />
-                      More qualified leads
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <CheckCircle className="text-[hsl(217,90%,40%)] mr-3 h-5 w-5 flex-shrink-0" />
-                      Better SEO visibility
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <CheckCircle className="text-[hsl(217,90%,40%)] mr-3 h-5 w-5 flex-shrink-0" />
-                      Professional online presence
-                    </li>
+                    {wantMore.map((item) => (
+                      <li key={item} className="flex items-center gap-4">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500 shadow-lg shadow-emerald-900/30 flex-shrink-0">
+                          <Check className="w-4 h-4 text-white" weight="bold" />
+                        </span>
+                        <span className="text-base font-medium text-white leading-snug">{item}</span>
+                      </li>
+                    ))}
                   </ul>
+                  <div className="mt-8 pt-6 border-t border-white/15">
+                    <Button
+                      onClick={scrollToContact}
+                      className="w-full bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 font-bold shadow-lg"
+                    >
+                      Start Your Project →
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
-            
-            {/* Want Less */}
+
+            {/* Want Less - Muted greyed loser */}
             <motion.div variants={fadeInUp}>
-              <Card className="bg-gradient-to-br from-red-50 to-transparent shadow-xl h-full border-2 border-red-200/50">
+              <Card className="relative h-full overflow-hidden bg-gray-50 border-2 border-gray-200 shadow-sm">
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-red-700 mb-6 flex items-center">
-                    <XCircle className="mr-3 h-6 w-6" />
-                    Want Less
-                  </h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-200 text-gray-500 text-[10px] font-semibold uppercase tracking-widest">
+                      The Old Way
+                    </div>
+                    <div className="text-2xl font-bold text-gray-400">Want Less</div>
+                  </div>
                   <ul className="space-y-4">
-                    <li className="flex items-center text-gray-700">
-                      <XCircle className="text-red-500 mr-3 h-5 w-5 flex-shrink-0" />
-                      Missed deadlines
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <XCircle className="text-red-500 mr-3 h-5 w-5 flex-shrink-0" />
-                      Overpriced developers
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <XCircle className="text-red-500 mr-3 h-5 w-5 flex-shrink-0" />
-                      Broken websites
-                    </li>
-                    <li className="flex items-center text-gray-700">
-                      <XCircle className="text-red-500 mr-3 h-5 w-5 flex-shrink-0" />
-                      Poor communication
-                    </li>
+                    {wantLess.map((item) => (
+                      <li key={item} className="flex items-center gap-4">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 border border-red-200 flex-shrink-0">
+                          <XCircle className="w-4 h-4 text-red-500" weight="fill" />
+                        </span>
+                        <span className="text-base font-medium text-gray-500 line-through decoration-gray-300 leading-snug">{item}</span>
+                      </li>
+                    ))}
                   </ul>
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <div className="text-center text-sm text-gray-400">Stick with the old freelancer route</div>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -1150,24 +1121,16 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Contact Form Section */}
-      <section id="contact-form" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-        {/* Background gradient orb */}
-        <motion.div 
+      {/* ─────────────────────────────────────────── CONTACT FORM (LIGHT) */}
+      <section id="contact-form" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+        <motion.div
           className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-br from-[hsl(217,90%,60%)]/10 to-transparent rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
 
         <div className="relative max-w-4xl mx-auto">
-          <motion.div 
+          <motion.div
             className="text-center mb-12"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -1179,7 +1142,7 @@ export default function WebDevelopment() {
             </h2>
             <p className="text-xl text-gray-600">📩 Prefer Email Over Calls? Same Here. We do everything online.</p>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1191,8 +1154,8 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+      {/* ─────────────────────────────────────────── TESTIMONIALS (LIGHT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1289,12 +1252,11 @@ export default function WebDevelopment() {
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
-        {/* Background Elements */}
+      {/* ─────────────────────────────────────────── FINAL CTA (BLUE GRADIENT) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,50%)] text-white relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-white/10 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-tr from-white/10 to-transparent rounded-full blur-3xl" />
           <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: `linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)`,
             backgroundSize: '60px 60px'
@@ -1315,23 +1277,23 @@ export default function WebDevelopment() {
               Join the growing number of South African businesses that trust Storm for their web presence.
             </p>
             <p className="text-sm text-blue-200 mb-10 font-medium">No setup fees. No lock-in contracts. Cancel anytime.</p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
+              <Button
                 onClick={scrollToContact}
                 size="lg"
                 className="group bg-white text-[hsl(217,90%,40%)] hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-2xl px-10 py-6 text-lg font-bold"
                 data-testid="button-cta-quote"
               >
                 Get Your Website Quote
-                <motion.span 
+                <motion.span
                   className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
                   initial={{ x: 0 }}
                 >
                   →
                 </motion.span>
               </Button>
-              <Button 
+              <Button
                 asChild
                 variant="outline"
                 size="lg"
