@@ -47,6 +47,8 @@ export function InvoiceProductPicker({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const categoryRowRef = useRef<HTMLDivElement>(null);
+  const lastNavSourceRef = useRef<"keyboard" | "init">("init");
 
   const hasTrade = products.some(
     (p) => p.tradePrice && parseFloat(p.tradePrice) > 0
@@ -91,6 +93,7 @@ export function InvoiceProductPicker({
 
   useEffect(() => {
     if (!open || !listRef.current) return;
+    if (lastNavSourceRef.current !== "keyboard") return;
     const items = listRef.current.querySelectorAll<HTMLElement>("[data-item]");
     items[activeIndex]?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, open]);
@@ -98,9 +101,11 @@ export function InvoiceProductPicker({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      lastNavSourceRef.current = "keyboard";
       setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
+      lastNavSourceRef.current = "keyboard";
       setActiveIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
@@ -110,6 +115,21 @@ export function InvoiceProductPicker({
       setOpen(false);
     }
   };
+
+  // Translate vertical wheel into horizontal scroll for the category pill row.
+  useEffect(() => {
+    const el = categoryRowRef.current;
+    if (!el || !open) return;
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      const dir = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (dir === 0) return;
+      el.scrollLeft += dir;
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [open, categories.length]);
 
   const cat = (id: number | null | undefined) =>
     id ? categories.find((c) => c.id === id) : null;
@@ -180,8 +200,9 @@ export function InvoiceProductPicker({
         {/* Category pills */}
         {categories.length > 0 && (
           <div
+            ref={categoryRowRef}
             className="flex gap-1.5 px-3 py-2 border-b overflow-x-auto bg-white"
-            style={{ scrollbarWidth: "none" }}
+            style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
           >
             <button
               type="button"
@@ -212,7 +233,13 @@ export function InvoiceProductPicker({
         )}
 
         {/* Product list */}
-        <div ref={listRef} className="overflow-y-auto" style={{ maxHeight: 320 }}>
+        <div
+          ref={listRef}
+          className="overflow-y-auto overscroll-contain"
+          style={{ maxHeight: 320, WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
+          onWheelCapture={(e) => { e.stopPropagation(); }}
+          onTouchMoveCapture={(e) => { e.stopPropagation(); }}
+        >
           {filtered.length === 0 ? (
             <div className="py-10 text-center text-sm text-gray-400 flex flex-col items-center gap-2">
               <Package className="w-8 h-8 text-gray-200" />
@@ -235,7 +262,6 @@ export function InvoiceProductPicker({
                   data-item
                   type="button"
                   onClick={() => handleSelect(product)}
-                  onMouseEnter={() => setActiveIndex(i)}
                   className={`w-full flex items-center gap-3 px-4 py-3 border-b last:border-b-0 text-left transition-colors ${
                     isActive
                       ? "bg-[hsl(217,90%,97%)]"
