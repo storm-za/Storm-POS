@@ -4557,9 +4557,9 @@ export default function PosSystem() {
               </button>
               {/* Staff list */}
               {mobileStaffPickerOpen && (
-                <div className="mx-1 mb-1 bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                <div className={`mx-1 mb-1 rounded-xl overflow-hidden border ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'}`}>
                   {staffAccounts.length === 0 ? (
-                    <p className="text-xs text-gray-400 px-3 py-2.5">No staff accounts added yet.</p>
+                    <p className={`text-xs px-3 py-2.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>No staff accounts added yet.</p>
                   ) : (
                     staffAccounts.map((staff) => {
                       const isCurrent = currentStaff?.id === staff.id;
@@ -4574,20 +4574,46 @@ export default function PosSystem() {
                               setIsStaffPasswordDialogOpen(true);
                             }
                           }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-all ${
-                            isCurrent ? 'bg-[hsl(217,90%,40%)]/8 cursor-default' : 'hover:bg-gray-100 cursor-pointer'
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
+                            isCurrent
+                              ? posTheme === 'dark'
+                                ? 'bg-gray-800/60 cursor-default'
+                                : 'bg-gray-100 cursor-default'
+                              : posTheme === 'dark'
+                                ? 'hover:bg-gray-800/40 cursor-pointer'
+                                : 'hover:bg-gray-50 cursor-pointer'
                           }`}
                         >
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                            isCurrent ? 'bg-[hsl(217,90%,40%)] text-white' : 'bg-gray-200 text-gray-600'
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
+                            posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
                           }`}>
                             {staff.username.charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <span className={`font-medium block truncate ${isCurrent ? 'text-[hsl(217,90%,40%)]' : 'text-gray-700'}`}>{staff.username}</span>
-                            <span className="text-[10px] text-gray-400 capitalize">{staff.userType}</span>
+                            <span className={`font-medium block truncate ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>{staff.username}</span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-block mt-0.5 ${
+                              isCurrent
+                                ? posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'
+                                : staff.userType === 'management'
+                                  ? posTheme === 'dark'
+                                    ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]'
+                                    : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                                  : posTheme === 'dark'
+                                    ? 'bg-gray-800 text-gray-400'
+                                    : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {staff.userType === 'management' ? 'Manager' : 'Staff'}
+                            </span>
                           </div>
-                          {isCurrent && <Check className="h-3.5 w-3.5 text-[hsl(217,90%,40%)] flex-shrink-0" />}
+                          {isCurrent && (
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
+                              posTheme === 'dark'
+                                ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]'
+                                : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                            }`}>
+                              Active
+                            </span>
+                          )}
                         </button>
                       );
                     })
@@ -4762,24 +4788,36 @@ export default function PosSystem() {
                       </div>
                     )}
                     {!sidebarCollapsed && currentStaff && (
-                      <Badge className={`text-[10px] px-1.5 py-0 h-4 ${currentStaff.userType === 'management' ? 'bg-[hsl(217,90%,40%)] text-white border-0' : 'bg-gray-600 text-white border-0'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                        currentStaff.userType === 'management'
+                          ? posTheme === 'dark'
+                            ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]'
+                            : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                          : posTheme === 'dark'
+                            ? 'bg-gray-800 text-gray-400'
+                            : 'bg-gray-100 text-gray-600'
+                      }`}>
                         {currentStaff.userType === 'management' ? 'Manager' : 'Staff'}
-                      </Badge>
+                      </span>
                     )}
                     {!sidebarCollapsed && <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />}
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
                   align="end" 
-                  className="w-72 p-0 bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl shadow-black/50 rounded-xl overflow-hidden"
+                  className={`w-72 p-0 rounded-xl overflow-hidden shadow-xl ${
+                    posTheme === 'dark'
+                      ? 'bg-[hsl(217,30%,12%)] border border-gray-800 text-gray-100'
+                      : 'bg-white border border-gray-200 text-gray-900'
+                  }`}
                 >
-                  <div className={`px-4 py-3 border-b ${posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] border-gray-700/50' : 'bg-gray-50 border-gray-200'}`}>
+                  <div className={`px-4 py-3 border-b ${posTheme === 'dark' ? 'bg-[hsl(217,30%,10%)] border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                      <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Team Members</span>
+                      <Users className={`h-4 w-4 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                      <span className={`text-xs font-semibold uppercase tracking-wider ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Team Members</span>
                     </div>
                   </div>
-                  <div className="py-2 max-h-[300px] overflow-y-auto">
+                  <div className="py-1 max-h-[300px] overflow-y-auto">
                     {staffAccounts.map((staff) => {
                       const isCurrentUser = currentStaff?.id === staff.id;
                       return (
@@ -4792,60 +4830,68 @@ export default function PosSystem() {
                               setIsStaffPasswordDialogOpen(true);
                             }
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 ${
-                            isCurrentUser 
-                              ? 'bg-[hsl(217,90%,40%)]/10 cursor-default' 
-                              : 'hover:bg-gray-700/50 cursor-pointer'
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                            isCurrentUser
+                              ? posTheme === 'dark'
+                                ? 'bg-gray-800/60 cursor-default'
+                                : 'bg-gray-100 cursor-default'
+                              : posTheme === 'dark'
+                                ? 'hover:bg-gray-800/40 cursor-pointer'
+                                : 'hover:bg-gray-50 cursor-pointer'
                           }`}
                         >
-                          <div className={`relative flex items-center justify-center w-10 h-10 rounded-xl ${
-                            staff.userType === 'management'
-                              ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
-                              : 'bg-gradient-to-br from-gray-600 to-gray-700'
-                          } shadow-lg`}>
-                            <User className="h-5 w-5 text-white" />
-                            {isCurrentUser && (
-                              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[hsl(217,90%,50%)] rounded-full border-2 border-gray-900 shadow-lg shadow-blue-500/50" />
-                            )}
+                          <div className={`flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold flex-shrink-0 ${
+                            posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {(staff.displayName || staff.username).charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-semibold truncate ${isCurrentUser ? 'text-[hsl(217,90%,60%)]' : 'text-white'}`}>
-                                {staff.displayName || staff.username}
-                              </span>
-                              {isCurrentUser && (
-                                <Badge className="text-[10px] px-1.5 py-0 h-4 bg-[hsl(217,90%,40%)] text-white border-0">
-                                  Active
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-xs text-gray-500 capitalize">
+                            <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                              {staff.displayName || staff.username}
+                            </span>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-block mt-0.5 ${
+                              isCurrentUser
+                                ? posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'
+                                : staff.userType === 'management'
+                                  ? posTheme === 'dark'
+                                    ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]'
+                                    : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                                  : posTheme === 'dark'
+                                    ? 'bg-gray-800 text-gray-400'
+                                    : 'bg-gray-100 text-gray-600'
+                            }`}>
                               {staff.userType === 'management' ? 'Manager' : 'Staff'}
-                            </div>
+                            </span>
                           </div>
-                          {!isCurrentUser && (
-                            <ChevronRight className="h-4 w-4 text-gray-500" />
+                          {isCurrentUser && (
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
+                              posTheme === 'dark'
+                                ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]'
+                                : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                            }`}>
+                              Active
+                            </span>
                           )}
                         </button>
                       );
                     })}
                     {staffAccounts.length === 0 && (
-                      <div className="px-4 py-6 text-center text-gray-500">
+                      <div className={`px-4 py-6 text-center ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
                         <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">No users yet</p>
                       </div>
                     )}
                   </div>
                   {(currentStaff?.userType === 'management' || staffAccounts.length === 0) && (
-                    <div className={`p-2 border-t ${posTheme === 'dark' ? 'border-gray-700/50 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+                    <div className={`p-2 border-t ${posTheme === 'dark' ? 'border-gray-800 bg-[hsl(217,30%,10%)]' : 'border-gray-200 bg-gray-50'}`}>
                       <button
                         onClick={() => setIsUserManagementOpen(true)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-[hsl(217,90%,40%)]/20 transition-colors group"
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg transition-colors ${
+                          posTheme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'
+                        }`}
                       >
-                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[hsl(217,90%,40%)]/20 group-hover:bg-[hsl(217,90%,40%)]/30">
-                          <UserPlus className="h-4 w-4 text-[hsl(217,90%,50%)]" />
-                        </div>
-                        <span className="text-sm text-[hsl(217,90%,50%)] font-medium">Add New User</span>
+                        <UserPlus className={`h-4 w-4 ${posTheme === 'dark' ? 'text-[hsl(217,90%,65%)]' : 'text-[hsl(217,90%,45%)]'}`} />
+                        <span className={`text-sm font-medium ${posTheme === 'dark' ? 'text-[hsl(217,90%,65%)]' : 'text-[hsl(217,90%,45%)]'}`}>Add New User</span>
                       </button>
                     </div>
                   )}
@@ -8894,12 +8940,32 @@ export default function PosSystem() {
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
-            <DialogTitle>Enter Password</DialogTitle>
-            <DialogDescription>
-              Enter the password for {selectedStaffForAuth?.username}
-            </DialogDescription>
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center justify-center w-11 h-11 rounded-full text-base font-semibold flex-shrink-0 ${
+                posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
+              }`}>
+                {(selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || '?').charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <DialogTitle className={posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>
+                  {selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || 'Enter Password'}
+                </DialogTitle>
+                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
+                  Enter the password for {selectedStaffForAuth?.username}
+                </DialogDescription>
+              </div>
+              {selectedStaffForAuth && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                  selectedStaffForAuth.userType === 'management'
+                    ? posTheme === 'dark' ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]' : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                    : posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {selectedStaffForAuth.userType === 'management' ? 'Manager' : 'Staff'}
+                </span>
+              )}
+            </div>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -8939,7 +9005,7 @@ export default function PosSystem() {
                 <Button 
                   type="submit"
                   disabled={authenticateStaffMutation.isPending}
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  className="bg-[hsl(217,90%,45%)] hover:bg-[hsl(217,90%,40%)] text-white"
                 >
                   {authenticateStaffMutation.isPending ? "Verifying..." : "Login"}
                 </Button>
@@ -9028,15 +9094,15 @@ export default function PosSystem() {
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'} shadow-xl overflow-hidden`}>
           {/* Header */}
-          <div className={posTheme === 'dark' ? 'bg-gradient-to-r from-[hsl(217,30%,18%)] to-[hsl(217,30%,15%)] px-6 py-5 border-b border-gray-700/50' : 'bg-gray-50 px-6 py-5 border-b border-gray-200'}>
+          <div className={posTheme === 'dark' ? 'bg-[hsl(217,30%,10%)] px-6 py-5 border-b border-gray-800' : 'bg-gray-50 px-6 py-5 border-b border-gray-200'}>
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
-                <Users className="h-6 w-6 text-white" />
+              <div className={`flex items-center justify-center w-11 h-11 rounded-full ${posTheme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
+                <Users className="h-5 w-5" />
               </div>
               <div>
-                <DialogTitle className={posTheme === 'dark' ? 'text-xl font-bold text-white' : 'text-xl font-bold text-gray-900'}>
+                <DialogTitle className={posTheme === 'dark' ? 'text-lg font-semibold text-gray-100' : 'text-lg font-semibold text-gray-900'}>
                   {staffAccounts.length === 0 ? "Create Your First User" : "User Management"}
                 </DialogTitle>
                 <DialogDescription className={posTheme === 'dark' ? 'text-gray-400 text-sm mt-0.5' : 'text-gray-500 text-sm mt-0.5'}>
@@ -9054,11 +9120,11 @@ export default function PosSystem() {
             {staffAccounts.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Users className="h-4 w-4 text-[hsl(217,90%,50%)]" />
+                  <Users className={`h-4 w-4 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
                   <h3 className={posTheme === 'dark' ? 'text-sm font-semibold uppercase tracking-wider text-gray-400' : 'text-sm font-semibold uppercase tracking-wider text-gray-500'}>Team Members</h3>
-                  <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
+                  <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-800 ml-2' : 'flex-1 h-px bg-gray-200 ml-2'}></div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {staffAccounts.map((staff) => {
                     const isCurrentLoggedIn = currentStaff?.id === staff.id;
                     return (
@@ -9066,52 +9132,55 @@ export default function PosSystem() {
                         key={staff.id} 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`relative flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
-                          isCurrentLoggedIn 
-                            ? 'bg-[hsl(217,90%,40%)]/10 border-[hsl(217,90%,40%)]/30' 
-                            : posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50' : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                        className={`relative flex items-center gap-4 p-3 rounded-lg border transition-colors ${
+                          isCurrentLoggedIn
+                            ? posTheme === 'dark'
+                              ? 'bg-gray-800/60 border-gray-800'
+                              : 'bg-gray-100 border-gray-200'
+                            : posTheme === 'dark'
+                              ? 'bg-transparent border-gray-800 hover:bg-gray-800/40'
+                              : 'bg-white border-gray-200 hover:bg-gray-50'
                         }`}
                       >
                         {/* User Avatar */}
-                        <div className={`relative flex items-center justify-center w-12 h-12 rounded-xl ${
-                          staff.userType === 'management'
-                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]'
-                            : 'bg-gradient-to-br from-gray-600 to-gray-700'
-                        } shadow-lg`}>
-                          <User className="h-6 w-6 text-white" />
-                          {isCurrentLoggedIn && (
-                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg" />
-                          )}
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold flex-shrink-0 ${
+                          posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {(staff.displayName || staff.username).charAt(0).toUpperCase()}
                         </div>
                         
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className={posTheme === 'dark' ? 'font-semibold text-white truncate' : 'font-semibold text-gray-900 truncate'}>
-                              {staff.displayName || staff.username}
+                          <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                            {staff.displayName || staff.username}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                              isCurrentLoggedIn
+                                ? posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'
+                                : staff.userType === 'management'
+                                  ? posTheme === 'dark' ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]' : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                                  : posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {staff.userType === 'management' ? 'Manager' : 'Staff'}
                             </span>
-                            {isCurrentLoggedIn && (
-                              <Badge className="text-[10px] px-1.5 py-0 h-4 bg-green-500/20 text-green-400 border border-green-500/30">
-                                Online
-                              </Badge>
+                            {!staff.isActive && (
+                              <span className={`text-[10px] ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
+                                Inactive
+                              </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge 
-                              className={`text-[10px] px-1.5 py-0 h-4 ${
-                                staff.userType === 'management' 
-                                  ? 'bg-[hsl(217,90%,40%)]/20 text-[hsl(217,90%,60%)] border border-[hsl(217,90%,40%)]/30' 
-                                  : 'bg-gray-700 text-gray-300 border border-gray-600'
-                              }`}
-                            >
-                              {staff.userType === 'management' ? 'Manager' : 'Staff'}
-                            </Badge>
-                            <span className="text-xs text-gray-500">
-                              {staff.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                          </div>
                         </div>
-                        
+
+                        {/* Active pill */}
+                        {isCurrentLoggedIn && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                            posTheme === 'dark' ? 'bg-[hsl(217,90%,55%)]/15 text-[hsl(217,90%,70%)]' : 'bg-[hsl(217,90%,45%)]/10 text-[hsl(217,90%,40%)]'
+                          }`}>
+                            Active
+                          </span>
+                        )}
+
                         {/* Actions */}
                         <div className="flex items-center gap-2">
                           <Button
@@ -9123,10 +9192,12 @@ export default function PosSystem() {
                               }
                             }}
                             disabled={deleteStaffAccountMutation.isPending || isCurrentLoggedIn}
-                            className={`p-2 h-9 w-9 rounded-lg transition-all ${
-                              isCurrentLoggedIn 
-                                ? 'opacity-30 cursor-not-allowed' 
-                                : 'hover:bg-red-500/20 hover:text-red-400 text-gray-400'
+                            className={`p-2 h-9 w-9 rounded-lg transition-colors ${
+                              isCurrentLoggedIn
+                                ? 'opacity-30 cursor-not-allowed'
+                                : posTheme === 'dark'
+                                  ? 'text-gray-400 hover:bg-red-500/15 hover:text-red-400'
+                                  : 'text-gray-500 hover:bg-red-50 hover:text-red-600'
                             }`}
                             title={isCurrentLoggedIn ? "Cannot delete yourself" : "Delete user"}
                           >
