@@ -4,9 +4,8 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Code, Barcode as ScanBarcode, TrendUp as TrendingUp, Users, Medal as Award,
-  ShieldCheck as Shield, CheckCircle, Star, CaretDown as ChevronDown,
-  CaretUp as ChevronUp, EnvelopeSimple as Mail, Sparkle as Sparkles, X, Bell
+  TrendUp as TrendingUp, CheckCircle, Star, CaretDown as ChevronDown,
+  CaretUp as ChevronUp, EnvelopeSimple as Mail, Bell
 } from "@phosphor-icons/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,11 @@ import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM (10)_1759748743787.png";
 import { updatePageSEO } from "@/lib/seo";
+import HeroCodeIllustration from "@/components/illustrations/HeroCodeIllustration";
+import WebDevIllustration from "@/components/illustrations/WebDevIllustration";
+import MultiDeviceSync from "@/components/illustrations/MultiDeviceSync";
+import PricingIntelligenceIllustration from "@/components/illustrations/PricingIntelligenceIllustration";
+import ReportingDashboard from "@/components/illustrations/ReportingDashboard";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -155,107 +159,111 @@ export default function Home() {
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
           
-          {/* Floating particles - blue */}
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-[hsl(217,90%,50%)]/30 rounded-full"
-              style={{ left: `${(i * 17 + 5) % 100}%`, top: `${(i * 23 + 7) % 100}%` }}
-              animate={{ y: [0, -40, 0], opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
-              transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 3, ease: "easeInOut" }}
-            />
-          ))}
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto">
-          <motion.div 
-            className="text-center"
+          <motion.div
+            className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
             initial="initial"
             animate="animate"
             variants={staggerContainer}
           >
-            {/* Logo */}
+            {/* Left column: copy + CTAs */}
+            <div className="text-center lg:text-left">
+              {/* Logo */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="flex justify-center lg:justify-start mb-8"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[hsl(217,90%,60%)]/10 blur-2xl rounded-full scale-150" />
+                  <img src={stormLogo} alt="Storm" className="relative h-28 w-auto drop-shadow-lg" />
+                </div>
+              </motion.div>
+
+              {/* Enterprise badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="inline-flex items-center px-5 py-2 mb-6 bg-[hsl(217,90%,50%)]/10 backdrop-blur-xl rounded-full border border-[hsl(217,90%,50%)]/20 shadow-lg"
+              >
+                <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
+                <span className="text-sm font-medium text-[hsl(217,90%,35%)]">Enterprise Software Solutions</span>
+              </motion.div>
+
+              <motion.h1
+                className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+                variants={fadeInUp}
+              >
+                <span className="bg-gradient-to-r from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] bg-clip-text text-transparent">Smart Software.</span>
+                <br />
+                <span className="text-gray-900">Built for Growth.</span>
+              </motion.h1>
+
+              <motion.p
+                className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                variants={fadeInUp}
+              >
+                From stunning websites to intelligent business automation, <span className="text-gray-900 font-medium">we've got you covered.</span>
+              </motion.p>
+
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-blue-500/30 px-8 py-6 text-lg font-semibold"
+                  onClick={() => {
+                    const solutionsSection = document.querySelector('#solutions-section');
+                    if (solutionsSection) {
+                      solutionsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  Explore Our Solutions
+                  <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-[hsl(217,90%,50%)]/40 text-[hsl(217,90%,40%)] bg-white hover:bg-[hsl(217,90%,50%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-300 px-8 py-6 text-lg font-semibold"
+                >
+                  <Link href="/contact">Contact Sales</Link>
+                </Button>
+              </motion.div>
+
+              {/* Trust indicators */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.8 }}
+                className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-gray-500 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>No Setup Fees</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>24/7 Support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                  <span>South African Based</span>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right column: hero illustration */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="flex justify-center mb-10"
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-[hsl(217,90%,60%)]/10 blur-2xl rounded-full scale-150" />
-                <img src={stormLogo} alt="Storm" className="relative h-36 w-auto drop-shadow-lg" />
-              </div>
-            </motion.div>
-            
-            {/* Enterprise badge */}
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="inline-flex items-center px-5 py-2 mb-8 bg-[hsl(217,90%,50%)]/10 backdrop-blur-xl rounded-full border border-[hsl(217,90%,50%)]/20 shadow-lg"
-            >
-              <span className="w-2 h-2 bg-[hsl(217,90%,50%)] rounded-full mr-3 animate-pulse" />
-              <span className="text-sm font-medium text-[hsl(217,90%,35%)]">Enterprise Software Solutions</span>
-            </motion.div>
-            
-            <motion.h1 
-              className="text-5xl md:text-7xl font-bold mb-6"
               variants={fadeInUp}
+              className="relative flex justify-center lg:justify-end"
             >
-              <span className="bg-gradient-to-r from-[hsl(217,90%,40%)] via-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] bg-clip-text text-transparent">Smart Software.</span>
-              <br />
-              <span className="text-gray-900">Built for Growth.</span>
-            </motion.h1>
-            
-            <motion.p 
-              className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed"
-              variants={fadeInUp}
-            >
-              From stunning websites to intelligent business automation, <span className="text-gray-900 font-medium">we've got you covered.</span>
-            </motion.p>
-            
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] transform hover:scale-105 transition-all duration-300 shadow-2xl shadow-blue-500/30 px-8 py-6 text-lg font-semibold"
-                onClick={() => {
-                  const solutionsSection = document.querySelector('#solutions-section');
-                  if (solutionsSection) {
-                    solutionsSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                Explore Our Solutions
-                <motion.span className="ml-2" animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
-              </Button>
-              <Button 
-                asChild
-                size="lg" 
-                variant="outline"
-                className="border-2 border-[hsl(217,90%,50%)]/40 text-[hsl(217,90%,40%)] bg-white hover:bg-[hsl(217,90%,50%)]/10 hover:border-[hsl(217,90%,50%)]/60 transition-all duration-300 px-8 py-6 text-lg font-semibold"
-              >
-                <Link href="/contact">Contact Sales</Link>
-              </Button>
-            </motion.div>
-            
-            {/* Trust indicators */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.8 }}
-              className="mt-16 flex flex-wrap items-center justify-center gap-8 text-gray-500 text-sm"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                <span>No Setup Fees</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                <span>24/7 Support</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                <span>South African Based</span>
+              <div className="relative w-full max-w-2xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-3xl blur-2xl" />
+                <HeroCodeIllustration className="relative w-full h-auto drop-shadow-2xl" />
               </div>
             </motion.div>
           </motion.div>
@@ -440,18 +448,20 @@ export default function Home() {
                 {/* Subtle glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(217,90%,50%)]/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
                 
-                <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,40%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:shadow-blue-500/50 transition-all duration-300">
-                    <Code className="text-white h-10 w-10" />
+                <CardContent className="relative p-0 h-full flex flex-col">
+                  <div className="bg-white p-4 border-b border-white/10">
+                    <WebDevIllustration className="w-full h-[180px]" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Web Development</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Get a professional website that ranks on Google and converts visitors into paying customers, from <span className="text-white font-medium">R799/month.</span></p>
-                  <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold">
-                    <Link href="/web-development">
-                      Start Your Project
-                      <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
-                    </Link>
-                  </Button>
+                  <div className="p-8 text-center flex flex-col flex-grow">
+                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Web Development</h3>
+                    <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Get a professional website that ranks on Google and converts visitors into paying customers, from <span className="text-white font-medium">R799/month.</span></p>
+                    <Button asChild className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] text-white hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold">
+                      <Link href="/web-development">
+                        Start Your Project
+                        <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -471,21 +481,23 @@ export default function Home() {
                 {/* Subtle glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(217,90%,50%)]/20 to-cyan-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
                 
-                <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-br from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 group-hover:shadow-blue-500/50 transition-all duration-300">
-                    <ScanBarcode className="text-white h-10 w-10" />
+                <CardContent className="relative p-0 h-full flex flex-col">
+                  <div className="bg-white p-4 border-b border-white/10">
+                    <MultiDeviceSync className="w-full h-[180px]" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Storm POS</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Accept payments, track inventory, and send invoices from any device. No monthly fee, <span className="text-white font-medium">you only pay when you make money.</span></p>
-                  <Button 
-                    asChild 
-                    className="bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,45%)] text-white hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,50%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold"
-                  >
-                    <Link href="/pos">
-                      Explore POS System
-                      <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
-                    </Link>
-                  </Button>
+                  <div className="p-8 text-center flex flex-col flex-grow">
+                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-[hsl(217,90%,60%)] transition-colors duration-300">Storm POS</h3>
+                    <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Accept payments, track inventory, and send invoices from any device. No monthly fee, <span className="text-white font-medium">you only pay when you make money.</span></p>
+                    <Button
+                      asChild
+                      className="bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,45%)] text-white hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,50%)] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 font-semibold"
+                    >
+                      <Link href="/pos">
+                        Explore POS System
+                        <motion.span className="ml-2" animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>→</motion.span>
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -502,20 +514,22 @@ export default function Home() {
                 {/* Subtle glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
                 
-                <CardContent className="relative p-8 text-center h-full flex flex-col">
-                  <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/30 group-hover:scale-110 group-hover:shadow-amber-500/50 transition-all duration-300">
-                    <TrendingUp className="text-white h-10 w-10" />
+                <CardContent className="relative p-0 h-full flex flex-col">
+                  <div className="bg-white p-4 border-b border-white/10">
+                    <PricingIntelligenceIllustration className="w-full h-[180px]" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors duration-300">Pricing Intelligence</h3>
-                  <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Know what your competitors charge before your customers do. Real-time <span className="text-white font-medium">market intelligence</span> to help you stay ahead and win more business.</p>
-                  <div className="mt-auto">
-                    <button 
-                      onClick={() => setPricingInterestOpen(true)}
-                      className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 text-gray-400 text-sm hover:bg-amber-500/20 hover:border-amber-500/30 hover:text-amber-400 transition-all duration-300 cursor-pointer"
-                    >
-                      <span className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse"></span>
-                      Notify me when available
-                    </button>
+                  <div className="p-8 text-center flex flex-col flex-grow">
+                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors duration-300">Pricing Intelligence</h3>
+                    <p className="text-gray-400 mb-6 flex-grow leading-relaxed">Know what your competitors charge before your customers do. Real-time <span className="text-white font-medium">market intelligence</span> to help you stay ahead and win more business.</p>
+                    <div className="mt-auto">
+                      <button
+                        onClick={() => setPricingInterestOpen(true)}
+                        className="inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 text-gray-400 text-sm hover:bg-amber-500/20 hover:border-amber-500/30 hover:text-amber-400 transition-all duration-300 cursor-pointer"
+                      >
+                        <span className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse"></span>
+                        Notify me when available
+                      </button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -587,64 +601,39 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative flex justify-center lg:justify-end"
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent mb-2">500+</div>
-                  <div className="text-sm text-gray-400 font-medium">Happy Clients</div>
-                </div>
-                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] bg-clip-text text-transparent mb-2">99.9%</div>
-                  <div className="text-sm text-gray-400 font-medium">Uptime</div>
-                </div>
-                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-purple-500 bg-clip-text text-transparent mb-2">24/7</div>
-                  <div className="text-sm text-gray-400 font-medium">Support</div>
-                </div>
-                <div className="group p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-amber-500/30 transition-all duration-300">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent mb-2">5+</div>
-                  <div className="text-sm text-gray-400 font-medium">Years Experience</div>
+              <div className="relative w-full max-w-xl">
+                <div className="absolute -inset-4 bg-gradient-to-br from-[hsl(217,90%,60%)]/20 to-[hsl(217,90%,40%)]/10 rounded-3xl blur-2xl" />
+                <div className="relative bg-white rounded-2xl p-6 shadow-2xl">
+                  <ReportingDashboard className="w-full h-auto" />
                 </div>
               </div>
             </motion.div>
           </div>
 
+          {/* Trust strip */}
           <motion.div
-            className="grid md:grid-cols-3 gap-6"
-            initial="initial"
-            whileInView="animate"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            variants={staggerContainer}
+            transition={{ duration: 0.8 }}
+            className="mt-4 p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10"
           >
-            <motion.div variants={fadeInUp}>
-              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,40%)] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
-                  <Users className="text-white h-8 w-8" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-3">Expert Team</h4>
-                <p className="text-gray-400">Our skilled developers and designers bring years of experience to every project</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent mb-2">500+</div>
+                <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Clients</div>
               </div>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-[hsl(217,90%,50%)]/30 transition-all duration-300 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-[hsl(217,90%,55%)] to-[hsl(217,90%,45%)] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
-                  <Award className="text-white h-8 w-8" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-3">Quality First</h4>
-                <p className="text-gray-400">We never compromise on quality, delivering solutions that exceed expectations</p>
+              <div className="sm:border-x sm:border-white/10">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent mb-2">99.9%</div>
+                <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Uptime</div>
               </div>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <div className="group h-full p-8 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-purple-500/30 transition-all duration-300 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-purple-500/25 group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="text-white h-8 w-8" />
-                </div>
-                <h4 className="text-xl font-bold text-white mb-3">Trusted & Secure</h4>
-                <p className="text-gray-400">Enterprise-grade security and reliability you can count on</p>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[hsl(217,90%,60%)] to-[hsl(217,90%,50%)] bg-clip-text text-transparent mb-2">5+</div>
+                <div className="text-sm text-gray-400 font-medium uppercase tracking-wider">Years</div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
