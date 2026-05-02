@@ -44,66 +44,6 @@ export default function POS() {
       description: 'The smartest POS system for South African retailers. Flat-rate plans from R299/month — no percentage cuts, no surprises. Starter, Growth & Scale. Try free for 7 days.',
       canonical: 'https://stormsoftware.co.za/pos'
     });
-
-    const breadcrumbScript = document.createElement('script');
-    breadcrumbScript.type = 'application/ld+json';
-    breadcrumbScript.setAttribute('data-schema', 'breadcrumb');
-    breadcrumbScript.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
-        { "@type": "ListItem", "position": 2, "name": "Storm POS", "item": "https://stormsoftware.co.za/pos" }
-      ]
-    });
-    document.head.appendChild(breadcrumbScript);
-    
-    const faqSchema = {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        { "@type": "Question", "name": "How much does Storm POS cost?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS offers three flat-rate plans: Starter (R299/month, 50 invoices included), Growth (R599/month, 200 invoices included, R0.50 per extra), and Scale (R999/month, unlimited invoices, multi-location, dedicated priority support). All plans include a 7-day free trial with no setup fees." } },
-        { "@type": "Question", "name": "Is there a free trial for Storm POS?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers a 7-day free trial with full access to all features. No credit card required to start." } },
-        { "@type": "Question", "name": "Does Storm POS work offline?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS is a cloud-based system that works on any device with an internet connection. It automatically syncs your data across all your devices in real-time." } },
-        { "@type": "Question", "name": "Can I use Storm POS in Afrikaans?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS offers full Afrikaans language support. You can switch between English and Afrikaans at any time in your settings." } },
-        { "@type": "Question", "name": "What devices can I use with Storm POS?", "acceptedAnswer": { "@type": "Answer", "text": "Storm POS works on any device with a web browser - tablets, smartphones, laptops, or desktop computers. No special hardware required." } },
-        { "@type": "Question", "name": "Can Storm POS generate invoices and quotes?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Storm POS includes a full invoicing and quoting system. Generate professional PDF invoices and quotes with your business branding, then email them directly to customers." } }
-      ]
-    };
-    
-    const productSchema = {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": "Storm POS",
-      "description": "Cloud-based Point of Sale system for South African retailers. Real-time sales tracking, inventory management, invoicing, and comprehensive analytics.",
-      "brand": { "@type": "Brand", "name": "Storm Software" },
-      "offers": { "@type": "AggregateOffer", "priceCurrency": "ZAR", "lowPrice": "299", "highPrice": "999", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "description": "Starter: R299/month (50 invoices included). Growth: R599/month (200 invoices included, R0.50 extra). Scale: R999/month (unlimited invoices, multi-location). 7-day free trial." },
-      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127", "bestRating": "5", "worstRating": "1" }
-    };
-    
-    const existingFaqScript = document.querySelector('script[data-schema="faq"]');
-    if (!existingFaqScript) {
-      const faqScript = document.createElement('script');
-      faqScript.type = 'application/ld+json';
-      faqScript.setAttribute('data-schema', 'faq');
-      faqScript.textContent = JSON.stringify(faqSchema);
-      document.head.appendChild(faqScript);
-    }
-    
-    const existingProductScript = document.querySelector('script[data-schema="product"]');
-    if (!existingProductScript) {
-      const productScript = document.createElement('script');
-      productScript.type = 'application/ld+json';
-      productScript.setAttribute('data-schema', 'product');
-      productScript.textContent = JSON.stringify(productSchema);
-      document.head.appendChild(productScript);
-    }
-    
-    return () => {
-      document.querySelector('script[data-schema="faq"]')?.remove();
-      document.querySelector('script[data-schema="product"]')?.remove();
-      document.querySelector('script[data-schema="breadcrumb"]')?.remove();
-    };
   }, []);
 
   const features = [

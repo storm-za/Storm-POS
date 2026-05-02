@@ -44,6 +44,18 @@ const staticPageMeta: Record<string, PageMeta> = {
       "Expert insights on POS systems, web development, and digital transformation for South African businesses. Stay ahead with Storm Software.",
     canonical: `${BASE_URL}/blog`,
   },
+  "/pricing": {
+    title: "Pricing - Storm POS | Starter, Growth & Scale | 7-Day Free Trial",
+    description:
+      "Simple, transparent flat-rate pricing for South African retailers. Starter (R299/month), Growth (R599/month), Scale (R999/month). No setup fees. 7-day free trial.",
+    canonical: `${BASE_URL}/pricing`,
+  },
+  "/contact": {
+    title: "Contact Us - Storm Software | Web Development & POS Solutions in SA",
+    description:
+      "Get in touch with Storm for professional web development and POS solutions. We're here to help South African businesses grow with cutting-edge technology.",
+    canonical: `${BASE_URL}/contact`,
+  },
 };
 
 const blogPostMeta: Record<string, BlogPostMeta> = {
@@ -115,8 +127,8 @@ const blogPostMeta: Record<string, BlogPostMeta> = {
   },
 };
 
-function getPageMeta(urlPath: string): PageMeta {
-  if (staticPageMeta[urlPath]) return staticPageMeta[urlPath];
+function getPageMeta(urlPath: string): { meta: PageMeta; found: boolean } {
+  if (staticPageMeta[urlPath]) return { meta: staticPageMeta[urlPath], found: true };
 
   const blogMatch = urlPath.match(/^\/blog\/(.+)$/);
   if (blogMatch) {
@@ -124,14 +136,24 @@ function getPageMeta(urlPath: string): PageMeta {
     const post = blogPostMeta[slug];
     if (post) {
       return {
-        title: post.title + " | Storm Blog",
-        description: post.description,
-        canonical: `${BASE_URL}/blog/${slug}`,
+        meta: {
+          title: post.title + " | Storm Blog",
+          description: post.description,
+          canonical: `${BASE_URL}/blog/${slug}`,
+        },
+        found: true,
       };
     }
   }
 
-  return staticPageMeta["/"];
+  return {
+    meta: {
+      title: "Page Not Found - Storm Software",
+      description: "The page you are looking for could not be found. Return to the Storm Software homepage.",
+      canonical: `${BASE_URL}/`,
+    },
+    found: false,
+  };
 }
 
 function escapeHtml(str: string): string {
@@ -277,6 +299,44 @@ function buildStructuredData(urlPath: string): string {
     });
   }
 
+  if (urlPath === "/pricing") {
+    return jsonLdScript({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
+        { "@type": "ListItem", "position": 2, "name": "Pricing", "item": `${BASE_URL}/pricing` }
+      ]
+    });
+  }
+
+  if (urlPath === "/contact") {
+    return [
+      jsonLdScript({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": `${BASE_URL}/` },
+          { "@type": "ListItem", "position": 2, "name": "Contact", "item": `${BASE_URL}/contact` }
+        ]
+      }),
+      jsonLdScript({
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contact Storm Software",
+        "description": "Get in touch with Storm Software for web development and POS solutions in South Africa.",
+        "url": `${BASE_URL}/contact`,
+        "mainEntity": {
+          "@type": "Organization",
+          "name": "Storm Software",
+          "url": BASE_URL,
+          "logo": LOGO_URL,
+          "areaServed": "ZA"
+        }
+      })
+    ].join("\n    ");
+  }
+
   if (blogMatch) {
     const slug = blogMatch[1];
     const post = blogPostMeta[slug];
@@ -312,18 +372,19 @@ function buildStructuredData(urlPath: string): string {
   return "";
 }
 
-function buildHeadHtml(urlPath: string): string {
-  const meta = getPageMeta(urlPath);
+function buildHeadHtml(urlPath: string, meta: PageMeta, found: boolean): string {
   const title = escapeHtml(meta.title);
   const description = escapeHtml(meta.description);
   const canonical = escapeHtml(meta.canonical);
 
-  const structuredData = buildStructuredData(urlPath);
+  const structuredData = found ? buildStructuredData(urlPath) : "";
+  const robotsTag = found ? "" : `<meta name="robots" content="noindex, follow" />`;
 
   return `
     <title>${title}</title>
     <meta name="description" content="${description}" />
     <link rel="canonical" href="${canonical}" />
+    ${robotsTag}
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:url" content="${canonical}" />
@@ -342,8 +403,9 @@ function createStaticLocationHook(path: string) {
   };
 }
 
-export function render(urlPath: string): { html: string; headHtml: string } {
+export function render(urlPath: string): { html: string; headHtml: string; notFound: boolean } {
   const hook = createStaticLocationHook(urlPath);
+  const { meta, found } = getPageMeta(urlPath);
 
   let html = "";
   try {
@@ -357,6 +419,6 @@ export function render(urlPath: string): { html: string; headHtml: string } {
     html = "";
   }
 
-  const headHtml = buildHeadHtml(urlPath);
-  return { html, headHtml };
+  const headHtml = buildHeadHtml(urlPath, meta, found);
+  return { html, headHtml, notFound: !found };
 }

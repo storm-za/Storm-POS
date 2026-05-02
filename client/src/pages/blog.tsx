@@ -138,23 +138,6 @@ export default function Blog() {
       description: 'Expert insights on POS systems, web development, and digital transformation for South African businesses. Stay ahead with Storm Software.',
       canonical: 'https://stormsoftware.co.za/blog'
     });
-
-    const breadcrumbSchema = document.createElement('script');
-    breadcrumbSchema.type = 'application/ld+json';
-    breadcrumbSchema.id = 'blog-breadcrumb-schema';
-    breadcrumbSchema.text = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
-        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://stormsoftware.co.za/blog" }
-      ]
-    });
-    document.head.appendChild(breadcrumbSchema);
-
-    return () => {
-      document.getElementById('blog-breadcrumb-schema')?.remove();
-    };
   }, []);
 
   const fadeInUp = {

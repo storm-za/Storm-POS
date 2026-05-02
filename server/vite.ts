@@ -20,7 +20,7 @@ export function log(message: string, source = "express") {
 }
 
 const SSR_ROUTE_PATTERN =
-  /^(\/|\/pos|\/web-development|\/blog|\/blog\/[^/]+)(\?.*)?$/;
+  /^(\/|\/pos|\/web-development|\/pricing|\/contact|\/blog|\/blog\/[^/]+)(\?.*)?$/;
 
 function isSSRRoute(urlPath: string): boolean {
   return SSR_ROUTE_PATTERN.test(urlPath);
@@ -75,16 +75,16 @@ export async function setupVite(app: Express, server: Server) {
           )) as {
             render: (
               url: string,
-            ) => { html: string; headHtml: string };
+            ) => { html: string; headHtml: string; notFound: boolean };
           };
 
-          const { html: appHtml, headHtml } = render(urlPath);
+          const { html: appHtml, headHtml, notFound } = render(urlPath);
 
           const finalPage = page
             .replace("<!--ssr-head-->", headHtml)
             .replace("<!--ssr-outlet-->", appHtml);
 
-          res.status(200).set({ "Content-Type": "text/html" }).end(finalPage);
+          res.status(notFound ? 404 : 200).set({ "Content-Type": "text/html" }).end(finalPage);
           return;
         } catch (ssrErr) {
           log(`[SSR] render failed for ${urlPath}, falling back to SPA`);
@@ -134,13 +134,13 @@ export function serveStatic(app: Express) {
       try {
         const template = await fs.promises.readFile(indexHtmlPath, "utf-8");
         const { render } = (await import(ssrBundlePath)) as {
-          render: (url: string) => { html: string; headHtml: string };
+          render: (url: string) => { html: string; headHtml: string; notFound: boolean };
         };
-        const { html: appHtml, headHtml } = render(urlPath);
+        const { html: appHtml, headHtml, notFound } = render(urlPath);
         const finalPage = template
           .replace("<!--ssr-head-->", headHtml)
           .replace("<!--ssr-outlet-->", appHtml);
-        res.status(200).set({ "Content-Type": "text/html" }).end(finalPage);
+        res.status(notFound ? 404 : 200).set({ "Content-Type": "text/html" }).end(finalPage);
         return;
       } catch (err) {
         log(`[SSR] production render failed for ${urlPath}, falling back`);

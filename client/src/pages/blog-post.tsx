@@ -1339,57 +1339,6 @@ export default function BlogPost() {
       description: post.metaDescription,
       canonical: canonicalUrl
     });
-
-    const articleSchema = document.createElement('script');
-    articleSchema.type = 'application/ld+json';
-    articleSchema.id = 'article-schema';
-    articleSchema.text = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": post.title,
-      "description": post.metaDescription,
-      "image": post.image || "https://stormsoftware.co.za/storm-logo.png",
-      "datePublished": post.date,
-      "dateModified": post.date,
-      "author": {
-        "@type": "Organization",
-        "name": "Storm Software",
-        "url": "https://stormsoftware.co.za"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Storm Software",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://stormsoftware.co.za/storm-logo.png"
-        }
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": canonicalUrl
-      },
-      "url": canonicalUrl
-    });
-    document.head.appendChild(articleSchema);
-
-    const breadcrumbSchema = document.createElement('script');
-    breadcrumbSchema.type = 'application/ld+json';
-    breadcrumbSchema.id = 'breadcrumb-schema';
-    breadcrumbSchema.text = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stormsoftware.co.za/" },
-        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://stormsoftware.co.za/blog" },
-        { "@type": "ListItem", "position": 3, "name": post.title, "item": canonicalUrl }
-      ]
-    });
-    document.head.appendChild(breadcrumbSchema);
-
-    return () => {
-      document.getElementById('article-schema')?.remove();
-      document.getElementById('breadcrumb-schema')?.remove();
-    };
   }, [post, slug]);
 
   if (!post) {
