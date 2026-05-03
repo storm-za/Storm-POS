@@ -3896,7 +3896,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             transition={{ type: 'spring', damping: 22, stiffness: 280 }}
             className={`rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-[#080d1a] border border-white/10' : 'bg-white border border-gray-200'}`}
           >
-            <div className="h-0.5 bg-gradient-to-r from-[hsl(217,90%,35%)] via-[hsl(217,90%,55%)] to-[hsl(217,90%,35%)]" />
+            <div className="h-0.5 bg-[hsl(217,90%,40%)]" />
             <div className="relative p-7">
               <button
                 onClick={() => setSaleCompleteData(null)}
@@ -3963,8 +3963,8 @@ ${paidInvoicesInRange.map((inv: any) =>
           className="fixed top-20 left-4 right-4 md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 z-[100]"
         >
           <div className="relative max-w-sm md:max-w-none mx-auto md:mx-0">
-            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/30 via-[hsl(217,90%,50%)]/20 to-[hsl(217,90%,40%)]/30 rounded-xl md:rounded-2xl blur-xl"></div>
-            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl shadow-blue-900/40 md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
+            <div className="absolute inset-0 bg-transparent rounded-xl md:rounded-2xl blur-xl"></div>
+            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-xl md:rounded-2xl"
                 animate={{ x: ['-100%', '200%'] }}
@@ -3978,7 +3978,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </button>
               <div className="flex items-center gap-3 md:gap-4 relative z-10 pr-6">
-                <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+                <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-[hsl(217,90%,40%)] shadow-lg flex-shrink-0">
                   <User className="h-5 w-5 md:h-6 md:w-6 text-white drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -3987,7 +3987,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 </div>
               </div>
               <motion.div
-                className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,55%)] rounded-b-2xl"
+                className="absolute bottom-0 left-0 h-1 bg-[hsl(217,90%,45%)] rounded-b-2xl"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: 5, ease: 'linear' }}
@@ -4043,7 +4043,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   }}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all duration-200 ${
                     currentTab === item.id
-                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30"
+                      ? "bg-[hsl(217,90%,40%)] text-white shadow-lg"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                   data-testid={`menu-item-${item.id}-af`}
@@ -4060,7 +4060,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 onClick={() => setMobileStaffPickerOpen(prev => !prev)}
                 className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-colors text-left"
               >
-                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
+                <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)] shadow-inner flex-shrink-0">
                   {currentUser?.companyLogo ? (
                     <img src={currentUser.companyLogo} alt="" className="w-full h-full rounded-lg object-cover" />
                   ) : (
@@ -4075,7 +4075,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               </button>
               {/* Personeellys */}
               {mobileStaffPickerOpen && (
-                <div className={`mx-1 mb-1 rounded-xl overflow-hidden border ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'}`}>
+                <div className={`mx-1 mb-1 rounded-xl overflow-hidden border ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
                   {staffAccounts.length === 0 ? (
                     <p className={`text-xs px-3 py-2.5 ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Geen personeelrekeninge bygevoeg nie.</p>
                   ) : (
@@ -4242,7 +4242,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 title={sidebarCollapsed ? item.label : undefined}
                 className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm font-medium transition-all duration-200 ${sidebarCollapsed ? 'justify-center' : ''} ${
                   currentTab === item.id
-                    ? "bg-[hsl(217,90%,40%)] text-white shadow-lg shadow-blue-500/30"
+                    ? "bg-[hsl(217,90%,40%)] text-white shadow-lg"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
@@ -4292,7 +4292,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left hover:bg-gray-100 transition-all ${highlightStaffButton ? 'ring-2 ring-[hsl(217,90%,50%)] ring-opacity-70' : ''}`}
                     data-testid="staff-dropdown"
                   >
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-inner flex-shrink-0">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)] shadow-inner flex-shrink-0">
                       {currentUser?.companyLogo ? (
                         <img src={currentUser.companyLogo} alt="" className="w-full h-full rounded-lg object-cover" />
                       ) : (
@@ -4325,7 +4325,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   align="end" 
                   className={`w-72 p-0 rounded-xl overflow-hidden shadow-xl ${
                     posTheme === 'dark'
-                      ? 'bg-[hsl(217,30%,12%)] border border-gray-800 text-gray-100'
+                      ? 'bg-gray-950 border border-gray-800 text-gray-100'
                       : 'bg-white border border-gray-200 text-gray-900'
                   }`}
                 >
@@ -4426,7 +4426,7 @@ ${paidInvoicesInRange.map((inv: any) =>
           </div>
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="absolute top-1/2 -translate-y-1/2 -right-4 w-8 h-8 bg-[hsl(217,90%,40%)] border-2 border-[hsl(217,90%,50%)] rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center hover:bg-[hsl(217,90%,35%)] hover:shadow-blue-500/50 hover:scale-110 transition-all duration-200 z-50"
+            className="absolute top-1/2 -translate-y-1/2 -right-4 w-8 h-8 bg-[hsl(217,90%,40%)] border-2 border-[hsl(217,90%,50%)] rounded-full shadow-lg flex items-center justify-center hover:bg-[hsl(217,90%,35%)] hover:scale-110 transition-all duration-200 z-50"
           >
             <ChevronLeft className={`h-4 w-4 text-white transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`} />
           </button>
@@ -4452,7 +4452,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="w-full">
               <div className="px-1 pb-4">
                 <h2 style={{ color: posTheme === 'dark' ? '#ffffff' : '#111827' }} className="text-lg sm:text-2xl font-bold tracking-tight md:text-[35px] md:leading-[1.2]">Kies 'n produk om te begin verkoop</h2>
-                <div className="w-16 h-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,60%)] rounded-full mt-2"></div>
+                <div className="w-16 h-1 bg-[hsl(217,90%,45%)] rounded-full mt-2"></div>
               </div>
               <div className={`w-full rounded-2xl shadow-2xl overflow-hidden ${posTheme === 'dark' ? 'bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 shadow-black/20' : 'bg-white border border-gray-200 shadow-gray-200/80'}`}>
                 <div className="flex flex-col lg:flex-row w-full">
@@ -4543,7 +4543,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     >
                       {products.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16">
-                          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] flex items-center justify-center shadow-xl shadow-blue-500/30 mb-5">
+                          <div className="w-20 h-20 rounded-2xl bg-[hsl(217,90%,40%)] flex items-center justify-center shadow-xl mb-5">
                             <PlusCircle className="w-10 h-10 text-white" />
                           </div>
                           <h3 className={`text-lg font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Voeg jou eerste produk by</h3>
@@ -4694,7 +4694,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     <div className={`px-3 py-3 sm:px-5 sm:py-4 border-b ${posTheme === 'dark' ? 'border-gray-700/30 bg-[hsl(217,25%,13%)]/50' : 'border-gray-100 bg-gray-50'}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/20"><ShoppingCart className="h-4 w-4 text-white" /></div>
+                          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)] shadow-lg"><ShoppingCart className="h-4 w-4 text-white" /></div>
                           <div>
                             <h3 className={`text-sm font-semibold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Huidige Verkoop</h3>
                             <p className="text-xs text-gray-500">{currentSale.length === 0 ? 'Geen items nog nie' : `${currentSale.reduce((acc, item) => acc + item.quantity, 0)} items`}</p>
@@ -4831,7 +4831,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             </Select>
                           </div>
                         )}
-                        <Button className="w-full h-12 sm:h-10 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-lg shadow-blue-900/30" onClick={() => checkoutMutation.mutate()} disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}>
+                        <Button className="w-full h-12 sm:h-10 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold shadow-lg" onClick={() => checkoutMutation.mutate()} disabled={currentSale.length === 0 || checkoutMutation.isPending || (checkoutOption === 'add-to-account' && !selectedOpenAccountId)}>
                           {checkoutOption === 'complete' ? (<><Receipt className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Voltooi Verkoop"}</>) : checkoutOption === 'open-account' ? (<><FileText className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Skep Oop Rekening"}</>) : (<><Plus className="h-4 w-4 mr-2" />{checkoutMutation.isPending ? "Verwerk..." : "Voeg by Rekening"}</>)}
                         </Button>
                       </div>
@@ -4858,10 +4858,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                   transition={{ delay: 0.1 }}
                   className="relative group"
                 >
-                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
                   <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[hsl(217,90%,40%)] shadow-lg">
                         <Package className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -4934,12 +4934,12 @@ ${paidInvoicesInRange.map((inv: any) =>
               </div>
 
               {/* Main Products Card */}
-              <Card className={`${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10 overflow-hidden`}>
-                <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5"></div>
+              <Card className={`${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
+                <div className="absolute inset-0 bg-transparent"></div>
                 <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg">
                         <Package className="w-6 h-6 text-white" />
                       </div>
                       <div>
@@ -5095,7 +5095,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="space-y-4">
                     {/* Enhanced Search Bar */}
                     <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/10 via-transparent to-[hsl(217,90%,40%)]/10 rounded-xl blur-lg"></div>
+                      <div className="absolute inset-0 bg-transparent rounded-xl blur-lg"></div>
                       <div className="relative flex items-center">
                         <Search className="absolute left-4 h-5 w-5 text-[hsl(217,90%,50%)]" />
                         <Input
@@ -5141,7 +5141,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             className="group"
                           >
                             <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
                               {/* Mobile Layout - shows on screens below 768px */}
                               <div className="relative block md:hidden space-y-3">
@@ -5150,7 +5150,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                                     {product.imageUrl ? (
                                       <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                     ) : (
-                                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                         <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                                       </div>
                                     )}
@@ -5214,7 +5214,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                                   {product.imageUrl ? (
                                     <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                   ) : (
-                                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)]/20 to-[hsl(217,90%,35%)]/20 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                       <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
                                     </div>
                                   )}
@@ -6160,7 +6160,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               <div className={`rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-700/60' : 'bg-white border-gray-200 shadow-sm'}`}>
                 <div className={`px-5 py-4 border-b flex items-center justify-between ${posTheme === 'dark' ? 'border-gray-700/60' : 'border-gray-100'}`}>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,50%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-900/30">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg">
                       <BarChart3 className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -6171,7 +6171,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <Button
                     onClick={() => handlePrintReport()}
                     size="sm"
-                    className="h-8 bg-gradient-to-r from-[hsl(217,90%,50%)] to-[hsl(217,90%,38%)] hover:from-[hsl(217,90%,55%)] hover:to-[hsl(217,90%,43%)] text-white shadow-md text-xs"
+                    className="h-8 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white shadow-md text-xs"
                   >
                     <Download className="w-3.5 h-3.5 mr-1.5" />
                     Druk Verslag
@@ -6999,7 +6999,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 const completedCount = checklistItems.filter(i => i.done).length;
                 const pct = Math.round((completedCount / checklistItems.length) * 100);
                 return (
-                  <Card className="bg-gradient-to-r from-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,50%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl shadow-blue-900/20">
+                  <Card className="bg-[hsl(217,90%,40%)]/10 border border-[hsl(217,90%,50%)]/30 shadow-xl">
                     <CardContent className="pt-5 pb-5">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -7049,7 +7049,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               })()}
 
               {/* Voorkoms Kaart */}
-              <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl shadow-blue-900/10' : 'bg-white border-gray-200 shadow-lg'}>
+              <Card className={posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700 shadow-2xl' : 'bg-white border-gray-200 shadow-lg'}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {posTheme === 'dark' ? <Moon className="w-5 h-5 text-[hsl(217,90%,50%)]" /> : <Sun className="w-5 h-5 text-[hsl(217,90%,40%)]" />}
@@ -7081,7 +7081,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               </Card>
 
               {/* Account & Preferences Section */}
-              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl`}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <User className="w-5 h-5 text-[hsl(217,90%,40%)]" />
@@ -7098,9 +7098,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                       className="cursor-pointer group"
                     >
                       <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
                             <User className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
@@ -7120,9 +7120,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                       className="cursor-pointer group"
                     >
                       <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
                             <Receipt className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
@@ -7142,9 +7142,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                       className="cursor-pointer group"
                     >
                       <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
                             <FileText className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
@@ -7164,9 +7164,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                       className="cursor-pointer group"
                     >
                       <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
                             <Lock className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
@@ -7206,9 +7206,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                       className="cursor-pointer group"
                     >
                       <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/0 via-[hsl(217,90%,40%)]/5 to-[hsl(217,90%,40%)]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
                             <Globe className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
@@ -7246,7 +7246,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               </Card>
 
               {/* Business Information Section */}
-              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl`}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Building2 className="w-5 h-5 text-[hsl(217,90%,40%)]" />
@@ -7357,7 +7357,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               </Card>
 
               {/* Integrations Section */}
-              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/10`}>
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-800/50 backdrop-blur-xl border-gray-700' : 'bg-white border-gray-200'} shadow-2xl`}>
                 <CardHeader className={`border-b pb-4 ${posTheme === 'dark' ? 'border-white/10' : 'border-gray-100'}`}>
                   <CardTitle className={`flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     <Settings className="w-5 h-5 text-[hsl(217,90%,40%)]" />
@@ -7690,7 +7690,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             </Button>
             <Button 
               onClick={handleSaveCategory} 
-              className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)]"
+              className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
               disabled={createCategoryMutation.isPending || updateCategoryMutation.isPending}
             >
               {createCategoryMutation.isPending || updateCategoryMutation.isPending ? 'Stoor...' : (editingCategory ? 'Werk Kategorie By' : 'Skep Kategorie')}
@@ -7700,12 +7700,12 @@ ${paidInvoicesInRange.map((inv: any) =>
       </Dialog>
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/30 p-0`}>
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(217,90%,40%)]/5 via-transparent to-[hsl(217,90%,40%)]/5 pointer-events-none"></div>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[560px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl p-0`}>
+          <div className="absolute inset-0 bg-transparent pointer-events-none"></div>
           <div className="relative">
             <div className={posTheme === 'dark' ? 'px-6 pt-6 pb-4 border-b border-gray-700/50 flex-shrink-0' : 'px-6 pt-6 pb-4 border-b border-gray-200 flex-shrink-0'}>
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg">
                   <Package className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -7950,7 +7950,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg shadow-blue-500/30 px-6"
+                    className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] shadow-lg px-6"
                     disabled={createProductMutation.isPending || updateProductMutation.isPending}
                   >
                     {createProductMutation.isPending || updateProductMutation.isPending ? (
@@ -8072,10 +8072,10 @@ ${paidInvoicesInRange.map((inv: any) =>
       </Dialog>
       {/* Oop Rekening Skep Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl shadow-blue-900/30`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
           <DialogHeader className="border-b border-gray-700/50 pb-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] shadow-lg shadow-blue-500/30">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg">
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -8143,13 +8143,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                         onClick={() => field.onChange('table')}
                         className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
                           field.value === 'table' 
-                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg' 
                             : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
                         }`}
                       >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
                           field.value === 'table' 
-                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                            ? 'bg-[hsl(217,90%,40%)]' 
                             : 'bg-gray-700/50'
                         }`}>
                           <FileText className={`w-5 h-5 ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`} />
@@ -8162,13 +8162,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                         onClick={() => field.onChange('customer')}
                         className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
                           field.value === 'customer' 
-                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg shadow-blue-500/20' 
+                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg' 
                             : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
                         }`}
                       >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
                           field.value === 'customer' 
-                            ? 'bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)]' 
+                            ? 'bg-[hsl(217,90%,40%)]' 
                             : 'bg-gray-700/50'
                         }`}>
                           <Users className={`w-5 h-5 ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`} />
@@ -8636,7 +8636,7 @@ ${paidInvoicesInRange.map((inv: any) =>
           setSelectedStaffForAuth(null);
         }
       }}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'}`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
             <div className="flex items-center gap-3">
               <div className={`flex items-center justify-center w-11 h-11 rounded-full text-base font-semibold flex-shrink-0 ${
@@ -8790,7 +8790,7 @@ ${paidInvoicesInRange.map((inv: any) =>
       </Dialog>
       {/* User Management Dialog - Enterprise Design */}
       <Dialog open={isUserManagementOpen} onOpenChange={setIsUserManagementOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-[hsl(217,30%,12%)] border-gray-800' : 'bg-white border-gray-200'} shadow-xl overflow-hidden`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl max-h-[85vh] p-0 ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-xl overflow-hidden`}>
           {/* Header */}
           <div className={posTheme === 'dark' ? 'bg-[hsl(217,30%,10%)] px-6 py-5 border-b border-gray-800' : 'bg-gray-50 px-6 py-5 border-b border-gray-200'}>
             <div className="flex items-center gap-3">
@@ -8971,7 +8971,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <Button 
                     type="submit" 
                     disabled={createStaffAccountMutation.isPending}
-                    className="w-full bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,40%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,45%)] text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-blue-500/25 transition-all"
+                    className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold py-2.5 rounded-lg shadow-lg transition-all"
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
                     {createStaffAccountMutation.isPending ? "Skep tans..." : "Skep Gebruiker"}
@@ -9008,7 +9008,7 @@ ${paidInvoicesInRange.map((inv: any) =>
       <Dialog open={isBankDetailsOpen} onOpenChange={setIsBankDetailsOpen}>
         <DialogContent className={`w-[calc(100vw-2rem)] sm:w-auto sm:max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden p-0 rounded-2xl border shadow-2xl ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
           {/* Header */}
-          <div className="bg-gradient-to-r from-[hsl(217,90%,35%)] to-[hsl(217,90%,22%)] px-6 py-5 flex items-center gap-4">
+          <div className="bg-[hsl(217,90%,28%)] px-6 py-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
               <CreditCard className="w-6 h-6 text-white" />
             </div>
@@ -9094,7 +9094,7 @@ ${paidInvoicesInRange.map((inv: any) =>
 
             <Button
               onClick={() => setIsBankDetailsOpen(false)}
-              className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base rounded-xl shadow-lg shadow-blue-900/20"
+              className="w-full h-11 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold text-base rounded-xl shadow-lg"
             >
               Klaar
             </Button>
@@ -10404,7 +10404,7 @@ ${paidInvoicesInRange.map((inv: any) =>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader className="border-b border-gray-200 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-[hsl(217,90%,40%)] rounded-xl flex items-center justify-center shadow-lg">
                 <FileSpreadsheet className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -10418,7 +10418,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             </div>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto py-4 space-y-4">
-            <div className="bg-gradient-to-r from-[hsl(217,90%,40%)]/10 to-[hsl(217,90%,50%)]/10 rounded-xl p-4 border border-[hsl(217,90%,40%)]/20">
+            <div className="bg-[hsl(217,90%,40%)]/10 rounded-xl p-4 border border-[hsl(217,90%,40%)]/20">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-[hsl(217,90%,40%)] rounded-lg flex items-center justify-center">
                   <Package className="w-4 h-4 text-white" />
@@ -10481,7 +10481,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             <Button 
               onClick={handleImportConfirm}
               disabled={isImporting || importData.length === 0}
-              className="w-full sm:w-auto bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] shadow-lg"
+              className="w-full sm:w-auto bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] shadow-lg"
             >
               {isImporting ? (
                 <span className="flex items-center gap-2">
@@ -10613,7 +10613,7 @@ ${paidInvoicesInRange.map((inv: any) =>
         setOpenAccountTipEnabled(false);
       }}>
         <DialogContent className={`w-[calc(100vw-2rem)] sm:w-auto sm:max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden p-0 rounded-2xl border ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
-          <div className="bg-gradient-to-r from-[hsl(217,90%,35%)] to-[hsl(217,90%,25%)] px-5 py-4 flex items-center gap-3">
+          <div className="bg-[hsl(217,90%,30%)] px-5 py-4 flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 flex-shrink-0">
               <FileText className="w-5 h-5 text-white" />
             </div>
@@ -10763,9 +10763,9 @@ ${paidInvoicesInRange.map((inv: any) =>
       {/* Hernoem Oop Rekening Dialog */}
       <Dialog open={!!editingOpenAccount} onOpenChange={(open) => { if (!open) { setEditingOpenAccount(null); setEditOpenAccountName(""); } }}>
         <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-sm ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl rounded-2xl p-0 overflow-hidden`}>
-          <div className="relative bg-gradient-to-r from-[hsl(217,90%,30%)]/40 via-[hsl(217,90%,40%)]/20 to-[hsl(217,90%,30%)]/40 border-b border-gray-700/50 px-5 py-4">
+          <div className="relative bg-[hsl(217,90%,30%)]/30 border-b border-gray-700/50 px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(217,90%,45%)] to-[hsl(217,90%,30%)] shadow-lg shadow-blue-500/30 flex-shrink-0">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(217,90%,38%)] shadow-lg flex-shrink-0">
                 <Edit className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -10789,7 +10789,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1 border-gray-600/60 text-gray-300 hover:bg-gray-800 bg-transparent h-9" onClick={() => { setEditingOpenAccount(null); setEditOpenAccountName(""); }}>Kanselleer</Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-[hsl(217,90%,45%)] to-[hsl(217,90%,35%)] hover:from-[hsl(217,90%,50%)] hover:to-[hsl(217,90%,40%)] text-white h-9 font-semibold"
+                className="flex-1 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white h-9 font-semibold"
                 disabled={!editOpenAccountName.trim() || updateOpenAccountNameMutation.isPending}
                 onClick={() => { if (editingOpenAccount) updateOpenAccountNameMutation.mutate({ accountId: editingOpenAccount.id, accountName: editOpenAccountName.trim() }); }}
               >
