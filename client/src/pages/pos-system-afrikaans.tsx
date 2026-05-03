@@ -3964,7 +3964,7 @@ ${paidInvoicesInRange.map((inv: any) =>
         >
           <div className="relative max-w-sm md:max-w-none mx-auto md:mx-0">
             <div className="absolute inset-0 bg-transparent rounded-xl md:rounded-2xl blur-xl"></div>
-            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
+            <div className={`relative rounded-xl md:rounded-2xl px-4 py-3 md:px-8 md:py-5 shadow-2xl md:min-w-[320px] overflow-hidden ${posTheme === 'dark' ? 'bg-gray-900/95 backdrop-blur-2xl border border-gray-600/50' : 'bg-white border border-gray-200'}`}>
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent rounded-xl md:rounded-2xl"
                 animate={{ x: ['-100%', '200%'] }}
@@ -4563,7 +4563,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter('all'); }}
                             className={`p-4 rounded-xl border cursor-pointer transition-all group ${
                               posTheme === 'dark'
-                                ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                ? 'border-gray-600/50 bg-gray-800/40 hover:border-gray-500 hover:bg-gray-700/40'
                                 : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40 hover:bg-blue-50/30'
                             }`}
                           >
@@ -4584,7 +4584,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                               onClick={() => { setSelectedSalesCategory(cat.id); }}
                               className={`p-4 rounded-xl border cursor-pointer transition-all group ${
                                 posTheme === 'dark'
-                                  ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                  ? 'border-gray-600/50 bg-gray-800/40 hover:border-gray-500 hover:bg-gray-700/40'
                                   : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:bg-gray-50'
                               }`}
                               style={posTheme === 'dark' ? { borderColor: `${cat.color}30` } : { borderColor: `${cat.color}50` }}
@@ -4605,7 +4605,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                               onClick={() => { setSalesDisplayMode('tabs'); setSalesCategoryFilter(0 as any); }}
                               className={`p-4 rounded-xl border cursor-pointer transition-all group ${
                                 posTheme === 'dark'
-                                  ? 'border-gray-600/50 bg-gradient-to-br from-gray-700/30 to-gray-800/30 hover:border-gray-500 hover:bg-gray-700/40'
+                                  ? 'border-gray-600/50 bg-gray-800/40 hover:border-gray-500 hover:bg-gray-700/40'
                                   : 'border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300'
                               }`}
                             >
@@ -4859,7 +4859,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   className="relative group"
                 >
                   {posTheme === 'dark' && <div className="absolute inset-0 bg-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
-                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40'}`}>
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-[hsl(217,90%,40%)]/40'}`}>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-[hsl(217,90%,40%)] shadow-lg">
                         <Package className="w-5 h-5 text-white" />
@@ -4878,10 +4878,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                   transition={{ delay: 0.2 }}
                   className="relative group"
                 >
-                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
-                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-green-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-400/40'}`}>
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 hover:border-green-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-green-400/40'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/30">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-600 shadow-lg">
                         <TrendingUp className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -4898,10 +4898,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                   transition={{ delay: 0.3 }}
                   className="relative group"
                 >
-                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
-                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-amber-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-amber-400/40'}`}>
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 hover:border-amber-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-amber-400/40'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-600 shadow-lg">
                         <AlertTriangle className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -4918,10 +4918,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                   transition={{ delay: 0.4 }}
                   className="relative group"
                 >
-                  {posTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-rose-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
-                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl border border-gray-700/50 hover:border-red-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-red-400/40'}`}>
+                  {posTheme === 'dark' && <div className="absolute inset-0 bg-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>}
+                  <div className={`relative rounded-xl p-4 transition-all duration-300 ${posTheme === 'dark' ? 'bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 hover:border-red-500/50' : 'bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-red-400/40'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/30">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-600 shadow-lg">
                         <XCircle className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -4934,7 +4934,7 @@ ${paidInvoicesInRange.map((inv: any) =>
               </div>
 
               {/* Main Products Card */}
-              <Card className={`${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
+              <Card className={`${posTheme === 'dark' ? 'bg-gray-900/80 backdrop-blur-xl border-gray-700/50' : 'bg-white border-gray-200'} shadow-2xl overflow-hidden`}>
                 <div className="absolute inset-0 bg-transparent"></div>
                 <CardHeader className={`relative border-b border-white/10 pb-4 ${posTheme === 'dark' ? 'bg-[#000000]' : 'bg-white'}`}>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -5140,7 +5140,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             transition={{ delay: index * 0.03 }}
                             className="group"
                           >
-                            <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                            <div className="relative bg-gray-900/70 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
                               <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
                               {/* Mobile Layout - shows on screens below 768px */}
@@ -5808,7 +5808,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
                   ) : filteredPurchaseOrders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-blue-800/20 flex items-center justify-center mb-4 border border-blue-500/20">
+                      <div className="w-16 h-16 rounded-2xl bg-blue-600/15 flex items-center justify-center mb-4 border border-blue-500/20">
                         <ClipboardList className="h-8 w-8 text-blue-400" />
                       </div>
                       <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen aankoopbestellings nie</h3>
@@ -6073,7 +6073,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600/20 to-teal-800/20 flex items-center justify-center mb-4 border border-teal-500/20">
+                        <div className="w-16 h-16 rounded-2xl bg-teal-600/15 flex items-center justify-center mb-4 border border-teal-500/20">
                           <Users className="h-8 w-8 text-teal-400" />
                         </div>
                         <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen oop rekeninge nie</h3>
@@ -7097,7 +7097,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       onClick={() => setIsLogoDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
@@ -7119,7 +7119,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       onClick={() => setIsReceiptCustomizerOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
@@ -7141,7 +7141,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       onClick={() => setIsInvoiceSetupOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
@@ -7163,7 +7163,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       onClick={() => setIsChangePasswordDialogOpen(true)}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
@@ -7205,7 +7205,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       }}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden`}>
                         <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg transition-shadow duration-300">
@@ -7227,10 +7227,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                       onClick={logout}
                       className="cursor-pointer group"
                     >
-                      <div className={`relative ${posTheme === 'dark' ? 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden`}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/0 via-red-500/5 to-red-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className={`relative ${posTheme === 'dark' ? 'bg-gray-900/80 border-gray-600/50' : 'bg-gray-50 border-gray-200'} border rounded-xl p-5 hover:border-red-500/50 transition-all duration-300 overflow-hidden`}>
+                        <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
-                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-500/30 group-hover:shadow-red-500/50 transition-shadow duration-300">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-red-700 shadow-lg transition-shadow duration-300">
                             <LogOut className="w-7 h-7 text-white" />
                           </div>
                           <div className="flex-1">
