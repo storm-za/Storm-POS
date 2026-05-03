@@ -5923,7 +5923,7 @@ export default function PosSystem() {
                             transition={{ delay: index * 0.03 }}
                             className="group"
                           >
-                            <div className="relative bg-gray-900/70 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                            <div className={`relative rounded-xl p-3 sm:p-5 transition-all duration-300 overflow-hidden ${posTheme === 'dark' ? 'bg-gray-900/70 border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 hover:border-[hsl(217,90%,40%)]/40'}`}>
                               <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
                               {/* Mobile Layout - shows on screens below 768px */}
@@ -5931,15 +5931,15 @@ export default function PosSystem() {
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
                                     {product.imageUrl ? (
-                                      <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                      <img src={product.imageUrl} alt={product.name} className={`w-9 h-9 rounded-lg object-cover flex-shrink-0 border ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                     ) : (
                                       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                         <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                                       </div>
                                     )}
                                     <div className="min-w-0 flex-1 overflow-hidden">
-                                      <h3 className="font-semibold text-white text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
-                                      <p className="text-[11px] text-gray-400 truncate">SKU: {product.sku}</p>
+                                      <h3 className={`font-semibold text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</h3>
+                                      <p className={`text-[11px] truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>SKU: {product.sku}</p>
                                     </div>
                                   </div>
                                   <div className="flex gap-1 flex-shrink-0">
@@ -5947,44 +5947,44 @@ export default function PosSystem() {
                                       size="sm"
                                       variant="outline"
                                       onClick={() => openProductDialog(product as any)}
-                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                      className={`h-7 w-7 p-0 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                     >
-                                      <Edit className="h-3 w-3 text-gray-400" />
+                                      <Edit className={`h-3 w-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteProduct(product.id)}
-                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      className={`h-7 w-7 p-0 hover:border-red-500/50 hover:bg-red-500/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                       disabled={deleteProductMutation.isPending}
                                     >
-                                      <Trash2 className="h-3 w-3 text-gray-400" />
+                                      <Trash2 className={`h-3 w-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-gray-700/50">
+                                <div className={`grid grid-cols-3 gap-1 pt-2 border-t ${posTheme === 'dark' ? 'border-gray-700/50' : 'border-gray-200'}`}>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Retail</p>
-                                    <p className="text-white font-bold text-xs">R{product.retailPrice}</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Retail</p>
+                                    <p className={`font-bold text-xs ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{product.retailPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Cost</p>
-                                    <p className="text-gray-400 font-medium text-xs">R{product.costPrice}</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Cost</p>
+                                    <p className={`font-medium text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>R{product.costPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Stock</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Stock</p>
                                     <div className="flex items-center justify-center gap-0.5">
                                       <p className={`font-bold text-xs ${
-                                        product.quantity === 0 ? 'text-red-400' :
-                                        product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
+                                        product.quantity === 0 ? (posTheme === 'dark' ? 'text-red-400' : 'text-red-600') :
+                                        product.quantity <= 5 ? (posTheme === 'dark' ? 'text-amber-400' : 'text-amber-600') : (posTheme === 'dark' ? 'text-green-400' : 'text-green-600')
                                       }`}>
                                         {product.quantity}
                                       </p>
                                       {product.quantity <= 5 && product.quantity > 0 && (
-                                        <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1 rounded-full">Low</span>
+                                        <span className={`text-[8px] px-1 rounded-full ${posTheme === 'dark' ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Low</span>
                                       )}
                                       {product.quantity === 0 && (
-                                        <span className="text-[8px] bg-red-500/20 text-red-400 px-1 rounded-full">Out</span>
+                                        <span className={`text-[8px] px-1 rounded-full ${posTheme === 'dark' ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700'}`}>Out</span>
                                       )}
                                     </div>
                                   </div>
@@ -5995,46 +5995,46 @@ export default function PosSystem() {
                               <div className="relative hidden md:flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                   {product.imageUrl ? (
-                                    <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    <img src={product.imageUrl} alt={product.name} className={`w-12 h-12 rounded-xl object-cover flex-shrink-0 border ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                   ) : (
                                     <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                       <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
                                     </div>
                                   )}
                                   <div className="min-w-0 flex-1">
-                                    <h3 className="font-semibold text-white text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
-                                    <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                                    <h3 className={`font-semibold text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</h3>
+                                    <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>SKU: {product.sku}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-6">
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Cost</p>
-                                    <p className="text-gray-400 font-medium">R{product.costPrice}</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Cost</p>
+                                    <p className={`font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>R{product.costPrice}</p>
                                   </div>
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Retail</p>
-                                    <p className="text-white font-bold text-lg">R{product.retailPrice}</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Retail</p>
+                                    <p className={`font-bold text-lg ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{product.retailPrice}</p>
                                   </div>
                                   {product.tradePrice && (
                                     <div className="text-right hidden lg:block">
-                                      <p className="text-xs text-gray-500 uppercase tracking-wide">Trade</p>
+                                      <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Trade</p>
                                       <p className="text-[hsl(217,90%,60%)] font-medium">R{product.tradePrice}</p>
                                     </div>
                                   )}
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Stock</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Stock</p>
                                     <div className="flex items-center gap-1">
                                       <p className={`font-bold ${
-                                        product.quantity === 0 ? 'text-red-400' :
-                                        product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
+                                        product.quantity === 0 ? (posTheme === 'dark' ? 'text-red-400' : 'text-red-600') :
+                                        product.quantity <= 5 ? (posTheme === 'dark' ? 'text-amber-400' : 'text-amber-600') : (posTheme === 'dark' ? 'text-green-400' : 'text-green-600')
                                       }`}>
                                         {product.quantity}
                                       </p>
                                       {product.quantity <= 5 && product.quantity > 0 && (
-                                        <span className="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full border border-amber-500/30">Low</span>
+                                        <span className={`text-xs px-1.5 py-0.5 rounded-full border ${posTheme === 'dark' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>Low</span>
                                       )}
                                       {product.quantity === 0 && (
-                                        <span className="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">Out</span>
+                                        <span className={`text-xs px-1.5 py-0.5 rounded-full border ${posTheme === 'dark' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-red-100 text-red-700 border-red-200'}`}>Out</span>
                                       )}
                                     </div>
                                   </div>
@@ -6043,18 +6043,18 @@ export default function PosSystem() {
                                       size="sm"
                                       variant="outline"
                                       onClick={() => openProductDialog(product as any)}
-                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                      className={`h-9 w-9 p-0 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                     >
-                                      <Edit className="h-4 w-4 text-gray-400 group-hover:text-[hsl(217,90%,50%)]" />
+                                      <Edit className={`h-4 w-4 group-hover:text-[hsl(217,90%,50%)] ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteProduct(product.id)}
-                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      className={`h-9 w-9 p-0 hover:border-red-500/50 hover:bg-red-500/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                       disabled={deleteProductMutation.isPending}
                                     >
-                                      <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-400" />
+                                      <Trash2 className={`h-4 w-4 hover:text-red-400 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                   </div>
                                 </div>
