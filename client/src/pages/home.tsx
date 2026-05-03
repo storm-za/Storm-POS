@@ -908,54 +908,46 @@ export default function Home() {
           setEmailSubmitted(false);
         }
       }}>
-        <DialogContent className="sm:max-w-[480px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-white/10 shadow-2xl p-0 overflow-hidden">
-          {/* Premium Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: `linear-gradient(to right, hsl(217,90%,60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(217,90%,60%) 1px, transparent 1px)`,
-              backgroundSize: '40px 40px'
-            }} />
-          </div>
-
+        <DialogContent className="sm:max-w-[480px] bg-slate-900 border border-white/10 shadow-xl p-0 overflow-hidden">
           <div className="relative p-8">
             {!emailSubmitted ? (
               <>
                 <DialogHeader className="text-center mb-6">
-                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30">
-                    <TrendingUp className="text-white h-8 w-8" />
+                  <div className="mx-auto w-14 h-14 bg-amber-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-center mb-4">
+                    <TrendingUp className="text-amber-400 h-7 w-7" />
                   </div>
-                  <DialogTitle className="text-2xl font-bold text-white mb-2">
+                  <DialogTitle className="text-2xl font-semibold mb-2" style={{ color: '#ffffff' }}>
                     Pricing Intelligence
                   </DialogTitle>
-                  <DialogDescription className="text-gray-400 text-base leading-relaxed">
-                    Be the first to know when our advanced pricing intelligence platform launches. Get early access to <span className="text-amber-400 font-medium">market analysis</span> and <span className="text-amber-400 font-medium">competitor tracking</span> tools.
+                  <DialogDescription className="text-base leading-relaxed" style={{ color: '#e2e8f0' }}>
+                    Be the first to know when our advanced pricing intelligence platform launches. Get early access to <span className="font-medium" style={{ color: '#fbbf24' }}>market analysis</span> and <span className="font-medium" style={{ color: '#fbbf24' }}>competitor tracking</span> tools.
                   </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handlePricingInterestSubmit} className="space-y-4">
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       type="email"
                       placeholder="Enter your email address"
                       value={pricingEmail}
                       onChange={(e) => setPricingEmail(e.target.value)}
                       required
-                      className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-500 focus:border-amber-500/50 focus:ring-amber-500/20 transition-all"
+                      className="w-full pl-12 pr-4 py-4 bg-slate-800 border border-slate-700 rounded-xl placeholder:text-slate-400 focus:border-amber-500/60 focus:ring-amber-500/20 transition-all"
+                      style={{ color: '#ffffff' }}
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={pricingInterestMutation.isPending || !pricingEmail.includes("@")}
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold py-4 rounded-xl shadow-lg shadow-amber-500/25 transition-all duration-300 disabled:opacity-50"
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold py-4 rounded-xl transition-colors duration-200 disabled:opacity-50"
                   >
                     {pricingInterestMutation.isPending ? (
                       <span className="flex items-center justify-center gap-2">
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                          className="w-5 h-5 border-2 border-slate-950/30 border-t-slate-950 rounded-full"
                         />
                         Submitting...
                       </span>
@@ -968,7 +960,7 @@ export default function Home() {
                   </Button>
                 </form>
 
-                <p className="text-center text-xs text-gray-500 mt-4">
+                <p className="text-center text-xs text-slate-400 mt-4">
                   We'll only email you about this product. No spam.
                 </p>
               </>
@@ -978,13 +970,13 @@ export default function Home() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-500/30"
+                  className="mx-auto w-16 h-16 bg-emerald-500/15 border border-emerald-500/30 rounded-full flex items-center justify-center mb-6"
                 >
-                  <CheckCircle className="text-white h-10 w-10" />
+                  <CheckCircle className="text-emerald-400 h-8 w-8" />
                 </motion.div>
-                <h3 className="text-2xl font-bold text-white mb-2">You're on the list!</h3>
-                <p className="text-gray-400 mb-6">
-                  We'll notify you at <span className="text-white font-medium">{pricingEmail}</span> when Pricing Intelligence launches.
+                <h3 className="text-2xl font-semibold mb-2" style={{ color: '#ffffff' }}>You're on the list!</h3>
+                <p className="mb-6" style={{ color: '#e2e8f0' }}>
+                  We'll notify you at <span className="font-medium" style={{ color: '#ffffff' }}>{pricingEmail}</span> when Pricing Intelligence launches.
                 </p>
                 <Button
                   onClick={() => {
@@ -992,7 +984,8 @@ export default function Home() {
                     setPricingEmail("");
                     setEmailSubmitted(false);
                   }}
-                  className="bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-xl px-6 py-3"
+                  className="bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl px-6 py-3"
+                  style={{ color: '#ffffff' }}
                 >
                   Close
                 </Button>
