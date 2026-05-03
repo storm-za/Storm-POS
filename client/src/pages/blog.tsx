@@ -6,6 +6,7 @@ import { Clock, ArrowRight, Calendar, User } from "@phosphor-icons/react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { updatePageSEO } from "@/lib/seo";
+import stormPosCoverImg from "@assets/blog-storm-pos/02-pos-landing.jpg";
 
 interface BlogPost {
   slug: string;
@@ -19,6 +20,16 @@ interface BlogPost {
 }
 
 const blogPosts: BlogPost[] = [
+  {
+    slug: "what-is-storm-pos-complete-feature-tour",
+    title: "What Is Storm POS? A Complete Tour of Every Feature (with Real Screenshots)",
+    excerpt: "From the sales screen and inventory to bilingual EN/AF support, offline trading, invoicing and reports — here's everything Storm POS does, shown with real screenshots from inside the system.",
+    readTime: "13 min read",
+    date: "May 3, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: stormPosCoverImg
+  },
   {
     slug: "best-pos-system-small-business-south-africa",
     title: "Best POS System for Small Business in South Africa (2025 Guide)",

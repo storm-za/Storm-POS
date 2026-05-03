@@ -6,6 +6,12 @@ import { ArrowLeft, Clock, Calendar, User, ShareNetwork as Share2, CheckCircle, 
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { updatePageSEO } from "@/lib/seo";
+import stormPosSalesImg from "@assets/blog-storm-pos/01-sales-screen.jpg";
+import stormPosLandingImg from "@assets/blog-storm-pos/02-pos-landing.jpg";
+import stormPosAfrikaansImg from "@assets/blog-storm-pos/03-afrikaans.jpg";
+import stormPosHelpImg from "@assets/blog-storm-pos/04-help-center.jpg";
+import stormPosLoginImg from "@assets/blog-storm-pos/05-login.jpg";
+import stormPosPricingImg from "@assets/blog-storm-pos/06-pricing.jpg";
 
 interface BlogContent {
   slug: string;
@@ -21,6 +27,290 @@ interface BlogContent {
 }
 
 const blogContent: Record<string, BlogContent> = {
+  "what-is-storm-pos-complete-feature-tour": {
+    slug: "what-is-storm-pos-complete-feature-tour",
+    title: "What Is Storm POS? A Complete Tour of Every Feature (with Real Screenshots)",
+    metaDescription: "A real, screenshot-driven tour of Storm POS — the cloud point of sale built for South African businesses. Sales, inventory, customers, invoicing, reports, offline mode, bilingual EN/AF, and more.",
+    readTime: "13 min read",
+    date: "May 3, 2026",
+    author: "Storm Team",
+    category: "POS Systems",
+    image: stormPosLandingImg,
+    relatedPosts: ["best-pos-system-small-business-south-africa", "load-shedding-pos-system-south-africa"],
+    content: (
+      <>
+        <p className="lead">
+          If you've ever stood behind a counter trying to keep stock right, ring up a sale, send a customer their invoice, and figure out what actually sold last week — all on different bits of paper and three different apps — you already understand the problem Storm POS was built to solve.
+        </p>
+
+        <p>
+          Storm POS is a cloud-powered point of sale designed in South Africa, for South African retailers, cafes, bars, salons, hardware shops, takeaways and small wholesalers. It runs in your browser, on a tablet, or as a native Windows desktop app, and it works whether your internet is up, your power is out, or you're switching between English and Afrikaans mid-shift.
+        </p>
+
+        <p>
+          This is a proper walk-through. No vague marketing — just the real screens, what each one does, and why each part exists. Every screenshot below is from the actual live system.
+        </p>
+
+        <h2>The Big Idea: One Screen, Your Whole Business</h2>
+
+        <img src={stormPosLandingImg} alt="Storm POS landing page showing cloud-synced point of sale across desktop, tablet and phone" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          Storm POS lives at one URL. Sign in on a laptop in your office, on a tablet at the till, and on your phone while you're at the supplier — you'll see the same products, the same stock counts, the same customers, the same sales. Cloud sync isn't a marketing word here; it's how the whole thing is built. Make a sale on the tablet, your phone shows the new stock level a second later.
+        </p>
+
+        <p>
+          You don't need to install anything to start. Open the browser, log in, sell. Want a desktop app for the front-of-house terminal? There's a Windows download too — same software, same data, just packaged as a proper app for shops that prefer that.
+        </p>
+
+        <div className="callout">
+          <h4>What makes it different</h4>
+          <p>No setup fees. No card-swipe percentage cuts. Flat-rate monthly pricing in Rand. Built specifically for South African trading conditions — load shedding, intermittent connectivity, bilingual staff, VAT-ready invoices.</p>
+        </div>
+
+        <h2>1. The Sales Screen — Where You Actually Make Money</h2>
+
+        <img src={stormPosSalesImg} alt="Storm POS sales screen with product list, barcode scanner, customer selector, payment method, discount tiers and cart" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          This is the screen your staff will live on. Three columns, all visible at once, no clicking through screens to ring up a sale:
+        </p>
+
+        <ul>
+          <li><strong>Left:</strong> Your full product catalogue. Search by name, scan a barcode, or filter by category (you can see "All / Kos / Koeldrank" tabs above the product list — those are your own categories, you create them).</li>
+          <li><strong>Middle:</strong> The cart. Tap a product, it lands here. Adjust quantities with + / -, remove with the trash icon, watch the subtotal update live.</li>
+          <li><strong>Right:</strong> Sale settings — pick the customer (or leave it as "No customer" for a walk-in), pick the payment method (Cash, Card, or EFT), add sale notes, apply a discount (None / 5% / 10% / 20% / 50% / custom), turn on tip lines, then complete the sale.</li>
+        </ul>
+
+        <p>
+          The barcode field at the top accepts a real USB scanner — plug it in, scan an item, it drops into the cart instantly. No keyboard, no fiddling.
+        </p>
+
+        <h3>Discounts that actually make sense</h3>
+
+        <p>
+          You'll notice the discount row gives you preset tiers (5/10/20/50%) plus a free-form % field. That's because in real shops you discount the same amounts over and over (10% off for a regular, 20% for staff). One tap, done. Need something custom? Type it. The discount applies to the whole sale and shows up on the receipt.
+        </p>
+
+        <h3>Tips, notes, and customer-specific pricing</h3>
+
+        <p>
+          Flip the "Tip on receipt" switch and the printed slip leaves space for the customer to write a tip — perfect for restaurants and salons. Sale notes are for you (e.g. "delivered Tuesday", "wants pickup at 4pm"); they're attached to the sale forever and show up in your sales history. And if you select a customer who has trade pricing, the cart automatically uses their trade prices, not the retail prices.
+        </p>
+
+        <h2>2. Products & Inventory — Stock That Tracks Itself</h2>
+
+        <p>
+          The Products tab is your full inventory. Every item has a name, SKU, cost price, retail price, optional trade price, current stock count, category, and an optional image. You can edit any field inline, see low-stock and out-of-stock badges right on the row, and search across hundreds of products without it slowing down.
+        </p>
+
+        <p>
+          What happens behind the scenes is the bit that matters: every sale automatically deducts stock. Sell three Black Lable Cans, your stock count drops by three. No second app, no separate spreadsheet, no end-of-day stocktake reconciliation. The number you see on the product list <em>is</em> the number on the shelf (assuming nobody walked off with one).
+        </p>
+
+        <p>
+          Need to add 50 new products in bulk? There's a CSV import. Need to take stock to a market and bring back the leftovers? There's a stock adjustment screen. Need to push out a price change across a whole category? You can do that in seconds.
+        </p>
+
+        <h3>Categories you actually use</h3>
+
+        <p>
+          Categories aren't a fixed list — you create them. A coffee shop might have "Hot Drinks / Cold Drinks / Food / Retail". A bottle store might have "Beer / Wine / Spirits / Mixers / Cigarettes". They show as filter chips on the sales screen so staff can find an item in one tap.
+        </p>
+
+        <h2>3. Customers — Build a Database, Not Just a Receipt</h2>
+
+        <p>
+          The Customers tab is a proper CRM, lite version. Every customer has a name, phone, email, and full purchase history. When you select them on a sale, their info attaches to the receipt and the invoice. Over time you build a database of who actually shops with you, what they buy, and when they last came in.
+        </p>
+
+        <p>
+          That data isn't decoration. It powers two things you'll use weekly:
+        </p>
+
+        <ul>
+          <li><strong>Open accounts</strong> (account/tab customers): regulars who pay later. Add items to their tab through the day, settle when they pay. Storm POS keeps a running balance so nobody gets confused.</li>
+          <li><strong>Customer-specific pricing</strong>: trade customers automatically get trade prices, walk-ins get retail. No one has to remember.</li>
+        </ul>
+
+        <h2>4. Invoices & Quotes — Send a Pro-Looking PDF in 30 Seconds</h2>
+
+        <p>
+          This is where Storm POS pulls way ahead of a basic till. Open the Invoices & Quotes tab, click New Invoice, pick a customer (their details auto-fill), add line items from your products (descriptions, prices and VAT calculations all pre-fill), and Storm generates a professional PDF on the spot.
+        </p>
+
+        <p>
+          The PDF includes your company logo, your business address, your VAT number, the customer's details, the line items with their VAT calculations, the total in Rand, and your banking details for EFT. You can email it directly from inside the app, download it, or print it.
+        </p>
+
+        <p>
+          Quotes work exactly the same way — and when the customer says yes, you convert the quote into an invoice in one click. No retyping. The same flow handles credit notes, deposit invoices, and recurring invoices for monthly clients.
+        </p>
+
+        <h2>5. Purchase Orders — Re-Stock Without the Spreadsheet</h2>
+
+        <p>
+          Running low on stock? Open Purchase Orders, pick a supplier, add the products you need (with the quantities and your usual cost prices pre-filled), and Storm generates a PO PDF you can email to your supplier. When the stock arrives, mark it received and your inventory counts automatically go up.
+        </p>
+
+        <p>
+          That's the loop most small shops do badly with bits of paper and WhatsApp messages. Storm POS makes it boring, which is what you want for stock management.
+        </p>
+
+        <h2>6. Reports — See What's Actually Happening</h2>
+
+        <p>
+          The Reports tab gives you the views every owner asks for and most POS systems hide three menus deep:
+        </p>
+
+        <ul>
+          <li><strong>Sales by day / week / month</strong> — see your revenue trend at a glance</li>
+          <li><strong>Top products</strong> — what's selling, what's sitting</li>
+          <li><strong>Top customers</strong> — who keeps the lights on</li>
+          <li><strong>Payment breakdown</strong> — how much came in via Cash vs Card vs EFT</li>
+          <li><strong>Staff performance</strong> — who rang up the most sales (when you have multiple staff accounts)</li>
+          <li><strong>VAT report</strong> — the number you actually need at month-end for SARS</li>
+        </ul>
+
+        <p>
+          Every report exports to PDF or Excel for your accountant. The VAT report alone saves most owners a Sunday afternoon every month.
+        </p>
+
+        <h2>7. Bilingual: Full Afrikaans Support, Not Google Translate</h2>
+
+        <img src={stormPosAfrikaansImg} alt="Storm POS in Afrikaans showing Verkope, Produkte, Kliente, Fakture, Verslae and full localised interface" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          Storm POS is the only cloud POS with a proper, hand-translated Afrikaans mode. Every menu, every button, every label, every receipt, every invoice, every error message — translated by humans who actually speak the language. Switch any time from the sidebar.
+        </p>
+
+        <p>
+          That matters in practice. Plaaslike personeel kan in Afrikaans werk; jou klante kry kwitansies en fakture in die taal wat hulle verstaan; en jou hele backend admin werk in dieselfde taal. Geen verwarring, geen sleg-vertaalde knoppies nie.
+        </p>
+
+        <p>
+          For a Karoo farm shop, a Wes-Kaap bakery, or a Bloemfontein hardware store, this isn't a nice-to-have. It's the difference between staff using the system properly and staff working around it.
+        </p>
+
+        <h2>8. Staff Accounts & Permissions</h2>
+
+        <p>
+          Every staff member gets their own login. The owner can see everything; cashiers can only ring up sales; supervisors can do refunds and discounts. Every action is logged against the staff member who did it, so when you see a 50% discount on yesterday's sales you know exactly who to ask.
+        </p>
+
+        <p>
+          On the Growth and Scale plans you get up to 5 staff accounts and unlimited respectively, with proper role-based permissions — not just "everyone shares one login".
+        </p>
+
+        <h2>9. Built-In Help Centre — Your Staff Train Themselves</h2>
+
+        <img src={stormPosHelpImg} alt="Storm POS in-app help centre showing how to process a sale, customer selection, and complete documentation for every tab" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          New staff member starting Monday? Point them at the in-app Help icon. There's a complete walkthrough for every tab — Sales, Products, Customers, Invoices, Reports, Settings — written in plain English (and Afrikaans). They'll be productive in a morning instead of a week.
+        </p>
+
+        <p>
+          That's an under-rated feature. Most POS systems make you read a 200-page PDF or watch YouTube videos. Storm puts the answer right next to the button.
+        </p>
+
+        <h2>10. Secure, Cloud-Synced Login</h2>
+
+        <img src={stormPosLoginImg} alt="Storm POS login screen with bank-grade security, cloud sync across devices, and 7-day free trial" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          Bank-grade encryption. Your data lives in the cloud, not on a hard drive that can crash and take six months of sales with it. If your tablet falls in the sink, you log into the new one and everything's there. If you switch from a laptop to a tablet at lunchtime, your day-in-progress is waiting for you.
+        </p>
+
+        <p>
+          The "Keep me signed in for 7 days" option is genuinely useful — staff don't have to retype passwords every morning, but the session still expires sensibly.
+        </p>
+
+        <h2>11. Load Shedding & Offline Mode</h2>
+
+        <p>
+          The South African killer feature. When the lights go out (or the internet drops), Storm POS keeps trading. Sales process locally on the device, get saved offline, and automatically sync to the cloud the moment connectivity returns. Customers don't notice. You don't lose a single transaction.
+        </p>
+
+        <p>
+          On the Windows desktop app this is even more solid — sales just keep happening through the outage. Your reports will show the synced sales as if nothing happened.
+        </p>
+
+        <h2>12. Honest, Flat-Rate Pricing</h2>
+
+        <img src={stormPosPricingImg} alt="Storm POS pricing — Starter R299, Growth R599, Scale R999 per month with 7-day free trial" className="rounded-xl border border-gray-200 my-6 w-full" />
+
+        <p>
+          No card-swipe percentage cuts. No setup fees. No "first three months free then a R3,000 hardware deposit" trick. Three plans:
+        </p>
+
+        <ul>
+          <li><strong>Starter — R299/month</strong>: Full POS terminal, up to 200 products, 50 invoices/month, customer directory, purchase orders, VAT-ready invoices, XERO integration.</li>
+          <li><strong>Growth — R599/month</strong>: Everything in Starter, plus unlimited products, 200 invoices included (R0.50 each over), up to 5 staff accounts, full analytics, PDF export.</li>
+          <li><strong>Scale — R999/month</strong>: Everything in Growth, plus unlimited invoices, multi-location/branch support, unlimited staff, role-based permissions, dedicated priority support.</li>
+        </ul>
+
+        <p>
+          Every plan includes a 7-day free trial. No credit card needed to start.
+        </p>
+
+        <h2>13. The Things You Don't Notice (Until You Need Them)</h2>
+
+        <p>
+          A few features that don't get a screen but make every day easier:
+        </p>
+
+        <ul>
+          <li><strong>Notifications:</strong> low-stock alerts, end-of-day summaries, and important system messages all collected in the bell icon (you can see the red "1" in our screenshots — that's a real notification waiting).</li>
+          <li><strong>Saved payment details:</strong> regular EFT payees auto-fill on invoices.</li>
+          <li><strong>Receipt customisation:</strong> add a thank-you message, your social handles, or a returns policy to every printed slip.</li>
+          <li><strong>Light & dark themes:</strong> the whole app switches with one click — useful for a dark bar versus a bright daytime cafe.</li>
+          <li><strong>Tip-on-receipt toggle:</strong> per-sale, not a global setting — useful when one customer wants it and the next doesn't.</li>
+          <li><strong>Open Accounts:</strong> tab management for restaurants, table tracking for service venues, and account customers who pay weekly.</li>
+        </ul>
+
+        <h2>Who Storm POS Is Actually For</h2>
+
+        <p>
+          You'll get the most out of Storm POS if you're running:
+        </p>
+
+        <ul>
+          <li>A retail shop (hardware, clothing, gifts, books, niche stores) — full inventory and barcode scanning</li>
+          <li>A coffee shop or bakery — quick sales, categories, tips on receipts</li>
+          <li>A pub, bar or bottle store — open accounts, age-product handling, fast cash sales</li>
+          <li>A salon or spa — customer history, account balances, appointment-style workflows</li>
+          <li>A small wholesaler — trade pricing, customer-specific prices, invoices and quotes</li>
+          <li>A market trader or pop-up — works on a tablet with mobile data, syncs to the cloud, no hardware needed</li>
+        </ul>
+
+        <p>
+          If you're a single owner-operator running a side-hustle, Starter is probably enough. If you've got a couple of staff and you're sending invoices weekly, you want Growth. If you're running multiple locations, you need Scale.
+        </p>
+
+        <h2>How to Try It</h2>
+
+        <p>
+          The 7-day free trial is genuinely free — no card, no commitment. Sign up, get a fully-loaded account, ring up some test sales, send yourself a test invoice, see if it fits the way you actually work. If it does, pick a plan and keep going. If it doesn't, walk away with no card to cancel.
+        </p>
+
+        <div className="callout-cta">
+          <h4>Try Storm POS free for 7 days</h4>
+          <p>The full system, every feature, no card needed. Bilingual EN/AF, offline-capable, built for SA trading conditions. <Link href="/pos" className="text-[hsl(217,90%,40%)] font-semibold hover:underline">Start your free trial →</Link></p>
+        </div>
+
+        <h2>The Bottom Line</h2>
+
+        <p>
+          Storm POS isn't trying to be the cheapest POS in South Africa, and it isn't trying to be the most enterprise. It's trying to be the one a real shop owner can set up on a Sunday afternoon and have their staff using on Monday morning — without a training course, without a contract, without a hardware deposit, and without the lights going out being a crisis.
+        </p>
+
+        <p>
+          Every screenshot in this article is from the live system you'll get when you sign up. What you see is what you get.
+        </p>
+      </>
+    )
+  },
   "why-south-african-retailers-switching-cloud-pos": {
     slug: "why-south-african-retailers-switching-cloud-pos",
     title: "Why South African Retailers Are Switching to Cloud POS in 2025",
@@ -1321,6 +1611,10 @@ const relatedPostData: Record<string, { title: string; category: string }> = {
   "invoicing-software-south-africa": {
     title: "Best Invoicing Software for South African Small Businesses (Free & Paid)",
     category: "Business Tips"
+  },
+  "what-is-storm-pos-complete-feature-tour": {
+    title: "What Is Storm POS? A Complete Tour of Every Feature (with Real Screenshots)",
+    category: "POS Systems"
   }
 };
 
