@@ -91,6 +91,7 @@ export const posCustomers = pgTable("pos_customers", {
   userId: integer("user_id").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
+  email: text("email"),
   customerType: text("customer_type").notNull().default('retail'), // 'retail' or 'trade'
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

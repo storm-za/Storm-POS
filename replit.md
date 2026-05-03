@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 ### Feature Specifications
 - **Marketing Website**: Homepage, Web Development service page, Contact form with lead capture, dedicated `/pricing` page with interactive calculator, feature comparison table, and FAQ.
 - **POS System**:
-    - **Core**: Real-time sales, inventory management (CRUD), customer directory (CRUD), multiple payment types (Cash, Card, EFT).
+    - **Core**: Real-time sales, inventory management (CRUD), customer directory (CRUD with name/phone/email/type/notes), multiple payment types (Cash, Card, EFT).
     - **Advanced**: Staff account management with role-based access, void sale functionality with reason tracking, tip options for sales.
     - **Reporting**: Comprehensive sales analytics dashboard with charts, date filters, and transaction breakdowns.
     - **Subscription**: Tiered pricing (Basic, Growth, Pro), demo account available.

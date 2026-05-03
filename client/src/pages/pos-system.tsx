@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, apiFetch } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount, type PosCategory, type InsertPosCategory } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount, type PosCategory, type InsertPosCategory, type PosUser } from "@shared/schema";
 import { z } from "zod";
 import {
   ShoppingCart, Package, Users, ChartBar as BarChart3, Plus, Minus, Trash as Trash2,
@@ -46,21 +46,27 @@ import * as XLSX from 'xlsx';
 
 interface Product {
   id: number;
+  userId: number;
   sku: string;
   name: string;
   costPrice: string;
   retailPrice: string;
-  tradePrice?: string;
+  tradePrice?: string | null;
   quantity: number;
+  categoryId?: number | null;
   imageUrl?: string | null;
+  createdAt?: Date;
 }
 
 interface Customer {
   id: number;
+  userId: number;
   name: string;
-  phone?: string;
-  customerType: 'retail' | 'trade';
-  notes?: string;
+  phone?: string | null;
+  email?: string | null;
+  customerType: 'retail' | 'trade' | string;
+  notes?: string | null;
+  createdAt?: Date;
 }
 
 interface SaleItem {
@@ -75,10 +81,11 @@ interface Sale {
   id: number;
   total: string;
   items: SaleItem[];
-  customerId?: number;
-  customerName?: string;
-  notes?: string;
+  customerId?: number | null;
+  customerName?: string | null;
+  notes?: string | null;
   paymentType: string;
+  staffAccountId?: number | null;
   isVoided: boolean;
   voidReason?: string;
   voidedAt?: string;
@@ -379,7 +386,7 @@ export default function PosSystem() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string; receiptSettings?: any; paymentPlan?: string; planSavingAmount?: number | null; preferredLanguage?: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<(PosUser & { planSavingAmount?: number | null }) | null>(null);
 
   const refreshUserProfile = useCallback(async (userId: number, userEmail: string) => {
     try {
@@ -640,7 +647,7 @@ export default function PosSystem() {
           companyLogo: null,
           tutorialCompleted: false,
           companyName: 'Demo Account'
-        });
+        } as any);
       }
     } else {
       // If no user data in localStorage, set demo user as fallback
@@ -651,7 +658,7 @@ export default function PosSystem() {
         companyLogo: null,
         companyName: 'Demo Account',
         tutorialCompleted: false
-      });
+      } as any);
     }
   }, []);
 
@@ -805,6 +812,7 @@ export default function PosSystem() {
     defaultValues: {
       name: "",
       phone: "",
+      email: "",
       customerType: "retail",
       notes: "",
     },
@@ -979,7 +987,7 @@ export default function PosSystem() {
       if (invoiceStatusFilter === 'paid' && invoice.status !== 'paid') {
         return false;
       }
-      if (invoiceStatusFilter === 'not_paid' && invoice.status === 'paid') {
+      if ((invoiceStatusFilter as string) === 'not_paid' && invoice.status === 'paid') {
         return false;
       }
       
@@ -1763,8 +1771,8 @@ export default function PosSystem() {
       setInvoicePaymentMethod(newInvoice.paymentMethod || '');
       setInvoicePaymentDetails(newInvoice.paymentDetails || '');
       // Copy products/items
-      const items = Array.isArray(newInvoice.items) ? newInvoice.items : [];
-      setInvoiceItems(items.map((item) => ({
+      const items: any[] = Array.isArray(newInvoice.items) ? newInvoice.items : [];
+      setInvoiceItems(items.map((item: any) => ({
         productId: item.productId,
         customName: item.productId ? undefined : (item.name || item.customName),
         quantity: parseFloat(item.quantity) || item.quantity,
@@ -1987,7 +1995,7 @@ export default function PosSystem() {
   });
 
   // Helper functions for product management
-  const openProductDialog = (product?: PosProduct & { categoryId?: number | null }) => {
+  const openProductDialog = (product?: PosProduct & { categoryId?: number | null | undefined }) => {
     console.log("Opening product dialog with product:", product);
     if (product) {
       setEditingProduct(product);
@@ -2023,13 +2031,15 @@ export default function PosSystem() {
       setEditingCustomer(customer);
       customerForm.setValue("name", customer.name);
       customerForm.setValue("phone", customer.phone || "");
-      customerForm.setValue("customerType", customer.customerType);
+      customerForm.setValue("email", (customer as any).email || "");
+      customerForm.setValue("customerType", customer.customerType as "retail" | "trade");
       customerForm.setValue("notes", customer.notes || "");
     } else {
       setEditingCustomer(null);
       customerForm.reset({
         name: "",
         phone: "",
+        email: "",
         customerType: "retail",
         notes: "",
       });
@@ -2388,7 +2398,7 @@ export default function PosSystem() {
   }, [sales, customerSpendFrom, customerSpendTo]);
 
   // Get price for product based on customer type
-  const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
+  const getProductPrice = (product: Product, customerType: 'retail' | 'trade' | string = 'retail'): string => {
     if (customerType === 'trade' && product.tradePrice) {
       return product.tradePrice;
     }
@@ -2773,7 +2783,7 @@ export default function PosSystem() {
     }
 
     const selectedItems = selectedItemsForPrint
-      .map(index => selectedOpenAccount.items[index])
+      .map(index => (selectedOpenAccount.items as SaleItem[])[index])
       .filter(item => item);
 
     // Generate receipt for selected items
@@ -2790,14 +2800,14 @@ export default function PosSystem() {
 
       // Account info
       doc.setFontSize(10);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       doc.text(`Account: ${selectedOpenAccount.accountName}`, margin, yPosition);
       yPosition += lineHeight;
       doc.text(`Time: ${new Date().toLocaleString()}`, margin, yPosition);
       yPosition += lineHeight;
       
       if (currentStaff) {
-        const staffName = currentStaff.displayName || currentStaff.username || `Staff #${currentStaff.id}`;
+        const staffName = currentStaff.username || `Staff #${currentStaff.id}`;
         doc.text(`Served by: ${staffName}`, margin, yPosition);
         yPosition += lineHeight;
       }
@@ -2811,16 +2821,16 @@ export default function PosSystem() {
 
       // Items
       doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('SELECTED ITEMS:', margin, yPosition);
       yPosition += lineHeight * 1.5;
 
       let totalAmount = 0;
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       selectedItems.forEach(item => {
         // Item name and quantity
         doc.setFontSize(11);
-        doc.setFont(undefined, 'bold');
+        doc.setFont('helvetica', 'bold');
         doc.text(`${item.quantity}x ${item.name}`, margin, yPosition);
         
         // Price on the right
@@ -2840,7 +2850,7 @@ export default function PosSystem() {
       yPosition += lineHeight;
       
       doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text('TOTAL:', margin, yPosition);
       doc.text(`R${totalAmount.toFixed(2)}`, 70, yPosition, { align: 'right' });
 
@@ -3460,8 +3470,7 @@ export default function PosSystem() {
       ? "All Staff"
       : selectedStaffFilter === 0
         ? "Manager"
-        : staffAccounts.find(s => s.id === selectedStaffFilter)?.displayName ||
-          staffAccounts.find(s => s.id === selectedStaffFilter)?.username ||
+        : staffAccounts.find(s => s.id === selectedStaffFilter)?.username ||
           `Staff #${selectedStaffFilter}`;
 
     const dateLabel = reportDateFrom === reportDateTo
@@ -3519,8 +3528,7 @@ export default function PosSystem() {
     filteredSales.forEach((sale) => {
       if (yPosition > 250) { pdf.addPage(); yPosition = 20; }
       const staffName = sale.staffAccountId
-        ? staffAccounts.find(s => s.id === sale.staffAccountId)?.displayName ||
-          staffAccounts.find(s => s.id === sale.staffAccountId)?.username ||
+        ? staffAccounts.find(s => s.id === sale.staffAccountId)?.username ||
           `Staff #${sale.staffAccountId}`
         : 'Manager';
       pdf.text(`#${sale.id} - R${sale.total} - ${sale.paymentType.toUpperCase()} - ${new Date(sale.createdAt).toLocaleTimeString()} - ${staffName}${sale.isVoided ? ' [VOIDED]' : ''}`, 20, yPosition);
@@ -4843,11 +4851,11 @@ export default function PosSystem() {
                           <div className={`flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold flex-shrink-0 ${
                             posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
                           }`}>
-                            {(staff.displayName || staff.username).charAt(0).toUpperCase()}
+                            {(staff.username).charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
                             <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                              {staff.displayName || staff.username}
+                              {staff.username}
                             </span>
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-block mt-0.5 ${
                               isCurrentUser
@@ -5938,7 +5946,7 @@ export default function PosSystem() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => openProductDialog(product)}
+                                      onClick={() => openProductDialog(product as any)}
                                       className="h-7 w-7 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
                                     >
                                       <Edit className="h-3 w-3 text-gray-400" />
@@ -6034,7 +6042,7 @@ export default function PosSystem() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => openProductDialog(product)}
+                                      onClick={() => openProductDialog(product as any)}
                                       className="h-9 w-9 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
                                     >
                                       <Edit className="h-4 w-4 text-gray-400 group-hover:text-[hsl(217,90%,50%)]" />
@@ -6176,7 +6184,7 @@ export default function PosSystem() {
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
                           <button
-                            onClick={() => openCustomerDialog(customer)}
+                            onClick={() => openCustomerDialog(customer as any)}
                             className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
                             title="Edit customer"
                           >
@@ -6726,7 +6734,7 @@ export default function PosSystem() {
                               size="sm"
                               onClick={() => {
                                 const paymentType = 'cash';
-                                closeOpenAccountMutation.mutate({ accountId: account.id, paymentType });
+                                closeOpenAccountMutation.mutate({ accountId: account.id, paymentType, tipEnabled: false });
                               }}
                               className="flex-1 min-w-[120px] bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-300"
                               disabled={closeOpenAccountMutation.isPending}
@@ -6825,7 +6833,7 @@ export default function PosSystem() {
                         <SelectItem value="0">Manager</SelectItem>
                         {staffAccounts.map((staff) => (
                           <SelectItem key={staff.id} value={staff.id.toString()}>
-                            {staff.displayName || staff.username || `Staff #${staff.id}`}
+                            {staff.username || `Staff #${staff.id}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -8418,7 +8426,20 @@ export default function PosSystem() {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., +27 12 345 6789" {...field} />
+                      <Input placeholder="e.g., +27 12 345 6789" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="e.g., john@example.com" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8452,7 +8473,7 @@ export default function PosSystem() {
                   <FormItem>
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Any additional notes about the customer..." {...field} />
+                      <Textarea placeholder="Any additional notes about the customer..." {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8534,7 +8555,7 @@ export default function PosSystem() {
                   <FormItem>
                     <FormLabel>Notes (Optional)</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Any additional notes..." {...field} />
+                      <Textarea placeholder="Any additional notes..." {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8608,14 +8629,14 @@ export default function PosSystem() {
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                     <p className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})
+                      Items ({Array.isArray(selectedOpenAccount.items) ? (selectedOpenAccount.items as SaleItem[]).length : 0})
                     </p>
                   </div>
-                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.length > 0 && (
+                  {Array.isArray(selectedOpenAccount.items) && (selectedOpenAccount.items as SaleItem[]).length > 0 && (
                     <button
                       onClick={() => {
-                        const allIndices = selectedOpenAccount.items.map((_, index) => index);
-                        const allSelected = allIndices.every(index => selectedItemsForPrint.includes(index));
+                        const allIndices = (selectedOpenAccount.items as SaleItem[]).map((_: SaleItem, index: number) => index);
+                        const allSelected = allIndices.every((index: number) => selectedItemsForPrint.includes(index));
                         setSelectedItemsForPrint(allSelected ? [] : allIndices);
                       }}
                       className="text-xs font-semibold text-[hsl(217,90%,50%)] hover:text-[hsl(217,90%,40%)] transition-colors px-2 py-1 rounded-lg"
@@ -8946,11 +8967,11 @@ export default function PosSystem() {
               <div className={`flex items-center justify-center w-11 h-11 rounded-full text-base font-semibold flex-shrink-0 ${
                 posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
               }`}>
-                {(selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || '?').charAt(0).toUpperCase()}
+                {(selectedStaffForAuth?.username || '?').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <DialogTitle className={posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>
-                  {selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || 'Enter Password'}
+                  {selectedStaffForAuth?.username || 'Enter Password'}
                 </DialogTitle>
                 <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
                   Enter the password for {selectedStaffForAuth?.username}
@@ -9146,13 +9167,13 @@ export default function PosSystem() {
                         <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold flex-shrink-0 ${
                           posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
                         }`}>
-                          {(staff.displayName || staff.username).charAt(0).toUpperCase()}
+                          {(staff.username).charAt(0).toUpperCase()}
                         </div>
                         
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                            {staff.displayName || staff.username}
+                            {staff.username}
                           </span>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${

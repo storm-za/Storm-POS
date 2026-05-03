@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, apiFetch } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount } from "@shared/schema";
+import { insertPosProductSchema, insertPosCustomerSchema, insertPosOpenAccountSchema, defaultReceiptSettings, type InsertPosProduct, type PosProduct, type PosCustomer, type PosOpenAccount, type InsertPosOpenAccount, type PosUser } from "@shared/schema";
 import { z } from "zod";
 import {
   ShoppingCart, Package, Users, ChartBar as BarChart3, Plus, Minus, Trash as Trash2,
@@ -47,21 +47,27 @@ import * as XLSX from 'xlsx';
 
 interface Product {
   id: number;
+  userId: number;
   sku: string;
   name: string;
   costPrice: string;
   retailPrice: string;
-  tradePrice?: string;
+  tradePrice?: string | null;
   quantity: number;
+  categoryId?: number | null;
   imageUrl?: string | null;
+  createdAt?: Date;
 }
 
 interface Customer {
   id: number;
+  userId: number;
   name: string;
-  phone?: string;
-  customerType: 'retail' | 'trade';
-  notes?: string;
+  phone?: string | null;
+  email?: string | null;
+  customerType: 'retail' | 'trade' | string;
+  notes?: string | null;
+  createdAt?: Date;
 }
 
 interface SaleItem {
@@ -76,15 +82,15 @@ interface Sale {
   id: number;
   total: string;
   items: SaleItem[];
-  customerId?: number;
-  customerName?: string;
-  notes?: string;
+  customerId?: number | null;
+  customerName?: string | null;
+  notes?: string | null;
   paymentType: string;
+  staffAccountId?: number | null;
   isVoided: boolean;
   voidReason?: string;
   voidedAt?: string;
   voidedBy?: number;
-  staffAccountId?: number;
   staffAccount?: { username: string; userType: string };
   createdAt: string;
 }
@@ -387,7 +393,7 @@ export default function PosSystemAfrikaans() {
   const [bizInfoVat, setBizInfoVat] = useState("");
   const [bizInfoReg, setBizInfoReg] = useState("");
   const [isSavingBizInfo, setIsSavingBizInfo] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{id: number; email: string; paid: boolean; companyLogo?: string; companyName?: string; tutorialCompleted?: boolean; trialStartDate?: string; receiptSettings?: any; paymentPlan?: string; planSavingAmount?: number | null; preferredLanguage?: string} | null>(null);
+  const [currentUser, setCurrentUser] = useState<(PosUser & { planSavingAmount?: number | null }) | null>(null);
 
   const refreshUserProfile = useCallback(async (userId: number, userEmail: string) => {
     try {
@@ -615,6 +621,7 @@ export default function PosSystemAfrikaans() {
     defaultValues: {
       name: "",
       phone: "",
+      email: "",
       customerType: "retail",
       notes: "",
     },
@@ -685,10 +692,10 @@ export default function PosSystemAfrikaans() {
           id: 1,
           email: 'demo@storm.co.za',
           paid: true,
-          companyLogo: undefined,
+          companyLogo: null,
           companyName: 'Demo Rekening',
           tutorialCompleted: false
-        });
+        } as any);
       }
     } else {
       // If no user data in localStorage, set demo user as fallback
@@ -696,10 +703,10 @@ export default function PosSystemAfrikaans() {
         id: 1,
         email: 'demo@storm.co.za',
         paid: true,
-        companyLogo: undefined,
+        companyLogo: null,
         companyName: 'Demo Rekening',
         tutorialCompleted: false
-      });
+      } as any);
     }
   }, []);
 
@@ -975,7 +982,7 @@ export default function PosSystemAfrikaans() {
       if (invoiceStatusFilter === 'paid' && invoice.status !== 'paid') {
         return false;
       }
-      if (invoiceStatusFilter === 'not_paid' && invoice.status === 'paid') {
+      if ((invoiceStatusFilter as string) === 'not_paid' && invoice.status === 'paid') {
         return false;
       }
       
@@ -2415,8 +2422,8 @@ export default function PosSystemAfrikaans() {
       setInvoicePaymentMethod(newInvoice.paymentMethod || '');
       setInvoicePaymentDetails(newInvoice.paymentDetails || '');
       // Copy products/items
-      const items = Array.isArray(newInvoice.items) ? newInvoice.items : [];
-      setInvoiceItems(items.map((item) => ({
+      const items: any[] = Array.isArray(newInvoice.items) ? newInvoice.items : [];
+      setInvoiceItems(items.map((item: any) => ({
         productId: item.productId,
         customName: item.productId ? undefined : (item.name || item.customName),
         quantity: parseFloat(item.quantity) || item.quantity,
@@ -2771,7 +2778,7 @@ export default function PosSystemAfrikaans() {
     }
   };
 
-  const getProductPrice = (product: Product, customerType: 'retail' | 'trade' = 'retail'): string => {
+  const getProductPrice = (product: Product, customerType: 'retail' | 'trade' | string = 'retail'): string => {
     if (customerType === 'trade' && product.tradePrice) {
       return product.tradePrice;
     }
@@ -3331,7 +3338,7 @@ export default function PosSystemAfrikaans() {
   };
 
   // Helper functions
-  const openProductDialog = (product?: PosProduct) => {
+  const openProductDialog = (product?: PosProduct & { categoryId?: number | null | undefined }) => {
     if (product) {
       setEditingProduct(product);
       productForm.setValue("sku", product.sku);
@@ -3354,11 +3361,18 @@ export default function PosSystemAfrikaans() {
       setEditingCustomer(customer);
       customerForm.setValue("name", customer.name);
       customerForm.setValue("phone", customer.phone || "");
-      customerForm.setValue("customerType", customer.customerType);
+      customerForm.setValue("email", (customer as any).email || "");
+      customerForm.setValue("customerType", customer.customerType as "retail" | "trade");
       customerForm.setValue("notes", customer.notes || "");
     } else {
       setEditingCustomer(null);
-      customerForm.reset();
+      customerForm.reset({
+        name: "",
+        phone: "",
+        email: "",
+        customerType: "retail",
+        notes: "",
+      });
     }
     setIsCustomerDialogOpen(true);
   };
@@ -4347,11 +4361,11 @@ ${paidInvoicesInRange.map((inv: any) =>
                           <div className={`flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold flex-shrink-0 ${
                             posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
                           }`}>
-                            {(staff.displayName || staff.username).charAt(0).toUpperCase()}
+                            {(staff.username).charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
                             <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                              {staff.displayName || staff.username}
+                              {staff.username}
                             </span>
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-block mt-0.5 ${
                               isCurrentUser
@@ -5149,7 +5163,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => openProductDialog(product)}
+                                      onClick={() => openProductDialog(product as any)}
                                       className="h-7 w-7 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
                                     >
                                       <Edit className="h-3 w-3 text-gray-400" />
@@ -5245,7 +5259,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => openProductDialog(product)}
+                                      onClick={() => openProductDialog(product as any)}
                                       className="h-9 w-9 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
                                     >
                                       <Edit className="h-4 w-4 text-gray-400 group-hover:text-[hsl(217,90%,50%)]" />
@@ -5387,7 +5401,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
                           <button
-                            onClick={() => openCustomerDialog(customer)}
+                            onClick={() => openCustomerDialog(customer as any)}
                             className={`p-1.5 rounded-lg transition-colors ${posTheme === 'dark' ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
                             title="Wysig kliënt"
                           >
@@ -6116,7 +6130,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             <Button
                               size="sm"
                               onClick={() => {
-                                closeOpenAccountMutation.mutate({ accountId: account.id, paymentType: 'cash' });
+                                closeOpenAccountMutation.mutate({ accountId: account.id, paymentType: 'cash', tipEnabled: false });
                               }}
                               className="flex-1 min-w-[120px] bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 font-semibold transition-all duration-300"
                               disabled={closeOpenAccountMutation.isPending}
@@ -6215,7 +6229,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <SelectItem value="0">Bestuur</SelectItem>
                         {staffAccounts.map((staff) => (
                           <SelectItem key={staff.id} value={staff.id.toString()}>
-                            {staff.displayName || staff.username || `Personeel #${staff.id}`}
+                            {staff.username || `Personeel #${staff.id}`}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -7987,7 +8001,20 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <FormItem>
                     <FormLabel>Telefoon (Opsioneel)</FormLabel>
                     <FormControl>
-                      <Input placeholder="0123456789" {...field} />
+                      <Input placeholder="0123456789" {...field} value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={customerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Epos (Opsioneel)</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="bv. jan@voorbeeld.co.za" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8021,7 +8048,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <FormItem>
                     <FormLabel>Notas (Opsioneel)</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enige addisionele notas..." {...field} />
+                      <Textarea placeholder="Enige addisionele notas..." {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8164,6 +8191,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       <Textarea 
                         placeholder="Enige addisionele notas..." 
                         {...field} 
+                        value={field.value ?? ''}
                         className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none`}
                         rows={3}
                       />
@@ -8614,11 +8642,11 @@ ${paidInvoicesInRange.map((inv: any) =>
               <div className={`flex items-center justify-center w-11 h-11 rounded-full text-base font-semibold flex-shrink-0 ${
                 posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
               }`}>
-                {(selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || '?').charAt(0).toUpperCase()}
+                {(selectedStaffForAuth?.username || '?').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <DialogTitle className={posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>
-                  {selectedStaffForAuth?.displayName || selectedStaffForAuth?.username || 'Voer Wagwoord In'}
+                  {selectedStaffForAuth?.username || 'Voer Wagwoord In'}
                 </DialogTitle>
                 <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
                   Voer die wagwoord in vir {selectedStaffForAuth?.username}
@@ -8814,13 +8842,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                         <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold flex-shrink-0 ${
                           posTheme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-100 text-gray-700'
                         }`}>
-                          {(staff.displayName || staff.username).charAt(0).toUpperCase()}
+                          {(staff.username).charAt(0).toUpperCase()}
                         </div>
                         
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <span className={`font-medium text-sm truncate block ${posTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
-                            {staff.displayName || staff.username}
+                            {staff.username}
                           </span>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
@@ -10627,19 +10655,19 @@ ${paidInvoicesInRange.map((inv: any) =>
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                     <p className={`font-semibold text-sm ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      Items ({Array.isArray(selectedOpenAccount.items) ? selectedOpenAccount.items.length : 0})
+                      Items ({Array.isArray(selectedOpenAccount.items) ? (selectedOpenAccount.items as any[]).length : 0})
                     </p>
                   </div>
-                  {Array.isArray(selectedOpenAccount.items) && selectedOpenAccount.items.length > 0 && (
+                  {Array.isArray(selectedOpenAccount.items) && (selectedOpenAccount.items as any[]).length > 0 && (
                     <button
                       onClick={() => {
-                        const allIndices = selectedOpenAccount.items.map((_: any, index: number) => index);
+                        const allIndices = (selectedOpenAccount.items as any[]).map((_: any, index: number) => index);
                         const allSelected = allIndices.every((index: number) => selectedItemsForPrint.includes(index));
                         setSelectedItemsForPrint(allSelected ? [] : allIndices);
                       }}
                       className="text-xs font-semibold text-[hsl(217,90%,50%)] hover:text-[hsl(217,90%,40%)] transition-colors px-2 py-1 rounded-lg"
                     >
-                      {selectedItemsForPrint.length === selectedOpenAccount.items.length ? 'Deselecteer Alles' : 'Kies Alles'}
+                      {selectedItemsForPrint.length === (selectedOpenAccount.items as any[]).length ? 'Deselecteer Alles' : 'Kies Alles'}
                     </button>
                   )}
                 </div>
