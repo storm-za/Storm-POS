@@ -15,6 +15,7 @@ import {
 import Footer from "@/components/footer";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1761856744843.png";
 import { updatePageSEO } from "@/lib/seo";
+import { SiGoogleplay } from "react-icons/si";
 import MultiDeviceSync from "@/components/illustrations/MultiDeviceSync";
 import InvoicePreview from "@/components/illustrations/InvoicePreview";
 import ReportingDashboard from "@/components/illustrations/ReportingDashboard";
@@ -209,10 +210,27 @@ export default function POS() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Monitor className="w-4 h-4 shrink-0" />
-                <span>Prefer a desktop app?</span>
-                <a href="https://github.com/storm-za/Storm-POS/releases/latest" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(217,90%,40%)] hover:underline">Download for Windows →</a>
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="https://github.com/storm-za/Storm-POS/releases/download/v1.5.34/Storm.POS_1.5.34_x64-setup.exe"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm border border-gray-700 hover:scale-105"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                  </svg>
+                  <span>Download for Windows</span>
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=za.storm.pos&pcampaignid=web_share"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm border border-gray-700 hover:scale-105"
+                >
+                  <SiGoogleplay className="w-4 h-4 shrink-0 text-[#01875f]" />
+                  <span>Get it on Google Play</span>
+                </a>
               </div>
             </motion.div>
 
@@ -627,9 +645,25 @@ export default function POS() {
               <Button asChild size="lg" className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 font-bold px-10 py-6 text-base hover:scale-105 transition-all border-0 shadow-xl">
                 <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
               </Button>
-              <a href="https://github.com/storm-za/Storm-POS/releases/latest" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold px-8 py-3 rounded-lg transition-all text-sm">
-                <Monitor className="w-4 h-4" />Download for Windows
+              <a
+                href="https://github.com/storm-za/Storm-POS/releases/download/v1.5.34/Storm.POS_1.5.34_x64-setup.exe"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold px-7 py-3 rounded-lg transition-all text-sm hover:scale-105"
+              >
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+                Download for Windows
+              </a>
+              <a
+                href="https://play.google.com/store/apps/details?id=za.storm.pos&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/30 font-semibold px-7 py-3 rounded-lg transition-all text-sm hover:scale-105"
+              >
+                <SiGoogleplay className="w-4 h-4 shrink-0 text-[#01875f]" />
+                Google Play
               </a>
             </div>
             <p className="mt-6 text-white/60 text-xs">After trial: Starter (R299/mo), Growth (R599/mo), or Scale (R999/mo). All flat-rate — no percentage cuts.</p>
