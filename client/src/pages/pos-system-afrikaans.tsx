@@ -456,7 +456,7 @@ export default function PosSystemAfrikaans() {
   const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
-  const [invoiceItems, setInvoiceItems] = useState<Array<{productId?: number; customName?: string; quantity: number; price: number}>>([]);
+  const [invoiceItems, setInvoiceItems] = useState<Array<{productId?: number; customName?: string; quantity: number; price: number; note?: string}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
   const [showQuickAddProduct, setShowQuickAddProduct] = useState(false);
   const [quickAddName, setQuickAddName] = useState("");
@@ -1225,18 +1225,33 @@ export default function PosSystemAfrikaans() {
         y = 20;
       }
       
+      const hasNote = item.note && item.note.trim().length > 0;
+      const rowHeight = hasNote ? 13 : 8;
+
       // Afwisselende ry agtergrond
       if (index % 2 === 0) {
         doc.setFillColor(248, 249, 250);
-        doc.rect(margin, y - 4, pageWidth - (margin * 2), 8, 'F');
+        doc.rect(margin, y - 4, pageWidth - (margin * 2), rowHeight, 'F');
       }
       
       doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
       doc.text(item.name || 'Item', margin + 5, y);
       doc.text(item.quantity?.toString() || '1', pageWidth - 95, y, { align: 'center' });
       doc.text(`R ${parseFloat(item.price || 0).toFixed(2)}`, pageWidth - 60, y, { align: 'right' });
       doc.text(`R ${parseFloat(item.lineTotal || 0).toFixed(2)}`, pageWidth - margin - 5, y, { align: 'right' });
-      y += 8;
+      
+      if (hasNote) {
+        y += 5;
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(item.note.trim(), margin + 5, y);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        y += 3;
+      } else {
+        y += 8;
+      }
     });
     
     // Onderste lyn van tabel
@@ -2427,7 +2442,8 @@ export default function PosSystemAfrikaans() {
         productId: item.productId,
         customName: item.productId ? undefined : (item.name || item.customName),
         quantity: parseFloat(item.quantity) || item.quantity,
-        price: parseFloat(item.price)
+        price: parseFloat(item.price),
+        note: item.note || undefined
       })));
       // Reset everything else to defaults
       setInvoiceDueDate('');
@@ -9289,6 +9305,14 @@ ${paidInvoicesInRange.map((inv: any) =>
                                   onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],customName:e.target.value,productId:undefined}; setInvoiceItems(u); }}
                                   className="w-full bg-transparent text-sm font-medium text-gray-900 focus:outline-none border-b border-transparent focus:border-[hsl(217,90%,40%)] py-0.5 transition-colors placeholder:text-gray-300"
                                 />
+                                <input
+                                  type="text"
+                                  value={item.note || ""}
+                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],note:e.target.value}; setInvoiceItems(u); }}
+                                  placeholder="Nota vir hierdie lyn (opsioneel)…"
+                                  maxLength={120}
+                                  className="w-full bg-transparent text-xs text-gray-500 focus:outline-none border-b border-dashed border-gray-200 focus:border-[hsl(217,90%,40%)] py-0.5 mt-0.5 placeholder:text-gray-300"
+                                />
                               </td>
                               <td className="px-2 py-2.5 text-center">
                                 <input
@@ -9373,9 +9397,11 @@ ${paidInvoicesInRange.map((inv: any) =>
                             value={quickAddName}
                             onChange={(e) => setQuickAddName(e.target.value)}
                             placeholder="bv. Aangepaste Diens"
+                            maxLength={80}
                             className="w-full px-2 py-1.5 text-sm border rounded"
                             data-testid="input-quick-add-name-af"
                           />
+                          <p className={`text-right text-[11px] mt-0.5 ${quickAddName.length >= 70 ? 'text-red-500' : 'text-gray-400'}`}>{quickAddName.length} / 80</p>
                         </div>
                         <div>
                           <Label className="text-xs">Prys (R)</Label>
@@ -9395,9 +9421,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                         type="button"
                         size="sm"
                         className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                        disabled={!quickAddName.trim() || !quickAddPrice || parseFloat(quickAddPrice) <= 0}
+                        disabled={!quickAddName.trim() || quickAddPrice === "" || parseFloat(quickAddPrice) < 0}
                         onClick={() => {
-                          if (quickAddName.trim() && quickAddPrice && parseFloat(quickAddPrice) > 0) {
+                          if (quickAddName.trim() && quickAddPrice !== "" && parseFloat(quickAddPrice) >= 0) {
                             setInvoiceItems([...invoiceItems, {
                               customName: quickAddName.trim(),
                               quantity: 1,
@@ -9687,7 +9713,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                       name: item.customName || products.find(p => p.id === item.productId)?.name || '',
                       quantity: item.quantity,
                       price: parseFloat(item.price.toFixed(2)),
-                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
+                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2)),
+                      note: item.note || undefined
                     })),
                     subtotal: subtotal.toFixed(2),
                     discountPercent: discountPercent.toFixed(2),

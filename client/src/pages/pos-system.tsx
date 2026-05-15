@@ -454,7 +454,7 @@ export default function PosSystem() {
   const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false);
   const [newStatus, setNewStatus] = useState<'draft' | 'sent' | 'paid' | 'cancelled'>('draft');
   const [invoiceType, setInvoiceType] = useState<'invoice' | 'quote'>('invoice');
-  const [invoiceItems, setInvoiceItems] = useState<Array<{productId?: number; customName?: string; quantity: number; price: number}>>([]);
+  const [invoiceItems, setInvoiceItems] = useState<Array<{productId?: number; customName?: string; quantity: number; price: number; note?: string}>>([]);
   const [invoiceClientId, setInvoiceClientId] = useState<number | null>(null);
   const [showQuickAddProduct, setShowQuickAddProduct] = useState(false);
   const [quickAddName, setQuickAddName] = useState("");
@@ -1776,7 +1776,8 @@ export default function PosSystem() {
         productId: item.productId,
         customName: item.productId ? undefined : (item.name || item.customName),
         quantity: parseFloat(item.quantity) || item.quantity,
-        price: parseFloat(item.price)
+        price: parseFloat(item.price),
+        note: item.note || undefined
       })));
       // Reset everything else to defaults
       setInvoiceDueDate('');
@@ -3783,18 +3784,33 @@ export default function PosSystem() {
         y = 20;
       }
       
+      const hasNote = item.note && item.note.trim().length > 0;
+      const rowHeight = hasNote ? 13 : 8;
+
       // Alternating row background
       if (index % 2 === 0) {
         doc.setFillColor(248, 249, 250);
-        doc.rect(margin, y - 4, pageWidth - (margin * 2), 8, 'F');
+        doc.rect(margin, y - 4, pageWidth - (margin * 2), rowHeight, 'F');
       }
       
       doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
       doc.text(item.name || 'Item', margin + 5, y);
       doc.text(item.quantity?.toString() || '1', pageWidth - 95, y, { align: 'center' });
       doc.text(`R ${parseFloat(item.price || 0).toFixed(2)}`, pageWidth - 60, y, { align: 'right' });
       doc.text(`R ${parseFloat(item.lineTotal || 0).toFixed(2)}`, pageWidth - margin - 5, y, { align: 'right' });
-      y += 8;
+      
+      if (hasNote) {
+        y += 5;
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(item.note.trim(), margin + 5, y);
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        y += 3;
+      } else {
+        y += 8;
+      }
       rowCount++;
     });
     
@@ -9897,6 +9913,19 @@ export default function PosSystem() {
                         />
                         <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
+                      {/* Row 3: Optional line note */}
+                      <input
+                        type="text"
+                        value={item.note || ""}
+                        onChange={(e) => {
+                          const updated = [...invoiceItems];
+                          updated[index] = { ...updated[index], note: e.target.value };
+                          setInvoiceItems(updated);
+                        }}
+                        placeholder="Add a note for this line (optional)…"
+                        maxLength={120}
+                        className="w-full bg-transparent border-b border-dashed border-gray-200 focus:border-blue-400 outline-none text-xs text-gray-500 placeholder:text-gray-300 px-0 py-0.5"
+                      />
                     </div>
                   );
                 })}
@@ -9940,9 +9969,11 @@ export default function PosSystem() {
                             value={quickAddName}
                             onChange={(e) => setQuickAddName(e.target.value)}
                             placeholder="e.g. Custom Service"
+                            maxLength={80}
                             className="w-full px-2 py-1.5 text-sm border rounded"
                             data-testid="input-quick-add-name"
                           />
+                          <p className={`text-right text-[11px] mt-0.5 ${quickAddName.length >= 70 ? 'text-red-500' : 'text-gray-400'}`}>{quickAddName.length} / 80</p>
                         </div>
                         <div>
                           <Label className="text-xs">Price (R)</Label>
@@ -9962,9 +9993,9 @@ export default function PosSystem() {
                         type="button"
                         size="sm"
                         className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
-                        disabled={!quickAddName.trim() || !quickAddPrice || parseFloat(quickAddPrice) <= 0}
+                        disabled={!quickAddName.trim() || quickAddPrice === "" || parseFloat(quickAddPrice) < 0}
                         onClick={() => {
-                          if (quickAddName.trim() && quickAddPrice && parseFloat(quickAddPrice) > 0) {
+                          if (quickAddName.trim() && quickAddPrice !== "" && parseFloat(quickAddPrice) >= 0) {
                             setInvoiceItems([...invoiceItems, {
                               customName: quickAddName.trim(),
                               quantity: 1,
@@ -10303,7 +10334,8 @@ export default function PosSystem() {
                       name: item.customName || products.find(p => p.id === item.productId)?.name || '',
                       quantity: item.quantity,
                       price: parseFloat(item.price.toFixed(2)),
-                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2))
+                      lineTotal: parseFloat((item.price * item.quantity).toFixed(2)),
+                      note: item.note || undefined
                     })),
                     subtotal: subtotal.toFixed(2),
                     discountPercent: discountPercent.toFixed(2),
