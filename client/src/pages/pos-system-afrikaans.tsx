@@ -1248,9 +1248,9 @@ export default function PosSystemAfrikaans() {
         doc.text(item.note.trim(), margin + 5, y);
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        y += 3;
+        y += (rowHeight - 5);
       } else {
-        y += 8;
+        y += rowHeight;
       }
     });
     
@@ -9305,11 +9305,12 @@ ${paidInvoicesInRange.map((inv: any) =>
                                   onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],customName:e.target.value,productId:undefined}; setInvoiceItems(u); }}
                                   className="w-full bg-transparent text-sm font-medium text-gray-900 focus:outline-none border-b border-transparent focus:border-[hsl(217,90%,40%)] py-0.5 transition-colors placeholder:text-gray-300"
                                 />
+                                <label className="text-[10px] text-gray-400">Nota (opsioneel)</label>
                                 <input
                                   type="text"
                                   value={item.note || ""}
                                   onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],note:e.target.value}; setInvoiceItems(u); }}
-                                  placeholder="Nota vir hierdie lyn (opsioneel)…"
+                                  placeholder="bv. sluit installasie in, gewaarborg 12 maande…"
                                   maxLength={120}
                                   className="w-full bg-transparent text-xs text-gray-500 focus:outline-none border-b border-dashed border-gray-200 focus:border-[hsl(217,90%,40%)] py-0.5 mt-0.5 placeholder:text-gray-300"
                                 />

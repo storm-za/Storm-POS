@@ -3807,9 +3807,9 @@ export default function PosSystem() {
         doc.text(item.note.trim(), margin + 5, y);
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        y += 3;
+        y += (rowHeight - 5);
       } else {
-        y += 8;
+        y += rowHeight;
       }
       rowCount++;
     });
@@ -9914,18 +9914,21 @@ export default function PosSystem() {
                         <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                       {/* Row 3: Optional line note */}
-                      <input
-                        type="text"
-                        value={item.note || ""}
-                        onChange={(e) => {
-                          const updated = [...invoiceItems];
-                          updated[index] = { ...updated[index], note: e.target.value };
-                          setInvoiceItems(updated);
-                        }}
-                        placeholder="Add a note for this line (optional)…"
-                        maxLength={120}
-                        className="w-full bg-transparent border-b border-dashed border-gray-200 focus:border-blue-400 outline-none text-xs text-gray-500 placeholder:text-gray-300 px-0 py-0.5"
-                      />
+                      <div>
+                        <label className="text-[10px] text-gray-400">Note (optional)</label>
+                        <input
+                          type="text"
+                          value={item.note || ""}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], note: e.target.value };
+                            setInvoiceItems(updated);
+                          }}
+                          placeholder="e.g. includes installation, warrantied 12 months…"
+                          maxLength={120}
+                          className="w-full bg-transparent border-b border-dashed border-gray-200 focus:border-blue-400 outline-none text-xs text-gray-500 placeholder:text-gray-300 px-0 py-0.5"
+                        />
+                      </div>
                     </div>
                   );
                 })}
