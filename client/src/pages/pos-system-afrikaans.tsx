@@ -3666,6 +3666,90 @@ ${paidInvoicesInRange.map((inv: any) =>
     }
   };
 
+  const handleQuickPrint = () => {
+    if (!selectedOpenAccount || selectedItemsForPrint.length === 0) {
+      toast({
+        title: "Geen items gekies",
+        description: "Kies items om te druk",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedItems = selectedItemsForPrint
+      .map(index => (selectedOpenAccount.items as any[])[index])
+      .filter(item => item);
+
+    const generateSelectedItemsPDF = () => {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [80, 200]
+      });
+
+      let yPosition = 10;
+      const lineHeight = 5;
+      const margin = 5;
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Rekening: ${selectedOpenAccount.accountName}`, margin, yPosition);
+      yPosition += lineHeight;
+      doc.text(`Tyd: ${new Date().toLocaleString()}`, margin, yPosition);
+      yPosition += lineHeight;
+
+      if (currentStaff) {
+        const staffName = currentStaff.username || `Personeel #${currentStaff.id}`;
+        doc.text(`Bedien deur: ${staffName}`, margin, yPosition);
+        yPosition += lineHeight;
+      }
+
+      yPosition += lineHeight;
+
+      doc.setDrawColor(0);
+      doc.line(margin, yPosition, 75, yPosition);
+      yPosition += lineHeight;
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('GEKOSE ITEMS:', margin, yPosition);
+      yPosition += lineHeight * 1.5;
+
+      let totalAmount = 0;
+      doc.setFont('helvetica', 'normal');
+      selectedItems.forEach(item => {
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${item.quantity}x ${item.name}`, margin, yPosition);
+        const itemTotal = parseFloat(item.price) * item.quantity;
+        totalAmount += itemTotal;
+        doc.text(`R${itemTotal.toFixed(2)}`, 70, yPosition, { align: 'right' });
+        yPosition += lineHeight;
+        yPosition += lineHeight * 0.5;
+      });
+
+      yPosition += lineHeight;
+      doc.setDrawColor(0);
+      doc.line(margin, yPosition, 75, yPosition);
+      yPosition += lineHeight;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('TOTAAL:', margin, yPosition);
+      doc.text(`R${totalAmount.toFixed(2)}`, 70, yPosition, { align: 'right' });
+
+      doc.save(`${selectedOpenAccount.accountName}-gekose-items-${new Date().toISOString().slice(0, 10)}.pdf`);
+    };
+
+    generateSelectedItemsPDF();
+    setSelectedItemsForPrint([]);
+
+    toast({
+      title: "Kombuisbestelling gedruk",
+      description: `${selectedItems.length} items gedruk vir ${selectedOpenAccount.accountName}`,
+    });
+  };
+
   const handleVoidSaleSubmit = () => {
     if (voidSaleDialog.sale && voidReason.trim()) {
       voidSaleMutation.mutate({
@@ -8214,31 +8298,16 @@ ${paidInvoicesInRange.map((inv: any) =>
                   </FormItem>
                 )}
               />
-              <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsOpenAccountDialogOpen(false)}
-                  className="bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600 hover:text-white px-6"
-                >
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsOpenAccountDialogOpen(false)}>
                   Kanselleer
                 </Button>
-                <Button 
-                  type="submit" 
-                  className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300 px-6"
-                  disabled={createOpenAccountMutation.isPending || currentSale.length === 0}
+                <Button
+                  type="submit"
+                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                  disabled={createOpenAccountMutation.isPending}
                 >
-                  {createOpenAccountMutation.isPending ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                      Besig...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Skep Rekening
-                    </>
-                  )}
+                  {createOpenAccountMutation.isPending ? 'Besig...' : 'Skep Rekening'}
                 </Button>
               </div>
             </form>
@@ -9185,11 +9254,17 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <h3 className="font-semibold text-gray-800 text-sm">Kliëntbesonderhede</h3>
                 <button
                   type="button"
-                  onClick={() => { setIsCustomClient(!isCustomClient); if (!isCustomClient) { setInvoiceClientId(null); } else { setInvoiceCustomClient(""); } }}
+                  onClick={() => {
+                    setIsCustomClient(!isCustomClient);
+                    if (!isCustomClient) {
+                      setInvoiceClientId(null);
+                    } else {
+                      setInvoiceCustomClient("");
+                    }
+                  }}
                   className="ml-auto text-xs text-[hsl(217,90%,40%)] hover:underline font-medium"
-                  data-testid="button-toggle-custom-client"
                 >
-                  {isCustomClient ? "Kies uit lys" : "Pasgemaakte kliënt"}
+                  {isCustomClient ? "Kies uit lys" : "Voer pasgemaakte kliënt in"}
                 </button>
               </div>
               <div className="p-4 space-y-4 bg-white">
@@ -9201,13 +9276,23 @@ ${paidInvoicesInRange.map((inv: any) =>
                       value={invoiceCustomClient}
                       onChange={(e) => setInvoiceCustomClient(e.target.value)}
                       placeholder="Voer kliëntnaam in"
-                      data-testid="input-custom-client"
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
                     />
                   ) : (
-                    <Select value={invoiceClientId?.toString() || ""} onValueChange={(v) => setInvoiceClientId(parseInt(v))} data-testid="select-client">
-                      <SelectTrigger><SelectValue placeholder="Kies kliënt..." /></SelectTrigger>
-                      <SelectContent>{customers.map((c) => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
+                    <Select
+                      value={invoiceClientId?.toString() || ""}
+                      onValueChange={(value) => setInvoiceClientId(parseInt(value))}
+                    >
+                      <SelectTrigger className="text-sm">
+                        <SelectValue placeholder="Kies 'n kliënt" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {customers.map((customer) => (
+                          <SelectItem key={customer.id} value={customer.id.toString()}>
+                            {customer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   )}
                 </div>
@@ -9216,13 +9301,25 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('clientEmail') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">E-posadres</Label>
-                        <input type="email" value={invoiceClientEmail} onChange={(e) => setInvoiceClientEmail(e.target.value)} placeholder="klient@voorbeeld.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
+                        <input
+                          type="email"
+                          value={invoiceClientEmail}
+                          onChange={(e) => setInvoiceClientEmail(e.target.value)}
+                          placeholder="klient@voorbeeld.com"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                        />
                       </div>
                     )}
                     {invoiceCardColumns.has('clientPhone') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Telefoonnommer</Label>
-                        <input type="tel" value={invoiceClientPhone} onChange={(e) => setInvoiceClientPhone(e.target.value)} placeholder="+27 12 345 6789" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
+                        <input
+                          type="tel"
+                          value={invoiceClientPhone}
+                          onChange={(e) => setInvoiceClientPhone(e.target.value)}
+                          placeholder="+27 12 345 6789"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                        />
                       </div>
                     )}
                   </div>
@@ -9244,14 +9341,22 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('poNumber') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">PO Nommer</Label>
-                        <input type="text" value={invoicePoNumber} onChange={(e) => setInvoicePoNumber(e.target.value)} placeholder="PO-0001" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
+                        <input
+                          type="text"
+                          value={invoicePoNumber}
+                          onChange={(e) => setInvoicePoNumber(e.target.value)}
+                          placeholder="Opsioneel"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                        />
                       </div>
                     )}
                     {invoiceCardColumns.has('dueTerms') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Betalingsvoorwaardes</Label>
                         <Select value={invoiceDueTerms} onValueChange={setInvoiceDueTerms}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">Geen</SelectItem>
                             <SelectItem value="7 dae">7 Dae</SelectItem>
@@ -9266,7 +9371,12 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('dueDate') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Vervaldatum</Label>
-                        <input type="date" value={invoiceDueDate} onChange={(e) => setInvoiceDueDate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
+                        <input
+                          type="date"
+                          value={invoiceDueDate}
+                          onChange={(e) => setInvoiceDueDate(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                        />
                       </div>
                     )}
                   </div>
@@ -9547,16 +9657,45 @@ ${paidInvoicesInRange.map((inv: any) =>
                     <div className="flex items-center justify-between mb-1.5">
                       <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Betalingsbesonderhede</Label>
                       {savedPaymentDetails.length > 0 && (
-                        <Select value="" onValueChange={(id) => { const s = savedPaymentDetails.find((x: any) => x.id.toString() === id); if (s) setInvoicePaymentDetails(s.details); }}>
-                          <SelectTrigger className="w-40 h-7 text-xs" data-testid="select-saved-payment-af"><SelectValue placeholder="Gestoorde..." /></SelectTrigger>
-                          <SelectContent>{savedPaymentDetails.map((s: any) => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent>
+                        <Select
+                          value=""
+                          onValueChange={(id) => {
+                            const saved = savedPaymentDetails.find((s: any) => s.id.toString() === id);
+                            if (saved) {
+                              setInvoicePaymentDetails(saved.details);
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-40 h-7 text-xs">
+                            <SelectValue placeholder="Gestoorde besonderhede" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {savedPaymentDetails.map((saved: any) => (
+                              <SelectItem key={saved.id} value={saved.id.toString()}>
+                                {saved.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
                         </Select>
                       )}
                     </div>
-                    <textarea value={invoicePaymentDetails} onChange={(e) => setInvoicePaymentDetails(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={2} placeholder="Bankbesonderhede, betalingsinstruksies..." />
+                    <textarea
+                      value={invoicePaymentDetails}
+                      onChange={(e) => setInvoicePaymentDetails(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none"
+                      rows={2}
+                      placeholder="Bankbesonderhede, betalingsinstruksies..."
+                    />
                     {invoicePaymentDetails.trim() && (
-                      <Button type="button" variant="outline" size="sm" className="mt-2 text-xs h-7" onClick={() => setIsSavePaymentDialogOpen(true)} data-testid="button-save-payment-details-af">
-                        <PlusCircle className="w-3 h-3 mr-1" />Stoor Besonderhede
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 text-xs h-7"
+                        onClick={() => setIsSavePaymentDialogOpen(true)}
+                      >
+                        <PlusCircle className="w-3 h-3 mr-1" />
+                        Stoor as Sjabloon
                       </Button>
                     )}
                   </div>
@@ -9578,12 +9717,26 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('notes') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Notas <span className="normal-case text-gray-400 font-normal">({invoiceNotes.length}/300)</span></Label>
-                        <textarea value={invoiceNotes} onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))} maxLength={300} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={3} placeholder="Addisionele notas..." />
+                        <textarea
+                          value={invoiceNotes}
+                          onChange={(e) => setInvoiceNotes(e.target.value.slice(0, 300))}
+                          maxLength={300}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none"
+                          rows={3}
+                          placeholder="Addisionele notas..."
+                        />
                       </div>
                     )}
                     <div>
                       <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Terme & Voorwaardes <span className="normal-case text-gray-400 font-normal">({invoiceTerms.length}/500)</span></Label>
-                      <textarea value={invoiceTerms} onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))} maxLength={500} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none" rows={3} placeholder="Betalingsvoorwaardes en -terme..." />
+                      <textarea
+                        value={invoiceTerms}
+                        onChange={(e) => setInvoiceTerms(e.target.value.slice(0, 500))}
+                        maxLength={500}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] resize-none"
+                        rows={3}
+                        placeholder="Betalingsvoorwaardes en -terme..."
+                      />
                     </div>
                   </div>
                 </div>
@@ -10754,6 +10907,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
+                    onClick={handleQuickPrint}
                     disabled={selectedItemsForPrint.length === 0}
                     className={`flex-1 h-10 font-medium ${posTheme === 'dark' ? 'border-gray-600 text-gray-200 hover:text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'} disabled:opacity-40`}
                   >
