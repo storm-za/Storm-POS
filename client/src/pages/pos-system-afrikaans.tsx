@@ -5156,7 +5156,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             transition={{ delay: index * 0.03 }}
                             className="group"
                           >
-                            <div className="relative bg-gray-900/70 border border-gray-700/50 rounded-xl p-3 sm:p-5 hover:border-[hsl(217,90%,40%)]/50 transition-all duration-300 overflow-hidden">
+                            <div className={`relative rounded-xl p-3 sm:p-5 transition-all duration-300 overflow-hidden ${posTheme === 'dark' ? 'bg-gray-900/70 border border-gray-700/50 hover:border-[hsl(217,90%,40%)]/50' : 'bg-white border border-gray-200 hover:border-[hsl(217,90%,40%)]/40'}`}>
                               <div className="absolute inset-0 bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               
                               {/* Mobile Layout - shows on screens below 768px */}
@@ -5164,15 +5164,15 @@ ${paidInvoicesInRange.map((inv: any) =>
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
                                     {product.imageUrl ? (
-                                      <img src={product.imageUrl} alt={product.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                      <img src={product.imageUrl} alt={product.name} className={`w-9 h-9 rounded-lg object-cover flex-shrink-0 border ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                     ) : (
                                       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                         <Package className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                                       </div>
                                     )}
                                     <div className="min-w-0 flex-1 overflow-hidden">
-                                      <h3 className="font-semibold text-white text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
-                                      <p className="text-[11px] text-gray-400 truncate">SKU: {product.sku}</p>
+                                      <h3 className={`font-semibold text-sm truncate group-hover:text-[hsl(217,90%,60%)] transition-colors ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</h3>
+                                      <p className={`text-[11px] truncate ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>SKU: {product.sku}</p>
                                     </div>
                                   </div>
                                   <div className="flex gap-1 flex-shrink-0">
@@ -5180,44 +5180,44 @@ ${paidInvoicesInRange.map((inv: any) =>
                                       size="sm"
                                       variant="outline"
                                       onClick={() => openProductDialog(product as any)}
-                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                      className={`h-7 w-7 p-0 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                     >
-                                      <Edit className="h-3 w-3 text-gray-400" />
+                                      <Edit className={`h-3 w-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteProduct(product.id)}
-                                      className="h-7 w-7 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      className={`h-7 w-7 p-0 hover:border-red-500/50 hover:bg-red-500/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                       disabled={deleteProductMutation.isPending}
                                     >
-                                      <Trash2 className="h-3 w-3 text-gray-400" />
+                                      <Trash2 className={`h-3 w-3 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-1 pt-2 border-t border-gray-700/50">
+                                <div className={`grid grid-cols-3 gap-1 pt-2 border-t ${posTheme === 'dark' ? 'border-gray-700/50' : 'border-gray-200'}`}>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Kleinhandel</p>
-                                    <p className="text-white font-bold text-xs">R{product.retailPrice}</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kleinhandel</p>
+                                    <p className={`font-bold text-xs ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{product.retailPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Kosprys</p>
-                                    <p className="text-gray-400 font-medium text-xs">R{product.costPrice}</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kosprys</p>
+                                    <p className={`font-medium text-xs ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>R{product.costPrice}</p>
                                   </div>
                                   <div className="text-center">
-                                    <p className="text-[9px] text-gray-500 uppercase">Voorraad</p>
+                                    <p className={`text-[9px] uppercase ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Voorraad</p>
                                     <div className="flex items-center justify-center gap-0.5">
                                       <p className={`font-bold text-xs ${
-                                        product.quantity === 0 ? 'text-red-400' :
-                                        product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
+                                        product.quantity === 0 ? (posTheme === 'dark' ? 'text-red-400' : 'text-red-600') :
+                                        product.quantity <= 5 ? (posTheme === 'dark' ? 'text-amber-400' : 'text-amber-600') : (posTheme === 'dark' ? 'text-green-400' : 'text-green-600')
                                       }`}>
                                         {product.quantity}
                                       </p>
                                       {product.quantity <= 5 && product.quantity > 0 && (
-                                        <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1 rounded-full">Laag</span>
+                                        <span className={`text-[8px] px-1 rounded-full ${posTheme === 'dark' ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Laag</span>
                                       )}
                                       {product.quantity === 0 && (
-                                        <span className="text-[8px] bg-red-500/20 text-red-400 px-1 rounded-full">Uit</span>
+                                        <span className={`text-[8px] px-1 rounded-full ${posTheme === 'dark' ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-700'}`}>Uit</span>
                                       )}
                                     </div>
                                   </div>
@@ -5228,46 +5228,46 @@ ${paidInvoicesInRange.map((inv: any) =>
                               <div className="relative hidden md:flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                   {product.imageUrl ? (
-                                    <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border border-gray-600/30" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    <img src={product.imageUrl} alt={product.name} className={`w-12 h-12 rounded-xl object-cover flex-shrink-0 border ${posTheme === 'dark' ? 'border-gray-600/30' : 'border-gray-200'}`} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                                   ) : (
                                     <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)]/15 border border-[hsl(217,90%,40%)]/30 flex-shrink-0">
                                       <Package className="w-6 h-6 text-[hsl(217,90%,50%)]" />
                                     </div>
                                   )}
                                   <div className="min-w-0 flex-1">
-                                    <h3 className="font-semibold text-white text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors">{product.name}</h3>
-                                    <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                                    <h3 className={`font-semibold text-lg truncate group-hover:text-[hsl(217,90%,60%)] transition-colors ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{product.name}</h3>
+                                    <p className={`text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>SKU: {product.sku}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-6">
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Kosprys</p>
-                                    <p className="text-gray-400 font-medium">R{product.costPrice}</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kosprys</p>
+                                    <p className={`font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>R{product.costPrice}</p>
                                   </div>
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Kleinhandel</p>
-                                    <p className="text-white font-bold text-lg">R{product.retailPrice}</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Kleinhandel</p>
+                                    <p className={`font-bold text-lg ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{product.retailPrice}</p>
                                   </div>
                                   {product.tradePrice && (
                                     <div className="text-right hidden lg:block">
-                                      <p className="text-xs text-gray-500 uppercase tracking-wide">Groothandel</p>
+                                      <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Groothandel</p>
                                       <p className="text-[hsl(217,90%,60%)] font-medium">R{product.tradePrice}</p>
                                     </div>
                                   )}
                                   <div className="text-right">
-                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Voorraad</p>
+                                    <p className={`text-xs uppercase tracking-wide ${posTheme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>Voorraad</p>
                                     <div className="flex items-center gap-1">
                                       <p className={`font-bold ${
-                                        product.quantity === 0 ? 'text-red-400' :
-                                        product.quantity <= 5 ? 'text-amber-400' : 'text-green-400'
+                                        product.quantity === 0 ? (posTheme === 'dark' ? 'text-red-400' : 'text-red-600') :
+                                        product.quantity <= 5 ? (posTheme === 'dark' ? 'text-amber-400' : 'text-amber-600') : (posTheme === 'dark' ? 'text-green-400' : 'text-green-600')
                                       }`}>
                                         {product.quantity}
                                       </p>
                                       {product.quantity <= 5 && product.quantity > 0 && (
-                                        <span className="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full border border-amber-500/30">Laag</span>
+                                        <span className={`text-xs px-1.5 py-0.5 rounded-full border ${posTheme === 'dark' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>Laag</span>
                                       )}
                                       {product.quantity === 0 && (
-                                        <span className="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">Uit</span>
+                                        <span className={`text-xs px-1.5 py-0.5 rounded-full border ${posTheme === 'dark' ? 'bg-red-500/20 text-red-400 border-red-500/30' : 'bg-red-100 text-red-700 border-red-200'}`}>Uit</span>
                                       )}
                                     </div>
                                   </div>
@@ -5276,18 +5276,18 @@ ${paidInvoicesInRange.map((inv: any) =>
                                       size="sm"
                                       variant="outline"
                                       onClick={() => openProductDialog(product as any)}
-                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all"
+                                      className={`h-9 w-9 p-0 hover:border-[hsl(217,90%,40%)]/50 hover:bg-[hsl(217,90%,40%)]/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                     >
-                                      <Edit className="h-4 w-4 text-gray-400 group-hover:text-[hsl(217,90%,50%)]" />
+                                      <Edit className={`h-4 w-4 group-hover:text-[hsl(217,90%,50%)] ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteProduct(product.id)}
-                                      className="h-9 w-9 p-0 border-gray-600/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all"
+                                      className={`h-9 w-9 p-0 hover:border-red-500/50 hover:bg-red-500/10 transition-all ${posTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300'}`}
                                       disabled={deleteProductMutation.isPending}
                                     >
-                                      <Trash2 className="h-4 w-4 text-gray-400 hover:text-red-400" />
+                                      <Trash2 className={`h-4 w-4 hover:text-red-400 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </Button>
                                   </div>
                                 </div>
@@ -5749,140 +5749,135 @@ ${paidInvoicesInRange.map((inv: any) =>
 
           {/* Aankoopbestellings Tab */}
           <TabsContent value="aankoopbestellings">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className={`border-gray-800 shadow-2xl ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-                <CardHeader className={`border-b border-gray-800 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <CardTitle className={`text-lg sm:text-xl font-bold flex items-center gap-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                      <ClipboardList className="h-5 w-5 text-blue-400" />
-                      Aankoopbestellings
-                    </CardTitle>
-                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
-                      <Plus className="h-4 w-4 mr-2" /> Nuwe Bestelling
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className={`text-2xl font-bold ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Aankoopbestellings</h2>
+                  <p className="text-gray-400 text-sm mt-1">Bestuur verskaffer bestellings en spoor aflewerings</p>
+                </div>
+                <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white shadow-lg">
+                  <Plus className="h-4 w-4 mr-2" />Nuwe Aankoopbestelling
+                </Button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <Input placeholder="Soek op bestellingnommer of verskaffer..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
+                </div>
+                <Select value={poSupplierFilter} onValueChange={setPOSupplierFilter}>
+                  <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-48 bg-gray-900 border-gray-700 text-white' : 'w-full sm:w-48 bg-white border-gray-200 text-gray-700'}>
+                    <SelectValue placeholder="Filtreer op verskaffer" />
+                  </SelectTrigger>
+                  <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
+                    <SelectItem value="all">Alle Verskaffers</SelectItem>
+                    {poSupplierOptions.map((name) => (
+                      <SelectItem key={name} value={name}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
+                  <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-48 bg-gray-900 border-gray-700 text-white' : 'w-full sm:w-48 bg-white border-gray-200 text-gray-700'}>
+                    <SelectValue placeholder="Filtreer op status" />
+                  </SelectTrigger>
+                  <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
+                    <SelectItem value="all">Alle Status</SelectItem>
+                    <SelectItem value="draft">Konsep</SelectItem>
+                    <SelectItem value="sent">Gestuur</SelectItem>
+                    <SelectItem value="partial">Gedeeltelik Ontvang</SelectItem>
+                    <SelectItem value="received">Ontvang</SelectItem>
+                    <SelectItem value="cancelled">Gekanselleer</SelectItem>
+                    <SelectItem value="paid" className="text-green-400">Betaal</SelectItem>
+                    <SelectItem value="not_paid" className="text-red-400">Nie Betaal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                {[
+                  { label: "Totaal",      count: purchaseOrders.length,                                                     accent: 'border-l-gray-400',  filter: 'all'      },
+                  { label: "Konsep",      count: purchaseOrders.filter((p: any) => p.status === 'draft').length,             accent: 'border-l-gray-400',  filter: 'draft'    },
+                  { label: "Gestuur",     count: purchaseOrders.filter((p: any) => p.status === 'sent').length,              accent: 'border-l-blue-500',  filter: 'sent'     },
+                  { label: "Gedeeltelik", count: purchaseOrders.filter((p: any) => p.status === 'partial').length,           accent: 'border-l-amber-500', filter: 'partial'  },
+                  { label: "Ontvang",     count: purchaseOrders.filter((p: any) => p.status === 'received').length,          accent: 'border-l-green-500', filter: 'received' },
+                  { label: "Nie Betaal",  count: purchaseOrders.filter((p: any) => !p.isPaid).length,                       accent: 'border-l-red-500',   filter: 'not_paid' },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    onClick={() => setPOStatusFilter(poStatusFilter === stat.filter ? 'all' : stat.filter)}
+                    className={`rounded-lg p-3 border-l-4 ${stat.accent} cursor-pointer transition-all select-none
+                      ${poStatusFilter === stat.filter
+                        ? (posTheme === 'dark' ? 'bg-white/15 border border-white/30 ring-1 ring-white/20' : 'bg-blue-50 border border-blue-200 ring-1 ring-blue-200')
+                        : (posTheme === 'dark' ? 'bg-white/5 border border-white/10 hover:bg-white/10' : 'bg-white border border-gray-200 shadow-sm hover:bg-gray-50')
+                      }`}
+                  >
+                    <p className={`text-2xl font-bold leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stat.count}</p>
+                    <p className={`text-xs font-medium mt-1.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                {isPOLoading ? (
+                  <div className="text-center py-12 text-gray-400">Laai aankoopbestellings...</div>
+                ) : filteredPurchaseOrders.length === 0 ? (
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 rounded-2xl bg-[hsl(217,90%,40%)]/15 flex items-center justify-center mx-auto mb-5 border border-[hsl(217,90%,50%)]/20">
+                      <ClipboardList className="h-10 w-10 text-[hsl(217,90%,50%)]/60" />
+                    </div>
+                    <h3 className={`text-xl font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen aankoopbestellings nie</h3>
+                    <p className={`text-sm mb-6 max-w-xs mx-auto ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Spoor voorraadbestellings van verskaffers. Skep jou eerste aankoopbestelling om inkomende voorraad te bestuur.</p>
+                    <Button onClick={() => { resetPOForm(); setIsPODialogOpen(true); }} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] shadow-lg">
+                      <Plus className="h-4 w-4 mr-2" />Skep Eerste Aankoopbestelling
                     </Button>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                      <Input placeholder="Soek bestellings..." value={poSearchTerm} onChange={(e) => setPOSearchTerm(e.target.value)} className={posTheme === 'dark' ? 'pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500' : 'pl-10 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} />
-                    </div>
-                    <Select value={poSupplierFilter} onValueChange={setPOSupplierFilter}>
-                      <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
-                        <SelectValue placeholder="Filtreer op verskaffer" />
-                      </SelectTrigger>
-                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
-                        <SelectItem value="all">Alle Verskaffers</SelectItem>
-                        {poSupplierOptions.map((name) => (
-                          <SelectItem key={name} value={name}>{name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={poStatusFilter} onValueChange={setPOStatusFilter}>
-                      <SelectTrigger className={posTheme === 'dark' ? 'w-full sm:w-[180px] bg-gray-900/50 border-gray-700 text-white' : 'w-full sm:w-[180px] bg-white border-gray-200 text-gray-700'}>
-                        <SelectValue placeholder="Filter Status" />
-                      </SelectTrigger>
-                      <SelectContent className={posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}>
-                        <SelectItem value="all">Alle Status</SelectItem>
-                        <SelectItem value="draft">Konsep</SelectItem>
-                        <SelectItem value="sent">Gestuur</SelectItem>
-                        <SelectItem value="partial">Gedeeltelik</SelectItem>
-                        <SelectItem value="received">Ontvang</SelectItem>
-                        <SelectItem value="cancelled">Gekanselleer</SelectItem>
-                        <SelectItem value="paid" className="text-green-400">Betaal</SelectItem>
-                        <SelectItem value="not_paid" className="text-red-400">Nie Betaal</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardHeader>
-                <div className={`px-4 pt-4 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                    {[
-                      { label: "Totaal",       count: purchaseOrders.length,                                                     accent: 'border-l-gray-400',  filter: 'all'      },
-                      { label: "Konsep",       count: purchaseOrders.filter((p: any) => p.status === 'draft').length,             accent: 'border-l-gray-400',  filter: 'draft'    },
-                      { label: "Gestuur",      count: purchaseOrders.filter((p: any) => p.status === 'sent').length,              accent: 'border-l-blue-500',  filter: 'sent'     },
-                      { label: "Gedeeltelik",  count: purchaseOrders.filter((p: any) => p.status === 'partial').length,           accent: 'border-l-amber-500', filter: 'partial'  },
-                      { label: "Ontvang",      count: purchaseOrders.filter((p: any) => p.status === 'received').length,          accent: 'border-l-green-500', filter: 'received' },
-                      { label: "Nie Betaal",   count: purchaseOrders.filter((p: any) => !p.isPaid).length,                       accent: 'border-l-red-500',   filter: 'not_paid' },
-                    ].map((stat) => (
-                      <div
-                        key={stat.label}
-                        onClick={() => setPOStatusFilter(poStatusFilter === stat.filter ? 'all' : stat.filter)}
-                        className={`rounded-lg p-3 border-l-4 ${stat.accent} cursor-pointer transition-all select-none
-                          ${poStatusFilter === stat.filter
-                            ? (posTheme === 'dark' ? 'bg-white/15 border border-white/30 ring-1 ring-white/20' : 'bg-blue-50 border border-blue-200 ring-1 ring-blue-200')
-                            : (posTheme === 'dark' ? 'bg-white/5 border border-white/10 hover:bg-white/10' : 'bg-white border border-gray-200 shadow-sm hover:bg-gray-50')
-                          }`}
-                      >
-                        <p className={`text-2xl font-bold leading-none ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{stat.count}</p>
-                        <p className={`text-xs font-medium mt-1.5 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <CardContent className={`p-0 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-                  {isPOLoading ? (
-                    <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div></div>
-                  ) : filteredPurchaseOrders.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-600/15 flex items-center justify-center mb-4 border border-blue-500/20">
-                        <ClipboardList className="h-8 w-8 text-blue-400" />
-                      </div>
-                      <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen aankoopbestellings nie</h3>
-                      <p className="text-sm text-gray-500 max-w-xs mb-4">Skep jou eerste aankoopbestelling om voorraad van verskaffers te bestel en ontvangs van goedere te spoor.</p>
-                      <Button size="sm" onClick={() => setIsPODialogOpen(true)} className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,45%)] text-white text-xs">
-                        <Plus className="w-3.5 h-3.5 mr-1.5" />Skep Aankoopbestelling
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-gray-800/50">
-                      {filteredPurchaseOrders.map((po: any) => (
-                        <div key={po.id} className="p-4 hover:bg-gray-900/30 transition-colors">
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-1">
-                                <span className="text-blue-400 font-mono font-bold text-sm">{po.poNumber}</span>
-                                {getPOStatusBadge(po.status)}
-                                <Badge className={`cursor-pointer text-xs ${po.isPaid ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} border`} onClick={(e) => { e.stopPropagation(); togglePOPaidMutation.mutate({ id: po.id, isPaid: !po.isPaid }); }}>{po.isPaid ? 'Betaal' : 'Nie Betaal'}</Badge>
-                              </div>
-                              <p className="text-white font-medium">{po.supplierName}</p>
-                              <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                                <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(po.createdAt).toLocaleDateString()}</span>
-                                {po.expectedDate && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Verwag: {new Date(po.expectedDate).toLocaleDateString()}</span>}
-                                <span>{(po.items || []).length} items</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-white font-bold text-lg">R{parseFloat(po.total || 0).toFixed(2)}</span>
-                              <div className="flex gap-1">
-                                <Button variant="ghost" size="sm" onClick={() => { setSelectedPO(po); setIsPOViewOpen(true); }} className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><Eye className="h-4 w-4" /></Button>
-                                <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 h-8 w-8 p-0" disabled={po.status === 'received' || po.status === 'cancelled'}><Edit className="h-4 w-4" /></Button>
-                                <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-green-400 hover:bg-green-500/10 h-8 w-8 p-0"><Download className="h-4 w-4" /></Button>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10 h-8 w-8 p-0"><ChevronDown className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                                  <DropdownMenuContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
-                                    {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Merk as Gestuur</DropdownMenuItem>}
-                                    {(po.status === 'sent' || po.status === 'partial') && (
-                                      <>
-                                        <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-yellow-400 hover:text-yellow-300">Gedeeltelik Ontvang</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-green-400 hover:text-green-300">Volledig Ontvang</DropdownMenuItem>
-                                      </>
-                                    )}
-                                    {po.status !== 'cancelled' && po.status !== 'received' && (
-                                      <><DropdownMenuSeparator className="bg-gray-700" /><DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Kanselleer</DropdownMenuItem></>
-                                    )}
-                                    <DropdownMenuSeparator className="bg-gray-700" />
-                                    <DropdownMenuItem onClick={() => { setDeletingPOId(po.id); setIsDeletePODialogOpen(true); }} className="text-red-400 hover:text-red-300">Verwyder</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
+                ) : (
+                  filteredPurchaseOrders.map((po: any) => (
+                    <motion.div key={po.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`${posTheme === 'dark' ? 'bg-gray-900/80 backdrop-blur-sm border-gray-800 hover:border-gray-700' : 'bg-white border-gray-200 hover:border-gray-300'} border rounded-xl p-4 transition-all group`}>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="text-[hsl(217,90%,60%)] font-mono font-bold text-sm">{po.poNumber}</span>
+                            {getPOStatusBadge(po.status)}
+                            <Badge className={`cursor-pointer text-xs ${po.isPaid ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} border`} onClick={(e) => { e.stopPropagation(); togglePOPaidMutation.mutate({ id: po.id, isPaid: !po.isPaid }); }}>{po.isPaid ? 'Betaal' : 'Nie Betaal'}</Badge>
+                          </div>
+                          <h3 className={`font-semibold truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{po.supplierName}</h3>
+                          <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
+                            <span>{(po.items || []).length} item{(po.items || []).length !== 1 ? 's' : ''}</span>
+                            <span>R{parseFloat(po.total).toFixed(2)}</span>
+                            <span>{new Date(po.createdAt).toLocaleDateString()}</span>
+                            {po.expectedDate && <span className="text-yellow-400/70">Verwag: {new Date(po.expectedDate).toLocaleDateString()}</span>}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => { setSelectedPO(po); setIsPOViewOpen(true); }} className="text-gray-400 hover:text-white hover:bg-gray-800"><Eye className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => loadPOForEdit(po)} className="text-gray-400 hover:text-white hover:bg-gray-800" disabled={po.status === 'received' || po.status === 'cancelled'}><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => generatePOPdf(po)} className="text-gray-400 hover:text-white hover:bg-gray-800"><Download className="h-4 w-4" /></Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800"><ChevronDown className="h-4 w-4" /></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className={`${posTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                              {po.status === 'draft' && <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'sent' })} className="text-blue-400 hover:text-blue-300">Merk as Gestuur</DropdownMenuItem>}
+                              {(po.status === 'sent' || po.status === 'partial') && (
+                                <>
+                                  <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'partial' })} className="text-yellow-400 hover:text-yellow-300">Gedeeltelik Ontvang</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'received' })} className="text-green-400 hover:text-green-300">Volledig Ontvang</DropdownMenuItem>
+                                </>
+                              )}
+                              {po.status !== 'cancelled' && po.status !== 'received' && (
+                                <><DropdownMenuSeparator className="bg-gray-700" /><DropdownMenuItem onClick={() => updatePOStatusMutation.mutate({ id: po.id, status: 'cancelled' })} className="text-red-400 hover:text-red-300">Kanselleer</DropdownMenuItem></>
+                              )}
+                              <DropdownMenuSeparator className="bg-gray-700" />
+                              <DropdownMenuItem onClick={() => { setDeletingPOId(po.id); setIsDeletePODialogOpen(true); }} className="text-red-400 hover:text-red-300">Verwyder</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
             </motion.div>
           </TabsContent>
 
@@ -6047,7 +6042,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</Label><Textarea value={poNotes} onChange={(e) => setPONotes(e.target.value)} rows={2} placeholder="Bykomende notas..." className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                 <div className="flex justify-end gap-3 pt-1">
                   <Button variant="outline" onClick={() => { resetPOForm(); setIsPODialogOpen(false); }} className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}>Kanselleer</Button>
-                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300">
+                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white py-3 text-base font-semibold shadow-lg">
                     {(createPOMutation.isPending || updatePOMutation.isPending) ? 'Stoor...' : editingPO ? 'Dateer Op' : 'Skep Bestelling'}
                   </Button>
                 </div>
@@ -9279,85 +9274,85 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <span className="ml-auto text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{invoiceItems.length} {invoiceItems.length === 1 ? 'item' : 'items'}</span>
               </div>
               <div className="bg-white p-4 space-y-3">
-                {/* Items table */}
-                {invoiceItems.length > 0 && (
-                  <div className="border border-gray-200 rounded-xl overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-gray-50 border-b border-gray-200">
-                          <th className="text-left px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Item</th>
-                          <th className="text-center px-2 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-14">Hv</th>
-                          <th className="text-right px-2 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Prys</th>
-                          <th className="text-right px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-24">Totaal</th>
-                          <th className="w-8"></th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {invoiceItems.map((item, index) => {
-                          const product = item.productId ? products.find(p => p.id === item.productId) : null;
-                          const itemName = item.customName || product?.name || '';
-                          return (
-                            <tr key={index} className="group hover:bg-[hsl(217,90%,40%)]/5 transition-colors">
-                              <td className="px-4 py-2.5">
-                                <input
-                                  type="text"
-                                  value={itemName}
-                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],customName:e.target.value,productId:undefined}; setInvoiceItems(u); }}
-                                  className="w-full bg-transparent text-sm font-medium text-gray-900 focus:outline-none border-b border-transparent focus:border-[hsl(217,90%,40%)] py-0.5 transition-colors placeholder:text-gray-300"
-                                />
-                                <label className="text-[10px] text-gray-400">Nota (opsioneel)</label>
-                                <input
-                                  type="text"
-                                  value={item.note || ""}
-                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],note:e.target.value}; setInvoiceItems(u); }}
-                                  placeholder="bv. sluit installasie in, gewaarborg 12 maande…"
-                                  maxLength={120}
-                                  className="w-full bg-transparent text-xs text-gray-500 focus:outline-none border-b border-dashed border-gray-200 focus:border-[hsl(217,90%,40%)] py-0.5 mt-0.5 placeholder:text-gray-300"
-                                />
-                              </td>
-                              <td className="px-2 py-2.5 text-center">
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={item.quantity}
-                                  onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],quantity:Math.max(1,parseInt(e.target.value)||1)}; setInvoiceItems(u); }}
-                                  className="w-12 text-center text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[hsl(217,90%,40%)] py-1"
-                                />
-                              </td>
-                              <td className="px-2 py-2.5">
-                                <div className="flex items-center justify-end gap-0.5">
-                                  <span className="text-gray-400 text-xs">R</span>
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={item.price}
-                                    onChange={(e) => { const u=[...invoiceItems]; u[index]={...u[index],price:parseFloat(e.target.value)||0}; setInvoiceItems(u); }}
-                                    className="w-20 text-right text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[hsl(217,90%,40%)] py-1 px-1.5"
-                                  />
-                                </div>
-                              </td>
-                              <td className="px-3 py-2.5 text-right">
-                                <span className="text-sm font-bold text-gray-900">R{(item.price * item.quantity).toFixed(2)}</span>
-                              </td>
-                              <td className="pr-2 py-2.5">
-                                <button
-                                  type="button"
-                                  onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
-                                  className="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                {/* Items list */}
                 <div className="space-y-2">
-                  <div className="space-y-2">
+                {invoiceItems.map((item, index) => {
+                  const product = item.productId ? products.find(p => p.id === item.productId) : null;
+                  const itemName = item.customName || product?.name || 'Onbekende Produk';
+                  return (
+                    <div key={index} className="p-2 border rounded space-y-1.5">
+                      {/* Ry 1: Produknaam + verwyder */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={itemName}
+                            onChange={(e) => {
+                              const updated = [...invoiceItems];
+                              updated[index] = { ...updated[index], customName: e.target.value, productId: undefined };
+                              setInvoiceItems(updated);
+                            }}
+                            className="w-full bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm font-medium px-0 py-0.5"
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setInvoiceItems(invoiceItems.filter((_, i) => i !== index))}
+                          className="shrink-0 h-7 w-7 p-0 text-gray-400 hover:text-red-500"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      {/* Ry 2: Hv x Prys = Totaal */}
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-xs text-gray-400">Hv</span>
+                        <input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], quantity: Math.max(1, parseInt(e.target.value) || 1) };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-12 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm text-center px-0 py-0.5"
+                        />
+                        <span className="text-gray-400">x</span>
+                        <span className="text-xs text-gray-400">R</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], price: parseFloat(e.target.value) || 0 };
+                            setInvoiceItems(updated);
+                          }}
+                          className="w-20 bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none text-sm px-0 py-0.5"
+                        />
+                        <span className="ml-auto font-medium text-sm">= R{(item.price * item.quantity).toFixed(2)}</span>
+                      </div>
+                      {/* Ry 3: Opsionele reëlnota */}
+                      <div>
+                        <label className="text-[10px] text-gray-400">Nota (opsioneel)</label>
+                        <input
+                          type="text"
+                          value={item.note || ""}
+                          onChange={(e) => {
+                            const updated = [...invoiceItems];
+                            updated[index] = { ...updated[index], note: e.target.value };
+                            setInvoiceItems(updated);
+                          }}
+                          placeholder="bv. sluit installasie in, gewaarborg 12 maande…"
+                          maxLength={120}
+                          className="w-full bg-transparent border-b border-dashed border-gray-200 focus:border-blue-400 outline-none text-xs text-gray-500 placeholder:text-gray-300 px-0 py-0.5"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
                 
                 <InvoiceProductPicker
                   products={products}
@@ -9446,10 +9441,10 @@ ${paidInvoicesInRange.map((inv: any) =>
                     </div>
                   )}
                 </div>
-                  </div>
-                  </div>
+                
                 </div>
               </div>
+            </div>
 
             {/* Section: Totals */}
             {invoiceItems.length > 0 && (() => {
