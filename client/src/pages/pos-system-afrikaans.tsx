@@ -6068,7 +6068,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Telefoon</Label><Input value={poSupplierPhone} onChange={(e) => setPOSupplierPhone(e.target.value)} placeholder="Telefoonnommer" className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                     <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Verwagte Datum</Label><Input type="date" value={poExpectedDate} onChange={(e) => setPOExpectedDate(e.target.value)} className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                   </div>
-                  <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Adres</Label><Input value={poSupplierAddress} onChange={(e) => setPOSupplierAddress(e.target.value)} placeholder="Verskaffer adres" className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
+                  <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Adres</Label><Textarea value={poSupplierAddress} onChange={(e) => setPOSupplierAddress(e.target.value)} className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} placeholder="Verskaffer adres" rows={2} /></div>
                 </div>
                 <div className={`rounded-xl p-4 border space-y-3 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200 shadow-sm'}`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -6080,9 +6080,11 @@ ${paidInvoicesInRange.map((inv: any) =>
                             <Package className="h-3 w-3 mr-1" /> Voeg Produk By
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-48 overflow-y-auto">
+                        <DropdownMenuContent className="bg-gray-900 border-gray-700 max-h-60 overflow-y-auto">
                           {(products || []).map((p: any) => (
-                            <DropdownMenuItem key={p.id} onClick={() => addPOItem(p)} className="text-gray-300 hover:text-white">{p.name} {p.sku ? `(${p.sku})` : ''}</DropdownMenuItem>
+                            <DropdownMenuItem key={p.id} onClick={() => addPOItem(p)} className="text-gray-300 hover:text-white">
+                              <div className="flex justify-between w-full"><span>{p.name}</span><span className="text-gray-500 ml-4">R{parseFloat(p.costPrice || p.retailPrice).toFixed(2)}</span></div>
+                            </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -6115,19 +6117,20 @@ ${paidInvoicesInRange.map((inv: any) =>
                   )}
                 </div>
                 <div className={`rounded-xl p-4 border space-y-3 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200 shadow-sm'}`}>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>BTW %</Label><Input type="number" step="0.1" value={poTaxPercent} onChange={(e) => setPOTaxPercent(parseFloat(e.target.value) || 0)} className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>BTW %</Label><Input type="number" value={poTaxPercent} onChange={(e) => setPOTaxPercent(parseFloat(e.target.value) || 0)} className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                     <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Versending (R)</Label><Input type="number" step="0.01" value={poShippingAmount} onChange={(e) => setPOShippingAmount(parseFloat(e.target.value) || 0)} className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
                   </div>
-                  {poItems.length > 0 && (() => {
-                    const subtotal = poItems.reduce((s: number, i: any) => s + (i.costPrice * i.quantity), 0);
-                    const tax = subtotal * (poTaxPercent / 100);
+                  {(() => {
+                    const subtotal = poItems.reduce((sum: number, item: any) => sum + (item.costPrice * item.quantity), 0);
+                    const taxAmount = subtotal * (poTaxPercent / 100);
+                    const total = subtotal + taxAmount + poShippingAmount;
                     return (
                       <div className={`space-y-1 pt-2 border-t ${posTheme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
                         <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}><span>Subtotaal</span><span>R{subtotal.toFixed(2)}</span></div>
-                        {poTaxPercent > 0 && <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}><span>BTW ({poTaxPercent}%)</span><span>R{tax.toFixed(2)}</span></div>}
+                        {poTaxPercent > 0 && <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}><span>BTW ({poTaxPercent}%)</span><span>R{taxAmount.toFixed(2)}</span></div>}
                         {poShippingAmount > 0 && <div className={`flex justify-between text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}><span>Versending</span><span>R{poShippingAmount.toFixed(2)}</span></div>}
-                        <div className={`flex justify-between text-lg font-bold pt-1 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}><span>Totaal</span><span className="text-[hsl(217,90%,50%)]">R{(subtotal + tax + poShippingAmount).toFixed(2)}</span></div>
+                        <div className={`flex justify-between text-lg font-bold pt-1 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}><span>Totaal</span><span className="text-[hsl(217,90%,50%)]">R{total.toFixed(2)}</span></div>
                       </div>
                     );
                   })()}
@@ -6823,8 +6826,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       {
                         id: 'percent',
                         name: 'Starter',
-                        rate: 'R299 / maand',
-                        detail: 'vaste tarief · geen verrassings',
+                        rate: 'R299',
                         description: 'Perfek vir nuwe en groeiende besighede. Een vaste maandelikse fooi — geen persentasie-aftreksels, geen verrassingsgelde.',
                         features: ['Volledige kassierterminaal', 'Tot 200 produkte', '50 fakture per maand', 'Kliëntegids', 'Aankoopbestellings', 'Oop rekeninge / kredietverkope', 'Pasgemaakte kwitansie & faktuurmerk', 'Basiese verkoopsverslae', 'XERO-integrasie', 'BTW-gereed fakture', 'E-posondersteuning', '7-dag gratis proeftydperk'],
                         icon: <TrendingUp className="w-5 h-5" />,
@@ -6837,8 +6839,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       {
                         id: 'flat',
                         name: 'Groei',
-                        rate: 'R599 / maand',
-                        detail: 'vaste fooi · gewildste plan',
+                        rate: 'R599',
                         description: 'Vir besighede wat gereed is om te groei. Voorspelbare koste, dieper insigte, en gereedskap om jou span te bou.',
                         features: ['Alles in Starter', 'Onbeperkte produkte', '200 fakture ingesluit (R0.50 elk ekstra)', 'Volledige verkoopsanalise & PDF-uitvoer', 'Personeelrekeninge (tot 5)', 'Topprodukte & doodstok-verslae', 'Tydperk-oor-tydperk-vergelykings', 'Outomatiese faktuurherinneringe', 'WhatsApp-kwitansie stuur', 'Prioriteits-e-posondersteuning', '7-dag gratis proeftydperk'],
                         icon: <BarChart3 className="w-5 h-5" />,
@@ -6851,8 +6852,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                       {
                         id: 'scale',
                         name: 'Skaal',
-                        rate: 'R999 / maand',
-                        detail: 'per maand · onderneming',
+                        rate: 'R999',
                         description: 'Vir gevestigde besighede met meerdere liggings of groot spanne. Volle beheer, maksimum funksies, prioriteitsbystand.',
                         features: ['Alles in Groei', 'Onbeperkte fakture', 'Multi-lokasie / takondersteuning', 'Onbeperkte personeelrekeninge', 'Rolgebaseerde toestemmings (Kassier / Bestuurder / Admin)', 'Gekonsolideerde multi-tak verslae', 'Kliëntlojaliteitspunte-stelsel', 'Toegewyde prioriteitsondersteuning', 'Vroeë toegang tot nuwe funksies', '7-dag gratis proeftydperk'],
                         icon: <Globe className="w-5 h-5" />,
@@ -6880,7 +6880,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                           Betaalplan
                         </div>
                         <div className="p-4">
-                          <div className="grid sm:grid-cols-3 gap-3 mb-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                             {plans.map(plan => {
                               const isActive = currentPlan === plan.id;
                               const isConfirming = planSwitchConfirm === plan.id;
@@ -6902,8 +6902,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                                     {plan.icon}
                                   </div>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
-                                  <div className={`text-base font-bold mb-0.5 ${planColorClass(plan, isActive)}`}>{plan.rate}</div>
-                                  <div className={`text-xs mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.detail}</div>
+                                  <div className={`text-base font-bold mb-2 ${planColorClass(plan, isActive)}`}>
+                                    {plan.rate}<span className="text-xs font-normal ml-1 text-gray-400">/maand</span>
+                                  </div>
                                   <div className={`text-xs leading-relaxed mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   <ul className="space-y-1 mb-3">
                                     {plan.features.map((f: string) => (
