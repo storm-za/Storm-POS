@@ -8170,37 +8170,12 @@ ${paidInvoicesInRange.map((inv: any) =>
       </Dialog>
       {/* Oop Rekening Skep Dialog */}
       <Dialog open={isOpenAccountDialogOpen} onOpenChange={setIsOpenAccountDialogOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} shadow-2xl`}>
-          <DialogHeader className="border-b border-gray-700/50 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[hsl(217,90%,40%)] shadow-lg">
-                <FileText className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <DialogTitle className={posTheme === 'dark' ? 'text-white text-xl font-bold' : 'text-gray-900 text-xl font-bold'}>Skep Oop Rekening</DialogTitle>
-                <p className="text-gray-400 text-sm mt-1">Voeg items by 'n nuwe tafel of klient rekening</p>
-              </div>
-            </div>
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Skep Oop Rekening</DialogTitle>
           </DialogHeader>
-          
-          {/* Current Sale Summary */}
-          {currentSale.length > 0 && (
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-gray-400 text-sm font-medium">Huidige Items</span>
-                <Badge variant="outline" className="border-[hsl(217,90%,40%)]/50 text-[hsl(217,90%,60%)]">
-                  {currentSale.length} {currentSale.length === 1 ? 'item' : 'items'}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300">Totaal Bedrag:</span>
-                <span className="text-2xl font-bold text-[hsl(217,90%,60%)]">R{calculateTotal()}</span>
-              </div>
-            </div>
-          )}
-          
           <Form {...openAccountForm}>
-            <form 
+            <form
               onSubmit={openAccountForm.handleSubmit((data) => {
                 const accountData = {
                   ...data,
@@ -8209,21 +8184,17 @@ ${paidInvoicesInRange.map((inv: any) =>
                   notes: saleNotes || null,
                 };
                 createOpenAccountMutation.mutate(accountData);
-              })} 
-              className="space-y-5"
+              })}
+              className="space-y-4"
             >
               <FormField
                 control={openAccountForm.control}
                 name="accountName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300 font-medium">Rekeningnaam</FormLabel>
+                    <FormLabel>Rekeningnaam</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="bv., Tafel 5, Jan Smit" 
-                        {...field} 
-                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 h-12 rounded-xl`}
-                      />
+                      <Input placeholder="bv., Tafel 5, Jan Smit" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8234,47 +8205,18 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="accountType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300 font-medium">Rekeningtipe</FormLabel>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => field.onChange('table')}
-                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
-                          field.value === 'table' 
-                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg' 
-                            : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
-                        }`}
-                      >
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
-                          field.value === 'table' 
-                            ? 'bg-[hsl(217,90%,40%)]' 
-                            : 'bg-gray-700/50'
-                        }`}>
-                          <FileText className={`w-5 h-5 ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`} />
-                        </div>
-                        <span className={`font-medium ${field.value === 'table' ? 'text-white' : 'text-gray-400'}`}>Tafel</span>
-                        <span className="text-xs text-gray-500 mt-1">Restaurant tafel</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => field.onChange('customer')}
-                        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
-                          field.value === 'customer' 
-                            ? 'border-[hsl(217,90%,40%)] bg-[hsl(217,90%,40%)]/10 shadow-lg' 
-                            : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
-                        }`}
-                      >
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
-                          field.value === 'customer' 
-                            ? 'bg-[hsl(217,90%,40%)]' 
-                            : 'bg-gray-700/50'
-                        }`}>
-                          <Users className={`w-5 h-5 ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`} />
-                        </div>
-                        <span className={`font-medium ${field.value === 'customer' ? 'text-white' : 'text-gray-400'}`}>Klient</span>
-                        <span className="text-xs text-gray-500 mt-1">Klient rekening</span>
-                      </button>
-                    </div>
+                    <FormLabel>Rekeningtipe</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Kies rekeningtipe" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="table">Tafel</SelectItem>
+                        <SelectItem value="customer">Klient</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -8284,15 +8226,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300 font-medium">Notas (Opsioneel)</FormLabel>
+                    <FormLabel>Notas (Opsioneel)</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enige addisionele notas..." 
-                        {...field} 
-                        value={field.value ?? ''}
-                        className={`${posTheme === 'dark' ? 'bg-gray-800/50 border-gray-700/50 text-white placeholder:text-gray-500' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'} focus:border-[hsl(217,90%,40%)]/50 focus:ring-[hsl(217,90%,40%)]/20 rounded-xl resize-none`}
-                        rows={3}
-                      />
+                      <Textarea placeholder="Enige addisionele notas..." {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
