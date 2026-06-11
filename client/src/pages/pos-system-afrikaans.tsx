@@ -6144,18 +6144,18 @@ ${paidInvoicesInRange.map((inv: any) =>
           </Dialog>
 
           {/* PO Delete Confirmation */}
-          <Dialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
-            <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} max-h-[85vh] overflow-y-auto`}>
-              <DialogHeader><DialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Bevestig Verwydering</DialogTitle></DialogHeader>
-              <p className="text-gray-400">Is jy seker jy wil hierdie aankoopbestelling verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.</p>
-              <div className="flex justify-end gap-3 mt-4">
-                <Button variant="outline" onClick={() => setIsDeletePODialogOpen(false)} className="border-gray-600 text-gray-300">Kanselleer</Button>
-                <Button variant="destructive" onClick={() => deletingPOId && deletePOMutation.mutate(deletingPOId)} disabled={deletePOMutation.isPending}>
-                  {deletePOMutation.isPending ? 'Verwyder...' : 'Verwyder'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <AlertDialog open={isDeletePODialogOpen} onOpenChange={setIsDeletePODialogOpen}>
+            <AlertDialogContent className={`${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
+              <AlertDialogHeader>
+                <AlertDialogTitle className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>Verwyder Aankoopbestelling</AlertDialogTitle>
+                <AlertDialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Is jy seker jy wil hierdie aankoopbestelling verwyder? Hierdie aksie kan nie ongedaan gemaak word nie.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700">Kanselleer</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deletingPOId && deletePOMutation.mutate(deletingPOId)} className="bg-red-600 hover:bg-red-700 text-white">Verwyder</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Open Accounts Tab */}
           <TabsContent value="oop-rekeninge">
@@ -6176,12 +6176,15 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <CardContent className={`pt-6 ${posTheme === 'dark' ? 'bg-black' : 'bg-white'}`}>
                   <div className="grid gap-4">
                     {openAccounts.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-                        <div className="w-16 h-16 rounded-2xl bg-teal-600/15 flex items-center justify-center mb-4 border border-teal-500/20">
-                          <Users className="h-8 w-8 text-teal-400" />
+                      <div className="text-center py-14">
+                        <div className="w-20 h-20 rounded-2xl bg-teal-500/15 flex items-center justify-center mx-auto mb-5 border border-teal-500/20">
+                          <BookOpen className="h-10 w-10 text-teal-400/60" />
                         </div>
-                        <h3 className={`text-base font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen oop rekeninge nie</h3>
-                        <p className="text-sm text-gray-500 max-w-xs">Voeg items by 'n oop rekening in die Verkope-oortjie om tafelle of kliënte se lopende balanse te bestuur.</p>
+                        <h3 className={`text-xl font-semibold mb-2 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Geen oop rekeninge nie</h3>
+                        <p className={`text-sm mb-6 max-w-xs mx-auto ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Oop rekeninge laat jou 'n lopende rekening voer vir 'n tafel of klient. Begin 'n verkoop op die Verkope-skerm en kies "Oop Rekening" by uitkassa.</p>
+                        <Button onClick={() => setCurrentTab('verkope')} variant="outline" className={`${posTheme === 'dark' ? 'border-teal-700/50 text-teal-400 hover:bg-teal-500/10' : 'border-teal-300 text-teal-700 hover:bg-teal-50'}`}>
+                          <ShoppingCart className="h-4 w-4 mr-2" />Gaan na Verkope
+                        </Button>
                       </div>
                     ) : (
                       openAccounts.map((account) => (
