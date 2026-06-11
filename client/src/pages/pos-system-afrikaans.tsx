@@ -5883,45 +5883,54 @@ ${paidInvoicesInRange.map((inv: any) =>
 
           {/* PO View Dialog */}
           <Dialog open={isPOViewOpen} onOpenChange={setIsPOViewOpen}>
-            <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-2xl ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} max-h-[85vh] overflow-y-auto`}>
-              <DialogHeader><DialogTitle className={posTheme === 'dark' ? 'text-white text-xl' : 'text-gray-900 text-xl'}>Aankoopbestelling: {selectedPO?.poNumber}</DialogTitle></DialogHeader>
+            <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-lg max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+              <DialogHeader>
+                <DialogTitle className={`text-xl font-bold flex items-center gap-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  <span className="text-[hsl(217,90%,60%)] font-mono">{selectedPO?.poNumber}</span>
+                  {selectedPO && getPOStatusBadge(selectedPO.status)}
+                </DialogTitle>
+                <DialogDescription className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Aankoopbestelling besonderhede</DialogDescription>
+              </DialogHeader>
               {selectedPO && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    {getPOStatusBadge(selectedPO.status)}
-                    <span className="text-gray-400 text-sm">{new Date(selectedPO.createdAt).toLocaleDateString()}</span>
+                <div className="space-y-4 mt-2">
+                  <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                    <h4 className="text-xs font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider mb-2">Verskaffer</h4>
+                    <p className="text-white font-semibold">{selectedPO.supplierName}</p>
+                    {selectedPO.supplierPhone && <p className="text-gray-400 text-sm">Tel: {selectedPO.supplierPhone}</p>}
+                    {selectedPO.supplierEmail && <p className="text-gray-400 text-sm">E-pos: {selectedPO.supplierEmail}</p>}
+                    {selectedPO.supplierAddress && <p className="text-gray-400 text-sm mt-1">{selectedPO.supplierAddress}</p>}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
-                      <h4 className="text-sm text-gray-400 mb-2 font-medium">Verskaffer</h4>
-                      <p className="text-white font-semibold">{selectedPO.supplierName}</p>
-                      {selectedPO.supplierPhone && <p className="text-gray-400 text-sm mt-1">Tel: {selectedPO.supplierPhone}</p>}
-                      {selectedPO.supplierEmail && <p className="text-gray-400 text-sm">E-pos: {selectedPO.supplierEmail}</p>}
-                      {selectedPO.supplierAddress && <p className="text-gray-400 text-sm mt-1">{selectedPO.supplierAddress}</p>}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Geskep</p><p className="text-white text-sm font-medium">{new Date(selectedPO.createdAt).toLocaleDateString()}</p></div>
+                    {selectedPO.expectedDate && <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Verwag</p><p className="text-white text-sm font-medium">{new Date(selectedPO.expectedDate).toLocaleDateString()}</p></div>}
+                    {selectedPO.receivedDate && <div className="bg-gray-900 rounded-xl p-3 border border-gray-800"><p className="text-xs text-gray-500">Ontvang</p><p className="text-green-400 text-sm font-medium">{new Date(selectedPO.receivedDate).toLocaleDateString()}</p></div>}
+                  </div>
+                  <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                    <h4 className="text-xs font-semibold text-[hsl(217,90%,60%)] uppercase tracking-wider mb-3">Items</h4>
+                    <div className="space-y-2">
+                      {(selectedPO.items || []).map((item: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
+                          <div><p className="text-white text-sm font-medium">{item.name || "Pasgemaakte Item"}</p>{item.sku && <p className="text-gray-500 text-xs">{item.sku}</p>}</div>
+                          <div className="text-right"><p className="text-white text-sm">{item.quantity} x R{parseFloat(item.costPrice).toFixed(2)}</p><p className="text-gray-400 text-xs">R{(item.costPrice * item.quantity).toFixed(2)}</p></div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800">
-                      <h4 className="text-sm text-gray-400 mb-2 font-medium">Besonderhede</h4>
-                      {selectedPO.expectedDate && <p className="text-gray-300 text-sm">Verwag: {new Date(selectedPO.expectedDate).toLocaleDateString()}</p>}
-                      <p className="text-gray-300 text-sm">{(selectedPO.items || []).length} items</p>
+                  </div>
+                  <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm text-gray-400"><span>Subtotaal</span><span>R{parseFloat(selectedPO.subtotal).toFixed(2)}</span></div>
+                      {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between text-sm text-gray-400"><span>BTW ({selectedPO.taxPercent}%)</span><span>R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
+                      {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between text-sm text-gray-400"><span>Versending</span><span>R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
+                      <div className="flex justify-between text-lg font-bold text-white pt-2 border-t border-gray-800"><span>Totaal</span><span className="text-[hsl(217,90%,60%)]">R{parseFloat(selectedPO.total).toFixed(2)}</span></div>
                     </div>
                   </div>
-                  <div className="border border-gray-800 rounded-lg overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead><tr className={posTheme === 'dark' ? 'bg-gray-900/80' : 'bg-gray-50'}><th className="text-left p-3 text-gray-400 font-medium">Item</th><th className="text-left p-3 text-gray-400 font-medium">SKU</th><th className="text-center p-3 text-gray-400 font-medium">Hv</th><th className="text-right p-3 text-gray-400 font-medium">Kosprys</th><th className="text-right p-3 text-gray-400 font-medium">Totaal</th></tr></thead>
-                      <tbody>
-                        {(selectedPO.items || []).map((item: any, i: number) => (
-                          <tr key={i} className={`border-t ${posTheme === 'dark' ? 'border-gray-800/50' : 'border-gray-200'}`}><td className={`p-3 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.name}</td><td className="p-3 text-gray-500">{item.sku || '-'}</td><td className={`p-3 text-center ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{item.quantity}</td><td className={`p-3 text-right ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>R{parseFloat(item.costPrice || 0).toFixed(2)}</td><td className={`p-3 text-right font-medium ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>R{(item.costPrice * item.quantity).toFixed(2)}</td></tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  {selectedPO.notes && <div className="bg-gray-900 rounded-xl p-4 border border-gray-800"><h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Notas</h4><p className="text-gray-300 text-sm">{selectedPO.notes}</p></div>}
+                  <div className="flex gap-2">
+                    <Button onClick={() => generatePOPdf(selectedPO)} className="flex-1 bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white"><Download className="h-4 w-4 mr-2" />Aflaai PDF</Button>
+                    {selectedPO.status !== 'received' && selectedPO.status !== 'cancelled' && (
+                      <Button onClick={() => { loadPOForEdit(selectedPO); setIsPOViewOpen(false); }} variant="outline" className="border-gray-700 text-gray-300 hover:text-white bg-gray-800"><Edit className="h-4 w-4 mr-2" />Wysig</Button>
+                    )}
                   </div>
-                  <div className={`flex flex-col items-end gap-1 pt-2 border-t ${posTheme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
-                    <div className={posTheme === 'dark' ? 'flex justify-between w-48 text-sm' : 'flex justify-between w-48 text-sm'}><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Subtotaal:</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{parseFloat(selectedPO.subtotal || 0).toFixed(2)}</span></div>
-                    {parseFloat(selectedPO.taxPercent) > 0 && <div className="flex justify-between w-48 text-sm"><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>BTW ({selectedPO.taxPercent}%):</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{(parseFloat(selectedPO.subtotal) * parseFloat(selectedPO.taxPercent) / 100).toFixed(2)}</span></div>}
-                    {parseFloat(selectedPO.shippingAmount) > 0 && <div className="flex justify-between w-48 text-sm"><span className={posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Versending:</span><span className={posTheme === 'dark' ? 'text-white' : 'text-gray-900'}>R{parseFloat(selectedPO.shippingAmount).toFixed(2)}</span></div>}
-                    <div className={posTheme === 'dark' ? 'flex justify-between w-48 text-sm font-bold border-t border-gray-700 pt-1' : 'flex justify-between w-48 text-sm font-bold border-t border-gray-200 pt-1'}><span className="text-blue-400">Totaal:</span><span className="text-blue-400">R{parseFloat(selectedPO.total || 0).toFixed(2)}</span></div>
-                  </div>
-                  {selectedPO.notes && <div className={`${posTheme === 'dark' ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-200'} p-3 rounded-lg border`}><h4 className={`text-sm mb-1 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</h4><p className={`text-sm ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{selectedPO.notes}</p></div>}
                 </div>
               )}
             </DialogContent>
@@ -7975,11 +7984,14 @@ ${paidInvoicesInRange.map((inv: any) =>
       </Dialog>
       {/* Customer Dialog */}
       <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-md max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
+        <DialogContent className={`w-[calc(100vw-1rem)] sm:w-auto sm:max-w-[500px] max-h-[85vh] overflow-y-auto ${posTheme === 'dark' ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`} aria-describedby="customer-dialog-description">
           <DialogHeader>
             <DialogTitle>
-              {editingCustomer ? "Redigeer Klient" : "Voeg Nuwe Klient By"}
+              {editingCustomer ? 'Redigeer Kliënt' : 'Voeg Nuwe Kliënt By'}
             </DialogTitle>
+            <div id="customer-dialog-description" className={`text-sm ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              {editingCustomer ? 'Dateer die kliëntinligting hieronder op.' : 'Voer die besonderhede vir die nuwe kliënt in.'}
+            </div>
           </DialogHeader>
           <Form {...customerForm}>
             <form onSubmit={customerForm.handleSubmit(handleCustomerSubmit)} className="space-y-4">
@@ -7988,9 +8000,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Naam</FormLabel>
+                    <FormLabel className={posTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}>Kliëntnaam *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Klientnaam" {...field} />
+                      <Input placeholder="bv. Jan van der Berg" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8001,9 +8013,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Telefoon (Opsioneel)</FormLabel>
+                    <FormLabel>Telefoonnommer</FormLabel>
                     <FormControl>
-                      <Input placeholder="0123456789" {...field} value={field.value ?? ''} />
+                      <Input placeholder="bv. +27 12 345 6789" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8014,7 +8026,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Epos (Opsioneel)</FormLabel>
+                    <FormLabel>E-posadres</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="bv. jan@voorbeeld.co.za" {...field} value={field.value ?? ''} />
                     </FormControl>
@@ -8027,16 +8039,16 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="customerType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Klienttipe</FormLabel>
+                    <FormLabel>Kliënttipe *</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Kies klienttipe" />
+                          <SelectValue placeholder="Kies kliënttipe" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="retail">Kleinhandel</SelectItem>
-                        <SelectItem value="trade">Groothandel</SelectItem>
+                        <SelectItem value="retail">Kleinhandelkliënt</SelectItem>
+                        <SelectItem value="trade">Groothandelkliënt</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -8048,9 +8060,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notas (Opsioneel)</FormLabel>
+                    <FormLabel>Notas</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enige addisionele notas..." {...field} value={field.value ?? ''} />
+                      <Textarea placeholder="Enige addisionele notas oor die kliënt..." {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8060,12 +8072,12 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <Button type="button" variant="outline" onClick={() => setIsCustomerDialogOpen(false)}>
                   Kanselleer
                 </Button>
-                <Button 
-                  type="submit" 
-                  className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)]"
+                <Button
+                  type="submit"
+                  className="bg-transparent border border-[hsl(217,90%,50%)] text-[hsl(217,90%,50%)] hover:bg-[hsl(217,90%,50%)]/10 transition-all duration-300"
                   disabled={createCustomerMutation.isPending || updateCustomerMutation.isPending}
                 >
-                  {createCustomerMutation.isPending || updateCustomerMutation.isPending ? 'Stoor...' : (editingCustomer ? 'Bywerk' : 'Skep')}
+                  {editingCustomer ? 'Bywerk Kliënt' : 'Voeg Kliënt By'}
                 </Button>
               </div>
             </form>
