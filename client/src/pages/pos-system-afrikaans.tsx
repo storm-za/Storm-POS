@@ -5841,7 +5841,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                             {getPOStatusBadge(po.status)}
                             <Badge className={`cursor-pointer text-xs ${po.isPaid ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30'} border`} onClick={(e) => { e.stopPropagation(); togglePOPaidMutation.mutate({ id: po.id, isPaid: !po.isPaid }); }}>{po.isPaid ? 'Betaal' : 'Nie Betaal'}</Badge>
                           </div>
-                          <h3 className={`font-semibold truncate ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{po.supplierName}</h3>
+                          <h3 className="text-white font-semibold truncate">{po.supplierName}</h3>
                           <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500">
                             <span>{(po.items || []).length} item{(po.items || []).length !== 1 ? 's' : ''}</span>
                             <span>R{parseFloat(po.total).toFixed(2)}</span>
@@ -9445,7 +9445,7 @@ ${paidInvoicesInRange.map((inv: any) =>
             </div>
 
             {/* Section: Totals */}
-            {invoiceItems.length > 0 && (() => {
+            {(() => {
               const subtotal = invoiceItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
               const discountAmt = invoiceDiscountType === 'percent'
                 ? subtotal * (parseFloat(invoiceDiscountPercent) / 100)
@@ -9463,10 +9463,8 @@ ${paidInvoicesInRange.map((inv: any) =>
                     <h3 className="font-semibold text-gray-800 text-sm">Totale</h3>
                   </div>
                   <div className="bg-white px-5 py-4 space-y-3">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Subtotaal</span>
-                      <span className="font-medium text-gray-900">R{subtotal.toFixed(2)}</span>
-                    </div>
+                    <div className="flex justify-between text-sm text-gray-600"><span>Subtotaal</span><span className="font-medium text-gray-900">R{subtotal.toFixed(2)}</span></div>
+
                     {invoiceCardColumns.has('discount') && (
                       <div className="flex justify-between items-center text-sm text-gray-600">
                         <div className="flex items-center gap-2">
@@ -9483,32 +9481,28 @@ ${paidInvoicesInRange.map((inv: any) =>
                         </div>
                       </div>
                     )}
-                    {discountAmt > 0 && (
-                      <div className="flex justify-between text-sm text-red-500">
-                        <span>Afslag Bedrag</span>
-                        <span>-R{discountAmt.toFixed(2)}</span>
+
+                    {discountAmt > 0 && <div className="flex justify-between text-sm text-gray-600"><span>Afslag Toegepas</span><span className="text-red-500">-R{discountAmt.toFixed(2)}</span></div>}
+
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <span>BTW (15%)</span>
+                        <Switch checked={invoiceTaxEnabled} onCheckedChange={setInvoiceTaxEnabled} />
                       </div>
-                    )}
-                    <div className="flex justify-between items-center text-sm text-gray-600">
-                      <span>BTW (15%)</span>
-                      <Switch checked={invoiceTaxEnabled} onCheckedChange={setInvoiceTaxEnabled} />
+                      {invoiceTaxEnabled && <span className="font-medium text-gray-900">R{taxAmt.toFixed(2)}</span>}
                     </div>
-                    {invoiceTaxEnabled && (
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>BTW Bedrag</span>
-                        <span className="font-medium text-gray-900">R{taxAmt.toFixed(2)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center text-sm text-gray-600">
+
+                    <div className="flex items-center justify-between text-sm text-gray-600">
                       <span>Versending</span>
                       <div className="flex items-center gap-1">
                         <span className="text-xs text-gray-400">R</span>
                         <input type="number" value={invoiceShippingAmount} onChange={(e) => setInvoiceShippingAmount(e.target.value)} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-right text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]" min="0" step="0.01" />
                       </div>
                     </div>
-                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                      <span className="font-bold text-gray-900 text-base">Totaal</span>
-                      <span className="font-bold text-xl text-[hsl(217,90%,40%)]">R{total.toFixed(2)}</span>
+
+                    <div className="flex justify-between font-bold text-base pt-3 border-t border-gray-200">
+                      <span className="text-gray-900">Totaal Verskuldig</span>
+                      <span className="text-[hsl(217,90%,40%)]">R{total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
