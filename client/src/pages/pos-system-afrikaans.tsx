@@ -7870,7 +7870,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                 {/* Category Selection */}
                 <div className="pt-2">
                   <div className="flex items-center gap-2 mb-3">
-                    <Tag className="w-4 h-4 text-[hsl(217,90%,50%)]" />
+                    <Folder className="w-4 h-4 text-[hsl(217,90%,50%)]" />
                     <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Kategorie</span>
                     <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
                   </div>
@@ -7905,49 +7905,34 @@ ${paidInvoicesInRange.map((inv: any) =>
                   />
                 </div>
                 
-                {/* Cost Price Warning */}
-                {(() => {
-                  const cp = parseFloat(productForm.watch("costPrice") || "0");
-                  return cp === 0 ? (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      <span>Kosprys is R0.00 — wins-verslae sal onakkuraat wees.</span>
-                    </div>
-                  ) : null;
-                })()}
-
-                {/* Product Image URL */}
+                {/* Product Image */}
                 <div className="pt-2">
                   <div className="flex items-center gap-2 mb-3">
                     <ImageIcon className="w-4 h-4 text-[hsl(217,90%,50%)]" />
-                    <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Produkfoto (opsioneel)</span>
+                    <span className={posTheme === 'dark' ? 'text-sm font-medium text-gray-300' : 'text-sm font-medium text-gray-700'}>Produkfoto</span>
                     <div className={posTheme === 'dark' ? 'flex-1 h-px bg-gray-700/50' : 'flex-1 h-px bg-gray-200'}></div>
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      {productImageInput && (
-                        <button type="button" onClick={() => setProductImageInput(null)} className="text-xs text-red-400 hover:text-red-300">Verwyder</button>
-                      )}
-                    </div>
-                    {productImageInput ? (
-                      <div className="flex items-center gap-3">
-                        <img src={productImageInput} alt="Produk" className="w-16 h-16 object-cover rounded-lg border border-gray-600" />
-                        <p className="text-xs text-gray-400">Foto opgelaai. Klik Verwyder om te verwyder.</p>
-                      </div>
-                    ) : (
-                      <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${posTheme === 'dark' ? 'border-gray-600 hover:border-[hsl(217,90%,50%)]/50 bg-gray-800/30' : 'border-gray-300 hover:border-[hsl(217,90%,50%)]/50 bg-gray-50'}`}>
-                        <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                        <span className="text-xs text-gray-400">Klik om produkfoto op te laai</span>
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const reader = new FileReader();
-                          reader.onload = (ev) => setProductImageInput(ev.target?.result as string);
-                          reader.readAsDataURL(file);
-                        }} />
-                      </label>
+                    {productImageInput && (
+                      <button type="button" onClick={() => setProductImageInput(null)} className="text-xs text-red-400 hover:text-red-300">Verwyder</button>
                     )}
                   </div>
+                  {productImageInput ? (
+                    <div className="flex items-center gap-3">
+                      <img src={productImageInput} alt="Produk" className="w-16 h-16 object-cover rounded-lg border border-gray-600" />
+                      <p className="text-xs text-gray-400">Foto opgelaai. Klik Verwyder om te verwyder.</p>
+                    </div>
+                  ) : (
+                    <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${posTheme === 'dark' ? 'border-gray-600 hover:border-[hsl(217,90%,50%)]/50 bg-gray-800/30' : 'border-gray-300 hover:border-[hsl(217,90%,50%)]/50 bg-gray-50'}`}>
+                      <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                      <span className="text-xs text-gray-400">Klik om produkfoto op te laai</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => setProductImageInput(ev.target?.result as string);
+                        reader.readAsDataURL(file);
+                      }} />
+                    </label>
+                  )}
                 </div>
 
                 <div className={posTheme === 'dark' ? 'flex justify-end gap-3 pt-4 border-t border-gray-700/50' : 'flex justify-end gap-3 pt-4 border-t border-gray-200'}>
@@ -9193,7 +9178,14 @@ ${paidInvoicesInRange.map((inv: any) =>
                 <div>
                   <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Kliënt *</Label>
                   {isCustomClient ? (
-                    <Input type="text" value={invoiceCustomClient} onChange={(e) => setInvoiceCustomClient(e.target.value)} placeholder="Voer kliëntnaam in" data-testid="input-custom-client" />
+                    <input
+                      type="text"
+                      value={invoiceCustomClient}
+                      onChange={(e) => setInvoiceCustomClient(e.target.value)}
+                      placeholder="Voer kliëntnaam in"
+                      data-testid="input-custom-client"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50"
+                    />
                   ) : (
                     <Select value={invoiceClientId?.toString() || ""} onValueChange={(v) => setInvoiceClientId(parseInt(v))} data-testid="select-client">
                       <SelectTrigger><SelectValue placeholder="Kies kliënt..." /></SelectTrigger>
@@ -9206,13 +9198,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('clientEmail') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">E-posadres</Label>
-                        <Input type="email" value={invoiceClientEmail} onChange={(e) => setInvoiceClientEmail(e.target.value)} placeholder="klient@voorbeeld.com" />
+                        <input type="email" value={invoiceClientEmail} onChange={(e) => setInvoiceClientEmail(e.target.value)} placeholder="klient@voorbeeld.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
                       </div>
                     )}
                     {invoiceCardColumns.has('clientPhone') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Telefoonnommer</Label>
-                        <Input type="tel" value={invoiceClientPhone} onChange={(e) => setInvoiceClientPhone(e.target.value)} placeholder="+27 12 345 6789" />
+                        <input type="tel" value={invoiceClientPhone} onChange={(e) => setInvoiceClientPhone(e.target.value)} placeholder="+27 12 345 6789" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
                       </div>
                     )}
                   </div>
@@ -9234,7 +9226,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('poNumber') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">PO Nommer</Label>
-                        <Input type="text" value={invoicePoNumber} onChange={(e) => setInvoicePoNumber(e.target.value)} placeholder="PO-0001" />
+                        <input type="text" value={invoicePoNumber} onChange={(e) => setInvoicePoNumber(e.target.value)} placeholder="PO-0001" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
                       </div>
                     )}
                     {invoiceCardColumns.has('dueTerms') && (
@@ -9256,7 +9248,7 @@ ${paidInvoicesInRange.map((inv: any) =>
                     {invoiceCardColumns.has('dueDate') && (
                       <div>
                         <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">Vervaldatum</Label>
-                        <Input type="date" value={invoiceDueDate} onChange={(e) => setInvoiceDueDate(e.target.value)} />
+                        <input type="date" value={invoiceDueDate} onChange={(e) => setInvoiceDueDate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[hsl(217,90%,40%)] bg-gray-50" />
                       </div>
                     )}
                   </div>
@@ -9616,7 +9608,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                           {invoiceCfs.map((field: any) => (
                             <div key={field.id}>
                               <Label className="text-xs font-medium text-gray-600 mb-1 block">{field.label}</Label>
-                              <Input type="text" value={invoiceCustomFieldValues[`cf_${field.id}`] || ''} onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))} placeholder={field.placeholder || field.label} />
+                              <input
+                                type="text"
+                                value={invoiceCustomFieldValues[`cf_${field.id}`] || ''}
+                                onChange={(e) => setInvoiceCustomFieldValues((prev: any) => ({ ...prev, [`cf_${field.id}`]: e.target.value }))}
+                                placeholder={field.placeholder || field.label}
+                                className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-[hsl(217,90%,40%)]"
+                              />
                             </div>
                           ))}
                         </div>
