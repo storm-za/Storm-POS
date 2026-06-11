@@ -6136,12 +6136,9 @@ ${paidInvoicesInRange.map((inv: any) =>
                   })()}
                 </div>
                 <div><Label className={`text-xs font-medium ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Notas</Label><Textarea value={poNotes} onChange={(e) => setPONotes(e.target.value)} rows={2} placeholder="Bykomende notas..." className={`mt-1 ${posTheme === 'dark' ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`} /></div>
-                <div className="flex justify-end gap-3 pt-1">
-                  <Button variant="outline" onClick={() => { resetPOForm(); setIsPODialogOpen(false); }} className={posTheme === 'dark' ? 'border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}>Kanselleer</Button>
-                  <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white py-3 text-base font-semibold shadow-lg">
-                    {(createPOMutation.isPending || updatePOMutation.isPending) ? 'Stoor...' : editingPO ? 'Dateer Op' : 'Skep Bestelling'}
-                  </Button>
-                </div>
+                <Button onClick={handleSubmitPO} disabled={createPOMutation.isPending || updatePOMutation.isPending} className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white py-3 text-base font-semibold shadow-lg">
+                  {(createPOMutation.isPending || updatePOMutation.isPending) ? 'Stoor...' : editingPO ? 'Dateer Aankoopbestelling Op' : 'Skep Aankoopbestelling'}
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -6834,7 +6831,6 @@ ${paidInvoicesInRange.map((inv: any) =>
                         accentDark: 'border-blue-500 bg-blue-900/20',
                         badgeLight: 'bg-blue-100 text-blue-700',
                         badgeDark: 'bg-blue-900/40 text-blue-300',
-                        colorKey: 'blue',
                       },
                       {
                         id: 'flat',
@@ -6847,7 +6843,6 @@ ${paidInvoicesInRange.map((inv: any) =>
                         accentDark: 'border-emerald-500 bg-emerald-900/20',
                         badgeLight: 'bg-emerald-100 text-emerald-700',
                         badgeDark: 'bg-emerald-900/40 text-emerald-300',
-                        colorKey: 'emerald',
                       },
                       {
                         id: 'scale',
@@ -6855,24 +6850,13 @@ ${paidInvoicesInRange.map((inv: any) =>
                         rate: 'R999',
                         description: 'Vir gevestigde besighede met meerdere liggings of groot spanne. Volle beheer, maksimum funksies, prioriteitsbystand.',
                         features: ['Alles in Groei', 'Onbeperkte fakture', 'Multi-lokasie / takondersteuning', 'Onbeperkte personeelrekeninge', 'Rolgebaseerde toestemmings (Kassier / Bestuurder / Admin)', 'Gekonsolideerde multi-tak verslae', 'Kliëntlojaliteitspunte-stelsel', 'Toegewyde prioriteitsondersteuning', 'Vroeë toegang tot nuwe funksies', '7-dag gratis proeftydperk'],
-                        icon: <Globe className="w-5 h-5" />,
+                        icon: <CheckCircle2 className="w-5 h-5" />,
                         accentLight: 'border-purple-500 bg-purple-50',
                         accentDark: 'border-purple-500 bg-purple-900/20',
                         badgeLight: 'bg-purple-100 text-purple-700',
                         badgeDark: 'bg-purple-900/40 text-purple-300',
-                        colorKey: 'purple',
                       },
                     ];
-                    const planColorClass = (plan: typeof plans[0], isActive: boolean) => {
-                      if (!isActive) return posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700';
-                      const map: Record<string, string> = { blue: posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600', emerald: posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600', purple: posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600' };
-                      return map[plan.colorKey] || '';
-                    };
-                    const planIconBg = (plan: typeof plans[0], isActive: boolean) => {
-                      if (!isActive) return posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500';
-                      const map: Record<string, string> = { blue: posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600', emerald: posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600', purple: posTheme === 'dark' ? 'bg-purple-900/40 text-purple-300' : 'bg-purple-100 text-purple-600' };
-                      return map[plan.colorKey] || '';
-                    };
                     return (
                       <div className={`rounded-lg border ${posTheme === 'dark' ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-white'}`}>
                         <div className={`px-4 py-3 border-b text-sm font-semibold flex items-center gap-2 ${posTheme === 'dark' ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'}`}>
@@ -6884,6 +6868,11 @@ ${paidInvoicesInRange.map((inv: any) =>
                             {plans.map(plan => {
                               const isActive = currentPlan === plan.id;
                               const isConfirming = planSwitchConfirm === plan.id;
+                              const iconColorMap: Record<string, string> = {
+                                'percent': isActive ? (posTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                                'flat': isActive ? (posTheme === 'dark' ? 'bg-emerald-900/40 text-emerald-300' : 'bg-emerald-100 text-emerald-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                                'scale': isActive ? (posTheme === 'dark' ? 'bg-purple-900/40 text-purple-300' : 'bg-purple-100 text-purple-600') : (posTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-500'),
+                              };
                               return (
                                 <div
                                   key={plan.id}
@@ -6898,18 +6887,18 @@ ${paidInvoicesInRange.map((inv: any) =>
                                       Huidige Plan
                                     </span>
                                   )}
-                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${planIconBg(plan, isActive)}`}>
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${iconColorMap[plan.id]}`}>
                                     {plan.icon}
                                   </div>
                                   <div className={`font-semibold text-sm mb-0.5 ${posTheme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{plan.name}</div>
-                                  <div className={`text-base font-bold mb-2 ${planColorClass(plan, isActive)}`}>
-                                    {plan.rate}<span className="text-xs font-normal ml-1 text-gray-400">/maand</span>
+                                  <div className={`text-base font-bold mb-2 ${isActive ? (plan.id === 'percent' ? (posTheme === 'dark' ? 'text-blue-300' : 'text-blue-600') : plan.id === 'flat' ? (posTheme === 'dark' ? 'text-emerald-300' : 'text-emerald-600') : (posTheme === 'dark' ? 'text-purple-300' : 'text-purple-600')) : (posTheme === 'dark' ? 'text-gray-200' : 'text-gray-700')}`}>
+                                    {plan.rate}<span className={`text-xs font-normal ml-1 text-gray-400`}>/maand</span>
                                   </div>
                                   <div className={`text-xs leading-relaxed mb-2 ${posTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{plan.description}</div>
                                   <ul className="space-y-1 mb-3">
                                     {plan.features.map((f: string) => (
                                       <li key={f} className={`flex items-start gap-1.5 text-xs ${posTheme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                                        <Check className={`w-3 h-3 mt-0.5 shrink-0 ${plan.colorKey === 'blue' ? 'text-blue-500' : plan.colorKey === 'emerald' ? 'text-emerald-500' : 'text-purple-500'}`} weight="bold" />
+                                        <Check className={`w-3 h-3 mt-0.5 shrink-0 ${plan.id === 'percent' ? 'text-blue-500' : plan.id === 'flat' ? 'text-emerald-500' : 'text-purple-500'}`} weight="bold" />
                                         {f}
                                       </li>
                                     ))}
