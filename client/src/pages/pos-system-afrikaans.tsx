@@ -7820,6 +7820,12 @@ ${paidInvoicesInRange.map((inv: any) =>
                               />
                             </div>
                           </FormControl>
+                          {(!field.value || field.value === "0" || field.value === "0.00") && (
+                            <p className="text-xs text-amber-500 flex items-center gap-1 mt-1">
+                              <AlertTriangle className="w-3 h-3" />
+                              Geen kosprys — winsgrens sal nie bereken word nie
+                            </p>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
