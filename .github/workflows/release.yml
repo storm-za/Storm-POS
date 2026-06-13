@@ -1,249 +1,262 @@
 name: Release Storm POS Desktop App
 
-  on:
-    push:
-      tags:
-        - 'v*'
+on:
+  push:
+    tags:
+      - 'v*'
 
-  jobs:
-    build-windows:
-      runs-on: windows-latest
-      permissions:
-        contents: write
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Install Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '22'
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-        - name: Install Rust stable
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            targets: x86_64-pc-windows-msvc
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
 
-        - name: Rust cache
-          uses: swatinem/rust-cache@v2
-          with:
-            workspaces: './src-tauri -> target'
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
-        - name: Install dependencies and build frontend
-          shell: pwsh
-          run: |
-            npm install
-            npm run build
-            Write-Host "Frontend built to dist/public"
+      - name: Install dependencies and build frontend
+        shell: pwsh
+        run: |
+          npm install
+          npm run build
+          Write-Host "Frontend built to dist/public"
 
-        - name: Build Tauri app (signed)
-          shell: pwsh
-          env:
-            TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-            TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
-          run: |
-            npm install -g @tauri-apps/cli@latest 2>&1 | Select-Object -Last 5
-            Write-Host "Building Tauri app..."
-            tauri build
-            Write-Host "Build complete."
+      - name: Build Tauri app (signed)
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+        run: |
+          npm install -g @tauri-apps/cli@latest 2>&1 | Select-Object -Last 5
+          Write-Host "Building Tauri app..."
+          tauri build
+          Write-Host "Build complete."
 
-        - name: Release and upload signed artifacts
-          shell: pwsh
-          env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            $tag     = "${{ github.ref_name }}"
-            $version = $tag.TrimStart('v')
-            $date    = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
-            $nsisDir = "src-tauri\target\release\bundle\nsis"
-            $msiDir  = "src-tauri\target\release\bundle\msi"
+      - name: Release and upload signed artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag     = "${{ github.ref_name }}"
+          $version = $tag.TrimStart('v')
+          $date    = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
+          $nsisDir = "src-tauri\target\release\bundle\nsis"
+          $msiDir  = "src-tauri\target\release\bundle\msi"
 
-            Write-Host "=== Bundle files ==="
-            Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "=== Bundle files ==="
+          Get-ChildItem "src-tauri\target\release\bundle" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-            $exe    = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe" -and $_.Name -notlike "*.sig" } | Select-Object -First 1
-            $msi    = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"       -and $_.Name -notlike "*.sig" } | Select-Object -First 1
-            $exeSig = if ($exe) { Get-Item ($exe.FullName + ".sig") -ErrorAction SilentlyContinue } else { $null }
+          $exe    = Get-ChildItem $nsisDir -Recurse | Where-Object { $_.Name -like "*-setup.exe" -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $msi    = Get-ChildItem $msiDir  -Recurse | Where-Object { $_.Name -like "*.msi"       -and $_.Name -notlike "*.sig" } | Select-Object -First 1
+          $exeSig = if ($exe) { Get-Item ($exe.FullName + ".sig") -ErrorAction SilentlyContinue } else { $null }
 
-            if (-not $exe) { Write-Host "ERROR: No installer found"; exit 1 }
-            Write-Host "Installer : $($exe.Name)"
-            Write-Host "MSI       : $($msi.Name)"
-            Write-Host "Sig file  : $($exeSig.Name)"
+          if (-not $exe) { Write-Host "ERROR: No installer found"; exit 1 }
+          Write-Host "Installer : $($exe.Name)"
+          Write-Host "MSI       : $($msi.Name)"
+          Write-Host "Sig file  : $($exeSig.Name)"
 
-            $notes = "Storm POS $tag - Download the Windows installer below. Existing installs update automatically on next launch."
-            gh release create $tag --title "Storm POS $tag" --notes $notes
+          $notes = "Storm POS $tag - Download the Windows installer below. Existing installs update automatically on next launch."
+          gh release create $tag --title "Storm POS $tag" --notes $notes
 
-            gh release upload $tag $exe.FullName
-            if ($msi) { gh release upload $tag $msi.FullName }
-            if ($exeSig) { gh release upload $tag $exeSig.FullName }
+          gh release upload $tag $exe.FullName
+          if ($msi) { gh release upload $tag $msi.FullName }
+          if ($exeSig) { gh release upload $tag $exeSig.FullName }
 
-            $sig = ""
-            if ($exeSig -and (Test-Path $exeSig.FullName)) {
-              $sig = (Get-Content $exeSig.FullName -Raw).Trim()
-              Write-Host "Signature OK (length $($sig.Length))"
-            } else {
-              Write-Host "WARNING: No .exe.sig file found — updater will not work"
-            }
+          $sig = ""
+          if ($exeSig -and (Test-Path $exeSig.FullName)) {
+            $sig = (Get-Content $exeSig.FullName -Raw).Trim()
+            Write-Host "Signature OK (length $($sig.Length))"
+          } else {
+            Write-Host "WARNING: No .exe.sig file found — updater will not work"
+          }
 
-            $exeName     = $exe.Name -replace ' ', '.'
-            $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
-            Write-Host "Download URL: $downloadUrl"
+          $exeName     = $exe.Name -replace ' ', '.'
+          $downloadUrl = "https://github.com/storm-za/Storm-POS/releases/download/$tag/$exeName"
+          Write-Host "Download URL: $downloadUrl"
 
-            $latestJson = [ordered]@{
-              version   = $version
-              notes     = "Improvements and bug fixes."
-              pub_date  = $date
-              platforms = @{ "windows-x86_64" = [ordered]@{ url = $downloadUrl; signature = $sig } }
-            } | ConvertTo-Json -Depth 5
+          $latestJson = [ordered]@{
+            version   = $version
+            notes     = "Improvements and bug fixes."
+            pub_date  = $date
+            platforms = @{ "windows-x86_64" = [ordered]@{ url = $downloadUrl; signature = $sig } }
+          } | ConvertTo-Json -Depth 5
 
-            $latestJson | Out-File "latest.json" -Encoding utf8NoBOM
-            Write-Host "=== latest.json ===" ; Get-Content "latest.json"
+          $latestJson | Out-File "latest.json" -Encoding utf8NoBOM
+          Write-Host "=== latest.json ===" ; Get-Content "latest.json"
 
-            gh release upload $tag latest.json
-            Write-Host "Done - Windows release $tag complete."
+          gh release upload $tag latest.json
+          Write-Host "Done - Windows release $tag complete."
 
-    build-android:
-      runs-on: ubuntu-latest
-      needs: build-windows
-      permissions:
-        contents: write
+  build-android:
+    runs-on: ubuntu-latest
+    needs: build-windows
+    permissions:
+      contents: write
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Install Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '22'
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-        - name: Set up JDK 17
-          uses: actions/setup-java@v4
-          with:
-            java-version: '17'
-            distribution: 'temurin'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-        - name: Setup Android SDK
-          uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-        - name: Install Android NDK
-          run: |
-            sdkmanager "ndk;27.0.12077973" "build-tools;34.0.0" "platforms;android-34"
-            echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+      - name: Install Android NDK
+        run: |
+          sdkmanager "ndk;27.0.12077973" "build-tools;34.0.0" "platforms;android-34"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
 
-        - name: Install Rust stable with Android targets
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+      - name: Install Rust stable with Android targets
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
 
-        - name: Rust cache
-          uses: swatinem/rust-cache@v2
-          with:
-            workspaces: './src-tauri -> target'
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
-        - name: Install dependencies and build frontend
-          run: |
-            npm install
-            npm run build
-            echo "Frontend built to dist/public"
+      - name: Install dependencies and build frontend
+        run: |
+          npm install
+          npm run build
+          echo "Frontend built to dist/public"
 
-        - name: Install Tauri CLI and cargo-ndk
-          run: |
-            npm install --no-save @tauri-apps/cli@latest
-            npm pkg set scripts.tauri="tauri"
-            cargo install cargo-ndk
+      - name: Install Tauri CLI and cargo-ndk
+        run: |
+          npm install --no-save @tauri-apps/cli@latest
+          npm pkg set scripts.tauri="tauri"
+          cargo install cargo-ndk
 
-        - name: Initialize Tauri Android project
-          run: |
-            rm -rf src-tauri/gen/android
-            npx tauri android init
+      - name: Initialize Tauri Android project
+        run: |
+          rm -rf src-tauri/gen/android
+          npx tauri android init
 
-        - name: Inject custom icons into generated Android project
-          run: |
-            for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-              dest="src-tauri/gen/android/app/src/main/res/mipmap-${density}"
-              src="src-tauri/icons/android/mipmap-${density}"
-              mkdir -p "$dest"
-              cp "${src}/ic_launcher.png"            "${dest}/ic_launcher.png"
-              cp "${src}/ic_launcher_round.png"      "${dest}/ic_launcher_round.png"
-              cp "${src}/ic_launcher_foreground.png" "${dest}/ic_launcher_foreground.png"
-              echo "Copied icons for ${density}"
-            done
-            echo "All custom icons injected."
+      - name: Inject custom icons into generated Android project
+        run: |
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            dest="src-tauri/gen/android/app/src/main/res/mipmap-${density}"
+            src="src-tauri/icons/android/mipmap-${density}"
+            mkdir -p "$dest"
+            cp "${src}/ic_launcher.png"            "${dest}/ic_launcher.png"
+            cp "${src}/ic_launcher_round.png"      "${dest}/ic_launcher_round.png"
+            cp "${src}/ic_launcher_foreground.png" "${dest}/ic_launcher_foreground.png"
+            echo "Copied icons for ${density}"
+          done
+          echo "All custom icons injected."
 
-        - name: Configure Android FileProvider and permissions for PDF sharing
-          run: |
-            MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
-            RES_XML="src-tauri/gen/android/app/src/main/res/xml"
+      - name: Configure Android FileProvider and permissions for PDF sharing
+        run: |
+          MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          RES_XML="src-tauri/gen/android/app/src/main/res/xml"
 
-            # ── 1. Add xmlns:tools namespace so tools:replace works ──────────────
-            if ! grep -q 'xmlns:tools' "$MANIFEST"; then
-              sed -i 's|xmlns:android="http://schemas.android.com/apk/res/android"|xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"|' "$MANIFEST"
-              echo "xmlns:tools namespace added"
-            fi
+          # ── 1. Add xmlns:tools namespace so tools:replace works ──────────────
+          # tools:replace tells the manifest merger to use OUR values for those
+          # attributes, overriding whatever any library (e.g. sharekit) declares.
+          if ! grep -q 'xmlns:tools' "$MANIFEST"; then
+            sed -i 's|xmlns:android="http://schemas.android.com/apk/res/android"|xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"|' "$MANIFEST"
+            echo "xmlns:tools namespace added"
+          fi
 
-            # ── 2. WRITE_EXTERNAL_STORAGE ─────────────────────────────────────────
-            if ! grep -q "WRITE_EXTERNAL_STORAGE" "$MANIFEST"; then
-              sed -i 's|<application|<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <application|' "$MANIFEST"
-              echo "WRITE_EXTERNAL_STORAGE injected"
-            fi
+          # ── 2. WRITE_EXTERNAL_STORAGE (needed on Android < 10 for Downloads) ─
+          if ! grep -q "WRITE_EXTERNAL_STORAGE" "$MANIFEST"; then
+            sed -i 's|<application|<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <application|' "$MANIFEST"
+            echo "WRITE_EXTERNAL_STORAGE injected"
+          fi
 
-            # ── 3. FileProvider ───────────────────────────────────────────────────
-            python3 -c "import re; txt=open('$MANIFEST').read(); txt=re.sub(r'\s*<provider[^>]*FileProvider[^>]*>.*?</provider>','',txt,flags=re.DOTALL); open('$MANIFEST','w').write(txt)" 2>/dev/null || perl -i -0pe 's/\s*<provider[^>]*FileProvider[^>]*>.*?<\/provider>//gs' "$MANIFEST" 2>/dev/null || true
+          # ── 3. FileProvider — always replace to avoid library-level conflicts ─
+          # tauri-plugin-sharekit ships its own FileProvider in its AAR manifest.
+          # Without tools:replace, the manifest merger may keep the library's
+          # android:resource reference, pointing to the plugin's file_paths.xml
+          # instead of ours.  Strip any existing <provider> block first (one-liner
+          # python3/perl — must stay on a single line to keep YAML literal block
+          # indentation valid), then inject our authoritative block.
+          python3 -c "import re; txt=open('$MANIFEST').read(); txt=re.sub(r'\s*<provider[^>]*FileProvider[^>]*>.*?</provider>','',txt,flags=re.DOTALL); open('$MANIFEST','w').write(txt)" 2>/dev/null || perl -i -0pe 's/\s*<provider[^>]*FileProvider[^>]*>.*?<\/provider>//gs' "$MANIFEST" 2>/dev/null || true
 
-            sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true"\n            tools:replace="android:authorities,android:exported,android:grantUriPermissions">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths"\n                tools:replace="android:resource" />\n        </provider>\n    </application>|' "$MANIFEST"
-            echo "FileProvider (with tools:replace) injected"
+          # Inject our authoritative FileProvider block with tools:replace.
+          sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true"\n            tools:replace="android:authorities,android:exported,android:grantUriPermissions">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths"\n                tools:replace="android:resource" />\n        </provider>\n    </application>|' "$MANIFEST"
+          echo "FileProvider (with tools:replace) injected"
 
-            echo "=== Manifest: FileProvider + permissions ==="
-            grep -E "WRITE_EXTERNAL|FileProvider|tools:replace" "$MANIFEST" || echo "WARNING: expected entries not found"
+          # ── 4. Verify ─────────────────────────────────────────────────────────
+          echo "=== Manifest: FileProvider + permissions ==="
+          grep -E "WRITE_EXTERNAL|FileProvider|tools:replace" "$MANIFEST" || echo "WARNING: expected entries not found"
 
-            # ── 4. file_provider_paths.xml ────────────────────────────────────────
-            mkdir -p "$RES_XML"
-            printf '<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <cache-path name="cache" path="." />\n    <files-path name="files" path="." />\n    <external-cache-path name="external_cache" path="." />\n    <external-files-path name="external_files" path="." />\n    <external-path name="external_download" path="Download/StormPOS/" />\n</paths>\n' > "$RES_XML/file_provider_paths.xml"
-            echo "file_provider_paths.xml written:"
-            cat "$RES_XML/file_provider_paths.xml"
+          # ── 5. file_provider_paths.xml ────────────────────────────────────────
+          # Covers every directory Tauri can write to on Android.
+          # NOTE: use printf (not a heredoc) — heredocs require unindented EOF
+          # markers which break YAML literal-block indentation parsing.
+          mkdir -p "$RES_XML"
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <cache-path name="cache" path="." />\n    <files-path name="files" path="." />\n    <external-cache-path name="external_cache" path="." />\n    <external-files-path name="external_files" path="." />\n    <external-path name="external_download" path="Download/StormPOS/" />\n</paths>\n' > "$RES_XML/file_provider_paths.xml"
+          echo "file_provider_paths.xml written:"
+          cat "$RES_XML/file_provider_paths.xml"
 
-        - name: Build Android AAB (release)
-          env:
-            ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-            ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-          run: npx tauri android build
+      - name: Build Android AAB (release)
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+        run: npx tauri android build
 
-        - name: Sign AAB
-          env:
-            ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-            ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-            ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-            ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          run: |
-            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > release.jks
+      - name: Sign AAB
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > release.jks
 
-            AAB=$(find src-tauri/gen/android/app/build/outputs/bundle -name "*.aab" | head -1)
-            echo "Found AAB: $AAB"
+          AAB=$(find src-tauri/gen/android/app/build/outputs/bundle -name "*.aab" | head -1)
+          echo "Found AAB: $AAB"
 
-            jarsigner -verbose \
-              -sigalg SHA256withRSA \
-              -digestalg SHA-256 \
-              -keystore release.jks \
-              -storepass "$ANDROID_KEYSTORE_PASSWORD" \
-              -keypass "$ANDROID_KEY_PASSWORD" \
-              "$AAB" "$ANDROID_KEY_ALIAS"
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore release.jks \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -keypass "$ANDROID_KEY_PASSWORD" \
+            "$AAB" "$ANDROID_KEY_ALIAS"
 
-            TAG="${{ github.ref_name }}"
-            VERSION="${TAG#v}"
-            SIGNED_AAB="StormPOS_${VERSION}.aab"
-            cp "$AAB" "$SIGNED_AAB"
-            echo "SIGNED_AAB=$SIGNED_AAB" >> $GITHUB_ENV
+          # Rename for clarity
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+          SIGNED_AAB="StormPOS_${VERSION}.aab"
+          cp "$AAB" "$SIGNED_AAB"
+          echo "SIGNED_AAB=$SIGNED_AAB" >> $GITHUB_ENV
 
-            rm -f release.jks
-            echo "AAB signed: $SIGNED_AAB"
+          rm -f release.jks
+          echo "AAB signed: $SIGNED_AAB"
 
-        - name: Upload AAB to GitHub Release
-          env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            TAG="${{ github.ref_name }}"
-            gh release upload "$TAG" "$SIGNED_AAB" --clobber
-            echo "Done - Android AAB uploaded to release $TAG"
-  
+      - name: Upload AAB to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          gh release upload "$TAG" "$SIGNED_AAB" --clobber
+          echo "Done - Android AAB uploaded to release $TAG"
