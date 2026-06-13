@@ -9,13 +9,17 @@ import {
   insertPosOpenAccountSchema,
   insertPosInvoiceSchema,
   signupPosUserSchema,
-  insertPosCategorySchema
+  insertPosCategorySchema,
+  posInvoices,
+  posProducts
 } from "@shared/schema";
 import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail, sendUpsellSwitchEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import * as XLSX from "xlsx";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
 
@@ -97,6 +101,114 @@ setInterval(() => {
   const now = Date.now();
   for (const [k, v] of pdfTempStore) if (v.expires < now) pdfTempStore.delete(k);
 }, 5 * 60 * 1000);
+
+// Aggregate invoice line items by productId (handles duplicate product lines correctly)
+function aggregateItemsByProduct(items: any[]): Map<number, number> {
+  const map = new Map<number, number>();
+  for (const item of items) {
+    if (!item.productId) continue;
+    map.set(item.productId, (map.get(item.productId) ?? 0) + Number(item.quantity));
+  }
+  return map;
+}
+
+/**
+ * Atomically deduct stock for an invoice marked Sent.
+ * Uses a DB transaction + conditional update to prevent double-deduction under concurrency.
+ * Returns an error string if stock is insufficient, or null on success / safe no-op.
+ */
+async function deductInvoiceStock(
+  invoiceId: number,
+  items: any[],
+  userId: number,
+  extraUpdates: Record<string, any> = {}
+): Promise<{ invoice?: any; error?: string }> {
+  return db.transaction(async (tx) => {
+    // Atomically claim the deduction slot: only proceeds if stock_deducted is still false
+    const [claimed] = await tx
+      .update(posInvoices)
+      .set({ stockDeducted: true, ...extraUpdates })
+      .where(and(eq(posInvoices.id, invoiceId), eq(posInvoices.stockDeducted, false)))
+      .returning();
+
+    if (!claimed) {
+      // Concurrent request already deducted — safe no-op, return current invoice
+      const [current] = await tx.select().from(posInvoices).where(eq(posInvoices.id, invoiceId));
+      return { invoice: current };
+    }
+
+    // Aggregate quantities per product
+    const needed = aggregateItemsByProduct(items);
+    if (needed.size === 0) return { invoice: claimed };
+
+    // Fetch relevant products within the transaction
+    const productRows = await tx.select().from(posProducts).where(eq(posProducts.userId, userId));
+    const productMap = new Map(productRows.map(p => [p.id, p]));
+
+    // Check stock sufficiency across aggregated quantities
+    const shortfalls: string[] = [];
+    for (const [pid, qty] of needed) {
+      const p = productMap.get(pid);
+      if (p && p.quantity - qty < 0) {
+        shortfalls.push(`${p.name} (available: ${p.quantity}, needed: ${qty})`);
+      }
+    }
+    if (shortfalls.length > 0) {
+      // Throw to trigger rollback — reverting the stock_deducted = true update above
+      throw new Error(`STOCK_SHORTFALL:${shortfalls.join('; ')}`);
+    }
+
+    // Deduct aggregated quantities
+    for (const [pid, qty] of needed) {
+      const p = productMap.get(pid);
+      if (p) {
+        await tx.update(posProducts).set({ quantity: p.quantity - qty }).where(eq(posProducts.id, pid));
+      }
+    }
+
+    return { invoice: claimed };
+  });
+}
+
+/**
+ * Atomically restore stock for an invoice being Cancelled.
+ */
+async function restoreInvoiceStock(
+  invoiceId: number,
+  items: any[],
+  userId: number,
+  extraUpdates: Record<string, any> = {}
+): Promise<any> {
+  return db.transaction(async (tx) => {
+    // Atomically claim the restore: only proceeds if stock_deducted is still true
+    const [claimed] = await tx
+      .update(posInvoices)
+      .set({ stockDeducted: false, ...extraUpdates })
+      .where(and(eq(posInvoices.id, invoiceId), eq(posInvoices.stockDeducted, true)))
+      .returning();
+
+    if (!claimed) {
+      // Already restored by concurrent request — return current invoice
+      const [current] = await tx.select().from(posInvoices).where(eq(posInvoices.id, invoiceId));
+      return current;
+    }
+
+    const needed = aggregateItemsByProduct(items);
+    if (needed.size === 0) return claimed;
+
+    const productRows = await tx.select().from(posProducts).where(eq(posProducts.userId, userId));
+    const productMap = new Map(productRows.map(p => [p.id, p]));
+
+    for (const [pid, qty] of needed) {
+      const p = productMap.get(pid);
+      if (p) {
+        await tx.update(posProducts).set({ quantity: p.quantity + qty }).where(eq(posProducts.id, pid));
+      }
+    }
+
+    return claimed;
+  });
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Temporary PDF storage endpoint (used by Android/Tauri to trigger native download)
@@ -1266,62 +1378,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (!updates.dueDate) {
         updates.dueDate = null;
       }
-      
+
       const currentInvoice = await storage.getPosInvoice(invoiceId);
       if (!currentInvoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
-      
+
       const newStatus = updates.status;
-      
-      // Deduct stock when an invoice (not quote) is first marked Sent via full update
+      const items = (updates.items ?? currentInvoice.items) as any[];
+
+      // Deduct stock when an invoice (not quote) transitions to Sent for the first time
       if (newStatus === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
-        const products = await storage.getPosProducts(currentInvoice.userId);
-        const items = (updates.items ?? currentInvoice.items) as any[];
-        
-        const shortfalls: string[] = [];
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product && product.quantity - item.quantity < 0) {
-            shortfalls.push(`${product.name} (available: ${product.quantity}, needed: ${item.quantity})`);
-          }
-        }
-        if (shortfalls.length > 0) {
-          return res.status(400).json({ message: `Insufficient stock: ${shortfalls.join('; ')}` });
-        }
-        
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product) {
-            await storage.updatePosProduct(product.id, { quantity: product.quantity - item.quantity });
-          }
-        }
-        updates.stockDeducted = true;
+        const { invoice: updatedInvoice, error } = await deductInvoiceStock(invoiceId, items, currentInvoice.userId, updates);
+        if (error) return res.status(400).json({ message: error });
+        return res.json(updatedInvoice);
       }
-      
+
       // Restore stock when cancelling an invoice whose stock was already deducted
       if (newStatus === 'cancelled' && currentInvoice.stockDeducted) {
-        const products = await storage.getPosProducts(currentInvoice.userId);
-        const items = (updates.items ?? currentInvoice.items) as any[];
-        
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product) {
-            await storage.updatePosProduct(product.id, { quantity: product.quantity + item.quantity });
-          }
-        }
-        updates.stockDeducted = false;
+        const updatedInvoice = await restoreInvoiceStock(invoiceId, (currentInvoice.items as any[]), currentInvoice.userId, updates);
+        return res.json(updatedInvoice);
       }
-      
+
+      // No stock change needed — plain update
       const invoice = await storage.updatePosInvoice(invoiceId, updates);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
       res.json(invoice);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.message?.startsWith('STOCK_SHORTFALL:')) {
+        return res.status(400).json({ message: error.message.replace('STOCK_SHORTFALL:', 'Insufficient stock: ') });
+      }
       console.error("Error updating invoice:", error);
       res.status(500).json({ message: "Failed to update invoice" });
     }
@@ -1331,66 +1419,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const invoiceId = parseInt(req.params.id);
       const { status } = req.body;
-      
+
       if (!status || !['draft', 'sent', 'paid', 'cancelled'].includes(status)) {
         return res.status(400).json({ message: "Invalid status value" });
       }
-      
+
       const currentInvoice = await storage.getPosInvoice(invoiceId);
       if (!currentInvoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
-      
-      const updates: any = { status };
-      
-      // Deduct stock when an invoice (not quote) is first marked Sent
+
+      // Deduct stock when an invoice (not quote) transitions to Sent for the first time
       if (status === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
-        const products = await storage.getPosProducts(currentInvoice.userId);
-        const items = currentInvoice.items as any[];
-        
-        const shortfalls: string[] = [];
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product && product.quantity - item.quantity < 0) {
-            shortfalls.push(`${product.name} (available: ${product.quantity}, needed: ${item.quantity})`);
-          }
-        }
-        if (shortfalls.length > 0) {
-          return res.status(400).json({ message: `Insufficient stock: ${shortfalls.join('; ')}` });
-        }
-        
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product) {
-            await storage.updatePosProduct(product.id, { quantity: product.quantity - item.quantity });
-          }
-        }
-        updates.stockDeducted = true;
+        const { invoice: updatedInvoice, error } = await deductInvoiceStock(
+          invoiceId, currentInvoice.items as any[], currentInvoice.userId, { status }
+        );
+        if (error) return res.status(400).json({ message: error });
+        return res.json(updatedInvoice);
       }
-      
+
       // Restore stock when cancelling an invoice whose stock was already deducted
       if (status === 'cancelled' && currentInvoice.stockDeducted) {
-        const products = await storage.getPosProducts(currentInvoice.userId);
-        const items = currentInvoice.items as any[];
-        
-        for (const item of items) {
-          if (!item.productId) continue;
-          const product = products.find(p => p.id === item.productId);
-          if (product) {
-            await storage.updatePosProduct(product.id, { quantity: product.quantity + item.quantity });
-          }
-        }
-        updates.stockDeducted = false;
+        const updatedInvoice = await restoreInvoiceStock(
+          invoiceId, currentInvoice.items as any[], currentInvoice.userId, { status }
+        );
+        return res.json(updatedInvoice);
       }
-      
-      const invoice = await storage.updatePosInvoice(invoiceId, updates);
+
+      // No stock change needed — plain status update
+      const invoice = await storage.updatePosInvoice(invoiceId, { status });
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
       res.json(invoice);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.message?.startsWith('STOCK_SHORTFALL:')) {
+        return res.status(400).json({ message: error.message.replace('STOCK_SHORTFALL:', 'Insufficient stock: ') });
+      }
       console.error("Error updating invoice status:", error);
       res.status(500).json({ message: "Failed to update invoice status" });
     }
