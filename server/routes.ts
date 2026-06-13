@@ -1315,7 +1315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pos/invoices", async (req, res) => {
     try {
-      const { userId, tax, ...invoiceData } = req.body; // Remove 'tax' as it's calculated, not stored
+      const { userId, tax, stockDeducted: _ignored, ...invoiceData } = req.body; // Remove server-only and calculated fields
       const userIdToUse = userId || 1;
 
       // Growth plan (flat): track 200 included invoices; flag overage (R0.50 per extra invoice)
@@ -1400,7 +1400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Restore stock when cancelling an invoice whose stock was already deducted
-      if (newStatus === 'cancelled' && currentInvoice.stockDeducted) {
+      if (newStatus === 'cancelled' && currentInvoice.documentType === 'invoice' && currentInvoice.stockDeducted) {
         const updatedInvoice = await restoreInvoiceStock(invoiceId, (currentInvoice.items as any[]), currentInvoice.userId, updates);
         return res.json(updatedInvoice);
       }
@@ -1444,7 +1444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Restore stock when cancelling an invoice whose stock was already deducted
-      if (status === 'cancelled' && currentInvoice.stockDeducted) {
+      if (status === 'cancelled' && currentInvoice.documentType === 'invoice' && currentInvoice.stockDeducted) {
         const updatedInvoice = await restoreInvoiceStock(
           invoiceId, currentInvoice.items as any[], currentInvoice.userId, { status }
         );

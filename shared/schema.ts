@@ -264,6 +264,7 @@ export const insertPosInvoiceSchema = createInsertSchema(posInvoices).omit({
   id: true,
   createdAt: true,
   createdDate: true,
+  stockDeducted: true, // server-controlled only — clients must never set this
 });
 
 export const insertPosSavedPaymentDetailsSchema = createInsertSchema(posSavedPaymentDetails).omit({
