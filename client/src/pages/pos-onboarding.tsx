@@ -31,22 +31,15 @@ const LABELS = {
       { id: "growth", label: "Growing Business",    sub: "R10,000 – R100,000 / month" },
       { id: "high",   label: "High-Volume",         sub: "R100,000+ / month or 10+ daily sales" },
     ],
-    s3MicroTitle:  "The perfect starting plan for you",
-    s3MicroBody:   "Your volume fits our pay-as-you-grow plan perfectly. Only pay when you sell — no monthly minimums!",
-    s3GrowthTitle: "Two great options — we suggest starting here",
-    s3GrowthBody:  "Your volume is in the sweet spot. Start pay-as-you-grow, then switch to flat when you're ready to save even more.",
-    s3HighTitle:   "You're a Power User — get the most for your money",
-    s3HighBody:    "No success tax. Unlimited transactions for one fixed cost per sale. Maximise your profit as you scale.",
-    pctLabel: "Pay-As-You-Grow",
-    pctRate:  "0.5% per sale",
-    pctPitch: "Only pay when you sell",
-    flatLabel: "Flat Rate",
-    flatRate:  "R1.00 per sale",
-    flatPitch: "Fixed fee, unlimited sales",
-    invoiceFee: "+ R0.50 per invoice / quote",
-    trialNote:  "7-day free trial on both plans — no credit card needed",
-    confirmPlan: "Confirm This Plan",
-    saving: "Saving...",
+    s3Title: "Choose the plan that fits your business",
+    s3Sub: "Start free for 7 days — no credit card needed.",
+    tiers: [
+      { id: "starter", label: "Starter", price: "R299", period: "/month", desc: "Perfect for new and growing businesses.", features: ["Full POS terminal", "Up to 200 products", "50 invoices/month", "Customer directory", "Basic sales reports"] },
+      { id: "growth", label: "Growth", price: "R599", period: "/month", popular: true, desc: "For businesses ready to scale. Deeper insights, more tools.", features: ["Everything in Starter", "Unlimited products", "200 invoices/month", "Full analytics & PDF export", "Staff accounts (up to 5)"] },
+      { id: "scale", label: "Scale", price: "R999", period: "/month", desc: "For established businesses with multiple locations.", features: ["Everything in Growth", "Unlimited invoices", "Multi-location support", "Unlimited staff accounts", "Customer loyalty points"] },
+    ],
+    choosePlan: "Choose This Plan",
+    trialNote: "7-day free trial — no credit card needed",
     s4Title: "Complete these 2 steps to process your first sale!",
     s4Sub:   "Tick each step as you go — we'll celebrate when you're done.",
     checklist: [
@@ -102,22 +95,15 @@ const LABELS = {
       { id: "growth", label: "Groeiende Besigheid", sub: "R10,000 – R100,000 / maand" },
       { id: "high",   label: "Hoe Volume",          sub: "R100,000+ / maand of 10+ daaglikse verkope" },
     ],
-    s3MicroTitle:  "Die perfekte beginplan vir jou",
-    s3MicroBody:   "Jou volume pas perfek by ons betaal-soos-jy-groei-plan. Betaal slegs wanneer jy verkoop!",
-    s3GrowthTitle: "Twee goeie opsies - ons stel hierdie een voor",
-    s3GrowthBody:  "Jou volume is in die ideale reeks. Begin met betaal-soos-jy-groei, dan skakel oor na die vaste plan wanneer jy gereed is.",
-    s3HighTitle:   "Jy is 'n Kraggebruiker - kry die meeste vir jou geld",
-    s3HighBody:    "Geen sukses-belasting nie. Onbeperkte transaksies teen een vaste koste per verkoop.",
-    pctLabel: "Betaal-Soos-Jy-Groei",
-    pctRate:  "0.5% per verkoop",
-    pctPitch: "Betaal slegs wanneer jy verkoop",
-    flatLabel: "Vaste Tarief",
-    flatRate:  "R1.00 per verkoop",
-    flatPitch: "Vaste fooi, onbeperkte verkope",
-    invoiceFee: "+ R0.50 per faktuur / kwotasie",
-    trialNote:  "7-dag gratis proeftydperk op beide planne - geen kredietkaart nodig nie",
-    confirmPlan: "Bevestig Hierdie Plan",
-    saving: "Stoor...",
+    s3Title: "Kies die plan wat by jou besigheid pas",
+    s3Sub: "Begin gratis vir 7 dae — geen kredietkaart nodig nie.",
+    tiers: [
+      { id: "starter", label: "Starter", price: "R299", period: "/maand", desc: "Perfek vir nuwe en groeiende besighede.", features: ["Volledige POS-terminaal", "Tot 200 produkte", "50 fakture/maand", "Kliëntgids", "Basiese verkoopsverslae"] },
+      { id: "growth", label: "Growth", price: "R599", period: "/maand", popular: true, desc: "Vir besighede wat gereed is om te groei.", features: ["Alles in Starter", "Onbeperkte produkte", "200 fakture/maand", "Volledige analitika & PDF-uitvoer", "Personeelrekeninge (tot 5)"] },
+      { id: "scale", label: "Scale", price: "R999", period: "/maand", desc: "Vir gevestigde besighede met verskeie takke.", features: ["Alles in Growth", "Onbeperkte fakture", "Multi-tak ondersteuning", "Onbeperkte personeelrekeninge", "Kliëntlojaliteitspunte"] },
+    ],
+    choosePlan: "Kies Hierdie Plan",
+    trialNote: "7-dag gratis proeftydperk — geen kredietkaart nodig nie",
     s4Title: "Voltooi hierdie 2 stappe om jou eerste verkoop te verwerk!",
     s4Sub:   "Merk elke stap soos jy gaan - ons vier wanneer jy klaar is.",
     checklist: [
@@ -166,22 +152,11 @@ interface LabelSet {
   s2Title: string;
   s2Sub: string;
   volumes: ReadonlyArray<{ id: string; label: string; sub: string }>;
-  s3MicroTitle: string;
-  s3MicroBody: string;
-  s3GrowthTitle: string;
-  s3GrowthBody: string;
-  s3HighTitle: string;
-  s3HighBody: string;
-  pctLabel: string;
-  pctRate: string;
-  pctPitch: string;
-  flatLabel: string;
-  flatRate: string;
-  flatPitch: string;
-  invoiceFee: string;
+  s3Title: string;
+  s3Sub: string;
+  tiers: ReadonlyArray<{ id: string; label: string; price: string; period: string; desc: string; features: ReadonlyArray<string>; popular?: boolean }>;
+  choosePlan: string;
   trialNote: string;
-  confirmPlan: string;
-  saving: string;
   s4Title: string;
   s4Sub: string;
   checklist: ReadonlyArray<{ id: string; label: string; sub: string }>;
@@ -399,51 +374,11 @@ function PaymentCheckIcon() {
   );
 }
 
-function SafeNetIcon() {
-  return (
-    <svg viewBox="0 0 72 52" fill="none" className="w-full h-full">
-      {/* Net strings horizontal */}
-      {([18, 28, 38] as number[]).map((y: number) => (
-        <line key={y} x1="8" y1={y} x2="64" y2={y} stroke={B} strokeWidth="2" opacity="0.7"/>
-      ))}
-      {/* Net strings vertical */}
-      {([14, 28, 42, 56] as number[]).map((x: number) => (
-        <line key={x} x1={x} y1="14" x2={x} y2="44" stroke={B} strokeWidth="2" opacity="0.7"/>
-      ))}
-      {/* Net border */}
-      <rect x="8" y="14" width="56" height="30" rx="2" fill="none" stroke="black" strokeWidth="2.5" {...SL}/>
-      {/* Person */}
-      <circle cx="36" cy="8" r="5" fill="white" stroke="black" strokeWidth="2"/>
-      <path d="M36 13 L36 26" stroke="black" strokeWidth="2" {...SL}/>
-      <path d="M30 16 L24 12" stroke="black" strokeWidth="2" {...SL}/>
-      <path d="M42 16 L48 12" stroke="black" strokeWidth="2" {...SL}/>
-      <path d="M31 26 L36 32 L41 26" fill="none" stroke="black" strokeWidth="2" {...SL}/>
-    </svg>
-  );
-}
-
-function RocketIcon() {
-  return (
-    <svg viewBox="0 0 72 52" fill="none" className="w-full h-full">
-      {/* Rocket body */}
-      <path d="M36 6 Q48 6 52 26 L52 40 Q44 46 36 46 Q28 46 20 40 L20 26 Q24 6 36 6Z" fill="white" stroke="black" strokeWidth="2.5" {...SL}/>
-      {/* Porthole - brand blue */}
-      <circle cx="36" cy="22" r="7" fill={B} stroke="black" strokeWidth="2"/>
-      <circle cx="36" cy="22" r="4" fill="white" opacity="0.25"/>
-      {/* Fins */}
-      <path d="M20 32 L10 44 L20 42Z" fill="white" stroke="black" strokeWidth="2" {...SL}/>
-      <path d="M52 32 L62 44 L52 42Z" fill="white" stroke="black" strokeWidth="2" {...SL}/>
-      {/* Flame trail - brand blue */}
-      <path d="M30 46 Q33 56 36 50 Q39 56 42 46" stroke={B} strokeWidth="3" fill="none" {...SL}/>
-      <path d="M33 48 Q35 54 36 51 Q37 54 39 48" stroke={B} strokeWidth="2" fill="none" {...SL} opacity="0.6"/>
-    </svg>
-  );
-}
 
 type Step = 0 | 1 | 2 | 3 | 4;
 type BizType = "retail" | "restaurant" | "service" | "wholesale";
 type Volume  = "micro" | "growth" | "high";
-type Plan    = "percent" | "flat";
+type Plan    = "starter" | "growth" | "scale";
 
 export default function PosOnboarding() {
   const [, setLocation] = useLocation();
@@ -464,7 +399,7 @@ export default function PosOnboarding() {
   const [step,           setStep]          = useState<Step>(0);
   const [bizType,        setBizType]       = useState<BizType | null>(null);
   const [volume,         setVolume]        = useState<Volume | null>(null);
-  const [selectedPlan,   setSelectedPlan]  = useState<Plan>("percent");
+  const [selectedPlan,   setSelectedPlan]  = useState<Plan>("starter");
   const [logoUploading,  setLogoUploading] = useState(false);
   const [logoPreview,    setLogoPreview]   = useState<string | null>(null);
   const [productFormOpen, setProductFormOpen] = useState(false);
@@ -526,9 +461,6 @@ export default function PosOnboarding() {
       })
       .catch(() => {});
   }, [user?.id]);
-
-  const recommendedPlan: Plan = volume === "high" ? "flat" : "percent";
-  const secondaryPlan:   Plan = recommendedPlan === "flat" ? "percent" : "flat";
 
   const markItemChecked = useCallback((id: string) => {
     setChecked(prev => {
@@ -630,14 +562,11 @@ export default function PosOnboarding() {
   }, [prodName, prodPrice, prodSku, prodStock, user, lang, markItemChecked, toast]);
 
   const handlePlanConfirm = () => {
-    setSelectedPlan(recommendedPlan);
     setStep(3);
   };
 
   const handleSkip = () => {
     if (step < 3) {
-      // Guest steps: jump to account creation with the recommended plan
-      setSelectedPlan(recommendedPlan ?? "percent");
       setStep(3);
       return;
     }
@@ -745,10 +674,8 @@ export default function PosOnboarding() {
           {step === 2 && (
             <Step3
               L={L}
-              volume={volume!}
-              recommendedPlan={recommendedPlan}
-              secondaryPlan={secondaryPlan}
-              isPending={false}
+              selected={selectedPlan}
+              onSelect={setSelectedPlan}
               onConfirm={handlePlanConfirm}
               onBack={() => setStep(1)}
               onSkip={handleSkip}
@@ -935,103 +862,86 @@ function Step2({ L, selected, onSelect, onNext, onBack, onSkip }: {
   );
 }
 
-function PlanCard({
-  isRecommended,
-  plan,
-  rate,
-  pitch,
-  invoiceFee,
-  label,
-  L,
-}: {
-  isRecommended: boolean;
-  plan: Plan;
-  rate: string;
-  pitch: string;
-  invoiceFee: string;
-  label: string;
+function Step3({ L, selected, onSelect, onConfirm, onBack, onSkip }: {
   L: LabelSet;
-}) {
-  const Icon = isRecommended
-    ? (plan === "percent" ? SafeNetIcon : RocketIcon)
-    : null;
-
-  return (
-    <div className={`relative rounded-2xl border-2 p-5 transition-all ${
-      isRecommended
-        ? "border-[hsl(217,90%,50%)] bg-[hsl(217,90%,40%)]/15 shadow-xl shadow-blue-500/20"
-        : "border-white/10 bg-white/5"
-    }`}>
-      {isRecommended && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[hsl(217,90%,40%)] text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg shadow-blue-500/30">
-          {L.recommended}
-        </div>
-      )}
-      {Icon && (
-        <div className="flex justify-center mb-3">
-          <div className="w-20 h-14">
-            <Icon/>
-          </div>
-        </div>
-      )}
-      <div className="text-center">
-        <p className="text-white font-bold text-base mb-1">{label}</p>
-        <p className="text-[hsl(217,90%,60%)] text-2xl font-extrabold">{rate}</p>
-        <p className="text-gray-400 text-xs mt-1">{pitch}</p>
-        <p className="text-gray-500 text-xs mt-2">{invoiceFee}</p>
-      </div>
-    </div>
-  );
-}
-
-function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm, onBack, onSkip }: {
-  L: LabelSet;
-  volume: Volume;
-  recommendedPlan: Plan;
-  secondaryPlan: Plan;
-  isPending: boolean;
+  selected: Plan | null;
+  onSelect: (p: Plan) => void;
   onConfirm: () => void;
   onBack: () => void;
   onSkip: () => void;
 }) {
-  const title = volume === "micro" ? L.s3MicroTitle : volume === "growth" ? L.s3GrowthTitle : L.s3HighTitle;
-  const body  = volume === "micro" ? L.s3MicroBody  : volume === "growth" ? L.s3GrowthBody  : L.s3HighBody;
-
-  const planData = (p: Plan, recommended: boolean) => ({
-    plan: p,
-    isRecommended: recommended,
-    label:     p === "percent" ? L.pctLabel  : L.flatLabel,
-    rate:      p === "percent" ? L.pctRate   : L.flatRate,
-    pitch:     p === "percent" ? L.pctPitch  : L.flatPitch,
-    invoiceFee: L.invoiceFee,
-  });
-
   return (
     <div>
-      <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{title}</h1>
-        <p className="text-gray-400 text-sm max-w-md mx-auto">{body}</p>
+      <div className="text-center mb-7">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{L.s3Title}</h1>
+        <p className="text-gray-400 text-sm">{L.s3Sub}</p>
       </div>
 
-      <div className={`grid gap-4 mb-4 ${volume !== "high" ? "grid-cols-2" : "grid-cols-1 max-w-sm mx-auto"}`}>
-        <PlanCard {...planData(recommendedPlan, true)} L={L}/>
-        {volume !== "high" && <PlanCard {...planData(secondaryPlan, false)} L={L}/>}
+      <div className="grid md:grid-cols-3 gap-4 mb-5">
+        {L.tiers.map(tier => {
+          const isSelected = selected === tier.id;
+          const isGrowth = tier.id === "growth";
+          const isScale  = tier.id === "scale";
+          return (
+            <button
+              key={tier.id}
+              type="button"
+              onClick={() => onSelect(tier.id as Plan)}
+              className={`relative flex flex-col rounded-2xl border-2 p-5 text-left transition-all ${
+                isGrowth
+                  ? isSelected
+                    ? "border-white/50 bg-gradient-to-br from-[hsl(217,90%,36%)] to-[hsl(217,90%,50%)] ring-2 ring-white/25"
+                    : "border-[hsl(217,90%,50%)]/50 bg-gradient-to-br from-[hsl(217,90%,33%)] to-[hsl(217,90%,46%)] hover:border-white/30"
+                  : isScale
+                  ? isSelected
+                    ? "border-purple-400/80 bg-[hsl(270,50%,18%)]/70 ring-2 ring-purple-400/25"
+                    : "border-purple-500/30 bg-[hsl(270,50%,14%)]/50 hover:border-purple-400/50"
+                  : isSelected
+                  ? "border-[hsl(217,90%,55%)] bg-[hsl(217,90%,40%)]/15 ring-2 ring-[hsl(217,90%,50%)]/20"
+                  : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
+              }`}
+            >
+              {tier.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-[hsl(217,90%,40%)] text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap shadow">
+                  Popular
+                </div>
+              )}
+              {isSelected && (
+                <div className={`absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${isGrowth ? "bg-white" : isScale ? "bg-purple-500" : "bg-[hsl(217,90%,50%)]"}`}>
+                  <Check className={`w-3 h-3 ${isGrowth ? "text-[hsl(217,90%,40%)]" : "text-white"}`}/>
+                </div>
+              )}
+              <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isGrowth ? "text-white/60" : isScale ? "text-purple-400" : "text-[hsl(217,90%,55%)]"}`}>
+                {tier.label}
+              </div>
+              <div className={`text-2xl font-extrabold mb-1 ${isGrowth ? "text-white" : "text-white"}`}>
+                {tier.price}<span className={`text-xs font-normal ml-0.5 ${isGrowth ? "text-white/55" : "text-gray-400"}`}>{tier.period}</span>
+              </div>
+              <p className={`text-xs mb-3 leading-relaxed ${isGrowth ? "text-white/55" : "text-gray-400"}`}>{tier.desc}</p>
+              <ul className="space-y-1.5 flex-1">
+                {tier.features.map(f => (
+                  <li key={f} className="flex items-start gap-1.5 text-xs">
+                    <Check className={`w-3 h-3 mt-0.5 shrink-0 ${isGrowth ? "text-green-300" : isScale ? "text-purple-400" : "text-[hsl(217,90%,55%)]"}`}/>
+                    <span className={isGrowth ? "text-white/75" : "text-gray-300"}>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </button>
+          );
+        })}
       </div>
 
-      <p className="text-center text-xs text-gray-500 mb-6 flex items-center justify-center gap-1.5">
+      <p className="text-center text-xs text-gray-500 mb-5 flex items-center justify-center gap-1.5">
         <Shield className="w-3 h-3"/> {L.trialNote}
       </p>
 
       <div className="flex flex-col items-center gap-3">
         <Button
           onClick={onConfirm}
-          disabled={isPending}
-          className="w-full max-w-xs bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,57%)] text-white font-bold py-6 rounded-xl shadow-2xl shadow-blue-500/30 disabled:opacity-60"
+          disabled={!selected}
+          className="w-full max-w-xs bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,57%)] text-white font-bold py-6 rounded-xl shadow-2xl shadow-blue-500/30 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {isPending
-            ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin mr-2"/>{L.saving}</>
-            : <>{L.confirmPlan} <ArrowRight className="w-4 h-4 ml-1.5"/></>
-          }
+          {L.choosePlan} <ArrowRight className="w-4 h-4 ml-1.5"/>
         </Button>
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">
