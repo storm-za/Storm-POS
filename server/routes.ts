@@ -124,10 +124,11 @@ async function deductInvoiceStock(
   extraUpdates: Record<string, any> = {}
 ): Promise<{ invoice?: any; error?: string }> {
   return db.transaction(async (tx) => {
-    // Atomically claim the deduction slot: only proceeds if stock_deducted is still false
+    // Atomically claim the deduction slot: only proceeds if stock_deducted is still false.
+    // stockDeducted is placed last so no caller-supplied value can override it.
     const [claimed] = await tx
       .update(posInvoices)
-      .set({ stockDeducted: true, ...extraUpdates })
+      .set({ ...extraUpdates, stockDeducted: true })
       .where(and(eq(posInvoices.id, invoiceId), eq(posInvoices.stockDeducted, false)))
       .returning();
 
@@ -180,10 +181,11 @@ async function restoreInvoiceStock(
   extraUpdates: Record<string, any> = {}
 ): Promise<any> {
   return db.transaction(async (tx) => {
-    // Atomically claim the restore: only proceeds if stock_deducted is still true
+    // Atomically claim the restore: only proceeds if stock_deducted is still true.
+    // stockDeducted is placed last so no caller-supplied value can override it.
     const [claimed] = await tx
       .update(posInvoices)
-      .set({ stockDeducted: false, ...extraUpdates })
+      .set({ ...extraUpdates, stockDeducted: false })
       .where(and(eq(posInvoices.id, invoiceId), eq(posInvoices.stockDeducted, true)))
       .returning();
 
@@ -1383,6 +1385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!currentInvoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
+
+      // Never allow clients to directly control the stockDeducted flag
+      delete updates.stockDeducted;
 
       const newStatus = updates.status;
       const items = (updates.items ?? currentInvoice.items) as any[];
