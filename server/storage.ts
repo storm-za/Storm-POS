@@ -156,7 +156,7 @@ export interface IStorage {
   getMonthlyInvoiceCount(userId: number): Promise<number>;
   expireTrials(): Promise<number>;
   expireSubscriptions(): Promise<number>;
-  markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined>;
+  markUserPaid(userId: number, months?: number): Promise<PosUser | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -734,7 +734,7 @@ export class MemStorage implements IStorage {
     return 0;
   }
 
-  async markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined> {
+  async markUserPaid(userId: number, months?: number): Promise<PosUser | undefined> {
     return undefined;
   }
 
@@ -1417,7 +1417,7 @@ export class DatabaseStorage implements IStorage {
     const now = new Date();
     const expired = await db
       .update(posUsers)
-      .set({ paid: false, subscriptionStartDate: posUsers.paidUntil })
+      .set({ paid: false })
       .where(and(
         eq(posUsers.paid, true),
         sql`${posUsers.paidUntil} IS NOT NULL`,
@@ -1427,7 +1427,25 @@ export class DatabaseStorage implements IStorage {
     return expired.length;
   }
 
-  async markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined> {
+  async markUserPaid(userId: number, months: number = 1): Promise<PosUser | undefined> {
+    const [user] = await db.select().from(posUsers).where(eq(posUsers.id, userId));
+    if (!user) return undefined;
+    const anchor = (user as any).subscriptionStartDate
+      ? new Date((user as any).subscriptionStartDate)
+      : null;
+    let paidUntil: Date;
+    if (anchor) {
+      const anchorDay = anchor.getDate();
+      const now = new Date();
+      let candidate = new Date(now.getFullYear(), now.getMonth(), anchorDay);
+      if (candidate <= now) {
+        candidate = new Date(now.getFullYear(), now.getMonth() + 1, anchorDay);
+      }
+      paidUntil = new Date(candidate.getFullYear(), candidate.getMonth() + (months - 1), anchorDay);
+    } else {
+      const now = new Date();
+      paidUntil = new Date(now.getFullYear(), now.getMonth() + months, now.getDate());
+    }
     const [updated] = await db
       .update(posUsers)
       .set({ paid: true, paidUntil })

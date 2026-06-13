@@ -422,6 +422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           receiptSettings: user.receiptSettings,
           paymentOptionSelected: user.paymentOptionSelected,
           paymentPlan: user.paymentPlan,
+          subscriptionTier: (user as any).subscriptionTier ?? user.paymentPlan ?? 'starter',
           planSavingAmount: computePlanSavingAmount(user)
         }
       });
@@ -480,6 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           receiptSettings: updatedUser.receiptSettings,
           paymentOptionSelected: updatedUser.paymentOptionSelected,
           paymentPlan: updatedUser.paymentPlan,
+          subscriptionTier: (updatedUser as any).subscriptionTier ?? updatedUser.paymentPlan ?? 'starter',
           planSavingAmount: computePlanSavingAmount(updatedUser)
         }
       });
@@ -517,6 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           receiptSettings: updatedUser.receiptSettings,
           paymentOptionSelected: updatedUser.paymentOptionSelected,
           paymentPlan: updatedUser.paymentPlan,
+          subscriptionTier: (updatedUser as any).subscriptionTier ?? updatedUser.paymentPlan ?? 'starter',
           planSavingAmount: null
         }
       });
@@ -557,6 +560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           receiptSettings: updatedUser.receiptSettings,
           paymentOptionSelected: updatedUser.paymentOptionSelected,
           paymentPlan: updatedUser.paymentPlan,
+          subscriptionTier: (updatedUser as any).subscriptionTier ?? updatedUser.paymentPlan ?? 'starter',
           planSavingAmount: null
         }
       });
@@ -608,6 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           receiptSettings: user.receiptSettings,
           paymentOptionSelected: user.paymentOptionSelected,
           paymentPlan: user.paymentPlan,
+          subscriptionTier: (user as any).subscriptionTier ?? user.paymentPlan ?? 'starter',
           planSavingAmount: computePlanSavingAmount(user)
         }
       });
@@ -649,10 +654,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const userId = parseInt(req.params.id);
       const { months = 1 } = req.body;
-      const paidUntil = new Date(Date.now() + Number(months) * 30 * 24 * 60 * 60 * 1000);
-      const updatedUser = await storage.markUserPaid(userId, paidUntil);
+      const updatedUser = await storage.markUserPaid(userId, Number(months));
       if (!updatedUser) return res.status(404).json({ message: "User not found" });
-      console.log(`✅ Admin marked user ${userId} as paid until ${paidUntil.toISOString()}`);
+      const paidUntil = (updatedUser as any).paidUntil;
+      console.log(`✅ Admin marked user ${userId} as paid until ${paidUntil}`);
       res.json({ success: true, userId, paidUntil, user: updatedUser });
     } catch (error) {
       console.error("Admin mark-paid error:", error);
