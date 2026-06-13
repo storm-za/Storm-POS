@@ -1637,6 +1637,7 @@ export default function PosSystem() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/pos/invoices", currentUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/products", currentUser?.id] });
       setIsInvoiceDialogOpen(false);
       setEditingInvoice(null);
       setInvoiceItems([]);
