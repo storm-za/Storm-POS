@@ -1430,10 +1430,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertPosInvoiceSchema.parse(processedData);
       
       const invoice = await storage.createPosInvoice(validatedData);
-      
+
+      // Deduct stock immediately on invoice creation (not quotes)
+      if (invoice.documentType === 'invoice') {
+        const items = (invoice.items as any[]) ?? [];
+        const { error } = await deductInvoiceStock(invoice.id, items, userIdToUse);
+        if (error) {
+          // Roll back: delete the just-created invoice so stock state stays consistent
+          await storage.deletePosInvoice(invoice.id);
+          return res.status(400).json({ message: error });
+        }
+      }
+
       // Invoice fees (R0.50 per invoice) apply equally on all plans;
       // they are NOT tracked in currentUsage to keep the sales-fee upsell comparison clean.
-      
+
       res.json({ ...invoice, invoiceOverage });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1469,13 +1480,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newStatus = updates.status;
       const items = (updates.items ?? currentInvoice.items) as any[];
 
-      // Deduct stock when an invoice (not quote) transitions to Sent for the first time
-      if (newStatus === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
-        const { invoice: updatedInvoice, error } = await deductInvoiceStock(invoiceId, items, currentInvoice.userId, updates);
-        if (error) return res.status(400).json({ message: error });
-        return res.json(updatedInvoice);
-      }
-
       // Restore stock when cancelling an invoice whose stock was already deducted
       if (newStatus === 'cancelled' && currentInvoice.documentType === 'invoice' && currentInvoice.stockDeducted) {
         const updatedInvoice = await restoreInvoiceStock(invoiceId, (currentInvoice.items as any[]), currentInvoice.userId, updates);
@@ -1509,15 +1513,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentInvoice = await storage.getPosInvoice(invoiceId);
       if (!currentInvoice) {
         return res.status(404).json({ message: "Invoice not found" });
-      }
-
-      // Deduct stock when an invoice (not quote) transitions to Sent for the first time
-      if (status === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
-        const { invoice: updatedInvoice, error } = await deductInvoiceStock(
-          invoiceId, currentInvoice.items as any[], currentInvoice.userId, { status }
-        );
-        if (error) return res.status(400).json({ message: error });
-        return res.json(updatedInvoice);
       }
 
       // Restore stock when cancelling an invoice whose stock was already deducted
