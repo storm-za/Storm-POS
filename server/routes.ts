@@ -19,7 +19,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import * as XLSX from "xlsx";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 const scryptAsync = promisify(scrypt);
 
@@ -142,29 +142,29 @@ async function deductInvoiceStock(
     const needed = aggregateItemsByProduct(items);
     if (needed.size === 0) return { invoice: claimed };
 
-    // Fetch relevant products within the transaction
+    // Fetch product names and snapshot quantities for error messages (within tx)
     const productRows = await tx.select().from(posProducts).where(eq(posProducts.userId, userId));
     const productMap = new Map(productRows.map(p => [p.id, p]));
 
-    // Check stock sufficiency across aggregated quantities
+    // Atomic conditional decrements: quantity = quantity - needed WHERE quantity >= needed.
+    // If a concurrent transaction already decremented the same product, this WHERE fails
+    // and returns 0 rows, ensuring we never silently oversell.
     const shortfalls: string[] = [];
     for (const [pid, qty] of needed) {
       const p = productMap.get(pid);
-      if (p && p.quantity - qty < 0) {
+      if (!p) continue; // unlinked product — skip
+      const updated = await tx
+        .update(posProducts)
+        .set({ quantity: sql`quantity - ${qty}` })
+        .where(and(eq(posProducts.id, pid), sql`quantity >= ${qty}`))
+        .returning({ quantity: posProducts.quantity });
+      if (updated.length === 0) {
         shortfalls.push(`${p.name} (available: ${p.quantity}, needed: ${qty})`);
       }
     }
     if (shortfalls.length > 0) {
-      // Throw to trigger rollback — reverting the stock_deducted = true update above
+      // Throw to trigger full rollback — reverts stockDeducted flag and all product changes
       throw new Error(`STOCK_SHORTFALL:${shortfalls.join('; ')}`);
-    }
-
-    // Deduct aggregated quantities
-    for (const [pid, qty] of needed) {
-      const p = productMap.get(pid);
-      if (p) {
-        await tx.update(posProducts).set({ quantity: p.quantity - qty }).where(eq(posProducts.id, pid));
-      }
     }
 
     return { invoice: claimed };
