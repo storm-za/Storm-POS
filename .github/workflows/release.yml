@@ -6,8 +6,36 @@ on:
       - 'v*'
 
 jobs:
+  # ─── Step 1: Build frontend on Linux (reliable npm) ──────────────────────
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies and build frontend
+        run: |
+          npm install
+          npm run build
+          echo "Frontend built"
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 1
+
+  # ─── Step 2: Windows — Tauri build (no npm install) ──────────────────────
   build-windows:
     runs-on: windows-latest
+    needs: build-frontend
     permissions:
       contents: write
 
@@ -20,6 +48,12 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -29,13 +63,6 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-
-      - name: Install dependencies and build frontend
-        shell: pwsh
-        run: |
-          npm install
-          npm run build
-          Write-Host "Frontend built to dist/public"
 
       - name: Build Tauri app (signed)
         shell: pwsh
@@ -103,6 +130,7 @@ jobs:
           gh release upload $tag latest.json
           Write-Host "Done - Windows release $tag complete."
 
+  # ─── Step 3: Android — Tauri build (no npm install) ──────────────────────
   build-android:
     runs-on: ubuntu-latest
     needs: build-windows
@@ -117,6 +145,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Download frontend dist
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -141,12 +175,6 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-
-      - name: Install dependencies and build frontend
-        run: |
-          npm install
-          npm run build
-          echo "Frontend built to dist/public"
 
       - name: Install Tauri CLI and cargo-ndk
         run: |
@@ -177,45 +205,27 @@ jobs:
           MANIFEST="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
           RES_XML="src-tauri/gen/android/app/src/main/res/xml"
 
-          # ── 1. Add xmlns:tools namespace so tools:replace works ──────────────
-          # tools:replace tells the manifest merger to use OUR values for those
-          # attributes, overriding whatever any library (e.g. sharekit) declares.
           if ! grep -q 'xmlns:tools' "$MANIFEST"; then
             sed -i 's|xmlns:android="http://schemas.android.com/apk/res/android"|xmlns:android="http://schemas.android.com/apk/res/android"\n    xmlns:tools="http://schemas.android.com/tools"|' "$MANIFEST"
             echo "xmlns:tools namespace added"
           fi
 
-          # ── 2. WRITE_EXTERNAL_STORAGE (needed on Android < 10 for Downloads) ─
           if ! grep -q "WRITE_EXTERNAL_STORAGE" "$MANIFEST"; then
             sed -i 's|<application|<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <application|' "$MANIFEST"
             echo "WRITE_EXTERNAL_STORAGE injected"
           fi
 
-          # ── 3. FileProvider — always replace to avoid library-level conflicts ─
-          # tauri-plugin-sharekit ships its own FileProvider in its AAR manifest.
-          # Without tools:replace, the manifest merger may keep the library's
-          # android:resource reference, pointing to the plugin's file_paths.xml
-          # instead of ours.  Strip any existing <provider> block first (one-liner
-          # python3/perl — must stay on a single line to keep YAML literal block
-          # indentation valid), then inject our authoritative block.
           python3 -c "import re; txt=open('$MANIFEST').read(); txt=re.sub(r'\s*<provider[^>]*FileProvider[^>]*>.*?</provider>','',txt,flags=re.DOTALL); open('$MANIFEST','w').write(txt)" 2>/dev/null || perl -i -0pe 's/\s*<provider[^>]*FileProvider[^>]*>.*?<\/provider>//gs' "$MANIFEST" 2>/dev/null || true
 
-          # Inject our authoritative FileProvider block with tools:replace.
           sed -i 's|</application>|        <provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true"\n            tools:replace="android:authorities,android:exported,android:grantUriPermissions">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_provider_paths"\n                tools:replace="android:resource" />\n        </provider>\n    </application>|' "$MANIFEST"
-          echo "FileProvider (with tools:replace) injected"
+          echo "FileProvider injected"
 
-          # ── 4. Verify ─────────────────────────────────────────────────────────
           echo "=== Manifest: FileProvider + permissions ==="
           grep -E "WRITE_EXTERNAL|FileProvider|tools:replace" "$MANIFEST" || echo "WARNING: expected entries not found"
 
-          # ── 5. file_provider_paths.xml ────────────────────────────────────────
-          # Covers every directory Tauri can write to on Android.
-          # NOTE: use printf (not a heredoc) — heredocs require unindented EOF
-          # markers which break YAML literal-block indentation parsing.
           mkdir -p "$RES_XML"
           printf '<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <cache-path name="cache" path="." />\n    <files-path name="files" path="." />\n    <external-cache-path name="external_cache" path="." />\n    <external-files-path name="external_files" path="." />\n    <external-path name="external_download" path="Download/StormPOS/" />\n</paths>\n' > "$RES_XML/file_provider_paths.xml"
-          echo "file_provider_paths.xml written:"
-          cat "$RES_XML/file_provider_paths.xml"
+          echo "file_provider_paths.xml written"
 
       - name: Build Android AAB (release)
         env:
@@ -243,7 +253,6 @@ jobs:
             -keypass "$ANDROID_KEY_PASSWORD" \
             "$AAB" "$ANDROID_KEY_ALIAS"
 
-          # Rename for clarity
           TAG="${{ github.ref_name }}"
           VERSION="${TAG#v}"
           SIGNED_AAB="StormPOS_${VERSION}.aab"
