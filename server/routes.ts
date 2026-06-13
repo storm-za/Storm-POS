@@ -623,7 +623,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User notifies Storm of EFT payment — sends email to admin
-  app.post("/api/pos/notify-payment", async (req, res) => {
+  // Registered on both /api/pos/notify-payment and spec path /api/pos/payment-notification
+  async function handlePaymentNotification(req: any, res: any) {
     try {
       const { userId, userEmail, companyName, plan } = req.body;
       if (!userId || !userEmail) {
@@ -634,16 +635,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized" });
       }
       const planAmounts: Record<string, number> = { starter: 299, growth: 599, scale: 999 };
-      const monthlyAmount = planAmounts[plan || user.paymentPlan || 'starter'] ?? 299;
+      const tier = (user as any).subscriptionTier || user.paymentPlan || 'starter';
+      const monthlyAmount = planAmounts[plan || tier] ?? 299;
       const emailSent = await sendPaymentNotificationEmail(
-        Number(userId), userEmail, companyName || user.companyName, plan || user.paymentPlan || 'starter', monthlyAmount
+        Number(userId), userEmail, companyName || user.companyName, plan || tier, monthlyAmount
       );
       res.json({ success: true, emailSent, message: "Payment notification sent. Storm will activate your account within 24 hours once payment is verified." });
     } catch (error) {
       console.error("Payment notification error:", error);
       res.status(500).json({ message: "Failed to send payment notification" });
     }
-  });
+  }
+  app.post("/api/pos/notify-payment", handlePaymentNotification);
+  app.post("/api/pos/payment-notification", handlePaymentNotification);
 
   // Admin endpoint — mark a user as paid (requires STORM_ADMIN_SECRET header)
   app.put("/api/admin/pos/user/:id/mark-paid", async (req, res) => {

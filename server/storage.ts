@@ -821,9 +821,11 @@ export class DatabaseStorage implements IStorage {
 
   async createPosUser(insertUser: InsertPosUser): Promise<PosUser> {
     const hashedPassword = await hashPassword(insertUser.password);
+    const TIER_MAP: Record<string, string> = { percent: 'starter', flat: 'starter', starter: 'starter', growth: 'growth', scale: 'scale' };
+    const subscriptionTier = TIER_MAP[insertUser.paymentPlan ?? ''] ?? 'starter';
     const [user] = await db
       .insert(posUsers)
-      .values({ ...insertUser, password: hashedPassword })
+      .values({ ...insertUser, password: hashedPassword, subscriptionTier } as any)
       .returning();
     return user;
   }
@@ -892,9 +894,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updatePosUserPaymentPlan(id: number, plan: string): Promise<PosUser | undefined> {
+    const TIER_MAP: Record<string, string> = { percent: 'starter', flat: 'starter', starter: 'starter', growth: 'growth', scale: 'scale' };
+    const subscriptionTier = TIER_MAP[plan] ?? 'starter';
     const [user] = await db
       .update(posUsers)
-      .set({ paymentPlan: plan, paymentOptionSelected: true })
+      .set({ paymentPlan: plan, paymentOptionSelected: true, subscriptionTier } as any)
       .where(eq(posUsers.id, id))
       .returning();
     return user || undefined;
@@ -1400,9 +1404,19 @@ export class DatabaseStorage implements IStorage {
   async expireTrials(): Promise<number> {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    // Backfill subscriptionTier for existing rows that still have legacy paymentPlan values
+    await db.execute(sql`
+      UPDATE pos_users
+      SET subscription_tier = CASE
+        WHEN payment_plan IN ('percent', 'flat') THEN 'starter'
+        WHEN payment_plan IN ('starter', 'growth', 'scale') THEN payment_plan
+        ELSE 'starter'
+      END
+      WHERE subscription_tier IS NULL AND payment_plan IS NOT NULL
+    `);
     const expired = await db
       .update(posUsers)
-      .set({ paid: false, subscriptionStartDate: sql`trial_start_date + interval '7 days'` })
+      .set({ paid: false, subscriptionStartDate: sql`trial_start_date + interval '7 days'` } as any)
       .where(and(
         eq(posUsers.paid, true),
         sql`${posUsers.trialStartDate} IS NOT NULL`,
@@ -1424,7 +1438,19 @@ export class DatabaseStorage implements IStorage {
         lte(posUsers.paidUntil, now)
       ))
       .returning({ id: posUsers.id });
-    return expired.length;
+    // Also expire users who have paid=true with NO paidUntil but an anchor date older than 30 days
+    // (covers manual DB edits that set paid=true without going through the admin endpoint)
+    const expiredNoPaidUntil = await db
+      .update(posUsers)
+      .set({ paid: false })
+      .where(and(
+        eq(posUsers.paid, true),
+        sql`${posUsers.paidUntil} IS NULL`,
+        sql`${posUsers.subscriptionStartDate} IS NOT NULL`,
+        sql`${posUsers.subscriptionStartDate} < NOW() - INTERVAL '30 days'`
+      ))
+      .returning({ id: posUsers.id });
+    return expired.length + expiredNoPaidUntil.length;
   }
 
   async markUserPaid(userId: number, months: number = 1): Promise<PosUser | undefined> {
