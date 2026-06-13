@@ -155,6 +155,7 @@ export const posInvoices = pgTable("pos_invoices", {
   showBusinessInfo: boolean("show_business_info").notNull().default(true),
   customFieldValues: jsonb("custom_field_values"), // { cf_id: value, vis_fieldName: boolean }
   staffAccountId: integer("staff_account_id").references(() => posStaffAccounts.id),
+  stockDeducted: boolean("stock_deducted").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

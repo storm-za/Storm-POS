@@ -1266,6 +1266,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (!updates.dueDate) {
         updates.dueDate = null;
       }
+      
+      const currentInvoice = await storage.getPosInvoice(invoiceId);
+      if (!currentInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      const newStatus = updates.status;
+      
+      // Deduct stock when an invoice (not quote) is first marked Sent via full update
+      if (newStatus === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
+        const products = await storage.getPosProducts(currentInvoice.userId);
+        const items = (updates.items ?? currentInvoice.items) as any[];
+        
+        const shortfalls: string[] = [];
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product && product.quantity - item.quantity < 0) {
+            shortfalls.push(`${product.name} (available: ${product.quantity}, needed: ${item.quantity})`);
+          }
+        }
+        if (shortfalls.length > 0) {
+          return res.status(400).json({ message: `Insufficient stock: ${shortfalls.join('; ')}` });
+        }
+        
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product) {
+            await storage.updatePosProduct(product.id, { quantity: product.quantity - item.quantity });
+          }
+        }
+        updates.stockDeducted = true;
+      }
+      
+      // Restore stock when cancelling an invoice whose stock was already deducted
+      if (newStatus === 'cancelled' && currentInvoice.stockDeducted) {
+        const products = await storage.getPosProducts(currentInvoice.userId);
+        const items = (updates.items ?? currentInvoice.items) as any[];
+        
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product) {
+            await storage.updatePosProduct(product.id, { quantity: product.quantity + item.quantity });
+          }
+        }
+        updates.stockDeducted = false;
+      }
+      
       const invoice = await storage.updatePosInvoice(invoiceId, updates);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
@@ -1286,7 +1336,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid status value" });
       }
       
-      const invoice = await storage.updatePosInvoice(invoiceId, { status });
+      const currentInvoice = await storage.getPosInvoice(invoiceId);
+      if (!currentInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      const updates: any = { status };
+      
+      // Deduct stock when an invoice (not quote) is first marked Sent
+      if (status === 'sent' && currentInvoice.documentType === 'invoice' && !currentInvoice.stockDeducted) {
+        const products = await storage.getPosProducts(currentInvoice.userId);
+        const items = currentInvoice.items as any[];
+        
+        const shortfalls: string[] = [];
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product && product.quantity - item.quantity < 0) {
+            shortfalls.push(`${product.name} (available: ${product.quantity}, needed: ${item.quantity})`);
+          }
+        }
+        if (shortfalls.length > 0) {
+          return res.status(400).json({ message: `Insufficient stock: ${shortfalls.join('; ')}` });
+        }
+        
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product) {
+            await storage.updatePosProduct(product.id, { quantity: product.quantity - item.quantity });
+          }
+        }
+        updates.stockDeducted = true;
+      }
+      
+      // Restore stock when cancelling an invoice whose stock was already deducted
+      if (status === 'cancelled' && currentInvoice.stockDeducted) {
+        const products = await storage.getPosProducts(currentInvoice.userId);
+        const items = currentInvoice.items as any[];
+        
+        for (const item of items) {
+          if (!item.productId) continue;
+          const product = products.find(p => p.id === item.productId);
+          if (product) {
+            await storage.updatePosProduct(product.id, { quantity: product.quantity + item.quantity });
+          }
+        }
+        updates.stockDeducted = false;
+      }
+      
+      const invoice = await storage.updatePosInvoice(invoiceId, updates);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
