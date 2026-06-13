@@ -242,7 +242,7 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-        run: npx tauri android build
+        run: tauri android build
 
       - name: Sign AAB
         env:
