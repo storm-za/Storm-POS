@@ -289,8 +289,8 @@ export default function PosLogin() {
           {!isAutoLoading && (
             <p className="mt-7 text-center text-sm text-gray-500">
               No account yet?{" "}
-              <a href="/pos/signup" className="text-[hsl(217,90%,40%)] hover:underline font-medium">
-                Start your free trial
+              <a href="/pos/onboarding" className="text-[hsl(217,90%,40%)] hover:underline font-medium">
+                Start for free
               </a>
             </p>
           )}

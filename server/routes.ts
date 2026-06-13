@@ -324,7 +324,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validatedData,
         paid: true,
         companyLogo: null,
-        trialStartDate: new Date() // Start 7-day free trial
+        trialStartDate: new Date(), // Start 7-day free trial
+        ...(validatedData.paymentPlan ? { paymentPlan: validatedData.paymentPlan, paymentOptionSelected: true } : {}),
       });
       
       // Send welcome email

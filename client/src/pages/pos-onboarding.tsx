@@ -3,7 +3,6 @@ import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Check, ArrowRight, ArrowLeft, Sparkle as Sparkles, ShieldCheck as Shield, CaretRight as ChevronRight, Plus } from "@phosphor-icons/react";
 import { updatePageSEO } from "@/lib/seo";
@@ -12,7 +11,7 @@ const B = "hsl(217,90%,40%)";
 
 const LABELS = {
   en: {
-    step: (n: number) => `Step ${n} of 4`,
+    step: (n: number) => `Step ${n} of 5`,
     skip: "Skip for now",
     next: "Next",
     back: "Back",
@@ -69,9 +68,21 @@ const LABELS = {
     prodAdding: "Adding...",
     prodCancel: "Cancel",
     prodAlready: "Product already added",
+    s4AccountTitle: "Create your free account",
+    s4AccountSub: "7 days free — no credit card needed",
+    firstNameField: "First name",
+    lastNameField: "Last name",
+    emailField: "Email address",
+    passwordField: "Password",
+    companyNameField: "Company name",
+    langField: "Language / Taal",
+    createAccount: "Create Account & Continue",
+    creating: "Creating account...",
+    alreadyAccount: "Already have an account?",
+    signIn: "Sign in",
   },
   af: {
-    step: (n: number) => `Stap ${n} van 4`,
+    step: (n: number) => `Stap ${n} van 5`,
     skip: "Slaan oor vir nou",
     next: "Volgende",
     back: "Terug",
@@ -128,6 +139,18 @@ const LABELS = {
     prodAdding: "Byvoeg...",
     prodCancel: "Kanselleer",
     prodAlready: "Produk reeds bygevoeg",
+    s4AccountTitle: "Skep jou gratis rekening",
+    s4AccountSub: "7 dae gratis — geen kredietkaart nodig nie",
+    firstNameField: "Voornaam",
+    lastNameField: "Van",
+    emailField: "E-posadres",
+    passwordField: "Wagwoord",
+    companyNameField: "Maatskappynaam",
+    langField: "Taal / Language",
+    createAccount: "Skep Rekening & Gaan Voort",
+    creating: "Rekening skep...",
+    alreadyAccount: "Het jy reeds 'n rekening?",
+    signIn: "Teken aan",
   },
 } as const;
 
@@ -177,6 +200,18 @@ interface LabelSet {
   prodAdding: string;
   prodCancel: string;
   prodAlready: string;
+  s4AccountTitle: string;
+  s4AccountSub: string;
+  firstNameField: string;
+  lastNameField: string;
+  emailField: string;
+  passwordField: string;
+  companyNameField: string;
+  langField: string;
+  createAccount: string;
+  creating: string;
+  alreadyAccount: string;
+  signIn: string;
 }
 
 const SL = { strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -405,7 +440,7 @@ function RocketIcon() {
   );
 }
 
-type Step = 0 | 1 | 2 | 3;
+type Step = 0 | 1 | 2 | 3 | 4;
 type BizType = "retail" | "restaurant" | "service" | "wholesale";
 type Volume  = "micro" | "growth" | "high";
 type Plan    = "percent" | "flat";
@@ -415,15 +450,21 @@ export default function PosOnboarding() {
   const { toast } = useToast();
   const logoInputRef = useRef<HTMLInputElement>(null);
 
-  const user = (() => {
+  const [user, setUser] = useState<any>(() => {
     try { return JSON.parse(localStorage.getItem("posUser") ?? "null"); } catch { return null; }
-  })();
-  const lang: "en" | "af" = user?.preferredLanguage === "af" ? "af" : "en";
+  });
+  const [lang, setLang] = useState<"en" | "af">(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("posUser") ?? "null");
+      return u?.preferredLanguage === "af" ? "af" : "en";
+    } catch { return "en"; }
+  });
   const L: LabelSet = LABELS[lang];
 
   const [step,           setStep]          = useState<Step>(0);
   const [bizType,        setBizType]       = useState<BizType | null>(null);
   const [volume,         setVolume]        = useState<Volume | null>(null);
+  const [selectedPlan,   setSelectedPlan]  = useState<Plan>("percent");
   const [logoUploading,  setLogoUploading] = useState(false);
   const [logoPreview,    setLogoPreview]   = useState<string | null>(null);
   const [productFormOpen, setProductFormOpen] = useState(false);
@@ -432,6 +473,16 @@ export default function PosOnboarding() {
   const [prodSku,        setProdSku]       = useState("");
   const [prodStock,      setProdStock]     = useState("0");
   const [prodAdding,     setProdAdding]    = useState(false);
+
+  // Account creation form state (step 3)
+  const [acctFirstName,  setAcctFirstName]  = useState("");
+  const [acctLastName,   setAcctLastName]   = useState("");
+  const [acctEmail,      setAcctEmail]      = useState("");
+  const [acctPassword,   setAcctPassword]   = useState("");
+  const [acctCompany,    setAcctCompany]    = useState("");
+  const [acctShowPass,   setAcctShowPass]   = useState(false);
+  const [acctSubmitting, setAcctSubmitting] = useState(false);
+
   const [checked,        setChecked]       = useState<Set<string>>(() => {
     try {
       const raw = localStorage.getItem(`storm-checklist-${user?.id}`);
@@ -447,15 +498,15 @@ export default function PosOnboarding() {
       description: "Set up your Storm POS account in a few easy steps.",
       canonical: window.location.origin + "/pos/onboarding",
     });
-    if (!user) { setLocation("/pos/login"); return; }
-    if (user.paymentOptionSelected && user.tutorialCompleted) {
+    // Returning users: redirect to their appropriate destination
+    if (user?.paymentOptionSelected && user?.tutorialCompleted) {
       setLocation(user.paid
         ? (user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system")
         : "/pos/inactive");
       return;
     }
-    if (user.paymentOptionSelected && !user.tutorialCompleted) {
-      setStep(3);
+    if (user?.paymentOptionSelected && !user?.tutorialCompleted) {
+      setStep(4); // skip to setup checklist
     }
   }, []);
 
@@ -578,39 +629,52 @@ export default function PosOnboarding() {
     }
   }, [prodName, prodPrice, prodSku, prodStock, user, lang, markItemChecked, toast]);
 
-  const confirmMutation = useMutation({
-    mutationFn: async (plan: Plan) => {
-      const res = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan, userEmail: user.email });
-      return res.json();
-    },
-    onSuccess: (data) => {
-      localStorage.setItem("posUser", JSON.stringify(data.user));
-      setStep(3);
-    },
-    onError: (err: Error) => {
-      if (err.message.includes("already been selected")) {
-        const u = { ...user, paymentOptionSelected: true };
-        localStorage.setItem("posUser", JSON.stringify(u));
-        setStep(3);
-        return;
-      }
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    },
-  });
+  const handlePlanConfirm = () => {
+    setSelectedPlan(recommendedPlan);
+    setStep(3);
+  };
 
-  const handleSkip = async () => {
-    if (!user.paymentOptionSelected) {
-      try {
-        const res = await apiRequest("PUT", `/api/pos/user/${user.id}/payment-plan`, { plan: "percent", userEmail: user.email });
-        const data = await res.json();
-        localStorage.setItem("posUser", JSON.stringify(data.user));
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Could not save your plan. Please check your connection and try again.";
-        toast({ title: lang === "af" ? "Fout" : "Error", description: msg, variant: "destructive" });
-        return;
-      }
+  const handleSkip = () => {
+    if (step < 3) {
+      // Guest steps: jump to account creation with the recommended plan
+      setSelectedPlan(recommendedPlan ?? "percent");
+      setStep(3);
+      return;
     }
-    setLocation(user.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+    // Step 4 (setup checklist): go to POS
+    setLocation(user?.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
+  };
+
+  const handleAccountSubmit = async () => {
+    if (!acctFirstName.trim() || !acctLastName.trim() || !acctEmail.trim() || !acctPassword.trim() || !acctCompany.trim()) {
+      toast({ title: lang === "af" ? "Ontbrekende inligting" : "Missing information", description: lang === "af" ? "Vul asseblief alle verpligte velde in." : "Please fill in all required fields.", variant: "destructive" });
+      return;
+    }
+    setAcctSubmitting(true);
+    try {
+      const res = await apiRequest("POST", "/api/pos/signup", {
+        firstName: acctFirstName.trim(),
+        lastName: acctLastName.trim(),
+        email: acctEmail.trim(),
+        password: acctPassword,
+        companyName: acctCompany.trim(),
+        preferredLanguage: lang,
+        paymentPlan: selectedPlan,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: "Unknown error" }));
+        throw new Error(err.message || "Signup failed");
+      }
+      const data = await res.json();
+      localStorage.setItem("posUser", JSON.stringify(data.user));
+      localStorage.setItem("posLoginTimestamp", Date.now().toString());
+      setUser(data.user);
+      setStep(4);
+    } catch (err) {
+      toast({ title: lang === "af" ? "Fout" : "Error", description: err instanceof Error ? err.message : "Could not create account.", variant: "destructive" });
+    } finally {
+      setAcctSubmitting(false);
+    }
   };
 
   const goPOS = async () => {
@@ -623,8 +687,6 @@ export default function PosOnboarding() {
     }
     setLocation(user?.preferredLanguage === "af" ? "/pos/system/afrikaans" : "/pos/system");
   };
-
-  if (!user) return null;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[hsl(217,30%,8%)] via-[hsl(217,25%,12%)] to-[hsl(217,20%,10%)] flex flex-col items-center justify-start px-4 pt-8 pb-12 relative overflow-x-hidden">
@@ -646,7 +708,7 @@ export default function PosOnboarding() {
           <img src="/storm-logo.png" alt="Storm POS" className="h-8 w-auto block"/>
         </div>
         <div className="flex items-center gap-2">
-          {([0, 1, 2, 3] as Step[]).map(s => (
+          {([0, 1, 2, 3, 4] as Step[]).map(s => (
             <div
               key={s}
               className={`transition-all rounded-full ${
@@ -664,7 +726,7 @@ export default function PosOnboarding() {
         <motion.div
           className="h-full bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,60%)] rounded-full"
           initial={false}
-          animate={{ width: `${((step + 1) / 4) * 100}%` }}
+          animate={{ width: `${((step + 1) / 5) * 100}%` }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
         />
       </div>
@@ -686,13 +748,29 @@ export default function PosOnboarding() {
               volume={volume!}
               recommendedPlan={recommendedPlan}
               secondaryPlan={secondaryPlan}
-              isPending={confirmMutation.isPending}
-              onConfirm={() => confirmMutation.mutate(recommendedPlan)}
+              isPending={false}
+              onConfirm={handlePlanConfirm}
               onBack={() => setStep(1)}
               onSkip={handleSkip}
             />
           )}
           {step === 3 && (
+            <Step3Account
+              L={L}
+              lang={lang}
+              firstName={acctFirstName} setFirstName={setAcctFirstName}
+              lastName={acctLastName} setLastName={setAcctLastName}
+              email={acctEmail} setEmail={setAcctEmail}
+              password={acctPassword} setPassword={setAcctPassword}
+              companyName={acctCompany} setCompanyName={setAcctCompany}
+              showPassword={acctShowPass} setShowPassword={setAcctShowPass}
+              submitting={acctSubmitting}
+              onSubmit={handleAccountSubmit}
+              onBack={() => setStep(2)}
+              onLangChange={(l) => setLang(l)}
+            />
+          )}
+          {step === 4 && (
             <Step4
               L={L}
               checked={checked}
@@ -962,6 +1040,153 @@ function Step3({ L, volume, recommendedPlan, secondaryPlan, isPending, onConfirm
           <span className="text-gray-600">|</span>
           <button onClick={onSkip} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">{L.skip}</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function Step3Account({
+  L, lang, firstName, setFirstName, lastName, setLastName,
+  email, setEmail, password, setPassword, companyName, setCompanyName,
+  showPassword, setShowPassword, submitting, onSubmit, onBack, onLangChange,
+}: {
+  L: LabelSet;
+  lang: "en" | "af";
+  firstName: string; setFirstName: (v: string) => void;
+  lastName: string; setLastName: (v: string) => void;
+  email: string; setEmail: (v: string) => void;
+  password: string; setPassword: (v: string) => void;
+  companyName: string; setCompanyName: (v: string) => void;
+  showPassword: boolean; setShowPassword: (v: boolean) => void;
+  submitting: boolean;
+  onSubmit: () => void;
+  onBack: () => void;
+  onLangChange: (lang: "en" | "af") => void;
+}) {
+  return (
+    <div>
+      <div className="text-center mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{L.s4AccountTitle}</h1>
+        <p className="text-gray-400 text-sm">{L.s4AccountSub}</p>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+        {/* Language toggle */}
+        <div>
+          <label className="text-gray-400 text-xs mb-2 block">{L.langField}</label>
+          <div className="flex gap-2">
+            {(["en", "af"] as const).map(lc => (
+              <button
+                key={lc}
+                type="button"
+                onClick={() => onLangChange(lc)}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  lang === lc
+                    ? "bg-[hsl(217,90%,40%)] text-white"
+                    : "bg-white/8 text-gray-400 hover:bg-white/12 hover:text-gray-200"
+                }`}
+              >
+                {lc === "en" ? "🇿🇦 English" : "🇿🇦 Afrikaans"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Name row */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">{L.firstNameField} *</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              placeholder={L.firstNameField}
+              className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+            />
+          </div>
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">{L.lastNameField} *</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              placeholder={L.lastNameField}
+              className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+            />
+          </div>
+        </div>
+
+        {/* Company */}
+        <div>
+          <label className="text-gray-400 text-xs mb-1 block">{L.companyNameField} *</label>
+          <input
+            type="text"
+            value={companyName}
+            onChange={e => setCompanyName(e.target.value)}
+            placeholder={lang === "af" ? "Jou besigheidsnaam" : "Your business name"}
+            className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+          />
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="text-gray-400 text-xs mb-1 block">{L.emailField} *</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            className="w-full bg-black/30 border border-white/15 rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+          />
+        </div>
+
+        {/* Password */}
+        <div>
+          <label className="text-gray-400 text-xs mb-1 block">{L.passwordField} *</label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder={lang === "af" ? "Skep 'n wagwoord" : "Create a password"}
+              className="w-full bg-black/30 border border-white/15 rounded-lg px-3 pr-16 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[hsl(217,90%,50%)]/60"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors text-xs font-medium"
+            >
+              {showPassword ? (lang === "af" ? "Verberg" : "Hide") : (lang === "af" ? "Wys" : "Show")}
+            </button>
+          </div>
+        </div>
+
+        <p className="text-gray-500 text-xs leading-relaxed">
+          {lang === "af"
+            ? "Deur aan te meld stem jy in tot ons diensbepalings. Na 7 dae: Starter (R299/mo), Growth (R599/mo) of Scale (R999/mo)."
+            : "By signing up you agree to our terms of service. After 7 days: Starter (R299/mo), Growth (R599/mo), or Scale (R999/mo)."
+          }
+        </p>
+      </div>
+
+      <div className="flex flex-col items-center gap-3 mt-6">
+        <Button
+          onClick={onSubmit}
+          disabled={submitting}
+          className="w-full max-w-xs bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,57%)] text-white font-bold py-6 rounded-xl shadow-2xl shadow-blue-500/30 disabled:opacity-60"
+        >
+          {submitting
+            ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin mr-2"/>{L.creating}</>
+            : <>{L.createAccount} <ArrowRight className="w-4 h-4 ml-1.5"/></>
+          }
+        </Button>
+        <button onClick={onBack} className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1">
+          <ArrowLeft className="w-3 h-3"/>{L.back}
+        </button>
+        <p className="text-xs text-gray-500">
+          {L.alreadyAccount}{" "}
+          <a href="/pos/login" className="text-[hsl(217,90%,60%)] hover:underline">{L.signIn}</a>
+        </p>
       </div>
     </div>
   );

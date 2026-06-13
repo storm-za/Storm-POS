@@ -232,6 +232,8 @@ export const signupPosUserSchema = createInsertSchema(posUsers).pick({
   password: true,
   companyName: true,
   preferredLanguage: true,
+}).extend({
+  paymentPlan: z.enum(['percent', 'flat']).optional(),
 });
 
 export const insertPosCategorySchema = createInsertSchema(posCategories).omit({

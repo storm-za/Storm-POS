@@ -108,7 +108,7 @@ export default function POS() {
               <Link href="/pos/login">Log In</Link>
             </Button>
             <Button asChild size="sm" className="bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-semibold px-5 rounded-full border-0">
-              <Link href="/pos/signup"><Zap className="w-3.5 h-3.5 mr-1.5" />Free Trial</Link>
+              <Link href="/pos/onboarding"><Zap className="w-3.5 h-3.5 mr-1.5" />Start for Free</Link>
             </Button>
           </div>
 
@@ -161,7 +161,7 @@ export default function POS() {
                   <Link href="/pos/login">Log In to POS</Link>
                 </Button>
                 <Button asChild className="w-full bg-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,35%)] text-white font-bold rounded-full border-0">
-                  <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
+                  <Link href="/pos/onboarding"><Zap className="w-4 h-4 mr-2" />Start for Free</Link>
                 </Button>
               </div>
             </motion.aside>
@@ -195,7 +195,7 @@ export default function POS() {
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-gradient-to-r from-[hsl(217,90%,40%)] to-[hsl(217,90%,52%)] text-white hover:from-[hsl(217,90%,45%)] hover:to-[hsl(217,90%,57%)] font-bold px-8 py-6 text-base shadow-xl shadow-blue-500/25 hover:scale-105 transition-all border-0">
-                  <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start 7-Day Free Trial</Link>
+                  <Link href="/pos/onboarding"><Zap className="w-4 h-4 mr-2" />Start for Free</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="border-2 border-[hsl(217,90%,40%)] text-[hsl(217,90%,40%)] hover:bg-[hsl(217,90%,40%)]/5 font-semibold px-8 py-6 text-base hover:scale-105 transition-all">
                   <Link href="/pos/login">Log In to POS</Link>
@@ -392,7 +392,7 @@ export default function POS() {
                     ? 'bg-[hsl(217,90%,40%)] text-white hover:bg-[hsl(217,90%,35%)]'
                     : 'bg-white text-[hsl(217,90%,40%)] border border-[hsl(217,90%,40%)] hover:bg-blue-50'
                 }`}>
-                  <Link href="/pos/signup">Start for free →</Link>
+                  <Link href="/pos/onboarding">Start for free →</Link>
                 </Button>
               </div>
             </motion.div>
@@ -442,7 +442,7 @@ export default function POS() {
                     ? 'bg-white text-[hsl(217,90%,40%)] hover:bg-white/90'
                     : 'bg-transparent text-white border border-white/70 hover:bg-white/10'
                 }`}>
-                  <Link href="/pos/signup">Start for free →</Link>
+                  <Link href="/pos/onboarding">Start for free →</Link>
                 </Button>
               </div>
             </motion.div>
@@ -487,7 +487,7 @@ export default function POS() {
                     ? 'bg-purple-600 text-white hover:bg-purple-700'
                     : 'bg-white text-purple-600 border border-purple-500 hover:bg-purple-50'
                 }`}>
-                  <Link href="/pos/signup">Start for free →</Link>
+                  <Link href="/pos/onboarding">Start for free →</Link>
                 </Button>
               </div>
             </motion.div>
@@ -587,9 +587,9 @@ export default function POS() {
               <div className="grid grid-cols-3 border-t border-gray-100">
                 <div className="bg-gray-50 px-7 py-5" />
                 <div className="bg-[#0f172a] px-6 py-5 flex items-center justify-center">
-                  <Link href="/pos/signup">
+                  <Link href="/pos/onboarding">
                     <Button className="bg-white text-[#0f172a] hover:bg-gray-100 font-semibold text-sm px-5 h-9 rounded-lg shadow-none">
-                      Start free trial
+                      Start for Free
                     </Button>
                   </Link>
                 </div>
@@ -643,7 +643,7 @@ export default function POS() {
             <p className="text-white/80 mb-8 text-lg">7 days free. No credit card. No risk. Just results.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-[hsl(217,90%,40%)] hover:bg-gray-50 font-bold px-10 py-6 text-base hover:scale-105 transition-all border-0 shadow-xl">
-                <Link href="/pos/signup"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
+                <Link href="/pos/onboarding"><Zap className="w-4 h-4 mr-2" />Start Free Trial</Link>
               </Button>
               <a
                 href="https://github.com/storm-za/Storm-POS/releases/download/v1.5.34/Storm.POS_1.5.34_x64-setup.exe"
