@@ -182,16 +182,21 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
       - name: Install Tauri CLI and cargo-ndk
         run: |
-          npm install --no-save @tauri-apps/cli@latest
-          npm pkg set scripts.tauri="tauri"
+          pnpm add --global @tauri-apps/cli@latest
           cargo install cargo-ndk
 
       - name: Initialize Tauri Android project
         run: |
           rm -rf src-tauri/gen/android
-          npx tauri android init
+          tauri android init
 
       - name: Inject custom icons into generated Android project
         run: |
