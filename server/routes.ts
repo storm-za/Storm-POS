@@ -13,7 +13,7 @@ import {
   posInvoices,
   posProducts
 } from "@shared/schema";
-import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail, sendUpsellSwitchEmail } from "./email";
+import { sendContactSubmissionEmail, sendWelcomeEmail, sendWhatsNewEmail, sendPricingInterestEmail, sendUpsellSwitchEmail, sendPaymentNotificationEmail } from "./email";
 import { z } from "zod";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -92,6 +92,18 @@ setInterval(async () => {
     await storage.processScheduledDeletions();
   } catch (err) {
     console.error("❌ Error processing scheduled account deletions:", err);
+  }
+}, 60 * 60 * 1000);
+
+// Subscription lifecycle — expire trials and paid subscriptions every hour
+setInterval(async () => {
+  try {
+    const expiredTrials = await storage.expireTrials();
+    const expiredSubs = await storage.expireSubscriptions();
+    if (expiredTrials > 0) console.log(`📅 ${expiredTrials} trial(s) expired → billing started`);
+    if (expiredSubs > 0) console.log(`💳 ${expiredSubs} subscription(s) expired → grace period started`);
+  } catch (err) {
+    console.error("❌ Error in subscription lifecycle check:", err);
   }
 }, 60 * 60 * 1000);
 
@@ -353,6 +365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           paid: newUser.paid,
           tutorialCompleted: newUser.tutorialCompleted,
           trialStartDate: newUser.trialStartDate,
+          subscriptionStartDate: newUser.subscriptionStartDate,
+          paidUntil: newUser.paidUntil,
           preferredLanguage: newUser.preferredLanguage,
           selectedStaffAccountId: newUser.selectedStaffAccountId,
           receiptSettings: newUser.receiptSettings,
@@ -401,6 +415,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: user.companyName, 
           tutorialCompleted: user.tutorialCompleted,
           trialStartDate: user.trialStartDate,
+          subscriptionStartDate: (user as any).subscriptionStartDate,
+          paidUntil: (user as any).paidUntil,
           preferredLanguage: user.preferredLanguage,
           selectedStaffAccountId: user.selectedStaffAccountId,
           receiptSettings: user.receiptSettings,
@@ -457,6 +473,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: updatedUser.companyName,
           tutorialCompleted: updatedUser.tutorialCompleted,
           trialStartDate: updatedUser.trialStartDate,
+          subscriptionStartDate: (updatedUser as any).subscriptionStartDate,
+          paidUntil: (updatedUser as any).paidUntil,
           preferredLanguage: updatedUser.preferredLanguage,
           selectedStaffAccountId: updatedUser.selectedStaffAccountId,
           receiptSettings: updatedUser.receiptSettings,
@@ -492,6 +510,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: updatedUser.companyName,
           tutorialCompleted: updatedUser.tutorialCompleted,
           trialStartDate: updatedUser.trialStartDate,
+          subscriptionStartDate: (updatedUser as any).subscriptionStartDate,
+          paidUntil: (updatedUser as any).paidUntil,
           preferredLanguage: updatedUser.preferredLanguage,
           selectedStaffAccountId: updatedUser.selectedStaffAccountId,
           receiptSettings: updatedUser.receiptSettings,
@@ -530,6 +550,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: updatedUser.companyName,
           tutorialCompleted: updatedUser.tutorialCompleted,
           trialStartDate: updatedUser.trialStartDate,
+          subscriptionStartDate: (updatedUser as any).subscriptionStartDate,
+          paidUntil: (updatedUser as any).paidUntil,
           preferredLanguage: updatedUser.preferredLanguage,
           selectedStaffAccountId: updatedUser.selectedStaffAccountId,
           receiptSettings: updatedUser.receiptSettings,
@@ -579,6 +601,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: user.companyName,
           tutorialCompleted: user.tutorialCompleted,
           trialStartDate: user.trialStartDate,
+          subscriptionStartDate: (user as any).subscriptionStartDate,
+          paidUntil: (user as any).paidUntil,
           preferredLanguage: user.preferredLanguage,
           selectedStaffAccountId: user.selectedStaffAccountId,
           receiptSettings: user.receiptSettings,
@@ -590,6 +614,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Failed to get user" });
+    }
+  });
+
+  // User notifies Storm of EFT payment — sends email to admin
+  app.post("/api/pos/notify-payment", async (req, res) => {
+    try {
+      const { userId, userEmail, companyName, plan } = req.body;
+      if (!userId || !userEmail) {
+        return res.status(400).json({ message: "userId and userEmail are required" });
+      }
+      const user = await storage.getPosUser(Number(userId));
+      if (!user || user.email !== userEmail) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      const planAmounts: Record<string, number> = { starter: 299, growth: 599, scale: 999 };
+      const monthlyAmount = planAmounts[plan || user.paymentPlan || 'starter'] ?? 299;
+      const emailSent = await sendPaymentNotificationEmail(
+        Number(userId), userEmail, companyName || user.companyName, plan || user.paymentPlan || 'starter', monthlyAmount
+      );
+      res.json({ success: true, emailSent, message: "Payment notification sent. Storm will activate your account within 24 hours once payment is verified." });
+    } catch (error) {
+      console.error("Payment notification error:", error);
+      res.status(500).json({ message: "Failed to send payment notification" });
+    }
+  });
+
+  // Admin endpoint — mark a user as paid (requires STORM_ADMIN_SECRET header)
+  app.put("/api/admin/pos/user/:id/mark-paid", async (req, res) => {
+    try {
+      const adminSecret = req.headers['x-storm-admin-secret'];
+      if (!adminSecret || adminSecret !== process.env.STORM_ADMIN_SECRET) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const userId = parseInt(req.params.id);
+      const { months = 1 } = req.body;
+      const paidUntil = new Date(Date.now() + Number(months) * 30 * 24 * 60 * 60 * 1000);
+      const updatedUser = await storage.markUserPaid(userId, paidUntil);
+      if (!updatedUser) return res.status(404).json({ message: "User not found" });
+      console.log(`✅ Admin marked user ${userId} as paid until ${paidUntil.toISOString()}`);
+      res.json({ success: true, userId, paidUntil, user: updatedUser });
+    } catch (error) {
+      console.error("Admin mark-paid error:", error);
+      res.status(500).json({ message: "Failed to mark user as paid" });
     }
   });
 

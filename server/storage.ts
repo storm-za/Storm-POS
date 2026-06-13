@@ -154,6 +154,9 @@ export interface IStorage {
   scheduleAccountDeletion(userId: number): Promise<PosUser | undefined>;
   processScheduledDeletions(): Promise<void>;
   getMonthlyInvoiceCount(userId: number): Promise<number>;
+  expireTrials(): Promise<number>;
+  expireSubscriptions(): Promise<number>;
+  markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -720,6 +723,18 @@ export class MemStorage implements IStorage {
   }
 
   async switchPosUserToPercentPlan(userId: number): Promise<PosUser | undefined> {
+    return undefined;
+  }
+
+  async expireTrials(): Promise<number> {
+    return 0;
+  }
+
+  async expireSubscriptions(): Promise<number> {
+    return 0;
+  }
+
+  async markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined> {
     return undefined;
   }
 
@@ -1380,6 +1395,45 @@ export class DatabaseStorage implements IStorage {
         gte(posInvoices.createdDate, startOfMonth)
       ));
     return result[0]?.value ?? 0;
+  }
+
+  async expireTrials(): Promise<number> {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const expired = await db
+      .update(posUsers)
+      .set({ paid: false, subscriptionStartDate: sql`trial_start_date + interval '7 days'` })
+      .where(and(
+        eq(posUsers.paid, true),
+        sql`${posUsers.trialStartDate} IS NOT NULL`,
+        sql`${posUsers.trialStartDate} <= ${sevenDaysAgo}`,
+        sql`${posUsers.subscriptionStartDate} IS NULL`
+      ))
+      .returning({ id: posUsers.id });
+    return expired.length;
+  }
+
+  async expireSubscriptions(): Promise<number> {
+    const now = new Date();
+    const expired = await db
+      .update(posUsers)
+      .set({ paid: false, subscriptionStartDate: posUsers.paidUntil })
+      .where(and(
+        eq(posUsers.paid, true),
+        sql`${posUsers.paidUntil} IS NOT NULL`,
+        lte(posUsers.paidUntil, now)
+      ))
+      .returning({ id: posUsers.id });
+    return expired.length;
+  }
+
+  async markUserPaid(userId: number, paidUntil: Date): Promise<PosUser | undefined> {
+    const [updated] = await db
+      .update(posUsers)
+      .set({ paid: true, paidUntil })
+      .where(eq(posUsers.id, userId))
+      .returning();
+    return updated || undefined;
   }
 }
 

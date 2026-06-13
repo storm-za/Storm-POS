@@ -441,6 +441,95 @@ The Storm Team
   }
 }
 
+export async function sendPaymentNotificationEmail(
+  userId: number,
+  userEmail: string,
+  companyName: string,
+  plan: string,
+  monthlyAmount: number
+): Promise<boolean> {
+  const transporter = createTransporter();
+
+  const planLabel = plan === 'starter' ? 'Starter (R299/mo)' : plan === 'growth' ? 'Growth (R599/mo)' : plan === 'scale' ? 'Scale (R999/mo)' : plan;
+
+  const subject = `💰 Storm POS Payment Notification — ${companyName}`;
+  const bodyText = `
+A Storm POS customer has notified us that they have made an EFT payment.
+
+Customer Details:
+• User ID: ${userId}
+• Email: ${userEmail}
+• Company: ${companyName}
+• Plan: ${planLabel}
+• Monthly Amount: R${monthlyAmount.toFixed(2)}
+
+Please verify the payment and activate their account using:
+PUT /api/admin/pos/user/${userId}/mark-paid
+
+Banking Reference: STORM-${userId}-POS
+  `.trim();
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, hsl(217,90%,40%) 0%, hsl(217,90%,52%) 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
+    .info-box { background: #f9fafb; border-left: 4px solid hsl(217,90%,40%); padding: 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+    .footer { background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; border-radius: 0 0 10px 10px; font-size: 12px; }
+    .badge { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin:0;">💰 Payment Notification</h1>
+      <p style="margin:8px 0 0;opacity:0.85;">A customer has submitted a payment notice</p>
+    </div>
+    <div class="content">
+      <p>A Storm POS customer has notified us that they have made an EFT payment and is awaiting account activation.</p>
+      <div class="info-box">
+        <p style="margin:0 0 8px;"><strong>User ID:</strong> ${userId}</p>
+        <p style="margin:0 0 8px;"><strong>Email:</strong> <a href="mailto:${userEmail}">${userEmail}</a></p>
+        <p style="margin:0 0 8px;"><strong>Company:</strong> ${companyName}</p>
+        <p style="margin:0 0 8px;"><strong>Plan:</strong> <span class="badge">${planLabel}</span></p>
+        <p style="margin:0;"><strong>Amount:</strong> R${monthlyAmount.toFixed(2)}/month</p>
+      </div>
+      <p><strong>Banking Reference to verify:</strong> <code>STORM-${userId}-POS</code></p>
+      <p style="color:#6b7280;font-size:13px;">Once the payment is confirmed in your bank account, activate their account by calling the admin endpoint with the STORM_ADMIN_SECRET header.</p>
+    </div>
+    <div class="footer">Storm POS Payment Notification System — stormsoftware.co.za</div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  if (!transporter) {
+    console.log(`📧 Payment notification (no transporter): userId=${userId}, ${userEmail}, ${companyName}`);
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_USER,
+      replyTo: userEmail,
+      subject,
+      text: bodyText,
+      html: htmlContent,
+    });
+    console.log(`✅ Payment notification sent for user ${userId} (${userEmail})`);
+    return true;
+  } catch (error: any) {
+    console.error('❌ Failed to send payment notification:', error.message);
+    return false;
+  }
+}
+
 export async function sendPricingInterestEmail(email: string): Promise<boolean> {
   const transporter = createTransporter();
   

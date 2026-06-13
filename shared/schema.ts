@@ -48,6 +48,8 @@ export const posUsers = pgTable("pos_users", {
   upsellEmailSentMonth: text("upsell_email_sent_month"), // 'YYYY-MM' of month upsell email was sent
   pendingDeletion: boolean("pending_deletion").notNull().default(false), // Soft-delete: account scheduled for deletion
   deletionScheduledAt: timestamp("deletion_scheduled_at"), // When the 24h grace period expires
+  subscriptionStartDate: timestamp("subscription_start_date"), // When billing started (= trial end date)
+  paidUntil: timestamp("paid_until"), // When current payment period expires
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

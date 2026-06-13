@@ -37,6 +37,7 @@ import {
   Barcode, Image as ImageIcon, ArrowSquareOut as ExternalLink
 } from "@phosphor-icons/react";
 import stormLogo from "@assets/STORM__500_x_250_px_-removebg-preview_1762197388108.png";
+import { BillingGate } from "@/components/BillingGate";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { ReceiptCustomizerDialog } from "@/components/ReceiptCustomizerDialog";
@@ -10917,6 +10918,7 @@ ${paidInvoicesInRange.map((inv: any) =>
           </div>
         </DialogContent>
       </Dialog>
+      <BillingGate user={currentUser} lang="af" />
     </div>
   );
 }
